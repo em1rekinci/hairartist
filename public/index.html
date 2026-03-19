@@ -234,11 +234,11 @@
     </div>
     <div class="book-right">
       <div class="fr">
-        <div class="fg"><label class="fl">Ad Soyad</label><input class="fi" type="text" placeholder="Adınız"></div>
-        <div class="fg"><label class="fl">Telefon</label><input class="fi" type="tel" placeholder="+90 5xx xxx xx xx"></div>
+        <div class="fg"><label class="fl">Ad Soyad</label><input id="rez-ad" class="fi" type="text" placeholder="Adınız" required></div>
+        <div class="fg"><label class="fl">Telefon</label><input id="rez-tel" class="fi" type="tel" placeholder="+90 5xx xxx xx xx" required></div>
       </div>
       <div class="fg"><label class="fl">Hizmet</label>
-        <select class="fi">
+        <select id="rez-hizmet" class="fi">
           <option>Saç Kesimi</option>
           <option>Saç Bakımı</option>
           <option>Saç Boyama</option>
@@ -249,17 +249,18 @@
         </select>
       </div>
       <div class="fr">
-        <div class="fg"><label class="fl">Tarih</label><input class="fi" type="date"></div>
+        <div class="fg"><label class="fl">Tarih</label><input id="rez-tarih" class="fi" type="date" required></div>
         <div class="fg"><label class="fl">Saat</label>
-          <select class="fi">
+          <select id="rez-saat" class="fi">
             <option>09:00</option><option>10:00</option><option>11:00</option>
             <option>12:00</option><option>13:00</option><option>14:00</option>
             <option>15:00</option><option>16:00</option><option>17:00</option><option>18:00</option>
           </select>
         </div>
       </div>
-      <div class="fg"><label class="fl">Not (saç durumu, istek…)</label><input class="fi" type="text" placeholder="İsteğe bağlı"></div>
-      <button class="fsub">Rezervasyonu Gönder</button>
+      <div class="fg"><label class="fl">Not (saç durumu, istek…)</label><input id="rez-not" class="fi" type="text" placeholder="İsteğe bağlı"></div>
+      <div id="rez-mesaj" style="display:none;font-size:.78rem;padding:10px 14px;margin-bottom:10px;border-radius:2px"></div>
+      <button class="fsub" id="rez-btn" onclick="rezervasyonGonder()">Rezervasyonu Gönder</button>
     </div>
   </div>
 </section>
@@ -364,5 +365,65 @@ hamburger.addEventListener('click',()=>{
 
 
 </script>
+<script>
+async function rezervasyonGonder() {
+  const btn = document.getElementById('rez-btn');
+  const mesajDiv = document.getElementById('rez-mesaj');
+
+  const ad      = document.getElementById('rez-ad').value.trim();
+  const telefon = document.getElementById('rez-tel').value.trim();
+  const hizmet  = document.getElementById('rez-hizmet').value;
+  const tarih   = document.getElementById('rez-tarih').value;
+  const saat    = document.getElementById('rez-saat').value;
+  const not     = document.getElementById('rez-not').value.trim();
+
+  // Basit doğrulama
+  if (!ad || !telefon || !tarih) {
+    goster(mesajDiv, 'Lütfen ad, telefon ve tarih alanlarını doldurun.', 'hata');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Gönderiliyor…';
+
+  try {
+    // Railway'deki sunucu URL'ini buraya yazın
+    // Örnek: https://hairartist-rezervasyon.up.railway.app
+    const SUNUCU = window.location.origin; // Aynı sunucuda çalışıyorsa bu yeterli
+
+    const res = await fetch(`${SUNUCU}/rezervasyon`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ad, telefon, hizmet, tarih, saat, not })
+    });
+
+    const veri = await res.json();
+
+    if (veri.ok) {
+      goster(mesajDiv, '✓ ' + veri.mesaj, 'basari');
+      // Formu temizle
+      ['rez-ad','rez-tel','rez-tarih','rez-not'].forEach(id => document.getElementById(id).value = '');
+      btn.textContent = 'Gönderildi ✓';
+    } else {
+      goster(mesajDiv, '✗ ' + veri.mesaj, 'hata');
+      btn.disabled = false;
+      btn.textContent = 'Rezervasyonu Gönder';
+    }
+  } catch (e) {
+    goster(mesajDiv, '✗ Bağlantı hatası. Lütfen tekrar deneyin.', 'hata');
+    btn.disabled = false;
+    btn.textContent = 'Rezervasyonu Gönder';
+  }
+}
+
+function goster(el, metin, tip) {
+  el.textContent = metin;
+  el.style.display = 'block';
+  el.style.background = tip === 'basari' ? 'rgba(200,255,0,.1)' : 'rgba(255,80,80,.1)';
+  el.style.border     = tip === 'basari' ? '1px solid rgba(200,255,0,.3)' : '1px solid rgba(255,80,80,.3)';
+  el.style.color      = tip === 'basari' ? '#c8ff00' : '#ff6b6b';
+}
+</script>
+
 </body>
 </html>
