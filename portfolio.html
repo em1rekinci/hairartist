@@ -114,17 +114,38 @@ footer p{font-size:.62rem;letter-spacing:.12em;color:rgba(247,244,239,.25)}
 .foot-credit:hover{color:rgba(247,244,239,.5)}
 
 /* ── RESPONSIVE ── */
+/* ── HAMBURGEr MENÜ ── */
+.hamburger{display:none;flex-direction:column;justify-content:center;gap:5px;width:40px;height:40px;cursor:pointer;background:none;border:none;padding:4px;z-index:300}
+.hamburger span{display:block;width:24px;height:1.5px;background:var(--off);transition:all .3s;transform-origin:center}
+.hamburger.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
+.hamburger.open span:nth-child(2){opacity:0;transform:scaleX(0)}
+.hamburger.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
+.mobile-menu{display:none;position:fixed;inset:0;background:rgba(8,8,8,.98);z-index:250;flex-direction:column;align-items:center;justify-content:center;gap:0;opacity:0;transition:opacity .3s}
+.mobile-menu.open{opacity:1}
+.mobile-menu ul{list-style:none;text-align:center;padding:0}
+.mobile-menu ul li a{display:block;font-family:"Playfair Display",serif;font-size:clamp(1.8rem,7vw,2.8rem);font-weight:700;color:rgba(247,244,239,.5);text-decoration:none;padding:14px 0;transition:color .3s}
+.mobile-menu ul li a:hover{color:var(--off)}
+.mobile-menu .m-book{margin-top:36px;background:var(--off);color:var(--black);padding:16px 44px;font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;font-weight:600;text-decoration:none}
+
 @media(max-width:900px){
   nav{padding:0 24px}
+  nav ul{display:none}
+  .nav-right .nav-book{display:none}
+  .hamburger{display:flex}
   .page-header,.ba-section,.gallery-section,.filter-bar,.cta-strip{padding-left:24px;padding-right:24px}
   .ba-grid{grid-template-columns:1fr}
   .gal-grid{columns:2}
   .cta-strip{flex-direction:column;gap:32px;text-align:center}
-  footer{flex-direction:column;gap:10px;text-align:center}
+  footer{flex-direction:column;gap:10px;text-align:center;padding:24px}
+  .page-header{padding-top:110px;padding-bottom:48px}
 }
 @media(max-width:540px){
+  nav{padding:0 16px}
+  .page-header,.ba-section,.gallery-section,.filter-bar,.cta-strip{padding-left:16px;padding-right:16px}
   .gal-grid{columns:1}
-  nav ul{display:none}
+  .filter-bar{gap:6px}
+  .ftab{padding:8px 16px;font-size:.55rem}
+  footer{padding:24px 16px}
 }
 
 /* Fade-in on scroll */
@@ -147,9 +168,24 @@ footer p{font-size:.62rem;letter-spacing:.12em;color:rgba(247,244,239,.25)}
     <li><a href="index.html#contact">İletişim</a></li>
   </ul>
   <div class="nav-right">
-    <a href="index.html#book" class="nav-book">Randevu Al</a>
+    <a href="index.html#booking" class="nav-book">Randevu Al</a>
+    <button class="hamburger" id="hamburger" aria-label="Menü">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <ul>
+    <li><a href="index.html">Anasayfa</a></li>
+    <li><a href="index.html#about">Hakkımızda</a></li>
+    <li><a href="index.html#services">Hizmetler</a></li>
+    <li><a href="portfolio.html">Portfolyo</a></li>
+    <li><a href="index.html#contact">İletişim</a></li>
+  </ul>
+  <a href="index.html#booking" class="m-book">Randevu Al</a>
+</div>
 
 <!-- PAGE HEADER -->
 <div class="page-header">
@@ -424,6 +460,23 @@ const obs = new IntersectionObserver(entries => {
   entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }});
 }, { threshold: 0.12 });
 document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+/* ── HAMBURGER MENÜ ── */
+const hamburger = document.getElementById('hamburger');
+const mobileMenu = document.getElementById('mobileMenu');
+hamburger.addEventListener('click', () => {
+  const isOpen = hamburger.classList.toggle('open');
+  if(isOpen){
+    mobileMenu.style.display='flex';
+    setTimeout(()=>mobileMenu.classList.add('open'),10);
+    document.body.style.overflow='hidden';
+  } else {
+    hamburger.classList.remove('open');
+    mobileMenu.classList.remove('open');
+    mobileMenu.style.display='none';
+    document.body.style.overflow='';
+  }
+});
 </script>
 </body>
 </html>
