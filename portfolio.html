@@ -126,6 +126,8 @@ footer p{font-size:.62rem;letter-spacing:.12em;color:rgba(247,244,239,.25)}
 .mobile-menu ul li a{display:block;font-family:"Playfair Display",serif;font-size:clamp(1.8rem,7vw,2.8rem);font-weight:700;color:rgba(247,244,239,.5);text-decoration:none;padding:14px 0;transition:color .3s}
 .mobile-menu ul li a:hover{color:var(--off)}
 .mobile-menu .m-book{margin-top:36px;background:var(--off);color:var(--black);padding:16px 44px;font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;font-weight:600;text-decoration:none}
+.mobile-menu-close{position:absolute;top:24px;right:24px;background:none;border:none;color:var(--off);font-size:2rem;cursor:pointer;opacity:.5;transition:opacity .3s;line-height:1;padding:8px}
+.mobile-menu-close:hover{opacity:1}
 
 @media(max-width:900px){
   nav{padding:0 24px}
@@ -177,6 +179,7 @@ footer p{font-size:.62rem;letter-spacing:.12em;color:rgba(247,244,239,.25)}
 
 <!-- MOBILE MENU -->
 <div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-menu-close" id="mobileMenuClose">✕</button>
   <ul>
     <li><a href="index.html">Anasayfa</a></li>
     <li><a href="index.html#about">Hakkımızda</a></li>
@@ -464,6 +467,12 @@ document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 /* ── HAMBURGER MENÜ ── */
 const hamburger = document.getElementById('hamburger');
 const mobileMenu = document.getElementById('mobileMenu');
+function closeMobileMenu(){
+  hamburger.classList.remove('open');
+  mobileMenu.classList.remove('open');
+  mobileMenu.style.display='none';
+  document.body.style.overflow='';
+}
 hamburger.addEventListener('click', () => {
   const isOpen = hamburger.classList.toggle('open');
   if(isOpen){
@@ -471,12 +480,10 @@ hamburger.addEventListener('click', () => {
     setTimeout(()=>mobileMenu.classList.add('open'),10);
     document.body.style.overflow='hidden';
   } else {
-    hamburger.classList.remove('open');
-    mobileMenu.classList.remove('open');
-    mobileMenu.style.display='none';
-    document.body.style.overflow='';
+    closeMobileMenu();
   }
 });
+document.getElementById('mobileMenuClose').addEventListener('click', closeMobileMenu);
 </script>
 </body>
 </html>

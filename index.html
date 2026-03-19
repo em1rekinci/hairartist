@@ -194,6 +194,8 @@ footer p{font-size:.62rem;color:rgba(247,244,239,.2);letter-spacing:.08em}
 .mobile-menu ul li a{display:block;font-family:"Playfair Display",serif;font-size:clamp(1.8rem,7vw,2.8rem);font-weight:700;color:rgba(247,244,239,.5);text-decoration:none;padding:14px 0;transition:color .3s;letter-spacing:-.01em}
 .mobile-menu ul li a:hover{color:var(--off)}
 .mobile-menu .m-book{margin-top:36px;background:var(--off);color:var(--black);padding:16px 44px;font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;font-weight:600;text-decoration:none}
+.mobile-menu-close{position:absolute;top:24px;right:24px;background:none;border:none;color:var(--off);font-size:2rem;cursor:pointer;opacity:.5;transition:opacity .3s;line-height:1;padding:8px}
+.mobile-menu-close:hover{opacity:1}
 
 /* ── RESPONSIVE ── */
 @media(max-width:900px){
@@ -206,7 +208,7 @@ footer p{font-size:.62rem;color:rgba(247,244,239,.2);letter-spacing:.08em}
   /* Hero */
   .hero{padding:70px 24px 0;min-height:100svh}
   .hero-top-bar{padding:28px 24px}
-  .hero-model-wrap{left:30%;opacity:.6}
+  .hero-model-wrap{left:0;opacity:.25;pointer-events:none}
   .hero h1{font-size:clamp(3.2rem,12vw,5rem)}
   .hero-bottom{flex-direction:column;align-items:flex-start;gap:28px;margin-top:32px}
   .hero-desc{max-width:100%;font-size:.78rem}
@@ -251,7 +253,7 @@ footer p{font-size:.62rem;color:rgba(247,244,239,.2);letter-spacing:.08em}
   nav{padding:0 16px}
   .hero{padding:70px 16px 0}
   .hero-top-bar{padding:20px 16px}
-  .hero-model-wrap{display:none}
+  .hero-model-wrap{left:0;opacity:.18}
   .hero h1{font-size:clamp(2.8rem,14vw,4rem)}
   .hero-tagline-top{font-size:1rem}
   .services{padding:60px 16px}
@@ -351,6 +353,7 @@ footer p{font-size:.62rem;color:rgba(247,244,239,.2);letter-spacing:.08em}
 
 <!-- MOBILE MENU -->
 <div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-menu-close" onclick="closeMobileMenu()">✕</button>
   <ul>
     <li><a href="#" onclick="closeMobileMenu()">Anasayfa</a></li>
     <li><a href="#about" onclick="closeMobileMenu()">Hakkımızda</a></li>
