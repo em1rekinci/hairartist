@@ -176,9 +176,9 @@ function sayfaHTML(baslik, icerik, renk) {
   </body></html>`;
 }
 
-// ─── PORTFOLYO SAYFA YÖNLENDİRME
+// ─── PORTFOLYO TEMİZ URL
 app.get('/portfolio', (req, res) => {
-  res.redirect('/portfolio.html');
+  res.sendFile(path.join(__dirname, 'public', 'portfolio.html'));
 });
 
 // ─── PORTFOLYo FOTOĞRAF LİSTESİ ─────────────────────────────────────────────
