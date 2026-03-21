@@ -316,4 +316,155 @@ footer p{font-size:.62rem;color:rgba(247,244,239,.2);letter-spacing:.08em}
   height: 16px;
 }
 
+/* ===== SCROLL ANIMATIONS ===== */
+[data-anim] {
+  opacity: 0;
+  transform: translateY(36px);
+  transition: opacity .7s cubic-bezier(.4,0,.2,1), transform .7s cubic-bezier(.4,0,.2,1);
+}
+[data-anim].anim-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+[data-anim][data-delay="1"] { transition-delay: .1s }
+[data-anim][data-delay="2"] { transition-delay: .2s }
+[data-anim][data-delay="3"] { transition-delay: .3s }
+[data-anim][data-delay="4"] { transition-delay: .4s }
+[data-anim][data-delay="5"] { transition-delay: .5s }
+[data-anim][data-delay="6"] { transition-delay: .6s }
+
+/* ===== SCROLL INDICATOR (HERO) ===== */
+.scroll-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  opacity: .4;
+  transition: opacity .3s;
+  margin-top: 4px;
+}
+.scroll-indicator:hover { opacity: .8 }
+.scroll-indicator span {
+  font-size: .52rem;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--off);
+}
+.scroll-indicator .si-line {
+  width: 1px;
+  height: 40px;
+  background: var(--off);
+  position: relative;
+  overflow: hidden;
+}
+.scroll-indicator .si-line::after {
+  content: '';
+  position: absolute;
+  top: -100%;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--off);
+  animation: scrollLine 1.6s ease-in-out infinite;
+}
+@keyframes scrollLine {
+  0% { top: -100% }
+  100% { top: 100% }
+}
+
+/* ===== NAV SCROLL STATE ===== */
+nav.scrolled {
+  background: rgba(8,8,8,.99);
+  border-bottom-color: rgba(247,244,239,.13);
+  box-shadow: 0 4px 32px rgba(0,0,0,.4);
+}
+
+/* ===== WHATSAPP FLOATING ===== */
+.wa-float {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 999;
+  width: 54px;
+  height: 54px;
+  background: #25D366;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(37,211,102,.4);
+  text-decoration: none;
+  transition: transform .3s, box-shadow .3s;
+  animation: waPulse 3s ease-in-out infinite;
+}
+.wa-float:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 28px rgba(37,211,102,.6);
+  animation: none;
+}
+.wa-float svg { width: 28px; height: 28px; fill: #fff; }
+@keyframes waPulse {
+  0%,100% { box-shadow: 0 4px 20px rgba(37,211,102,.4) }
+  50% { box-shadow: 0 4px 32px rgba(37,211,102,.7), 0 0 0 8px rgba(37,211,102,.1) }
+}
+@media(max-width:540px){
+  .wa-float { bottom: 18px; right: 16px; width: 48px; height: 48px; }
+  .wa-float svg { width: 24px; height: 24px; }
+}
+
+/* ===== SAAT BUTTON GRID ===== */
+.time-grid {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 8px;
+  margin-top: 2px;
+}
+.time-btn {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--black);
+  padding: 10px 4px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: .72rem;
+  font-weight: 500;
+  letter-spacing: .04em;
+  cursor: pointer;
+  transition: all .2s;
+  text-align: center;
+}
+.time-btn:hover { border-color: var(--black); background: rgba(8,8,8,.05); }
+.time-btn.selected { background: var(--black); color: var(--off); border-color: var(--black); }
+.time-btn:disabled { opacity: .3; cursor: not-allowed; }
+
+/* ===== BUTTON RIPPLE / MICRO ===== */
+.nav-book, .hero-btn, .fsub, .svc-book-link {
+  position: relative;
+  overflow: hidden;
+}
+.nav-book::after, .hero-btn::after, .fsub::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0);
+  transition: background .25s;
+}
+.nav-book:hover::after, .hero-btn:hover::after { background: rgba(255,255,255,.08); }
+.fsub:hover::after { background: rgba(255,255,255,.06); }
+
+/* ===== AF-CARD HOVER ===== */
+.af-card {
+  transition: transform .3s cubic-bezier(.4,0,.2,1), box-shadow .3s;
+}
+.af-card:hover {
+  transform: translateY(-4px);
+}
+.af-card.af-dark:hover { box-shadow: 0 12px 40px rgba(0,0,0,.5); }
+.af-card.af-light:hover { box-shadow: 0 12px 32px rgba(0,0,0,.12); }
+
+/* ===== INPUT FOCUS GLOW ===== */
+.fi:focus {
+  border-color: var(--black);
+  box-shadow: 0 0 0 3px rgba(8,8,8,.08);
+}
 
