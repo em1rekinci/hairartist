@@ -320,19 +320,19 @@ footer p{font-size:.62rem;color:rgba(247,244,239,.2);letter-spacing:.08em}
 /* ===== SCROLL ANIMATIONS ===== */
 [data-anim] {
   opacity: 0;
-  transform: translateY(36px);
-  transition: opacity .7s cubic-bezier(.4,0,.2,1), transform .7s cubic-bezier(.4,0,.2,1);
+  transform: translateY(20px);
+  transition: opacity .35s cubic-bezier(.4,0,.2,1), transform .35s cubic-bezier(.4,0,.2,1);
 }
 [data-anim].anim-in {
   opacity: 1;
   transform: translateY(0);
 }
-[data-anim][data-delay="1"] { transition-delay: .1s }
-[data-anim][data-delay="2"] { transition-delay: .2s }
-[data-anim][data-delay="3"] { transition-delay: .3s }
-[data-anim][data-delay="4"] { transition-delay: .4s }
-[data-anim][data-delay="5"] { transition-delay: .5s }
-[data-anim][data-delay="6"] { transition-delay: .6s }
+[data-anim][data-delay="1"] { transition-delay: .05s }
+[data-anim][data-delay="2"] { transition-delay: .1s }
+[data-anim][data-delay="3"] { transition-delay: .15s }
+[data-anim][data-delay="4"] { transition-delay: .2s }
+[data-anim][data-delay="5"] { transition-delay: .25s }
+[data-anim][data-delay="6"] { transition-delay: .3s }
 
 /* ===== SCROLL INDICATOR (HERO) ===== */
 .scroll-indicator {
