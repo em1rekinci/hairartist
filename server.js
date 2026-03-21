@@ -176,6 +176,11 @@ function sayfaHTML(baslik, icerik, renk) {
   </body></html>`;
 }
 
+// ─── PORTFOLYO SAYFA YÖNLENDİRME
+app.get('/portfolio', (req, res) => {
+  res.redirect('/portfolio.html');
+});
+
 // ─── PORTFOLYo FOTOĞRAF LİSTESİ ─────────────────────────────────────────────
 const PORTFOLIO_DIR = path.join(__dirname, 'public', 'images', 'portfolio');
 const IMG_EXTS = ['.jpg', '.jpeg', '.png', '.webp'];
