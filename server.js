@@ -3,6 +3,7 @@ const cors    = require('cors');
 const fetch   = require('node-fetch');
 const path    = require('path');
 const crypto  = require('crypto');
+const fs      = require('fs');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -174,6 +175,51 @@ function sayfaHTML(baslik, icerik, renk) {
   <a href="/">← Anasayfaya Dön</a></div>
   </body></html>`;
 }
+
+// ─── PORTFOLYo FOTOĞRAF LİSTESİ ─────────────────────────────────────────────
+const PORTFOLIO_DIR = path.join(__dirname, 'public', 'images', 'portfolio');
+const IMG_EXTS = ['.jpg', '.jpeg', '.png', '.webp'];
+
+// Dosya adından kategori ve başlık çıkar
+// Format: kategori-sayi.jpg → ör: kesim-01.jpg, balayaj-03.webp
+const KATEGORİ_MAP = {
+  kesim:    'Saç Kesimi',
+  boya:     'Saç Boyama',
+  balayaj:  'Balayaj',
+  bakim:    'Bakım & Şekil',
+  gelin:    'Gelin Saçı',
+  sekil:    'Şekillendirme',
+};
+
+app.get('/api/portfolio', (req, res) => {
+  try {
+    if (!fs.existsSync(PORTFOLIO_DIR)) {
+      return res.json({ photos: [] });
+    }
+    const files = fs.readdirSync(PORTFOLIO_DIR)
+      .filter(f => IMG_EXTS.includes(path.extname(f).toLowerCase()))
+      .sort();
+
+    const photos = files.map(f => {
+      const base = path.basename(f, path.extname(f)); // ör: kesim-01
+      const parts = base.split('-');
+      const catKey = parts[0].toLowerCase();
+      const cat = KATEGORİ_MAP[catKey] || catKey;
+      return {
+        src: `/images/portfolio/${f}`,
+        cat: catKey,
+        catLabel: cat,
+        name: cat,
+        file: f
+      };
+    });
+
+    res.json({ photos });
+  } catch (e) {
+    console.error('Portfolyo hatası:', e);
+    res.status(500).json({ photos: [] });
+  }
+});
 
 // ─── SUNUCU BAŞLAT ────────────────────────────────────────────────────────────
 app.listen(PORT, () => console.log(`✓ Sunucu: http://localhost:${PORT}`));

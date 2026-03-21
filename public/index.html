@@ -18,7 +18,7 @@
     <span class="nav-logo-txt" style="display:none">HAIR ARTIST</span>
   </a>
   <ul>
-    <li><a href="#" class="active">Anasayfa</a></li>
+    <li><a href="#">Anasayfa</a></li>
     <li><a href="#about">Hakkımızda</a></li>
     <li><a href="#services">Hizmetler</a></li>
     <li><a href="portfolio.html">Portfolyo</a></li>
@@ -386,12 +386,33 @@ function selectTime(btn, time) {
   document.querySelectorAll('[data-anim]').forEach(el => obs.observe(el));
 })();
 
-// Nav scroll state
+// Nav scroll state + Scroll Spy
 (function(){
   const nav = document.querySelector('nav');
+  const navLinks = document.querySelectorAll('nav ul li a[href^="#"], nav ul li a[href="#"]');
+  const sections = [
+    { id: 'home',     el: document.getElementById('home')     || document.querySelector('.hero'), link: document.querySelector('nav ul li a[href="#"]') },
+    { id: 'about',    el: document.getElementById('about'),    link: document.querySelector('nav ul li a[href="#about"]') },
+    { id: 'services', el: document.getElementById('services'), link: document.querySelector('nav ul li a[href="#services"]') },
+    { id: 'contact',  el: document.getElementById('contact'),  link: document.querySelector('nav ul li a[href="#contact"]') },
+  ].filter(s => s.el && s.link);
+
+  function updateActive() {
+    const scrollY = window.scrollY + 80; // nav offset
+    let current = sections[0];
+    sections.forEach(s => {
+      if (s.el.offsetTop <= scrollY) current = s;
+    });
+    navLinks.forEach(a => a.classList.remove('active'));
+    if (current) current.link.classList.add('active');
+  }
+
   window.addEventListener('scroll', () => {
     nav.classList.toggle('scrolled', window.scrollY > 40);
+    updateActive();
   }, { passive: true });
+
+  updateActive();
 })();
 
 // Bugünkü günü vurgula

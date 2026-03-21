@@ -20,7 +20,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:70px;padding:0 56px;d
 nav ul{list-style:none;display:flex;gap:0}
 nav ul li a{color:rgba(247,244,239,.45);text-decoration:none;font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;transition:color .3s;padding:0 18px;line-height:70px;display:block}
 nav ul li a:hover{color:var(--off)}
-nav ul li a.active{color:var(--off);border-bottom:2px solid var(--off)}
+nav ul li a.active{color:var(--off);border-bottom:2px solid var(--off);transition:border-color .3s}
 .nav-right{display:flex;align-items:center;gap:20px}
 .nav-contact{color:rgba(247,244,239,.45);text-decoration:none;font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;transition:color .3s}
 .nav-contact:hover{color:var(--off)}

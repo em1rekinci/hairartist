@@ -303,54 +303,10 @@ footer p{font-size:.62rem;letter-spacing:.12em;color:rgba(247,244,239,.25)}
 <!-- GALLERY -->
 <div class="gallery-section">
   <span class="section-label" style="color:rgba(247,244,239,.3)">Galeri</span>
-  <div class="gal-grid" id="gal-grid">
-
-    <div class="gal-item reveal" data-cat="boya" data-src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=1200&q=85" data-caption="Saç Boyama">
-      <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&q=80" alt="Saç Boyama">
-      <div class="gal-overlay"><div class="gal-info"><span class="gal-cat">Saç Boyama</span><span class="gal-name">Renk Dönüşümü</span></div></div>
-    </div>
-
-    <div class="gal-item reveal" data-cat="kesim" data-src="https://images.unsplash.com/photo-1560869713-7d0a29430803?w=1200&q=85" data-caption="Saç Kesimi">
-      <img src="https://images.unsplash.com/photo-1560869713-7d0a29430803?w=600&q=80" alt="Saç Kesimi">
-      <div class="gal-overlay"><div class="gal-info"><span class="gal-cat">Saç Kesimi</span><span class="gal-name">Modern Kesim</span></div></div>
-    </div>
-
-    <div class="gal-item reveal" data-cat="balayaj" data-src="https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?w=1200&q=85" data-caption="Balayaj">
-      <img src="https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?w=600&q=80" alt="Balayaj">
-      <div class="gal-overlay"><div class="gal-info"><span class="gal-cat">Balayaj</span><span class="gal-name">Doğal Işıltı</span></div></div>
-    </div>
-
-    <div class="gal-item reveal" data-cat="bakim" data-src="https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=1200&q=85" data-caption="Bakım">
-      <img src="https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=600&q=80" alt="Bakım">
-      <div class="gal-overlay"><div class="gal-info"><span class="gal-cat">Bakım</span><span class="gal-name">Keratin Tedavisi</span></div></div>
-    </div>
-
-    <div class="gal-item reveal" data-cat="boya" data-src="https://images.unsplash.com/photo-1492106087820-71f1a00d2b11?w=1200&q=85" data-caption="Saç Boyama">
-      <img src="https://images.unsplash.com/photo-1492106087820-71f1a00d2b11?w=600&q=80" alt="Saç Boyama">
-      <div class="gal-overlay"><div class="gal-info"><span class="gal-cat">Saç Boyama</span><span class="gal-name">Koyu Ton</span></div></div>
-    </div>
-
-    <div class="gal-item reveal" data-cat="kesim" data-src="https://images.unsplash.com/photo-1562322140-8baeececf3df?w=1200&q=85" data-caption="Saç Kesimi">
-      <img src="https://images.unsplash.com/photo-1562322140-8baeececf3df?w=600&q=80" alt="Saç Kesimi">
-      <div class="gal-overlay"><div class="gal-info"><span class="gal-cat">Saç Kesimi</span><span class="gal-name">Klasik Kesim</span></div></div>
-    </div>
-
-    <div class="gal-item reveal" data-cat="balayaj" data-src="https://images.unsplash.com/photo-1500840216050-6ffa99d75160?w=1200&q=85" data-caption="Balayaj">
-      <img src="https://images.unsplash.com/photo-1500840216050-6ffa99d75160?w=600&q=80" alt="Balayaj">
-      <div class="gal-overlay"><div class="gal-info"><span class="gal-cat">Balayaj</span><span class="gal-name">Sombre Teknik</span></div></div>
-    </div>
-
-    <div class="gal-item reveal" data-cat="bakim" data-src="https://images.unsplash.com/photo-1526045612212-70caf35c14df?w=1200&q=85" data-caption="Bakım">
-      <img src="https://images.unsplash.com/photo-1526045612212-70caf35c14df?w=600&q=80" alt="Bakım">
-      <div class="gal-overlay"><div class="gal-info"><span class="gal-cat">Bakım</span><span class="gal-name">Saç Şekillendirme</span></div></div>
-    </div>
-
-    <div class="gal-item reveal" data-cat="boya" data-src="https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=1200&q=85" data-caption="Renk">
-      <img src="https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=600&q=80" alt="Renk">
-      <div class="gal-overlay"><div class="gal-info"><span class="gal-cat">Saç Boyama</span><span class="gal-name">Açık Ton Geçişi</span></div></div>
-    </div>
-
+  <div id="gal-empty" style="display:none;text-align:center;padding:60px 0;color:rgba(247,244,239,.25);font-size:.8rem;letter-spacing:.15em">
+    Henüz fotoğraf eklenmemiş.
   </div>
+  <div class="gal-grid" id="gal-grid"></div>
 </div>
 
 <!-- CTA -->
@@ -401,21 +357,19 @@ document.querySelectorAll('.ba-card').forEach(card => {
 /* ── FILTER ── */
 const ftabs = document.querySelectorAll('.ftab');
 const baCards = document.querySelectorAll('.ba-card');
-const galItems = document.querySelectorAll('.gal-item');
 
 ftabs.forEach(tab => {
   tab.addEventListener('click', () => {
     ftabs.forEach(t => t.classList.remove('active'));
     tab.classList.add('active');
     const f = tab.dataset.filter;
-    [...baCards, ...galItems].forEach(el => {
-      if(f === 'all' || el.dataset.cat === f) {
-        el.style.display = '';
-        el.style.opacity = '1';
-      } else {
-        el.style.display = 'none';
-      }
+    currentFilter = f;
+    // Before/After kartları
+    baCards.forEach(el => {
+      el.style.display = (f === 'all' || el.dataset.cat === f) ? '' : 'none';
     });
+    // Galeri dinamik render
+    renderGaleri(galList);
   });
 });
 
@@ -423,17 +377,13 @@ ftabs.forEach(tab => {
 const lb = document.getElementById('lightbox');
 const lbImg = document.getElementById('lb-img');
 const lbCaption = document.getElementById('lb-caption');
-let galList = [], lbIdx = 0;
+let lbList = [], lbIdx = 0;
 
-galItems.forEach((item, i) => {
-  galList.push({ src: item.dataset.src, caption: item.dataset.caption });
-  item.addEventListener('click', () => openLb(i));
-});
-
-function openLb(i) {
+function openLb(i, photos) {
+  if(photos) lbList = photos;
   lbIdx = i;
-  lbImg.src = galList[i].src;
-  lbCaption.textContent = galList[i].caption;
+  lbImg.src = lbList[i].src;
+  lbCaption.textContent = lbList[i].catLabel || lbList[i].caption || '';
   lb.classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -442,9 +392,9 @@ function closeLb() {
   document.body.style.overflow = '';
 }
 function navLb(dir) {
-  lbIdx = (lbIdx + dir + galList.length) % galList.length;
-  lbImg.src = galList[lbIdx].src;
-  lbCaption.textContent = galList[lbIdx].caption;
+  lbIdx = (lbIdx + dir + lbList.length) % lbList.length;
+  lbImg.src = lbList[lbIdx].src;
+  lbCaption.textContent = lbList[lbIdx].catLabel || lbList[lbIdx].caption || '';
 }
 
 document.getElementById('lb-close').addEventListener('click', closeLb);
@@ -457,6 +407,59 @@ document.addEventListener('keydown', e => {
   if(e.key === 'ArrowLeft') navLb(-1);
   if(e.key === 'ArrowRight') navLb(1);
 });
+
+/* ── GALERİ API'DEN YÜKLE ── */
+let galList = [];
+let currentFilter = 'all';
+
+async function galeriYukle() {
+  try {
+    const res = await fetch('/api/portfolio');
+    const data = await res.json();
+    const photos = data.photos || [];
+
+    const grid = document.getElementById('gal-grid');
+    const empty = document.getElementById('gal-empty');
+
+    if (photos.length === 0) {
+      empty.style.display = 'block';
+      return;
+    }
+
+    galList = photos;
+    renderGaleri(photos);
+  } catch(e) {
+    console.error('Galeri yükleme hatası:', e);
+  }
+}
+
+function renderGaleri(photos) {
+  const grid = document.getElementById('gal-grid');
+  const empty = document.getElementById('gal-empty');
+  const filtered = currentFilter === 'all' ? photos : photos.filter(p => p.cat === currentFilter);
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  grid.innerHTML = filtered.map((p, i) => `
+    <div class="gal-item reveal" data-cat="${p.cat}" data-src="${p.src}" data-caption="${p.catLabel}" data-idx="${i}">
+      <img src="${p.src}" alt="${p.catLabel}" loading="lazy">
+      <div class="gal-overlay"><div class="gal-info"><span class="gal-cat">${p.catLabel}</span><span class="gal-name">${p.name}</span></div></div>
+    </div>
+  `).join('');
+
+  // Lightbox ve reveal
+  grid.querySelectorAll('.gal-item').forEach((item, i) => {
+    item.addEventListener('click', () => openLb(i, filtered));
+    obs.observe(item);
+  });
+}
+
+galeriYukle();
 
 /* ── SCROLL REVEAL ── */
 const obs = new IntersectionObserver(entries => {
