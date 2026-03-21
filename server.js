@@ -185,7 +185,7 @@ const IMG_EXTS = ['.jpg', '.jpeg', '.png', '.webp'];
 const KATEGORİ_MAP = {
   kesim:    'Saç Kesimi',
   boya:     'Saç Boyama',
-  balayaj:  'Balayaj',
+  balyaj:   'Balyaj',
   bakim:    'Bakım & Şekil',
   gelin:    'Gelin Saçı',
   sekil:    'Şekillendirme',
