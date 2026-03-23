@@ -471,7 +471,7 @@
   </div>
 
   <!-- NORMAL REZERVASYON FORMU -->
-  <div class="rez-form-wrap" id="normal-form">
+  <div class="rez-form-wrap" id="normal-form" data-form="n">
     <button class="rez-geri" onclick="geriDon()">← Geri</button>
 
     <div class="rez-form-baslik">
@@ -551,7 +551,7 @@
   </div>
 
   <!-- ÖDEME FORMLU REZ -->
-  <div class="rez-form-wrap" id="odeme-form">
+  <div class="rez-form-wrap" id="odeme-form" data-form="o">
     <button class="rez-geri" onclick="geriDon()">← Geri</button>
 
     <div class="rez-form-baslik">
@@ -800,6 +800,55 @@ function mesaj(el, metin, tip) {
   el.className = 'rez-mesaj ' + tip;
   el.style.display = 'block';
 }
+
+// ─── SAAT SEÇİCİ
+function selectTime(btn, time, prefix) {
+  if (btn.disabled) return;
+  btn.closest('.time-grid').querySelectorAll('.time-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  document.getElementById(prefix + '-saat').value = time;
+}
+
+function saatleriGuncelle(prefix) {
+  var tarihEl = document.getElementById(prefix + '-tarih');
+  if (!tarihEl) return;
+  var tarih = tarihEl.value;
+  var simdi = new Date();
+  var bugun = simdi.toISOString().split('T')[0];
+  var bugunMu = tarih === bugun;
+  var suAnSaat = simdi.getHours();
+
+  // Prefix'e ait time-grid'leri bul
+  var formId = prefix === 'n' ? 'normal-form' : 'odeme-form';
+  document.querySelectorAll('#' + formId + ' .time-btn').forEach(function(btn) {
+    var saat = parseInt(btn.textContent.split(':')[0]);
+    if (bugunMu && saat <= suAnSaat) {
+      btn.disabled = true;
+      btn.classList.remove('selected');
+      btn.style.opacity = '.2';
+      btn.style.cursor = 'not-allowed';
+      btn.style.textDecoration = 'line-through';
+    } else {
+      btn.disabled = false;
+      btn.style.opacity = '';
+      btn.style.cursor = '';
+      btn.style.textDecoration = '';
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  var bugun = new Date().toISOString().split('T')[0];
+  ['n', 'o'].forEach(function(prefix) {
+    var el = document.getElementById(prefix + '-tarih');
+    if (!el) return;
+    el.min = bugun;
+    el.addEventListener('change', function() { saatleriGuncelle(prefix); });
+  });
+  // Sayfa yüklenince bugünü varsayılan yap
+  saatleriGuncelle('n');
+  saatleriGuncelle('o');
+});
 </script>
 </body>
 </html>
