@@ -400,7 +400,7 @@ nav.scrolled {
 .yorumlar-btn{background:var(--black);color:var(--off);padding:11px 24px;font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;font-weight:600;text-decoration:none;transition:opacity .2s;white-space:nowrap}
 .yorumlar-btn:hover{opacity:.8}
 .yorum-slider-wrap{overflow:hidden;padding:0 56px}
-.yorum-slider{display:flex;gap:16px;transition:transform .4s cubic-bezier(.4,0,.2,1)}
+.yorum-slider{display:flex;gap:16px;will-change:transform}
 .yorum-kart{background:#fff;border:1px solid #e8e4dc;padding:24px 22px;display:flex;flex-direction:column;gap:14px;min-width:280px;max-width:280px;flex-shrink:0}
 .yk-ust{display:flex;align-items:center;gap:10px}
 .yk-avatar{width:38px;height:38px;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-size:.9rem;font-weight:600;flex-shrink:0}

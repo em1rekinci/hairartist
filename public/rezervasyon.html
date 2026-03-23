@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rezervasyon — Hair Artist</title>
+<link rel="icon" type="image/png" href="https://hairartist.com.tr/static/base/img/photos/hairartist_logo_w.png">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+.rez-page { min-height: 100vh; background: var(--black); padding-top: 70px; }
+
+/* ── SEÇİM EKRANI ── */
+.rez-secim {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 70px);
+  padding: 60px 24px;
+}
+.rez-secim-baslik {
+  text-align: center;
+  margin-bottom: 60px;
+}
+.rez-secim-baslik .sec-tag { color: rgba(247,244,239,.35); }
+.rez-secim-baslik h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  font-weight: 700;
+  color: var(--off);
+  margin-top: 12px;
+  line-height: 1.1;
+}
+.rez-secim-baslik h1 em {
+  font-style: italic;
+  font-weight: 400;
+  color: rgba(247,244,239,.35);
+}
+.rez-secim-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  width: 100%;
+  max-width: 860px;
+}
+.rez-kart {
+  background: #111;
+  border: 1px solid #1e1e1e;
+  padding: 48px 40px;
+  cursor: pointer;
+  transition: background .2s, border-color .2s;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.rez-kart:hover { background: #161616; border-color: #333; }
+.rez-kart.odeme { border-color: rgba(200,255,0,.15); }
+.rez-kart.odeme:hover { background: rgba(200,255,0,.04); border-color: rgba(200,255,0,.35); }
+.rez-kart-no {
+  font-size: .6rem;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: rgba(247,244,239,.2);
+}
+.rez-kart.odeme .rez-kart-no { color: rgba(200,255,0,.4); }
+.rez-kart h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--off);
+  line-height: 1.15;
+}
+.rez-kart h2 em {
+  font-style: italic;
+  font-weight: 400;
+  color: rgba(247,244,239,.4);
+  display: block;
+  font-size: 1.1rem;
+}
+.rez-kart p {
+  font-size: .8rem;
+  line-height: 1.85;
+  color: rgba(247,244,239,.4);
+}
+.rez-kart-ozellik {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+.rez-oz-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: .72rem;
+  color: rgba(247,244,239,.5);
+}
+.rez-oz-item::before {
+  content: '';
+  width: 4px;
+  height: 4px;
+  background: rgba(247,244,239,.3);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.rez-kart.odeme .rez-oz-item::before { background: rgba(200,255,0,.5); }
+.rez-kart-btn {
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: .62rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: rgba(247,244,239,.5);
+  padding-top: 20px;
+  border-top: 1px solid #1e1e1e;
+  transition: color .2s;
+}
+.rez-kart:hover .rez-kart-btn { color: var(--off); }
+.rez-kart.odeme .rez-kart-btn { color: rgba(200,255,0,.6); border-top-color: rgba(200,255,0,.1); }
+.rez-kart.odeme:hover .rez-kart-btn { color: #c8ff00; }
+.rez-kart-btn-arrow { font-size: 1rem; transition: transform .2s; }
+.rez-kart:hover .rez-kart-btn-arrow { transform: translateX(4px); }
+.indirim-badge {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: #c8ff00;
+  color: #080808;
+  font-size: .55rem;
+  font-weight: 700;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  padding: 5px 10px;
+}
+
+/* ── FORM EKRANI ── */
+.rez-form-wrap {
+  display: none;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 60px 40px 80px;
+}
+.rez-form-wrap.aktif { display: block; }
+.rez-geri {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .62rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: rgba(247,244,239,.3);
+  cursor: pointer;
+  margin-bottom: 48px;
+  background: none;
+  border: none;
+  transition: color .2s;
+}
+.rez-geri:hover { color: var(--off); }
+.rez-form-baslik {
+  margin-bottom: 48px;
+}
+.rez-form-baslik h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  color: var(--off);
+  margin-top: 10px;
+  line-height: 1.1;
+}
+.rez-form-baslik h2 em {
+  font-style: italic;
+  font-weight: 400;
+  color: rgba(247,244,239,.35);
+}
+.rez-form-baslik p {
+  margin-top: 16px;
+  font-size: .82rem;
+  line-height: 1.8;
+  color: rgba(247,244,239,.4);
+}
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-grid-full { grid-column: 1 / -1; }
+.fg { margin-bottom: 0; }
+.fl {
+  display: block;
+  font-size: .58rem;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: rgba(247,244,239,.3);
+  margin-bottom: 8px;
+  font-weight: 400;
+}
+.fi {
+  width: 100%;
+  background: transparent;
+  border: 1px solid #2a2a2a;
+  color: var(--off);
+  padding: 13px 16px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: .85rem;
+  font-weight: 300;
+  outline: none;
+  transition: border-color .2s;
+  box-sizing: border-box;
+}
+.fi:focus { border-color: #555; }
+.fi option { background: #111; }
+
+/* Hizmet seçici */
+.cs-wrap { position: relative; }
+.cs-selected {
+  width: 100%;
+  background: transparent;
+  border: 1px solid #2a2a2a;
+  color: var(--off);
+  padding: 13px 16px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: .85rem;
+  font-weight: 300;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  transition: border-color .2s;
+  box-sizing: border-box;
+}
+.cs-selected:hover { border-color: #555; }
+.cs-arrow { width: 10px; height: 6px; color: rgba(247,244,239,.3); flex-shrink: 0; transition: transform .2s; }
+.cs-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0; right: 0;
+  background: #111;
+  border: 1px solid #333;
+  z-index: 100;
+}
+.cs-dropdown.open { display: block; }
+.cs-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid #1e1e1e;
+  font-size: .82rem;
+  color: rgba(247,244,239,.7);
+  gap: 12px;
+  transition: background .15s;
+}
+.cs-option:last-child { border-bottom: none; }
+.cs-option:hover { background: rgba(247,244,239,.05); }
+.cs-option.secili { background: rgba(200,255,0,.07); color: var(--off); }
+.cs-option.secili .cs-indirimli { color: #c8ff00; }
+.cs-option.secili .cs-normal { color: rgba(247,244,239,.25); text-decoration-color: rgba(247,244,239,.25); }
+.cs-ad { flex: 1; font-weight: 400; }
+.cs-fiyatlar { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.cs-indirimli { font-weight: 600; font-size: .82rem; color: rgba(247,244,239,.8); }
+.cs-normal { font-size: .72rem; color: rgba(247,244,239,.3); text-decoration: line-through; }
+
+/* Fiyat kutusu */
+.fiyat-box {
+  display: none;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+  padding: 13px 16px;
+  background: rgba(200,255,0,.05);
+  border: 1px solid rgba(200,255,0,.15);
+  flex-wrap: wrap;
+}
+.fiyat-box.show { display: flex; }
+#fiyat-indirimli {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #c8ff00;
+  line-height: 1;
+}
+#fiyat-normal {
+  font-size: .85rem;
+  color: rgba(247,244,239,.3);
+  text-decoration: line-through;
+  line-height: 1;
+}
+.fiyat-badge {
+  font-size: .58rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #c8ff00;
+  background: rgba(200,255,0,.08);
+  border: 1px solid rgba(200,255,0,.2);
+  padding: 4px 10px;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+/* Saat grid */
+.time-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-top: 2px;
+}
+.time-btn {
+  background: transparent;
+  border: 1px solid #2a2a2a;
+  color: rgba(247,244,239,.5);
+  padding: 10px 4px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: .72rem;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all .2s;
+  text-align: center;
+}
+.time-btn:hover { border-color: #555; color: var(--off); }
+.time-btn.selected { background: var(--off); color: var(--black); border-color: var(--off); }
+
+/* Mesaj */
+.rez-mesaj {
+  display: none;
+  font-size: .78rem;
+  padding: 12px 16px;
+  margin-top: 16px;
+  border-radius: 2px;
+}
+.rez-mesaj.basari {
+  background: rgba(200,255,0,.08);
+  border: 1px solid rgba(200,255,0,.25);
+  color: #c8ff00;
+}
+.rez-mesaj.hata {
+  background: rgba(255,85,85,.08);
+  border: 1px solid rgba(255,85,85,.25);
+  color: #ff6b6b;
+}
+
+/* Gönder butonu */
+.fsub {
+  width: 100%;
+  background: var(--off);
+  color: var(--black);
+  border: none;
+  padding: 16px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: .65rem;
+  font-weight: 600;
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  cursor: pointer;
+  margin-top: 24px;
+  transition: opacity .2s;
+}
+.fsub:hover { opacity: .85; }
+.fsub.odeme-btn {
+  background: #c8ff00;
+  color: #080808;
+}
+
+/* Bilgi kutusu */
+.rez-bilgi {
+  background: #111;
+  border: 1px solid #1e1e1e;
+  padding: 28px;
+  margin-bottom: 32px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 32px;
+}
+.rez-bilgi-item { font-size: .78rem; color: rgba(247,244,239,.4); line-height: 1.7; }
+.rez-bilgi-item strong { display: block; font-size: .58rem; letter-spacing: .18em; text-transform: uppercase; color: rgba(247,244,239,.2); margin-bottom: 4px; font-weight: 400; }
+
+@media(max-width:700px) {
+  .rez-secim-grid { grid-template-columns: 1fr; }
+  .rez-kart { padding: 32px 24px; }
+  .rez-form-wrap { padding: 40px 20px 60px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .form-grid-full { grid-column: auto; }
+  .time-grid { grid-template-columns: repeat(4, 1fr); }
+  .rez-bilgi { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">
+    <img src="https://hairartist.com.tr/static/base/img/photos/hairartist_logo_w.png"
+         alt="Hair Artist"
+         onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+    <span class="nav-logo-txt" style="display:none">HAIR ARTIST</span>
+  </a>
+  <ul>
+    <li><a href="/">Anasayfa</a></li>
+    <li><a href="/#about">Hakkımızda</a></li>
+    <li><a href="/#services">Hizmetler</a></li>
+    <li><a href="/portfolio">Portfolyo</a></li>
+    <li><a href="/#contact">İletişim</a></li>
+  </ul>
+  <div class="nav-right">
+    <a href="/rezervasyon" class="nav-book">Rezervasyon Yap</a>
+    <button class="hamburger" id="hamburger" aria-label="Menü">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-menu-close" onclick="closeMobileMenu()">✕</button>
+  <ul>
+    <li><a href="/" onclick="closeMobileMenu()">Anasayfa</a></li>
+    <li><a href="/#about" onclick="closeMobileMenu()">Hakkımızda</a></li>
+    <li><a href="/#services" onclick="closeMobileMenu()">Hizmetler</a></li>
+    <li><a href="/portfolio">Portfolyo</a></li>
+    <li><a href="/#contact" onclick="closeMobileMenu()">İletişim</a></li>
+  </ul>
+  <a href="/rezervasyon" class="m-book">Rezervasyon Yap</a>
+</div>
+
+<div class="rez-page">
+
+  <!-- SEÇİM EKRANI -->
+  <div class="rez-secim" id="secim-ekrani">
+    <div class="rez-secim-baslik">
+      <span class="sec-tag">Randevu</span>
+      <h1>Nasıl devam<br><em>etmek istersiniz?</em></h1>
+    </div>
+
+    <div class="rez-secim-grid">
+
+      <!-- Rezervasyon Yap -->
+      <div class="rez-kart" onclick="goster('normal-form')">
+        <div class="rez-kart-no">01 — Ücretsiz</div>
+        <h2>Rezervasyon Yap <em>Ödeme yok</em></h2>
+        <p>Randevunuzu ayırtın, onay SMS'i gelsin. Salona geldiğinizde ödeme yaparsınız.</p>
+        <div class="rez-kart-ozellik">
+          <div class="rez-oz-item">Anında SMS onayı</div>
+          <div class="rez-oz-item">2 saat öncesine kadar iptal</div>
+          <div class="rez-oz-item">Ödeme salonada</div>
+        </div>
+        <div class="rez-kart-btn">
+          Devam et <span class="rez-kart-btn-arrow">→</span>
+        </div>
+      </div>
+
+      <!-- Hizmet Al -->
+      <div class="rez-kart odeme" onclick="goster('odeme-form')">
+        <div class="indirim-badge">%10 İndirim</div>
+        <div class="rez-kart-no">02 — Online Ödeme</div>
+        <h2>Hizmet Al <em>Online öde, indirim kazan</em></h2>
+        <p>Hizmetinizi şimdi satın alın, %10 indirimli fiyatla ödeyin. Randevu tarihinizi belirleyin.</p>
+        <div class="rez-kart-ozellik">
+          <div class="rez-oz-item">%10 online indirim</div>
+          <div class="rez-oz-item">Güvenli ödeme</div>
+          <div class="rez-oz-item">Anında rezervasyon onayı</div>
+        </div>
+        <div class="rez-kart-btn">
+          Devam et <span class="rez-kart-btn-arrow">→</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- NORMAL REZERVASYON FORMU -->
+  <div class="rez-form-wrap" id="normal-form">
+    <button class="rez-geri" onclick="geriDon()">← Geri</button>
+
+    <div class="rez-form-baslik">
+      <span class="sec-tag">Rezervasyon Yap</span>
+      <h2>Randevunuzu<br><em>hemen alın.</em></h2>
+      <p>Formu doldurun, Fatih Bey sizi onaylayınca SMS ile bilgilendirileceksiniz.</p>
+    </div>
+
+    <div class="rez-bilgi">
+      <div class="rez-bilgi-item"><strong>Adres</strong>Alibeyköy Cd No:5, Eyüpsultan / İstanbul</div>
+      <div class="rez-bilgi-item"><strong>Telefon</strong>0531 777 02 03</div>
+      <div class="rez-bilgi-item"><strong>Mesai</strong>Pzt, Çar–Cmt 08:30–20:00</div>
+      <div class="rez-bilgi-item"><strong>Kapalı</strong>Salı · Pazar 09:00–19:00</div>
+    </div>
+
+    <div class="form-grid">
+      <div class="fg">
+        <label class="fl">Ad Soyad</label>
+        <input id="n-ad" class="fi" type="text" placeholder="Adınız" required>
+      </div>
+      <div class="fg">
+        <label class="fl">Telefon</label>
+        <input id="n-tel" class="fi" type="tel" placeholder="+90 5xx xxx xx xx" required>
+      </div>
+      <div class="fg form-grid-full">
+        <label class="fl">Hizmet</label>
+        <input type="hidden" id="n-hizmet" value="">
+        <div class="cs-wrap" id="n-cs-wrap">
+          <div class="cs-selected" onclick="csToggleN()">
+            <span id="n-cs-label" style="color:rgba(247,244,239,.25)">— Hizmet Seçin —</span>
+            <svg class="cs-arrow" id="n-cs-arrow" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.2"/></svg>
+          </div>
+          <div class="cs-dropdown" id="n-cs-dropdown">
+            <div class="cs-option" onclick="hizmetSecN(this,'Saç Kesimi',450,500)"><span class="cs-ad">Saç Kesimi</span><span class="cs-fiyatlar"><span class="cs-indirimli">450₺</span><span class="cs-normal">500₺</span></span></div>
+            <div class="cs-option" onclick="hizmetSecN(this,'Saç Bakımı',900,1000)"><span class="cs-ad">Saç Bakımı</span><span class="cs-fiyatlar"><span class="cs-indirimli">900₺</span><span class="cs-normal">1.000₺</span></span></div>
+            <div class="cs-option" onclick="hizmetSecN(this,'Saç Boyama',1800,2000)"><span class="cs-ad">Saç Boyama</span><span class="cs-fiyatlar"><span class="cs-indirimli">1.800₺</span><span class="cs-normal">2.000₺</span></span></div>
+            <div class="cs-option" onclick="hizmetSecN(this,'Saç Renklendirme (Ombre/Sombre)',3150,3500)"><span class="cs-ad">Saç Renklendirme <small style="opacity:.5;font-size:.85em">(Ombre/Sombre)</small></span><span class="cs-fiyatlar"><span class="cs-indirimli">3.150₺</span><span class="cs-normal">3.500₺</span></span></div>
+            <div class="cs-option" onclick="hizmetSecN(this,'Balyaj',7500,10000)"><span class="cs-ad">Balyaj</span><span class="cs-fiyatlar"><span class="cs-indirimli">7.500₺</span><span class="cs-normal">10.000₺</span></span></div>
+            <div class="cs-option" onclick="hizmetSecN(this,'Saç Şekillendirme',630,700)"><span class="cs-ad">Saç Şekillendirme</span><span class="cs-fiyatlar"><span class="cs-indirimli">630₺</span><span class="cs-normal">700₺</span></span></div>
+            <div class="cs-option" onclick="hizmetSecN(this,'Özel Saç Bakımı',1350,1500)"><span class="cs-ad">Özel Saç Bakımı</span><span class="cs-fiyatlar"><span class="cs-indirimli">1.350₺</span><span class="cs-normal">1.500₺</span></span></div>
+          </div>
+        </div>
+        <div class="fiyat-box" id="n-fiyat-box">
+          <span id="fiyat-indirimli"></span>
+          <span id="fiyat-normal"></span>
+          <span class="fiyat-badge">Salon fiyatı</span>
+        </div>
+      </div>
+      <div class="fg">
+        <label class="fl">Tarih</label>
+        <input id="n-tarih" class="fi" type="date" required>
+      </div>
+      <div class="fg">
+        <label class="fl">Saat</label>
+        <div class="time-grid">
+          <button type="button" class="time-btn" onclick="selectTime(this,'09:00','n')">09:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'10:00','n')">10:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'11:00','n')">11:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'12:00','n')">12:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'13:00','n')">13:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'14:00','n')">14:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'15:00','n')">15:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'16:00','n')">16:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'17:00','n')">17:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'18:00','n')">18:00</button>
+        </div>
+        <input type="hidden" id="n-saat" value="">
+      </div>
+      <div class="fg form-grid-full">
+        <label class="fl">Not (saç durumu, istek…)</label>
+        <input id="n-not" class="fi" type="text" placeholder="İsteğe bağlı">
+      </div>
+    </div>
+
+    <div class="rez-mesaj" id="n-mesaj"></div>
+    <button class="fsub" id="n-btn" onclick="normalGonder()">Rezervasyonu Gönder</button>
+  </div>
+
+  <!-- ÖDEME FORMLU REZ -->
+  <div class="rez-form-wrap" id="odeme-form">
+    <button class="rez-geri" onclick="geriDon()">← Geri</button>
+
+    <div class="rez-form-baslik">
+      <span class="sec-tag" style="color:rgba(200,255,0,.5)">Hizmet Al — %10 İndirim</span>
+      <h2>Hizmetinizi seçin,<br><em>online ödeyin.</em></h2>
+      <p>Aşağıdaki formu doldurun. Bilgilerinizi onayladıktan sonra güvenli ödeme sayfasına yönlendirileceksiniz.</p>
+    </div>
+
+    <div class="rez-bilgi">
+      <div class="rez-bilgi-item"><strong>Adres</strong>Alibeyköy Cd No:5, Eyüpsultan / İstanbul</div>
+      <div class="rez-bilgi-item"><strong>Telefon</strong>0531 777 02 03</div>
+      <div class="rez-bilgi-item"><strong>İndirim</strong>Online ödemelerde %10 indirim uygulanır</div>
+      <div class="rez-bilgi-item"><strong>İptal</strong>2 saat öncesine kadar ücretsiz iptal</div>
+    </div>
+
+    <div class="form-grid">
+      <div class="fg">
+        <label class="fl">Ad Soyad</label>
+        <input id="o-ad" class="fi" type="text" placeholder="Adınız" required>
+      </div>
+      <div class="fg">
+        <label class="fl">Telefon</label>
+        <input id="o-tel" class="fi" type="tel" placeholder="+90 5xx xxx xx xx" required>
+      </div>
+      <div class="fg form-grid-full">
+        <label class="fl">Hizmet</label>
+        <input type="hidden" id="o-hizmet" value="">
+        <input type="hidden" id="o-fiyat" value="">
+        <div class="cs-wrap" id="o-cs-wrap">
+          <div class="cs-selected" onclick="csToggleO()">
+            <span id="o-cs-label" style="color:rgba(247,244,239,.25)">— Hizmet Seçin —</span>
+            <svg class="cs-arrow" id="o-cs-arrow" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.2"/></svg>
+          </div>
+          <div class="cs-dropdown" id="o-cs-dropdown">
+            <div class="cs-option" onclick="hizmetSecO(this,'Saç Kesimi',450,500)"><span class="cs-ad">Saç Kesimi</span><span class="cs-fiyatlar"><span class="cs-indirimli">450₺</span><span class="cs-normal">500₺</span></span></div>
+            <div class="cs-option" onclick="hizmetSecO(this,'Saç Bakımı',900,1000)"><span class="cs-ad">Saç Bakımı</span><span class="cs-fiyatlar"><span class="cs-indirimli">900₺</span><span class="cs-normal">1.000₺</span></span></div>
+            <div class="cs-option" onclick="hizmetSecO(this,'Saç Boyama',1800,2000)"><span class="cs-ad">Saç Boyama</span><span class="cs-fiyatlar"><span class="cs-indirimli">1.800₺</span><span class="cs-normal">2.000₺</span></span></div>
+            <div class="cs-option" onclick="hizmetSecO(this,'Saç Renklendirme (Ombre/Sombre)',3150,3500)"><span class="cs-ad">Saç Renklendirme <small style="opacity:.5;font-size:.85em">(Ombre/Sombre)</small></span><span class="cs-fiyatlar"><span class="cs-indirimli">3.150₺</span><span class="cs-normal">3.500₺</span></span></div>
+            <div class="cs-option" onclick="hizmetSecO(this,'Balyaj',7500,10000)"><span class="cs-ad">Balyaj</span><span class="cs-fiyatlar"><span class="cs-indirimli">7.500₺</span><span class="cs-normal">10.000₺</span></span></div>
+            <div class="cs-option" onclick="hizmetSecO(this,'Saç Şekillendirme',630,700)"><span class="cs-ad">Saç Şekillendirme</span><span class="cs-fiyatlar"><span class="cs-indirimli">630₺</span><span class="cs-normal">700₺</span></span></div>
+            <div class="cs-option" onclick="hizmetSecO(this,'Özel Saç Bakımı',1350,1500)"><span class="cs-ad">Özel Saç Bakımı</span><span class="cs-fiyatlar"><span class="cs-indirimli">1.350₺</span><span class="cs-normal">1.500₺</span></span></div>
+          </div>
+        </div>
+        <div class="fiyat-box" id="o-fiyat-box">
+          <span id="o-fiyat-indirimli"></span>
+          <span id="o-fiyat-normal"></span>
+          <span class="fiyat-badge">%10 Online İndirim</span>
+        </div>
+      </div>
+      <div class="fg">
+        <label class="fl">Tarih</label>
+        <input id="o-tarih" class="fi" type="date" required>
+      </div>
+      <div class="fg">
+        <label class="fl">Saat</label>
+        <div class="time-grid">
+          <button type="button" class="time-btn" onclick="selectTime(this,'09:00','o')">09:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'10:00','o')">10:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'11:00','o')">11:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'12:00','o')">12:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'13:00','o')">13:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'14:00','o')">14:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'15:00','o')">15:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'16:00','o')">16:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'17:00','o')">17:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'18:00','o')">18:00</button>
+        </div>
+        <input type="hidden" id="o-saat" value="">
+      </div>
+      <div class="fg form-grid-full">
+        <label class="fl">Not (saç durumu, istek…)</label>
+        <input id="o-not" class="fi" type="text" placeholder="İsteğe bağlı">
+      </div>
+    </div>
+
+    <div class="rez-mesaj" id="o-mesaj"></div>
+    <button class="fsub odeme-btn" id="o-btn" onclick="odemeGit()">Ödemeye Geç →</button>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2026 Hair Artist · Branded by Fatih Kurt</p>
+  <a href="https://www.vionasoft.com" class="foot-credit" target="_blank" rel="noopener">Tasarım: Vionasoft</a>
+</footer>
+
+<script>
+// ── NAV
+const hamburger = document.getElementById('hamburger');
+const mobileMenu = document.getElementById('mobileMenu');
+function closeMobileMenu(){
+  hamburger.classList.remove('open');
+  mobileMenu.classList.remove('open');
+  mobileMenu.style.display='none';
+  document.body.style.overflow='';
+}
+hamburger.addEventListener('click',()=>{
+  const isOpen = hamburger.classList.toggle('open');
+  if(isOpen){
+    mobileMenu.style.display='flex';
+    setTimeout(()=>mobileMenu.classList.add('open'),10);
+    document.body.style.overflow='hidden';
+  } else { closeMobileMenu(); }
+});
+
+// ── EKRAN GEÇİŞ
+function goster(id) {
+  document.getElementById('secim-ekrani').style.display = 'none';
+  document.getElementById('normal-form').classList.remove('aktif');
+  document.getElementById('odeme-form').classList.remove('aktif');
+  document.getElementById(id).classList.add('aktif');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function geriDon() {
+  document.getElementById('normal-form').classList.remove('aktif');
+  document.getElementById('odeme-form').classList.remove('aktif');
+  document.getElementById('secim-ekrani').style.display = 'flex';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── SAAT SEÇİCİ
+function selectTime(btn, time, prefix) {
+  btn.closest('.time-grid').querySelectorAll('.time-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  document.getElementById(prefix + '-saat').value = time;
+}
+
+// ── NORMAL FORM HİZMET
+function csToggleN() {
+  var dd = document.getElementById('n-cs-dropdown');
+  var arrow = document.getElementById('n-cs-arrow');
+  var open = dd.classList.toggle('open');
+  arrow.style.transform = open ? 'rotate(180deg)' : '';
+}
+document.addEventListener('click', function(e) {
+  if (!document.getElementById('n-cs-wrap').contains(e.target)) {
+    document.getElementById('n-cs-dropdown').classList.remove('open');
+    document.getElementById('n-cs-arrow').style.transform = '';
+  }
+  if (!document.getElementById('o-cs-wrap').contains(e.target)) {
+    document.getElementById('o-cs-dropdown').classList.remove('open');
+    document.getElementById('o-cs-arrow').style.transform = '';
+  }
+});
+function hizmetSecN(el, ad, indirimli, normal) {
+  document.querySelectorAll('#n-cs-dropdown .cs-option').forEach(i => i.classList.remove('secili'));
+  el.classList.add('secili');
+  document.getElementById('n-hizmet').value = ad;
+  var lbl = document.getElementById('n-cs-label');
+  lbl.style.color = '';
+  lbl.textContent = ad;
+  document.getElementById('n-cs-dropdown').classList.remove('open');
+  document.getElementById('n-cs-arrow').style.transform = '';
+  document.getElementById('fiyat-indirimli').textContent = normal.toLocaleString('tr-TR') + '₺';
+  document.getElementById('fiyat-normal').textContent = '';
+  document.getElementById('n-fiyat-box').classList.add('show');
+}
+
+// ── ÖDEME FORM HİZMET
+function csToggleO() {
+  var dd = document.getElementById('o-cs-dropdown');
+  var arrow = document.getElementById('o-cs-arrow');
+  var open = dd.classList.toggle('open');
+  arrow.style.transform = open ? 'rotate(180deg)' : '';
+}
+function hizmetSecO(el, ad, indirimli, normal) {
+  document.querySelectorAll('#o-cs-dropdown .cs-option').forEach(i => i.classList.remove('secili'));
+  el.classList.add('secili');
+  document.getElementById('o-hizmet').value = ad;
+  document.getElementById('o-fiyat').value = indirimli;
+  var lbl = document.getElementById('o-cs-label');
+  lbl.style.color = '';
+  lbl.textContent = ad;
+  document.getElementById('o-cs-dropdown').classList.remove('open');
+  document.getElementById('o-cs-arrow').style.transform = '';
+  document.getElementById('o-fiyat-indirimli').textContent = indirimli.toLocaleString('tr-TR') + '₺';
+  document.getElementById('o-fiyat-normal').textContent = normal.toLocaleString('tr-TR') + '₺';
+  document.getElementById('o-fiyat-box').classList.add('show');
+}
+
+// ── NORMAL REZERVASYON GÖNDER
+async function normalGonder() {
+  const btn = document.getElementById('n-btn');
+  const mesajDiv = document.getElementById('n-mesaj');
+  const ad = document.getElementById('n-ad').value.trim();
+  const telefon = document.getElementById('n-tel').value.trim();
+  const hizmet = document.getElementById('n-hizmet').value;
+  const tarih = document.getElementById('n-tarih').value;
+  const saat = document.getElementById('n-saat').value;
+  const not = document.getElementById('n-not').value.trim();
+
+  if (!ad || !telefon || !hizmet || !tarih) {
+    mesaj(mesajDiv, 'Lütfen tüm zorunlu alanları doldurun.', 'hata');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Gönderiliyor…';
+
+  try {
+    const res = await fetch('/rezervasyon', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ad, telefon, hizmet, tarih, saat, not })
+    });
+    const veri = await res.json();
+    if (veri.ok) {
+      mesaj(mesajDiv, '✓ ' + veri.mesaj, 'basari');
+      ['n-ad','n-tel','n-tarih','n-not'].forEach(id => document.getElementById(id).value = '');
+      btn.textContent = 'Gönderildi ✓';
+    } else {
+      mesaj(mesajDiv, '✗ ' + veri.mesaj, 'hata');
+      btn.disabled = false;
+      btn.textContent = 'Rezervasyonu Gönder';
+    }
+  } catch(e) {
+    mesaj(mesajDiv, '✗ Bağlantı hatası. Lütfen tekrar deneyin.', 'hata');
+    btn.disabled = false;
+    btn.textContent = 'Rezervasyonu Gönder';
+  }
+}
+
+// ── ÖDEMEYE GİT
+function odemeGit() {
+  const mesajDiv = document.getElementById('o-mesaj');
+  const ad = document.getElementById('o-ad').value.trim();
+  const telefon = document.getElementById('o-tel').value.trim();
+  const hizmet = document.getElementById('o-hizmet').value;
+  const tarih = document.getElementById('o-tarih').value;
+  const saat = document.getElementById('o-saat').value;
+  const fiyat = document.getElementById('o-fiyat').value;
+
+  if (!ad || !telefon || !hizmet || !tarih) {
+    mesaj(mesajDiv, 'Lütfen tüm zorunlu alanları doldurun.', 'hata');
+    return;
+  }
+
+  // Ödeme sayfasına parametrelerle yönlendir
+  const params = new URLSearchParams({ ad, telefon, hizmet, tarih, saat, fiyat });
+  window.location.href = '/odeme?' + params.toString();
+}
+
+function mesaj(el, metin, tip) {
+  el.textContent = metin;
+  el.className = 'rez-mesaj ' + tip;
+  el.style.display = 'block';
+}
+</script>
+</body>
+</html>

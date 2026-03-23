@@ -23,6 +23,11 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// ─── REZERVASYON SAYFASI
+app.get('/rezervasyon', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'rezervasyon.html'));
+});
+
 // ─── ADMİN PANELİ — static'ten önce tanımlanmalı ─────────────────────────────
 app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));

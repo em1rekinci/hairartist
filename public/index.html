@@ -239,7 +239,7 @@
         </div>
       </div>
       <div class="yh-sag">
-        <a href="https://www.google.com/maps/place/Fatih+KURT+Hair+Artist/@41.065937,28.934312,17z/data=!4m8!3m7!1s0x14caa4b3e3b3b3b3:0x1!8m2!3d41.065937!4d28.934312!9m1!1b1" target="_blank" class="yorumlar-btn">Tüm Yorumlar →</a>
+        <a href="https://www.google.com/search?sca_esv=37e421cff93e3de4&hl=tr-TR&sxsrf=ANbL-n7XyJX_f-2PHJRBZOczkvGuNgvp9g:1774265717408&si=AL3DRZEsmMGCryMMFSHJ3StBhOdZ2-6yYkXd_doETEE1OR-qOdx1zRST3LBnjg2XE7qdJy5nkApWpFKWE3KrIfL9KhQzmGucNTzgLtZZddcWDIlZd7szxmLkM_SzhBqhmap1JayqLjVIhAn3MFv10js3GZdTM194AQ%3D%3D&q=Fatih+KURT+Hair+Artist+Yorumlar&sa=X&ved=2ahUKEwixycru9rWTAxUVVfEDHfhZBMEQ0bkNegQIKhAH&biw=1536&bih=695&dpr=1.25" target="_blank" class="yorumlar-btn">Tüm Yorumlar →</a>
       </div>
     </div>
 
@@ -567,21 +567,20 @@ function sliderKaydır(yon) {
   slider.style.transform = 'translateX(-' + (sliderPos * kartW) + 'px)';
 }
 
-function sliderOtoBaslat() {
-  sliderTimer = setInterval(function() { sliderKaydır(1); }, 3500);
-}
-
-function sliderOtoDurdur() {
-  clearInterval(sliderTimer);
-}
-
 document.addEventListener('DOMContentLoaded', function() {
-  var wrap = document.getElementById('yorum-slider');
-  if (wrap) {
-    sliderOtoBaslat();
-    wrap.parentElement.addEventListener('mouseenter', sliderOtoDurdur);
-    wrap.parentElement.addEventListener('mouseleave', sliderOtoBaslat);
-  }
+  var slider = document.getElementById('yorum-slider');
+  if (!slider) return;
+  // Kartları iki kez kopyala — sonsuz döngü
+  var kartlar = slider.innerHTML;
+  slider.innerHTML = kartlar + kartlar;
+  var toplamGenislik = slider.scrollWidth / 2;
+  slider.style.animation = 'none';
+  var styleEl = document.createElement('style');
+  styleEl.textContent = '@keyframes yorumKay { 0% { transform: translateX(0); } 100% { transform: translateX(-' + toplamGenislik + 'px); } }';
+  document.head.appendChild(styleEl);
+  slider.style.animation = 'yorumKay ' + (toplamGenislik / 40) + 's linear infinite';
+  slider.parentElement.addEventListener('mouseenter', function() { slider.style.animationPlayState = 'paused'; });
+  slider.parentElement.addEventListener('mouseleave', function() { slider.style.animationPlayState = 'running'; });
 });
 
 function csToggle() {
