@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel — Hair Artist</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --black:#080808;
+  --off:#f7f4ef;
+  --mid:#161616;
+  --line:#2a2a2a;
+  --dim:#666;
+  --green:#c8ff00;
+  --red:#ff5555;
+  --yellow:#f5a623;
+}
+body{background:#0a0a0a;color:#f7f4ef;font-family:'Montserrat',sans-serif;font-weight:300;min-height:100vh}
+
+/* ── GİRİŞ EKRANI ── */
+#giris-ekrani{display:flex;align-items:center;justify-content:center;min-height:100vh}
+.giris-box{background:#111;border:1px solid var(--line);padding:48px 40px;width:360px;text-align:center}
+.giris-box h1{font-family:'Playfair Display',serif;font-size:1.6rem;margin-bottom:6px}
+.giris-box p{font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);margin-bottom:32px}
+.giris-box input{width:100%;background:transparent;border:1px solid var(--line);color:#f7f4ef;padding:13px 16px;font-family:'Montserrat',sans-serif;font-size:.9rem;outline:none;margin-bottom:12px;transition:border-color .2s}
+.giris-box input:focus{border-color:#555}
+.giris-btn{width:100%;background:#f7f4ef;color:#080808;border:none;padding:14px;font-family:'Montserrat',sans-serif;font-size:.65rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;cursor:pointer;transition:opacity .2s}
+.giris-btn:hover{opacity:.85}
+.giris-hata{color:var(--red);font-size:.78rem;margin-top:12px;display:none}
+
+/* ── ANA PANEL ── */
+#panel{display:none}
+.topbar{background:#111;border-bottom:1px solid var(--line);padding:0 40px;height:60px;display:flex;align-items:center;justify-content:space-between}
+.topbar-logo{font-family:'Playfair Display',serif;font-size:1.1rem;color:#f7f4ef}
+.topbar-logo span{font-style:italic;font-weight:400;color:var(--dim)}
+.topbar-right{display:flex;align-items:center;gap:20px}
+.cikis-btn{font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);cursor:pointer;border:none;background:none;color:#f7f4ef;opacity:.4;transition:opacity .2s}
+.cikis-btn:hover{opacity:1}
+
+.content{padding:36px 40px;max-width:1400px;margin:0 auto}
+
+/* ── STAT KARTLARI ── */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:40px}
+.stat-card{background:#111;border:1px solid var(--line);padding:24px 20px}
+.stat-label{font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dim);margin-bottom:10px;display:block}
+.stat-val{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;line-height:1}
+.stat-val.green{color:var(--green)}
+.stat-sub{font-size:.7rem;color:var(--dim);margin-top:6px}
+
+/* ── FİLTRE ── */
+.filtre-bar{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.filtre-bar h2{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;flex:1}
+.filtre-btn{background:transparent;border:1px solid var(--line);color:rgba(247,244,239,.4);padding:7px 16px;font-family:'Montserrat',sans-serif;font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;transition:all .2s}
+.filtre-btn:hover{border-color:#555;color:#f7f4ef}
+.filtre-btn.aktif{background:#f7f4ef;color:#080808;border-color:#f7f4ef}
+.yenile-btn{background:transparent;border:1px solid var(--line);color:rgba(247,244,239,.5);padding:7px 14px;font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;font-family:'Montserrat',sans-serif;transition:all .2s}
+.yenile-btn:hover{border-color:#f7f4ef;color:#f7f4ef}
+
+/* ── TABLO ── */
+.tablo-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.8rem}
+thead tr{border-bottom:1px solid var(--line)}
+thead th{padding:10px 14px;text-align:left;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);font-weight:400}
+tbody tr{border-bottom:1px solid rgba(255,255,255,.04);transition:background .15s}
+tbody tr:hover{background:rgba(255,255,255,.03)}
+tbody td{padding:13px 14px;vertical-align:middle}
+.td-ad{font-weight:500}
+.td-tel{color:var(--dim);font-size:.75rem}
+.td-hizmet{color:#f7f4ef}
+.td-fiyat{font-weight:600;color:var(--green);white-space:nowrap}
+.td-tarih{white-space:nowrap;color:var(--dim);font-size:.75rem}
+.td-olustur{font-size:.7rem;color:rgba(247,244,239,.25)}
+.td-not{font-size:.73rem;color:var(--dim);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* Durum badge */
+.badge{display:inline-block;padding:4px 10px;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;font-weight:500;border-radius:2px}
+.badge-bekliyor{background:rgba(245,166,35,.12);color:var(--yellow);border:1px solid rgba(245,166,35,.25)}
+.badge-onaylandi{background:rgba(200,255,0,.1);color:var(--green);border:1px solid rgba(200,255,0,.2)}
+.badge-reddedildi{background:rgba(255,85,85,.1);color:var(--red);border:1px solid rgba(255,85,85,.2)}
+
+/* Aksiyon butonları */
+.aksiyon-wrap{display:flex;gap:6px;white-space:nowrap}
+.btn-onay{background:rgba(200,255,0,.1);border:1px solid rgba(200,255,0,.3);color:var(--green);padding:6px 12px;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;font-family:'Montserrat',sans-serif;transition:all .2s}
+.btn-onay:hover{background:rgba(200,255,0,.2)}
+.btn-red{background:rgba(255,85,85,.1);border:1px solid rgba(255,85,85,.3);color:var(--red);padding:6px 12px;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;font-family:'Montserrat',sans-serif;transition:all .2s}
+.btn-red:hover{background:rgba(255,85,85,.2)}
+.btn-sil{background:transparent;border:1px solid rgba(255,255,255,.1);color:rgba(247,244,239,.3);padding:6px 10px;font-size:.6rem;cursor:pointer;font-family:'Montserrat',sans-serif;transition:all .2s}
+.btn-sil:hover{border-color:var(--red);color:var(--red)}
+
+.bos-mesaj{text-align:center;padding:60px 20px;color:var(--dim);font-size:.85rem}
+
+/* Bildirim toast */
+.toast{position:fixed;bottom:28px;right:28px;background:#1a1a1a;border:1px solid var(--line);padding:14px 20px;font-size:.78rem;color:#f7f4ef;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;max-width:280px}
+.toast.show{opacity:1}
+.toast.ok{border-color:rgba(200,255,0,.4);color:var(--green)}
+.toast.hata{border-color:rgba(255,85,85,.4);color:var(--red)}
+
+@media(max-width:900px){
+  .topbar{padding:0 20px}
+  .content{padding:24px 16px}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  thead th:nth-child(5),thead th:nth-child(7),tbody td:nth-child(5),tbody td:nth-child(7){display:none}
+}
+@media(max-width:600px){
+  .stat-grid{grid-template-columns:1fr 1fr}
+  thead th:nth-child(4),tbody td:nth-child(4){display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- GİRİŞ EKRANI -->
+<div id="giris-ekrani">
+  <div class="giris-box">
+    <h1>Hair Artist</h1>
+    <p>Admin Paneli</p>
+    <input type="password" id="sifre-input" placeholder="Şifre" onkeydown="if(event.key==='Enter')girisYap()">
+    <button class="giris-btn" onclick="girisYap()">Giriş Yap</button>
+    <div class="giris-hata" id="giris-hata">Şifre hatalı, tekrar deneyin.</div>
+  </div>
+</div>
+
+<!-- ANA PANEL -->
+<div id="panel">
+  <div class="topbar">
+    <div class="topbar-logo">Hair Artist <span>/ Admin</span></div>
+    <div class="topbar-right">
+      <button class="cikis-btn" onclick="cikisYap()">Çıkış</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- STAT KARTLARI -->
+    <div class="stat-grid">
+      <div class="stat-card">
+        <span class="stat-label">Toplam Rezervasyon</span>
+        <div class="stat-val" id="st-toplam">—</div>
+        <div class="stat-sub">tüm zamanlar</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Onaylanan</span>
+        <div class="stat-val green" id="st-onaylanan">—</div>
+        <div class="stat-sub">tüm zamanlar</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Aylık Ciro</span>
+        <div class="stat-val green" id="st-aylik">—</div>
+        <div class="stat-sub" id="st-aylik-sub">bu ay onaylananlar</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Toplam Ciro</span>
+        <div class="stat-val green" id="st-toplam-ciro">—</div>
+        <div class="stat-sub">tüm onaylananlar</div>
+      </div>
+    </div>
+
+    <!-- REZERVASYON LİSTESİ -->
+    <div class="filtre-bar">
+      <h2>Rezervasyonlar</h2>
+      <button class="filtre-btn aktif" onclick="filtrele('hepsi',this)">Hepsi</button>
+      <button class="filtre-btn" onclick="filtrele('bekliyor',this)">Bekliyor</button>
+      <button class="filtre-btn" onclick="filtrele('onaylandi',this)">Onaylı</button>
+      <button class="filtre-btn" onclick="filtrele('reddedildi',this)">Reddedildi</button>
+      <button class="yenile-btn" onclick="verileriYukle()">↻ Yenile</button>
+    </div>
+
+    <div class="tablo-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Müşteri</th>
+            <th>Hizmet</th>
+            <th>Fiyat</th>
+            <th>Randevu</th>
+            <th>Not</th>
+            <th>Durum</th>
+            <th>Oluşturulma</th>
+            <th>İşlem</th>
+          </tr>
+        </thead>
+        <tbody id="rez-tbody">
+          <tr><td colspan="8" class="bos-mesaj">Yükleniyor...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── FİYAT HARİTASI ──────────────────────────────────────────────────────────
+const FIYATLAR = {
+  'Saç Kesimi': 450,
+  'Saç Bakımı': 900,
+  'Saç Boyama': 1800,
+  'Saç Renklendirme (Ombre/Sombre)': 3150,
+  'Balyaj': 7500,
+  'Saç Şekillendirme': 630,
+  'Özel Saç Bakımı': 1350,
+};
+
+let SIFRE = '';
+let tumRezervasyonlar = [];
+let aktifFiltre = 'hepsi';
+
+// ── GİRİŞ ────────────────────────────────────────────────────────────────────
+async function girisYap() {
+  const sifre = document.getElementById('sifre-input').value.trim();
+  if (!sifre) return;
+
+  const res = await fetch('/admin/giris', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ sifre })
+  });
+  const veri = await res.json();
+
+  if (veri.ok) {
+    SIFRE = sifre;
+    document.getElementById('giris-ekrani').style.display = 'none';
+    document.getElementById('panel').style.display = 'block';
+    verileriYukle();
+  } else {
+    document.getElementById('giris-hata').style.display = 'block';
+  }
+}
+
+function cikisYap() {
+  SIFRE = '';
+  tumRezervasyonlar = [];
+  document.getElementById('panel').style.display = 'none';
+  document.getElementById('giris-ekrani').style.display = 'flex';
+  document.getElementById('sifre-input').value = '';
+  document.getElementById('giris-hata').style.display = 'none';
+}
+
+// ── VERİ YÜKLE ───────────────────────────────────────────────────────────────
+async function verileriYukle() {
+  try {
+    const res = await fetch(`/admin/rezervasyonlar?sifre=${encodeURIComponent(SIFRE)}`);
+    const veri = await res.json();
+    if (!veri.ok) { toast('Oturum süresi doldu.', 'hata'); return; }
+
+    tumRezervasyonlar = veri.rezervasyonlar;
+    statsGuncelle();
+    tabloGoster(aktifFiltre);
+  } catch(e) {
+    toast('Bağlantı hatası.', 'hata');
+  }
+}
+
+// ── STATS ─────────────────────────────────────────────────────────────────────
+function statsGuncelle() {
+  const toplam = tumRezervasyonlar.length;
+  const onaylananlar = tumRezervasyonlar.filter(r => r.durum === 'onaylandi');
+
+  const simdi = new Date();
+  const ayliklar = onaylananlar.filter(r => {
+    const d = new Date(r.tarihOlustur);
+    return d.getMonth() === simdi.getMonth() && d.getFullYear() === simdi.getFullYear();
+  });
+
+  const toplamCiro = onaylananlar.reduce((s, r) => s + (FIYATLAR[r.hizmet] || 0), 0);
+  const aylikCiro  = ayliklar.reduce((s, r) => s + (FIYATLAR[r.hizmet] || 0), 0);
+
+  const aylar = ['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'];
+
+  document.getElementById('st-toplam').textContent = toplam;
+  document.getElementById('st-onaylanan').textContent = onaylananlar.length;
+  document.getElementById('st-aylik').textContent = aylikCiro.toLocaleString('tr-TR') + '₺';
+  document.getElementById('st-aylik-sub').textContent = aylar[simdi.getMonth()] + ' ' + simdi.getFullYear();
+  document.getElementById('st-toplam-ciro').textContent = toplamCiro.toLocaleString('tr-TR') + '₺';
+}
+
+// ── FİLTRE ───────────────────────────────────────────────────────────────────
+function filtrele(durum, btn) {
+  aktifFiltre = durum;
+  document.querySelectorAll('.filtre-btn').forEach(b => b.classList.remove('aktif'));
+  btn.classList.add('aktif');
+  tabloGoster(durum);
+}
+
+// ── TABLO GÖSTER ─────────────────────────────────────────────────────────────
+function tabloGoster(filtre) {
+  const liste = filtre === 'hepsi'
+    ? tumRezervasyonlar
+    : tumRezervasyonlar.filter(r => r.durum === filtre);
+
+  const tbody = document.getElementById('rez-tbody');
+
+  if (liste.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8" class="bos-mesaj">Rezervasyon bulunamadı.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = liste.map(r => {
+    const fiyat = FIYATLAR[r.hizmet] || 0;
+    const durumBadge = {
+      bekliyor:    `<span class="badge badge-bekliyor">Bekliyor</span>`,
+      onaylandi:   `<span class="badge badge-onaylandi">Onaylandı</span>`,
+      reddedildi:  `<span class="badge badge-reddedildi">Reddedildi</span>`,
+    }[r.durum] || r.durum;
+
+    const aksiyonlar = r.durum === 'bekliyor'
+      ? `<div class="aksiyon-wrap">
+           <button class="btn-onay" onclick="onayEt('${r.id}')">Onayla</button>
+           <button class="btn-red"  onclick="reddet('${r.id}')">Reddet</button>
+           <button class="btn-sil"  onclick="sil('${r.id}')">✕</button>
+         </div>`
+      : `<button class="btn-sil" onclick="sil('${r.id}')">✕ Sil</button>`;
+
+    const olusturma = new Date(r.tarihOlustur).toLocaleString('tr-TR', {
+      day:'2-digit', month:'2-digit', year:'numeric',
+      hour:'2-digit', minute:'2-digit'
+    });
+
+    return `<tr id="row-${r.id}">
+      <td>
+        <div class="td-ad">${r.ad}</div>
+        <div class="td-tel">${r.telefon}</div>
+      </td>
+      <td class="td-hizmet">${r.hizmet}</td>
+      <td class="td-fiyat">${fiyat ? fiyat.toLocaleString('tr-TR') + '₺' : '—'}</td>
+      <td class="td-tarih">${r.tarih}<br>${r.saat || '—'}</td>
+      <td class="td-not" title="${r.not || ''}">${r.not || '—'}</td>
+      <td>${durumBadge}</td>
+      <td class="td-olustur">${olusturma}</td>
+      <td>${aksiyonlar}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── ONAY ─────────────────────────────────────────────────────────────────────
+async function onayEt(id) {
+  const res = await fetch(`/admin/onay/${id}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ sifre: SIFRE })
+  });
+  const veri = await res.json();
+  toast(veri.mesaj || 'Onaylandı.', veri.ok ? 'ok' : 'hata');
+  if (veri.ok) verileriYukle();
+}
+
+// ── RED ───────────────────────────────────────────────────────────────────────
+async function reddet(id) {
+  const res = await fetch(`/admin/red/${id}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ sifre: SIFRE })
+  });
+  const veri = await res.json();
+  toast(veri.mesaj || 'Reddedildi.', veri.ok ? 'ok' : 'hata');
+  if (veri.ok) verileriYukle();
+}
+
+// ── SİL ───────────────────────────────────────────────────────────────────────
+async function sil(id) {
+  if (!confirm('Bu rezervasyonu silmek istediğinizden emin misiniz?')) return;
+  const res = await fetch(`/admin/sil/${id}`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ sifre: SIFRE })
+  });
+  const veri = await res.json();
+  if (veri.ok) {
+    toast('Silindi.', 'ok');
+    verileriYukle();
+  }
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+function toast(mesaj, tip) {
+  const el = document.getElementById('toast');
+  el.textContent = mesaj;
+  el.className = 'toast show ' + (tip || '');
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
