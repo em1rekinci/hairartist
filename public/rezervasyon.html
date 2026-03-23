@@ -843,9 +843,21 @@ document.addEventListener('DOMContentLoaded', function() {
     var el = document.getElementById(prefix + '-tarih');
     if (!el) return;
     el.min = bugun;
-    el.addEventListener('change', function() { saatleriGuncelle(prefix); });
+    el.addEventListener('change', function() {
+      // Geçmiş tarih seçildiyse bugüne sıfırla
+      if (el.value < bugun) {
+        el.value = bugun;
+      }
+      saatleriGuncelle(prefix);
+    });
+    // Input event'i de dinle (iOS için)
+    el.addEventListener('input', function() {
+      if (el.value < bugun) {
+        el.value = bugun;
+      }
+      saatleriGuncelle(prefix);
+    });
   });
-  // Sayfa yüklenince bugünü varsayılan yap
   saatleriGuncelle('n');
   saatleriGuncelle('o');
 });

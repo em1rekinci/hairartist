@@ -135,11 +135,11 @@ nav ul li a.active{color:var(--off);border-bottom:2px solid var(--off);transitio
 .fsub:hover{opacity:.8}
 
 /* FOOTER */
-footer{background:var(--black);border-top:1px solid rgba(247,244,239,.06);padding:40px 56px;display:flex;justify-content:space-between;align-items:center;position:relative}
+footer{background:var(--black);border-top:1px solid rgba(247,244,239,.06);padding:40px 56px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;position:relative}
 .foot-logo img{height:28px;width:auto;filter:brightness(0) invert(1);opacity:.6}
 .foot-logo-txt{font-family:"Playfair Display",serif;font-weight:700;font-size:.95rem;color:rgba(247,244,239,.5);letter-spacing:.1em}
 footer p{font-size:.62rem;color:rgba(247,244,239,.2);letter-spacing:.08em}
-.foot-credit{font-size:.82rem;color:#fff;text-decoration:none;transition:opacity .3s;letter-spacing:.04em;font-weight:600;position:absolute;left:50%;transform:translateX(-50%)}
+.foot-credit{font-size:.82rem;color:#fff;text-decoration:none;transition:opacity .3s;letter-spacing:.04em;font-weight:600}
 .foot-credit:hover{opacity:.7}
 
 /* CONTACT SECTION */
@@ -238,8 +238,7 @@ footer p{font-size:.62rem;color:rgba(247,244,239,.2);letter-spacing:.08em}
   .map-box iframe{height:240px}
 
   /* Footer */
-  footer{padding:28px 24px;flex-direction:column;gap:12px;text-align:center}
-  .foot-credit{position:static;transform:none}
+  footer{padding:28px 24px;gap:12px}
 }
 
 @media(max-width:540px){
