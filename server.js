@@ -14,6 +14,7 @@ const NETGSM_PASSWORD  = process.env.NETGSM_PASSWORD;
 const NETGSM_MSGHEADER = process.env.NETGSM_MSGHEADER;
 const ALICI_TELEFON    = process.env.ALICI_TELEFON;    // Fatih Kurt
 const SITE_URL         = process.env.SITE_URL;         // site adresi güncel unutma
+const ADMIN_SIFRE      = process.env.ADMIN_SIFRE || 'hairartist2026';  // admin şifresi
 
 // ─── GEÇİCİ REZERVASYON DEPOSU ───────────────────────────────────────────────
 const rezervasyonlar = new Map();
@@ -21,6 +22,12 @@ const rezervasyonlar = new Map();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// ─── ADMİN PANELİ — static'ten önce tanımlanmalı ─────────────────────────────
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ─── REZERVASYON AL ──────────────────────────────────────────────────────────
@@ -175,6 +182,86 @@ function sayfaHTML(baslik, icerik, renk) {
   <a href="/">← Anasayfaya Dön</a></div>
   </body></html>`;
 }
+
+// ─── ADMİN: GİRİŞ ───────────────────────────────────────────────────────────
+app.post('/admin/giris', (req, res) => {
+  const { sifre } = req.body;
+  if (sifre === ADMIN_SIFRE) {
+    return res.json({ ok: true });
+  }
+  return res.status(401).json({ ok: false, mesaj: 'Şifre hatalı.' });
+});
+
+// ─── ADMİN: TÜM REZERVASYONLAR ───────────────────────────────────────────────
+app.get('/admin/rezervasyonlar', (req, res) => {
+  const { sifre } = req.query;
+  if (sifre !== ADMIN_SIFRE) return res.status(401).json({ ok: false });
+
+  const liste = Array.from(rezervasyonlar.values())
+    .sort((a, b) => new Date(b.tarihOlustur) - new Date(a.tarihOlustur));
+
+  return res.json({ ok: true, rezervasyonlar: liste });
+});
+
+// ─── ADMİN: ONAY (panel üzerinden) ───────────────────────────────────────────
+app.post('/admin/onay/:id', async (req, res) => {
+  const { sifre } = req.body;
+  if (sifre !== ADMIN_SIFRE) return res.status(401).json({ ok: false });
+
+  const rez = rezervasyonlar.get(req.params.id);
+  if (!rez) return res.status(404).json({ ok: false, mesaj: 'Bulunamadı.' });
+  if (rez.durum !== 'bekliyor') return res.status(400).json({ ok: false, mesaj: 'Zaten işlendi.' });
+
+  rez.durum = 'onaylandi';
+
+  const musteriSms =
+    `Merhaba ${rez.ad}!\n` +
+    `Randevunuz ONAYLANDI ✓\n` +
+    `${rez.tarih} - ${rez.saat}\n` +
+    `Hizmet: ${rez.hizmet}\n` +
+    `Adres: Alibeyköy Cd No:5, Eyüpsultan\n` +
+    `İptal: 0531 777 02 03`;
+
+  try {
+    await smsSend(telefonFormat(rez.telefon), musteriSms);
+    return res.json({ ok: true, mesaj: 'Onaylandı, SMS gönderildi.' });
+  } catch (err) {
+    return res.json({ ok: true, mesaj: 'Onaylandı fakat SMS gönderilemedi.' });
+  }
+});
+
+// ─── ADMİN: RED (panel üzerinden) ────────────────────────────────────────────
+app.post('/admin/red/:id', async (req, res) => {
+  const { sifre } = req.body;
+  if (sifre !== ADMIN_SIFRE) return res.status(401).json({ ok: false });
+
+  const rez = rezervasyonlar.get(req.params.id);
+  if (!rez) return res.status(404).json({ ok: false, mesaj: 'Bulunamadı.' });
+  if (rez.durum !== 'bekliyor') return res.status(400).json({ ok: false, mesaj: 'Zaten işlendi.' });
+
+  rez.durum = 'reddedildi';
+
+  const musteriSms =
+    `Merhaba ${rez.ad},\n` +
+    `${rez.tarih} ${rez.saat} randevusu uygun değil.\n` +
+    `Yeni tarih için: 0531 777 02 03\n` +
+    `Hair Artist`;
+
+  try {
+    await smsSend(telefonFormat(rez.telefon), musteriSms);
+    return res.json({ ok: true, mesaj: 'Reddedildi, SMS gönderildi.' });
+  } catch (err) {
+    return res.json({ ok: true, mesaj: 'Reddedildi fakat SMS gönderilemedi.' });
+  }
+});
+
+// ─── ADMİN: SİL ──────────────────────────────────────────────────────────────
+app.delete('/admin/sil/:id', (req, res) => {
+  const { sifre } = req.body;
+  if (sifre !== ADMIN_SIFRE) return res.status(401).json({ ok: false });
+  rezervasyonlar.delete(req.params.id);
+  return res.json({ ok: true });
+});
 
 // ─── PORTFOLYO TEMİZ URL
 app.get('/portfolio', (req, res) => {
