@@ -242,16 +242,43 @@
       </div>
       <div class="fg">
         <label class="fl">Hizmet</label>
-        <select id="rez-hizmet" class="fi" onchange="hizmetSecildi(this)">
-          <option value="" data-indirimli="" data-normal="">— Hizmet Seçin —</option>
-          <option value="Saç Kesimi" data-indirimli="450" data-normal="500">Saç Kesimi — 450₺ (500₺)</option>
-          <option value="Saç Bakımı" data-indirimli="900" data-normal="1000">Saç Bakımı — 900₺ (1.000₺)</option>
-          <option value="Saç Boyama" data-indirimli="1800" data-normal="2000">Saç Boyama — 1.800₺ (2.000₺)</option>
-          <option value="Saç Renklendirme (Ombre/Sombre)" data-indirimli="3150" data-normal="3500">Saç Renklendirme — 3.150₺ (3.500₺)</option>
-          <option value="Balyaj" data-indirimli="7500" data-normal="10000">Balyaj — 7.500₺ (10.000₺)</option>
-          <option value="Saç Şekillendirme" data-indirimli="630" data-normal="700">Saç Şekillendirme — 630₺ (700₺)</option>
-          <option value="Özel Saç Bakımı" data-indirimli="1350" data-normal="1500">Özel Saç Bakımı — 1.350₺ (1.500₺)</option>
-        </select>
+        <input type="hidden" id="rez-hizmet" value="">
+        <div class="cs-wrap" id="cs-wrap">
+          <div class="cs-selected" id="cs-selected" onclick="csToggle()">
+            <span id="cs-label" style="color:rgba(8,8,8,.4)">— Hizmet Seçin —</span>
+            <svg class="cs-arrow" id="cs-arrow" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.2"/></svg>
+          </div>
+          <div class="cs-dropdown" id="cs-dropdown">
+            <div class="cs-option" onclick="hizmetSec(this,'Saç Kesimi',450,500)">
+              <span class="cs-ad">Saç Kesimi</span>
+              <span class="cs-fiyatlar"><span class="cs-indirimli">450₺</span><span class="cs-normal">500₺</span></span>
+            </div>
+            <div class="cs-option" onclick="hizmetSec(this,'Saç Bakımı',900,1000)">
+              <span class="cs-ad">Saç Bakımı</span>
+              <span class="cs-fiyatlar"><span class="cs-indirimli">900₺</span><span class="cs-normal">1.000₺</span></span>
+            </div>
+            <div class="cs-option" onclick="hizmetSec(this,'Saç Boyama',1800,2000)">
+              <span class="cs-ad">Saç Boyama</span>
+              <span class="cs-fiyatlar"><span class="cs-indirimli">1.800₺</span><span class="cs-normal">2.000₺</span></span>
+            </div>
+            <div class="cs-option" onclick="hizmetSec(this,'Saç Renklendirme (Ombre/Sombre)',3150,3500)">
+              <span class="cs-ad">Saç Renklendirme <small style="opacity:.55;font-size:.85em">(Ombre/Sombre)</small></span>
+              <span class="cs-fiyatlar"><span class="cs-indirimli">3.150₺</span><span class="cs-normal">3.500₺</span></span>
+            </div>
+            <div class="cs-option" onclick="hizmetSec(this,'Balyaj',7500,10000)">
+              <span class="cs-ad">Balyaj</span>
+              <span class="cs-fiyatlar"><span class="cs-indirimli">7.500₺</span><span class="cs-normal">10.000₺</span></span>
+            </div>
+            <div class="cs-option" onclick="hizmetSec(this,'Saç Şekillendirme',630,700)">
+              <span class="cs-ad">Saç Şekillendirme</span>
+              <span class="cs-fiyatlar"><span class="cs-indirimli">630₺</span><span class="cs-normal">700₺</span></span>
+            </div>
+            <div class="cs-option" onclick="hizmetSec(this,'Özel Saç Bakımı',1350,1500)">
+              <span class="cs-ad">Özel Saç Bakımı</span>
+              <span class="cs-fiyatlar"><span class="cs-indirimli">1.350₺</span><span class="cs-normal">1.500₺</span></span>
+            </div>
+          </div>
+        </div>
         <div id="fiyat-goster" style="display:none" class="fiyat-box">
           <span id="fiyat-indirimli"></span>
           <span id="fiyat-normal"></span>
@@ -437,17 +464,30 @@ function selectTime(btn, time) {
 
 </script>
 <script>
-function hizmetSecildi(sel) {
-  const opt = sel.options[sel.selectedIndex];
-  const indirimli = opt.dataset.indirimli;
-  const normal = opt.dataset.normal;
-  const box = document.getElementById('fiyat-goster');
-  if (!indirimli) { box.style.display = 'none'; return; }
-  document.getElementById('fiyat-indirimli').textContent =
-    Number(indirimli).toLocaleString('tr-TR') + '₺';
-  document.getElementById('fiyat-normal').textContent =
-    Number(normal).toLocaleString('tr-TR') + '₺';
-  box.style.display = 'flex';
+function csToggle() {
+  var dd = document.getElementById('cs-dropdown');
+  var arrow = document.getElementById('cs-arrow');
+  var open = dd.classList.toggle('open');
+  arrow.style.transform = open ? 'rotate(180deg)' : '';
+}
+document.addEventListener('click', function(e) {
+  if (!document.getElementById('cs-wrap').contains(e.target)) {
+    document.getElementById('cs-dropdown').classList.remove('open');
+    document.getElementById('cs-arrow').style.transform = '';
+  }
+});
+function hizmetSec(el, ad, indirimli, normal) {
+  document.querySelectorAll('.cs-option').forEach(i => i.classList.remove('secili'));
+  el.classList.add('secili');
+  document.getElementById('rez-hizmet').value = ad;
+  var lbl = document.getElementById('cs-label');
+  lbl.style.color = '';
+  lbl.innerHTML = '<strong>' + ad + '</strong>';
+  document.getElementById('cs-dropdown').classList.remove('open');
+  document.getElementById('cs-arrow').style.transform = '';
+  document.getElementById('fiyat-indirimli').textContent = indirimli.toLocaleString('tr-TR') + '₺';
+  document.getElementById('fiyat-normal').textContent = normal.toLocaleString('tr-TR') + '₺';
+  document.getElementById('fiyat-goster').style.display = 'flex';
 }
 
 async function rezervasyonGonder() {
@@ -462,8 +502,8 @@ async function rezervasyonGonder() {
   const not     = document.getElementById('rez-not').value.trim();
 
   // Basit doğrulama
-  if (!ad || !telefon || !tarih) {
-    goster(mesajDiv, 'Lütfen ad, telefon ve tarih alanlarını doldurun.', 'hata');
+  if (!ad || !telefon || !hizmet || !tarih) {
+    goster(mesajDiv, 'Lütfen tüm zorunlu alanları doldurun.', 'hata');
     return;
   }
 

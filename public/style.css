@@ -414,6 +414,64 @@ nav.scrolled {
   .wa-float svg { width: 24px; height: 24px; }
 }
 
+/* ===== CUSTOM SELECT ===== */
+.cs-wrap { position: relative; }
+.cs-selected {
+  width: 100%;
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--black);
+  padding: 13px 16px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: .85rem;
+  font-weight: 300;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  transition: border-color .3s;
+}
+.cs-selected:hover { border-color: var(--black); }
+.cs-arrow { width: 10px; height: 6px; color: var(--dim); flex-shrink: 0; transition: transform .2s; }
+.cs-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0; right: 0;
+  background: var(--off);
+  border: 1px solid var(--black);
+  z-index: 100;
+  box-shadow: 0 8px 24px rgba(8,8,8,.12);
+}
+.cs-dropdown.open { display: block; }
+.cs-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--line);
+  font-size: .82rem;
+  color: var(--black);
+  gap: 12px;
+  transition: background .15s;
+}
+.cs-option:last-child { border-bottom: none; }
+.cs-option:hover { background: rgba(8,8,8,.05); }
+.cs-option.secili { background: var(--black); color: var(--off); }
+.cs-option.secili .cs-indirimli { color: #c8ff00; }
+.cs-option.secili .cs-normal { color: rgba(247,244,239,.3); text-decoration-color: rgba(247,244,239,.3); }
+.cs-ad { flex: 1; font-weight: 400; }
+.cs-fiyatlar { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.cs-indirimli { font-weight: 600; font-size: .82rem; }
+.cs-normal {
+  font-size: .72rem;
+  color: rgba(8,8,8,.35);
+  text-decoration: line-through;
+  text-decoration-color: rgba(8,8,8,.35);
+}
+
 /* ===== FİYAT KUTUSU ===== */
 .fiyat-box {
   display: flex;
