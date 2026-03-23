@@ -239,9 +239,7 @@
         </div>
       </div>
       <div class="yh-sag">
-        <button class="slider-ok" id="ok-prev" onclick="sliderKaydır(-1)">←</button>
-        <button class="slider-ok" id="ok-next" onclick="sliderKaydır(1)">→</button>
-        <a href="https://maps.google.com/?cid=Fatih+KURT+Hair+Artist" target="_blank" class="yorumlar-btn">Tüm Yorumlar →</a>
+        <a href="https://www.google.com/maps/place/Fatih+KURT+Hair+Artist/@41.065937,28.934312,17z/data=!4m8!3m7!1s0x14caa4b3e3b3b3b3:0x1!8m2!3d41.065937!4d28.934312!9m1!1b1" target="_blank" class="yorumlar-btn">Tüm Yorumlar →</a>
       </div>
     </div>
 
@@ -556,14 +554,35 @@ function selectTime(btn, time) {
 <script>
 // ─── YORUM SLİDER
 var sliderPos = 0;
+var sliderTimer = null;
+
 function sliderKaydır(yon) {
   var slider = document.getElementById('yorum-slider');
   var kartlar = slider.querySelectorAll('.yorum-kart');
   var kartW = kartlar[0].offsetWidth + 16;
-  var maxPos = Math.max(0, kartlar.length - Math.floor(slider.parentElement.offsetWidth / kartW));
-  sliderPos = Math.min(Math.max(sliderPos + yon, 0), maxPos);
+  var maxPos = kartlar.length - 1;
+  sliderPos = sliderPos + yon;
+  if (sliderPos > maxPos) sliderPos = 0;
+  if (sliderPos < 0) sliderPos = maxPos;
   slider.style.transform = 'translateX(-' + (sliderPos * kartW) + 'px)';
 }
+
+function sliderOtoBaslat() {
+  sliderTimer = setInterval(function() { sliderKaydır(1); }, 3500);
+}
+
+function sliderOtoDurdur() {
+  clearInterval(sliderTimer);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  var wrap = document.getElementById('yorum-slider');
+  if (wrap) {
+    sliderOtoBaslat();
+    wrap.parentElement.addEventListener('mouseenter', sliderOtoDurdur);
+    wrap.parentElement.addEventListener('mouseleave', sliderOtoBaslat);
+  }
+});
 
 function csToggle() {
   var dd = document.getElementById('cs-dropdown');
