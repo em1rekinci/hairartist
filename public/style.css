@@ -381,38 +381,7 @@ nav.scrolled {
   box-shadow: 0 4px 32px rgba(0,0,0,.4);
 }
 
-/* ===== WHATSAPP FLOATING ===== */
-.wa-float {
-  position: fixed;
-  bottom: 28px;
-  right: 28px;
-  z-index: 999;
-  width: 54px;
-  height: 54px;
-  background: #25D366;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 20px rgba(37,211,102,.4);
-  text-decoration: none;
-  transition: transform .3s, box-shadow .3s;
-  animation: waPulse 3s ease-in-out infinite;
-}
-.wa-float:hover {
-  transform: scale(1.1);
-  box-shadow: 0 6px 28px rgba(37,211,102,.6);
-  animation: none;
-}
-.wa-float svg { width: 28px; height: 28px; fill: #fff; }
-@keyframes waPulse {
-  0%,100% { box-shadow: 0 4px 20px rgba(37,211,102,.4) }
-  50% { box-shadow: 0 4px 32px rgba(37,211,102,.7), 0 0 0 8px rgba(37,211,102,.1) }
-}
-@media(max-width:540px){
-  .wa-float { bottom: 18px; right: 16px; width: 48px; height: 48px; }
-  .wa-float svg { width: 24px; height: 24px; }
-}
+
 
 /* ===== CUSTOM SELECT ===== */
 .cs-wrap { position: relative; }
