@@ -383,6 +383,44 @@ nav.scrolled {
 
 
 
+/* ===== GOOGLE YORUMLAR ===== */
+.yorumlar-section{background:var(--off);color:var(--black);padding:80px 0 80px}
+.yorumlar-inner{max-width:100%}
+.yorumlar-header{display:flex;align-items:flex-end;justify-content:space-between;padding:0 56px;margin-bottom:40px;flex-wrap:wrap;gap:20px}
+.yh-sol h2{font-family:'Playfair Display',serif;font-size:clamp(2rem,4vw,3rem);font-weight:700;margin-bottom:20px}
+.yh-sol h2 em{font-style:italic;font-weight:400;color:var(--dim)}
+.genel-puan{display:flex;align-items:center;gap:16px}
+.gp-sayi{font-family:'Playfair Display',serif;font-size:3rem;font-weight:700;line-height:1;color:var(--black)}
+.gp-sag{display:flex;flex-direction:column;gap:4px}
+.gp-yildizlar{font-size:1.1rem;color:#f5a623;letter-spacing:2px}
+.gp-alt{font-size:.68rem;letter-spacing:.12em;color:var(--dim);text-transform:uppercase}
+.yh-sag{display:flex;align-items:center;gap:10px}
+.slider-ok{background:transparent;border:1px solid rgba(8,8,8,.2);color:var(--black);width:40px;height:40px;font-size:1rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center}
+.slider-ok:hover{background:var(--black);color:var(--off);border-color:var(--black)}
+.yorumlar-btn{background:var(--black);color:var(--off);padding:11px 24px;font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;font-weight:600;text-decoration:none;transition:opacity .2s;white-space:nowrap}
+.yorumlar-btn:hover{opacity:.8}
+.yorum-slider-wrap{overflow:hidden;padding:0 56px}
+.yorum-slider{display:flex;gap:16px;transition:transform .4s cubic-bezier(.4,0,.2,1)}
+.yorum-kart{background:#fff;border:1px solid #e8e4dc;padding:24px 22px;display:flex;flex-direction:column;gap:14px;min-width:280px;max-width:280px;flex-shrink:0}
+.yk-ust{display:flex;align-items:center;gap:10px}
+.yk-avatar{width:38px;height:38px;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-size:.9rem;font-weight:600;flex-shrink:0}
+.yk-kisi{flex:1;min-width:0}
+.yk-ad{font-size:.78rem;font-weight:600;color:var(--black);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.yk-yildiz{font-size:.7rem;color:#f5a623;letter-spacing:1px}
+.yk-google{width:18px;height:18px;flex-shrink:0}
+.yk-google svg{width:18px;height:18px}
+.yk-yorum{font-size:.8rem;line-height:1.75;color:#5a5650;flex:1}
+.yk-tarih{font-size:.68rem;color:rgba(8,8,8,.3);margin-top:auto}
+@media(max-width:900px){
+  .yorumlar-header{padding:0 24px}
+  .yorum-slider-wrap{padding:0 24px}
+  .yorum-kart{min-width:260px;max-width:260px}
+}
+@media(max-width:600px){
+  .yorumlar-header{flex-direction:column;align-items:flex-start}
+  .yorum-kart{min-width:80vw;max-width:80vw}
+}
+
 /* ===== CUSTOM SELECT ===== */
 .cs-wrap { position: relative; }
 .cs-selected {
