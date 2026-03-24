@@ -8,22 +8,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <style>
-.oneri-section{background:var(--off,#f7f4ef);padding:80px 56px;font-family:'Montserrat',sans-serif}
-.oneri-baslik{margin-bottom:40px}
-.oneri-baslik h2 em{font-style:italic;font-weight:400;color:rgba(8,8,8,.3)}
-.oneri-alt{font-size:.75rem;color:rgba(8,8,8,.4);margin-top:10px;letter-spacing:.06em}
-.oneri-form-wrap{max-width:640px;display:flex;flex-direction:column;gap:12px}
-.oneri-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.oneri-input,.oneri-textarea{width:100%;background:#fff;border:1px solid #e0dbd2;padding:14px 18px;font-family:'Montserrat',sans-serif;font-size:.82rem;color:#080808;outline:none;transition:border .2s;line-height:1.8;box-sizing:border-box}
-.oneri-input:focus,.oneri-textarea:focus{border-color:#080808}
-.oneri-input::placeholder,.oneri-textarea::placeholder{color:rgba(8,8,8,.3)}
+.oneri-section{display:none}
+.contact-oneri-col{padding-top:2px}
+.oneri-input,.oneri-textarea{width:100%;background:rgba(247,244,239,.05);border:1px solid rgba(247,244,239,.1);padding:12px 14px;font-family:'Montserrat',sans-serif;font-size:.78rem;color:var(--off,#f7f4ef);outline:none;transition:border .2s;line-height:1.7;box-sizing:border-box;border-radius:2px}
+.oneri-input:focus,.oneri-textarea:focus{border-color:rgba(247,244,239,.4)}
+.oneri-input::placeholder,.oneri-textarea::placeholder{color:rgba(247,244,239,.25)}
 .oneri-textarea{resize:vertical}
-.oneri-btn{align-self:flex-start;background:#080808;color:#f7f4ef;border:none;padding:14px 36px;font-family:'Montserrat',sans-serif;font-size:.65rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;transition:opacity .2s}
+.oneri-btn{background:var(--off,#f7f4ef);color:#080808;border:none;padding:12px 28px;font-family:'Montserrat',sans-serif;font-size:.6rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;transition:opacity .2s;border-radius:2px}
 .oneri-btn:hover{opacity:.75}
-.oneri-mesaj{font-size:.72rem;min-height:20px}
-.oneri-mesaj.basarili{color:#2d7a2d}
-.oneri-mesaj.hata{color:#b03030}
-@media(max-width:540px){.oneri-section{padding:56px 16px}.oneri-row{grid-template-columns:1fr}}
+.oneri-mesaj{font-size:.7rem;min-height:16px;margin-top:4px}
+.oneri-mesaj.basarili{color:#a8ff6b}
+.oneri-mesaj.hata{color:#ff8080}
+@media(max-width:900px){.contact-oneri-col{display:none}}
 </style>
 </head>
 <body>
@@ -427,7 +423,22 @@
     <h2 style="font-family:'Playfair Display',serif;font-size:clamp(2rem,4vw,2.8rem);font-weight:700;margin:0">Bize <em style="font-style:italic;font-weight:400;color:rgba(247,244,239,.4)">Ulaşın</em></h2>
     <img src="images/logo2.png" alt="Hair Artist" class="contact-logo">
   </div>
-  <div class="contact-grid" data-anim data-delay="2">
+  <div class="contact-grid" data-anim data-delay="2" style="grid-template-columns:1.6fr 1fr 1fr 1.2fr">
+
+    <!-- ÖNERİ & ŞİKAYET -->
+    <div class="contact-oneri-col">
+      <h4 style="font-family:'Playfair Display',serif;font-size:1rem;margin-bottom:14px;color:var(--off)">Öneri & <em style="font-style:italic;font-weight:400;color:rgba(247,244,239,.35)">Şikayet</em></h4>
+      <p style="font-size:.75rem;color:rgba(247,244,239,.35);margin-bottom:20px;line-height:1.7">Görüşleriniz bizim için değerli.</p>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <input class="oneri-input" id="oneriIsim" type="text" placeholder="Adınız">
+          <input class="oneri-input" id="oneriMail" type="email" placeholder="E-posta">
+        </div>
+        <textarea class="oneri-textarea" id="oneriMetin" placeholder="Öneri veya şikayetinizi yazın..." rows="4"></textarea>
+        <button class="oneri-btn" onclick="oneriGonder()">Gönder</button>
+        <div class="oneri-mesaj" id="oneriMesaj"></div>
+      </div>
+    </div>
 
     <!-- ADRES -->
     <div class="contact-item">
@@ -468,7 +479,6 @@
       <div class="hour-row" id="hr-4"><span class="day-name">Cuma</span><span class="hour-time">08:30 — 20:00</span></div>
       <div class="hour-row" id="hr-5"><span class="day-name">Cumartesi</span><span class="hour-time">08:30 — 20:00</span></div>
       <div class="hour-row" id="hr-6"><span class="day-name">Pazar</span><span class="hour-time">09:00 — 19:00</span></div>
-      <!-- Pazartesi=hr-0, Salı=hr-1(kapalı), Çar=hr-2, Per=hr-3, Cum=hr-4, Cmt=hr-5, Paz=hr-6 -->
     </div>
 
     <!-- HARİTA -->
@@ -481,24 +491,6 @@
       </iframe>
     </div>
 
-  </div>
-</section>
-
-<!-- ÖNERİ & ŞİKAYET -->
-<section class="oneri-section" id="oneri">
-  <span class="sec-tag" data-anim>Geri Bildirim</span>
-  <div class="oneri-baslik">
-    <h2 style="font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:700;margin:0;color:#080808">Öneri & <em>Şikayet</em></h2>
-    <p class="oneri-alt">Görüşleriniz bizim için değerli.</p>
-  </div>
-  <div class="oneri-form-wrap" data-anim data-delay="1">
-    <div class="oneri-row">
-      <input class="oneri-input" id="oneriIsim" type="text" placeholder="Adınız">
-      <input class="oneri-input" id="oneriMail" type="email" placeholder="E-posta adresiniz">
-    </div>
-    <textarea class="oneri-textarea" id="oneriMetin" placeholder="Öneri veya şikayetinizi buraya yazın..." rows="5"></textarea>
-    <button class="oneri-btn" onclick="oneriGonder()">Gönder</button>
-    <div class="oneri-mesaj" id="oneriMesaj"></div>
   </div>
 </section>
 
