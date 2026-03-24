@@ -144,13 +144,13 @@ footer p{font-size:.62rem;color:rgba(247,244,239,.2);letter-spacing:.08em}
 
 /* CONTACT SECTION */
 .contact-section{background:var(--mid);padding:80px 56px;border-top:1px solid rgba(247,244,239,.05)}
-/* Masaüstü: başlık + logo yan yana ama logo küçük */
-.contact-baslik{display:flex;align-items:center;gap:20px;margin-top:8px;margin-bottom:0}
-.contact-logo{height:36px;width:auto;object-fit:contain}
-/* Mobil: başlık solda logo sağda ama logo çok sağa gitmesin */
+/* Masaüstü: başlık üstte, logo altında */
+.contact-baslik{display:flex;flex-direction:column;align-items:flex-start;gap:16px;margin-top:8px;margin-bottom:0}
+.contact-logo{height:52px;width:auto;object-fit:contain}
+/* Mobil: başlık solda logo sağda, logo biraz içeride */
 @media(max-width:900px){
-  .contact-baslik{justify-content:space-between;width:100%}
-  .contact-logo{height:36px;margin-right:16px}
+  .contact-baslik{flex-direction:row;align-items:center;justify-content:space-between;width:100%}
+  .contact-logo{height:52px;margin-right:32px}
 }
 .contact-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1.4fr;gap:24px;margin-top:48px;align-items:start}
 .contact-item h4{font-family:"Playfair Display",serif;font-size:1rem;margin-bottom:14px;color:var(--off)}
