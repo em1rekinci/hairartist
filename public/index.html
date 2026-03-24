@@ -423,10 +423,10 @@
     <h2 style="font-family:'Playfair Display',serif;font-size:clamp(2rem,4vw,2.8rem);font-weight:700;margin:0">Bize <em style="font-style:italic;font-weight:400;color:rgba(247,244,239,.4)">Ulaşın</em></h2>
     <img src="images/logo2.png" alt="Hair Artist" class="contact-logo">
   </div>
-  <div class="contact-grid" data-anim data-delay="2" style="grid-template-columns:1fr 1.4fr 1fr;grid-template-rows:auto auto;gap:24px;align-items:start">
+  <div class="contact-grid" data-anim data-delay="2" style="grid-template-columns:1fr 1.4fr 1fr;gap:24px;align-items:start">
 
     <!-- SOL: adres + iletişim (2 satır kaplar) -->
-    <div style="grid-column:1;grid-row:1/3;display:flex;flex-direction:column;gap:24px">
+    <div style="grid-column:1;display:flex;flex-direction:column;gap:24px">
       <div class="contact-item">
         <h4>Adres</h4>
         <p>Esentepe, Yıldıztabya<br>Alibeyköy Cd No:5<br>34065 Eyüpsultan / İstanbul</p>
@@ -442,8 +442,8 @@
       </div>
     </div>
 
-    <!-- ORTA: Öneri & Şikayet (2 satır kaplar) -->
-    <div class="contact-oneri-col" style="grid-column:2;grid-row:1/3">
+    <!-- ORTA: Öneri & Şikayet -->
+    <div class="contact-oneri-col" style="grid-column:2">
       <h4 style="font-family:'Playfair Display',serif;font-size:1rem;margin-bottom:14px;color:var(--off)">Öneri & <em style="font-style:italic;font-weight:400;color:rgba(247,244,239,.35)">Şikayet</em></h4>
       <p style="font-size:.75rem;color:rgba(247,244,239,.35);margin-bottom:20px;line-height:1.7">Görüşleriniz bizim için değerli.</p>
       <div style="display:flex;flex-direction:column;gap:10px">
@@ -457,21 +457,21 @@
       </div>
     </div>
 
-    <!-- SAĞ ÜST: Çalışma Saatleri -->
-    <div class="hours-box" style="grid-column:3;grid-row:1">
-      <h4>Çalışma Saatleri</h4>
-      <div class="hour-row" id="hr-0"><span class="day-name">Pazartesi</span><span class="hour-time">08:30 — 20:00</span></div>
-      <div class="hour-row closed" id="hr-1"><span class="day-name">Salı</span><span class="hour-time">Kapalı</span></div>
-      <div class="hour-row" id="hr-2"><span class="day-name">Çarşamba</span><span class="hour-time">08:30 — 20:00</span></div>
-      <div class="hour-row" id="hr-3"><span class="day-name">Perşembe</span><span class="hour-time">08:30 — 20:00</span></div>
-      <div class="hour-row" id="hr-4"><span class="day-name">Cuma</span><span class="hour-time">08:30 — 20:00</span></div>
-      <div class="hour-row" id="hr-5"><span class="day-name">Cumartesi</span><span class="hour-time">08:30 — 20:00</span></div>
-      <div class="hour-row" id="hr-6"><span class="day-name">Pazar</span><span class="hour-time">09:00 — 19:00</span></div>
-    </div>
-
-    <!-- SAĞ ALT: Harita -->
-    <div class="map-box" style="grid-column:3;grid-row:2">
-      <iframe src="https://maps.google.com/maps?q=Fatih+KURT+Hair+Artist,+Yıldıztabya+Alibeyköy+Cd+No:5,+Eyüpsultan,+İstanbul&z=18&output=embed&hl=tr" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    <!-- SAĞ: Çalışma Saatleri + Harita (tek div, yukarıdan başlar) -->
+    <div style="grid-column:3;display:flex;flex-direction:column;gap:16px;align-self:start">
+      <div class="hours-box">
+        <h4>Çalışma Saatleri</h4>
+        <div class="hour-row" id="hr-0"><span class="day-name">Pazartesi</span><span class="hour-time">08:30 — 20:00</span></div>
+        <div class="hour-row closed" id="hr-1"><span class="day-name">Salı</span><span class="hour-time">Kapalı</span></div>
+        <div class="hour-row" id="hr-2"><span class="day-name">Çarşamba</span><span class="hour-time">08:30 — 20:00</span></div>
+        <div class="hour-row" id="hr-3"><span class="day-name">Perşembe</span><span class="hour-time">08:30 — 20:00</span></div>
+        <div class="hour-row" id="hr-4"><span class="day-name">Cuma</span><span class="hour-time">08:30 — 20:00</span></div>
+        <div class="hour-row" id="hr-5"><span class="day-name">Cumartesi</span><span class="hour-time">08:30 — 20:00</span></div>
+        <div class="hour-row" id="hr-6"><span class="day-name">Pazar</span><span class="hour-time">09:00 — 19:00</span></div>
+      </div>
+      <div class="map-box">
+        <iframe src="https://maps.google.com/maps?q=Fatih+KURT+Hair+Artist,+Yıldıztabya+Alibeyköy+Cd+No:5,+Eyüpsultan,+İstanbul&z=18&output=embed&hl=tr" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
     </div>
 
   </div>
@@ -533,7 +533,7 @@ function selectTime(btn, time) {
   ].filter(s => s.el && s.link);
 
   function updateActive() {
-    const scrollY = window.scrollY + 80; // nav offset
+    const scrollY = window.scrollY + 80;
     let current = sections[0];
     sections.forEach(s => {
       if (s.el.offsetTop <= scrollY) current = s;
@@ -552,16 +552,12 @@ function selectTime(btn, time) {
 
 // Bugünkü günü vurgula
 (function(){
-  const days = [0,1,2,3,4,5,6]; // Pzt=0...Paz=6 (JS: 0=Paz,1=Pzt...)
-  const jsDay = new Date().getDay(); // 0=Paz,1=Pzt,...,6=Cmt
-  // JS: 0=Paz -> hr-6, 1=Pzt -> hr-0, 2=Sal -> hr-1, ...
+  const jsDay = new Date().getDay();
   const map = {0:6,1:0,2:1,3:2,4:3,5:4,6:5};
   const idx = map[jsDay];
   const row = document.getElementById('hr-'+idx);
   if(row){ row.classList.add('today'); }
 })();
-
-
 </script>
 <script>
 // ─── YORUM SLİDER
@@ -582,7 +578,6 @@ function sliderKaydır(yon) {
 document.addEventListener('DOMContentLoaded', function() {
   var slider = document.getElementById('yorum-slider');
   if (!slider) return;
-  // Kartları iki kez kopyala — sonsuz döngü
   var kartlar = slider.innerHTML;
   slider.innerHTML = kartlar + kartlar;
   var toplamGenislik = slider.scrollWidth / 2;
@@ -632,7 +627,6 @@ async function rezervasyonGonder() {
   const saat    = document.getElementById('rez-saat').value;
   const not     = document.getElementById('rez-not').value.trim();
 
-  // Basit doğrulama
   if (!ad || !telefon || !hizmet || !tarih) {
     goster(mesajDiv, 'Lütfen tüm zorunlu alanları doldurun.', 'hata');
     return;
@@ -642,9 +636,7 @@ async function rezervasyonGonder() {
   btn.textContent = 'Gönderiliyor…';
 
   try {
-    // Railway'deki sunucu URL'ini buraya yazın
-    // Örnek: https://hairartist-rezervasyon.up.railway.app
-    const SUNUCU = window.location.origin; // Aynı sunucuda çalışıyorsa bu yeterli
+    const SUNUCU = window.location.origin;
 
     const res = await fetch(`${SUNUCU}/rezervasyon`, {
       method: 'POST',
@@ -656,7 +648,6 @@ async function rezervasyonGonder() {
 
     if (veri.ok) {
       goster(mesajDiv, '✓ ' + veri.mesaj, 'basari');
-      // Formu temizle
       ['rez-ad','rez-tel','rez-tarih','rez-not'].forEach(id => document.getElementById(id).value = '');
       btn.textContent = 'Gönderildi ✓';
     } else {
