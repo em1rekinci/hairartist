@@ -12,9 +12,9 @@
 .shop-page{background:var(--off);color:var(--black);padding-top:70px;font-family:'Montserrat',sans-serif}
 
 /* ── SHOP HEADER ── */
-.shop-hero{background:var(--black);padding:48px 56px 44px;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.shop-hero{background:var(--black);padding:80px 56px 72px;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap}
 .shop-hero-sol .sec-tag{color:rgba(247,244,239,.35)}
-.shop-hero-sol h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,4vw,3rem);font-weight:700;color:var(--off);margin-top:8px;line-height:.95}
+.shop-hero-sol h1{font-family:'Playfair Display',serif;font-size:clamp(2.6rem,6vw,4.2rem);font-weight:700;color:var(--off);margin-top:10px;line-height:.95}
 .shop-hero-sol h1 em{font-style:italic;font-weight:400;color:rgba(247,244,239,.3)}
 .shop-hero-sag{text-align:right}
 .shop-hero-sag p{font-size:.72rem;color:rgba(247,244,239,.3);line-height:1.8;max-width:280px}
@@ -30,14 +30,14 @@
 .bolum-baslik-alt{font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
 
 /* ── ÇOK SATANLAR SLİDER ── */
-.coksatan-wrap{overflow:hidden;padding:0 56px 48px}
-.coksatan-slider{display:flex;transition:transform .5s cubic-bezier(.4,0,.2,1)}
-.coksatan-grup{display:grid;grid-template-columns:1fr 1fr;gap:2px;flex-shrink:0;}
+.coksatan-wrap{overflow:hidden;padding:0 56px 60px}
+.coksatan-slider{display:flex;gap:16px;transition:transform .5s cubic-bezier(.4,0,.2,1)}
+.coksatan-grup{display:grid;grid-template-columns:1fr 1fr;gap:16px;flex-shrink:0;width:calc(100% - 8px)}
 
 /* ── ÜRÜN KARTI ── */
 .urun-kart{background:#fff;border:1px solid #e8e4dc;display:flex;flex-direction:column;overflow:hidden;transition:box-shadow .25s}
 .urun-kart:hover{box-shadow:0 8px 40px rgba(8,8,8,.1)}
-.urun-resim{aspect-ratio:4/3;background:#f0ece4;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.urun-resim{aspect-ratio:1/1;background:#f0ece4;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .urun-resim img{width:100%;height:100%;object-fit:cover}
 .urun-placeholder{display:flex;flex-direction:column;align-items:center;gap:10px;opacity:.2}
 .urun-placeholder svg{width:36px;height:36px}
@@ -50,9 +50,6 @@
 .urun-alt{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid #e8e4dc}
 .urun-fiyat{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:rgba(8,8,8,.2);font-style:italic}
 .urun-btn{font-size:.55rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(8,8,8,.25);border:1px solid rgba(8,8,8,.15);padding:7px 12px;background:transparent;cursor:not-allowed;font-family:'Montserrat',sans-serif}
-
-/* ── ÇOK SATANLAR KART RESİM OVERRIDE ── */
-.coksatan-wrap .urun-resim{aspect-ratio:3/2}
 
 /* ── SLİDER DOTS ── */
 .slider-dots{display:flex;justify-content:center;gap:8px;padding:0 0 20px}
@@ -89,10 +86,14 @@
 /* ── FOOTER ALANINDA BOŞLUK ── */
 .shop-page footer{background:var(--black);border-top:1px solid rgba(247,244,239,.06);padding:40px 56px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px}
 
+/* ── WEB: ÇOK SATANLAR KART YÜKSEKLİĞİ ── */
+.coksatan-wrap .urun-resim{aspect-ratio:3/2}
+
 @media(max-width:900px){
   .shop-hero{padding:60px 24px 52px}
   .bolum-baslik{padding:48px 24px 24px}
   .coksatan-wrap{padding:0 24px 48px}
+  .coksatan-grup{grid-template-columns:1fr 1fr}
   .bolum-ayirici{margin:0 24px}
   .urunler-grid{grid-template-columns:1fr 1fr;padding:0 24px}
   .bilgi-section{padding:60px 0}
@@ -110,7 +111,6 @@
   .shop-hero-sag{text-align:right;flex-shrink:0;max-width:140px;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
   .shop-hero-sag p{font-size:.6rem;max-width:140px;line-height:1.6}
   .coksatan-wrap .urun-resim{aspect-ratio:1/1}
-  .coksatan-wrap{padding:0 16px 32px}
   .coksatan-grup{gap:10px}
   .urunler-grid{padding:0 16px}
   .bilgi-slider-wrap{padding:0 16px}
@@ -159,10 +159,10 @@
   <!-- HERO -->
   <div class="shop-hero">
     <div class="shop-hero-sol">
-      <div class="yakinda-pill" id="yakinda-pill"><div class="yakinda-pill-dot"></div><span>Çok yakında</span></div>
+      <div class="yakinda-pill"><div class="yakinda-pill-dot"></div><span>Çok yakında</span></div>
       <h1>Saç Bakım<br><em>Ürünleri</em></h1>
     </div>
-    <div class="shop-hero-sag" id="shop-hero-sag">
+    <div class="shop-hero-sag">
       <p>Profesyonel saç bakımını eve taşıyın. Fatih Kurt tarafından özenle seçilmiş ürünler çok yakında sizlerle.</p>
     </div>
   </div>
@@ -175,42 +175,67 @@
 
   <div class="coksatan-wrap">
     <div class="coksatan-slider" id="cs-slider">
+
+      <!-- Grup 1 -->
       <div class="coksatan-grup">
         <div class="urun-kart">
-          <div class="urun-resim"><span class="yakinda-tag">Yakında</span><div class="urun-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg><span>Ürün</span></div></div>
+          <div class="urun-resim">
+            <span class="yakinda-tag">Yakında</span>
+            <div class="urun-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg><span>Ürün</span></div>
+          </div>
           <div class="urun-bilgi"><span class="urun-kat">Şampuan</span><div class="urun-ad">Onarıcı Şampuan</div><div class="urun-acik">Hasarlı ve kırılgan saçlar için yoğun onarım formülü. Günlük kullanıma uygundur.</div></div>
           <div class="urun-alt"><span class="urun-fiyat">— ₺</span><button class="urun-btn">Yakında</button></div>
         </div>
         <div class="urun-kart">
-          <div class="urun-resim"><span class="yakinda-tag">Yakında</span><div class="urun-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg><span>Ürün</span></div></div>
+          <div class="urun-resim">
+            <span class="yakinda-tag">Yakında</span>
+            <div class="urun-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg><span>Ürün</span></div>
+          </div>
           <div class="urun-bilgi"><span class="urun-kat">Maske</span><div class="urun-ad">Nem Bombası Saç Maskesi</div><div class="urun-acik">Derin nemlendirme ve parlaklık için haftalık bakım maskesi. Tüm saç tiplerine uygun.</div></div>
           <div class="urun-alt"><span class="urun-fiyat">— ₺</span><button class="urun-btn">Yakında</button></div>
         </div>
       </div>
+
+      <!-- Grup 2 -->
       <div class="coksatan-grup">
         <div class="urun-kart">
-          <div class="urun-resim"><span class="yakinda-tag">Yakında</span><div class="urun-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg><span>Ürün</span></div></div>
+          <div class="urun-resim">
+            <span class="yakinda-tag">Yakında</span>
+            <div class="urun-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg><span>Ürün</span></div>
+          </div>
           <div class="urun-bilgi"><span class="urun-kat">Serum</span><div class="urun-ad">Saç Ucu Serumu</div><div class="urun-acik">Yıpranmış saç uçlarını onarır, pürüzsüzleştirir ve parlaklık katar.</div></div>
           <div class="urun-alt"><span class="urun-fiyat">— ₺</span><button class="urun-btn">Yakında</button></div>
         </div>
         <div class="urun-kart">
-          <div class="urun-resim"><span class="yakinda-tag">Yakında</span><div class="urun-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg><span>Ürün</span></div></div>
+          <div class="urun-resim">
+            <span class="yakinda-tag">Yakında</span>
+            <div class="urun-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg><span>Ürün</span></div>
+          </div>
           <div class="urun-bilgi"><span class="urun-kat">Bakım Yağı</span><div class="urun-ad">Argan Saç Yağı</div><div class="urun-acik">Saçı besleyen, yumuşatan ve parlaklık katan saf argan yağı formülü.</div></div>
           <div class="urun-alt"><span class="urun-fiyat">— ₺</span><button class="urun-btn">Yakında</button></div>
         </div>
       </div>
+
+      <!-- Grup 3 -->
       <div class="coksatan-grup">
         <div class="urun-kart">
-          <div class="urun-resim"><span class="yakinda-tag">Yakında</span><div class="urun-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg><span>Ürün</span></div></div>
+          <div class="urun-resim">
+            <span class="yakinda-tag">Yakında</span>
+            <div class="urun-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg><span>Ürün</span></div>
+          </div>
           <div class="urun-bilgi"><span class="urun-kat">Renk Bakım</span><div class="urun-ad">Renk Koruyucu Şampuan</div><div class="urun-acik">Boyalı saçların rengini uzun süre canlı tutan özel sülfatsız formül.</div></div>
           <div class="urun-alt"><span class="urun-fiyat">— ₺</span><button class="urun-btn">Yakında</button></div>
         </div>
         <div class="urun-kart">
-          <div class="urun-resim"><span class="yakinda-tag">Yakında</span><div class="urun-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg><span>Ürün</span></div></div>
+          <div class="urun-resim">
+            <span class="yakinda-tag">Yakında</span>
+            <div class="urun-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg><span>Ürün</span></div>
+          </div>
           <div class="urun-bilgi"><span class="urun-kat">Krem</span><div class="urun-ad">Isı Koruyucu Krem</div><div class="urun-acik">Fön ve maşa öncesi saçı ısıdan koruyan hafif, yapışmayan krem.</div></div>
           <div class="urun-alt"><span class="urun-fiyat">— ₺</span><button class="urun-btn">Yakında</button></div>
         </div>
       </div>
+
     </div>
   </div>
 
@@ -360,23 +385,6 @@
 </footer>
 
 <script>
-// ── MOBİLDE YAKINDA PILL SAĞA TAŞI
-(function(){
-  function ayarla(){
-    var pill = document.getElementById('yakinda-pill');
-    var sag = document.getElementById('shop-hero-sag');
-    if(!pill || !sag) return;
-    if(window.innerWidth <= 540){
-      if(pill.parentElement !== sag) sag.prepend(pill);
-    } else {
-      var sol = document.querySelector('.shop-hero-sol');
-      if(pill.parentElement !== sol) sol.prepend(pill);
-    }
-  }
-  document.addEventListener('DOMContentLoaded', ayarla);
-  window.addEventListener('resize', ayarla);
-})();
-
 // ── NAV
 const hamburger = document.getElementById('hamburger');
 const mobileMenu = document.getElementById('mobileMenu');
@@ -393,6 +401,19 @@ hamburger.addEventListener('click',()=>{
 });
 window.addEventListener('scroll',()=>{ document.querySelector('nav').classList.toggle('scrolled',window.scrollY>40); },{passive:true});
 
+// ── MOBİLDE YAKINDA PILL SAĞA TAŞI
+(function(){
+  var pill = document.querySelector('.yakinda-pill');
+  var sol = document.querySelector('.shop-hero-sol');
+  var sag = document.querySelector('.shop-hero-sag');
+  function ayarla(){
+    if(window.innerWidth <= 540){ if(sag && pill.parentElement!==sag) sag.prepend(pill); }
+    else { if(sol && pill.parentElement!==sol) sol.prepend(pill); }
+  }
+  document.addEventListener('DOMContentLoaded', ayarla);
+  window.addEventListener('resize', ayarla);
+})();
+
 // ── ÇOK SATANLAR SLİDER
 var csPos = 0;
 var csTimer;
@@ -408,15 +429,13 @@ function csOto() { csTimer = setInterval(function(){ csPos = (csPos+1) % documen
 function csDur() { clearInterval(csTimer); }
 document.addEventListener('DOMContentLoaded', function(){
   var wrap = document.querySelector('.coksatan-wrap');
-  function grupBoyutla(){
-    var w = wrap.clientWidth;
-    document.querySelectorAll('.coksatan-grup').forEach(function(g){ g.style.width = w + 'px'; g.style.minWidth = w + 'px'; });
-  }
+  function grupBoyutla(){ var w = wrap.clientWidth; document.querySelectorAll('.coksatan-grup').forEach(function(g){ g.style.width=w+'px'; g.style.minWidth=w+'px'; }); }
   grupBoyutla();
   window.addEventListener('resize', function(){ grupBoyutla(); csGit(csPos); });
   csOto();
   wrap.addEventListener('mouseenter', csDur);
   wrap.addEventListener('mouseleave', csOto);
+});
 });
 
 // ── BİLGİ SLİDER
