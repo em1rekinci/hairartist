@@ -10,17 +10,20 @@
 <style>
 .oneri-section{background:var(--off,#f7f4ef);padding:80px 56px;font-family:'Montserrat',sans-serif}
 .oneri-baslik{margin-bottom:40px}
+.oneri-baslik h2 em{font-style:italic;font-weight:400;color:rgba(8,8,8,.3)}
 .oneri-alt{font-size:.75rem;color:rgba(8,8,8,.4);margin-top:10px;letter-spacing:.06em}
-.oneri-form-wrap{max-width:640px}
-.oneri-textarea{width:100%;background:#fff;border:1px solid #e0dbd2;padding:20px;font-family:'Montserrat',sans-serif;font-size:.82rem;color:#080808;resize:vertical;outline:none;transition:border .2s;line-height:1.8}
-.oneri-textarea:focus{border-color:#080808}
-.oneri-textarea::placeholder{color:rgba(8,8,8,.3)}
-.oneri-btn{margin-top:12px;background:#080808;color:#f7f4ef;border:none;padding:14px 36px;font-family:'Montserrat',sans-serif;font-size:.65rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;transition:opacity .2s}
+.oneri-form-wrap{max-width:640px;display:flex;flex-direction:column;gap:12px}
+.oneri-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.oneri-input,.oneri-textarea{width:100%;background:#fff;border:1px solid #e0dbd2;padding:14px 18px;font-family:'Montserrat',sans-serif;font-size:.82rem;color:#080808;outline:none;transition:border .2s;line-height:1.8;box-sizing:border-box}
+.oneri-input:focus,.oneri-textarea:focus{border-color:#080808}
+.oneri-input::placeholder,.oneri-textarea::placeholder{color:rgba(8,8,8,.3)}
+.oneri-textarea{resize:vertical}
+.oneri-btn{align-self:flex-start;background:#080808;color:#f7f4ef;border:none;padding:14px 36px;font-family:'Montserrat',sans-serif;font-size:.65rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;transition:opacity .2s}
 .oneri-btn:hover{opacity:.75}
-.oneri-mesaj{margin-top:14px;font-size:.72rem;color:rgba(8,8,8,.5);min-height:20px}
+.oneri-mesaj{font-size:.72rem;min-height:20px}
 .oneri-mesaj.basarili{color:#2d7a2d}
 .oneri-mesaj.hata{color:#b03030}
-@media(max-width:540px){.oneri-section{padding:56px 16px}}
+@media(max-width:540px){.oneri-section{padding:56px 16px}.oneri-row{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -485,10 +488,14 @@
 <section class="oneri-section" id="oneri">
   <span class="sec-tag" data-anim>Geri Bildirim</span>
   <div class="oneri-baslik">
-    <h2 style="font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:700;margin:0">Öneri & <em style="font-style:italic;font-weight:400;color:rgba(8,8,8,.25)">Şikayet</em></h2>
+    <h2 style="font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:700;margin:0;color:#080808">Öneri & <em>Şikayet</em></h2>
     <p class="oneri-alt">Görüşleriniz bizim için değerli.</p>
   </div>
   <div class="oneri-form-wrap" data-anim data-delay="1">
+    <div class="oneri-row">
+      <input class="oneri-input" id="oneriIsim" type="text" placeholder="Adınız">
+      <input class="oneri-input" id="oneriMail" type="email" placeholder="E-posta adresiniz">
+    </div>
     <textarea class="oneri-textarea" id="oneriMetin" placeholder="Öneri veya şikayetinizi buraya yazın..." rows="5"></textarea>
     <button class="oneri-btn" onclick="oneriGonder()">Gönder</button>
     <div class="oneri-mesaj" id="oneriMesaj"></div>
@@ -698,18 +705,26 @@ function goster(el, metin, tip) {
 }
 
 function oneriGonder() {
+  var isim = document.getElementById('oneriIsim').value.trim();
+  var mail = document.getElementById('oneriMail').value.trim();
   var metin = document.getElementById('oneriMetin').value.trim();
   var mesajEl = document.getElementById('oneriMesaj');
   mesajEl.className = 'oneri-mesaj';
-  if(!metin){ mesajEl.textContent = 'Lütfen bir şeyler yazın.'; mesajEl.className='oneri-mesaj hata'; return; }
+  if(!isim || !mail || !metin){ mesajEl.textContent = 'Lütfen tüm alanları doldurun.'; mesajEl.className='oneri-mesaj hata'; return; }
   mesajEl.textContent = 'Gönderiliyor...';
   fetch('https://formsubmit.co/ajax/info@hairartist.com.tr', {
     method: 'POST',
     headers: {'Content-Type':'application/json','Accept':'application/json'},
-    body: JSON.stringify({mesaj: metin, _subject: 'Yeni Öneri/Şikayet — Hair Artist'})
+    body: JSON.stringify({isim: isim, email: mail, mesaj: metin, _subject: 'Yeni Öneri/Şikayet — Hair Artist'})
   })
   .then(function(r){ return r.json(); })
-  .then(function(){ document.getElementById('oneriMetin').value=''; mesajEl.textContent='Geri bildiriminiz iletildi, teşekkürler!'; mesajEl.className='oneri-mesaj basarili'; })
+  .then(function(){
+    document.getElementById('oneriIsim').value='';
+    document.getElementById('oneriMail').value='';
+    document.getElementById('oneriMetin').value='';
+    mesajEl.textContent='Geri bildiriminiz iletildi, teşekkürler!';
+    mesajEl.className='oneri-mesaj basarili';
+  })
   .catch(function(){ mesajEl.textContent='Bir sorun oluştu, lütfen tekrar deneyin.'; mesajEl.className='oneri-mesaj hata'; });
 }
 </script>
