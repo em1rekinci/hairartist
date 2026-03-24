@@ -30,9 +30,9 @@
 .bolum-baslik-alt{font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
 
 /* ── ÇOK SATANLAR SLİDER ── */
-.coksatan-wrap{overflow:hidden;padding:0 56px 60px}
+.coksatan-wrap{overflow:hidden;padding:0 56px 60px;box-sizing:border-box}
 .coksatan-slider{display:flex;gap:0;transition:transform .5s cubic-bezier(.4,0,.2,1)}
-.coksatan-grup{display:grid;grid-template-columns:1fr 1fr;gap:16px;flex-shrink:0;width:calc(100vw - 112px)}
+.coksatan-grup{display:grid;grid-template-columns:1fr 1fr;gap:16px;flex-shrink:0;width:100%}
 
 /* ── ÜRÜN KARTI ── */
 .urun-kart{background:#fff;border:1px solid #e8e4dc;display:flex;flex-direction:column;overflow:hidden;transition:box-shadow .25s}
@@ -86,11 +86,14 @@
 /* ── FOOTER ALANINDA BOŞLUK ── */
 .shop-page footer{background:var(--black);border-top:1px solid rgba(247,244,239,.06);padding:40px 56px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px}
 
+/* ── WEB: ÇOK SATANLAR KART YÜKSEKLİĞİ ── */
+.coksatan-wrap .urun-resim{aspect-ratio:3/2}
+
 @media(max-width:900px){
   .shop-hero{padding:60px 24px 52px}
   .bolum-baslik{padding:48px 24px 24px}
   .coksatan-wrap{padding:0 24px 48px}
-  .coksatan-grup{grid-template-columns:1fr 1fr;width:calc(100vw - 48px)}
+  .coksatan-grup{grid-template-columns:1fr 1fr}
   .bolum-ayirici{margin:0 24px}
   .urunler-grid{grid-template-columns:1fr 1fr;padding:0 24px}
   .bilgi-section{padding:60px 0}
@@ -100,9 +103,15 @@
   .shop-page footer{padding:28px 24px}
 }
 @media(max-width:540px){
-  .shop-hero{padding:48px 16px 40px}
-  .coksatan-wrap{padding:0 16px 48px}
-  .coksatan-grup{gap:10px;width:calc(100vw - 32px)}
+  .shop-hero{padding:24px 16px 20px;flex-direction:row;align-items:center;flex-wrap:nowrap}
+  .shop-hero-sol{flex:1}
+  .shop-hero-sol h1{font-size:1.7rem;margin-top:4px}
+  .yakinda-pill{margin-bottom:0;padding:5px 10px}
+  .yakinda-pill span{font-size:.52rem}
+  .shop-hero-sag{text-align:right;flex-shrink:0;max-width:140px;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+  .shop-hero-sag p{font-size:.6rem;max-width:140px;line-height:1.6}
+  .coksatan-wrap .urun-resim{aspect-ratio:1/1}
+  .coksatan-grup{gap:10px}
   .urunler-grid{padding:0 16px}
   .bilgi-slider-wrap{padding:0 16px}
   .bilgi-baslik{padding:0 16px 24px}
@@ -392,21 +401,43 @@ hamburger.addEventListener('click',()=>{
 });
 window.addEventListener('scroll',()=>{ document.querySelector('nav').classList.toggle('scrolled',window.scrollY>40); },{passive:true});
 
+// ── MOBİLDE YAKINDA PILL SAĞA TAŞI
+(function(){
+  var pill = document.querySelector('.yakinda-pill');
+  var sol = document.querySelector('.shop-hero-sol');
+  var sag = document.querySelector('.shop-hero-sag');
+  function ayarla(){
+    if(window.innerWidth <= 540){ if(sag && pill.parentElement!==sag) sag.prepend(pill); }
+    else { if(sol && pill.parentElement!==sol) sol.prepend(pill); }
+  }
+  document.addEventListener('DOMContentLoaded', ayarla);
+  window.addEventListener('resize', ayarla);
+})();
+
 // ── ÇOK SATANLAR SLİDER
 var csPos = 0;
 var csTimer;
 function csGit(idx) {
   csPos = idx;
   var slider = document.getElementById('cs-slider');
-  var grupW = slider.querySelector('.coksatan-grup').offsetWidth;
+  var wrap = document.querySelector('.coksatan-wrap');
+  var style = window.getComputedStyle(wrap);
+  var grupW = wrap.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
   slider.style.transform = 'translateX(-' + (csPos * grupW) + 'px)';
   document.querySelectorAll('#cs-dots .sdot').forEach(function(d,i){ d.classList.toggle('aktif', i===csPos); });
 }
 function csOto() { csTimer = setInterval(function(){ csPos = (csPos+1) % document.querySelectorAll('.coksatan-grup').length; csGit(csPos); }, 3500); }
 function csDur() { clearInterval(csTimer); }
 document.addEventListener('DOMContentLoaded', function(){
-  csOto();
   var wrap = document.querySelector('.coksatan-wrap');
+  function getGrupW(){
+    var style = window.getComputedStyle(wrap);
+    return wrap.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+  }
+  function grupBoyutla(){ var w = getGrupW(); document.querySelectorAll('.coksatan-grup').forEach(function(g){ g.style.width=w+'px'; g.style.minWidth=w+'px'; }); }
+  grupBoyutla();
+  window.addEventListener('resize', function(){ grupBoyutla(); csGit(csPos); });
+  csOto();
   wrap.addEventListener('mouseenter', csDur);
   wrap.addEventListener('mouseleave', csOto);
 });
