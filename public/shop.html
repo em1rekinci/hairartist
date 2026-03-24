@@ -32,7 +32,7 @@
 /* ── ÇOK SATANLAR SLİDER ── */
 .coksatan-wrap{overflow:hidden;padding:0 56px 48px}
 .coksatan-slider{display:flex;transition:transform .5s cubic-bezier(.4,0,.2,1)}
-.coksatan-grup{display:grid;grid-template-columns:1fr 1fr;gap:2px;flex-shrink:0;width:100%}
+.coksatan-grup{display:grid;grid-template-columns:1fr 1fr;gap:2px;flex-shrink:0;}
 
 /* ── ÜRÜN KARTI ── */
 .urun-kart{background:#fff;border:1px solid #e8e4dc;display:flex;flex-direction:column;overflow:hidden;transition:box-shadow .25s}
@@ -109,6 +109,7 @@
   .yakinda-pill span{font-size:.52rem}
   .shop-hero-sag{text-align:right;flex-shrink:0;max-width:140px;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
   .shop-hero-sag p{font-size:.6rem;max-width:140px;line-height:1.6}
+  .coksatan-wrap .urun-resim{aspect-ratio:1/1}
   .coksatan-wrap{padding:0 16px 32px}
   .coksatan-grup{gap:10px}
   .urunler-grid{padding:0 16px}
@@ -406,13 +407,13 @@ function csGit(idx) {
 function csOto() { csTimer = setInterval(function(){ csPos = (csPos+1) % document.querySelectorAll('.coksatan-grup').length; csGit(csPos); }, 3500); }
 function csDur() { clearInterval(csTimer); }
 document.addEventListener('DOMContentLoaded', function(){
-  // Her grup wrap genişliğine eşit olsun
   var wrap = document.querySelector('.coksatan-wrap');
-  document.querySelectorAll('.coksatan-grup').forEach(function(g){ g.style.width = wrap.clientWidth + 'px'; });
-  window.addEventListener('resize', function(){
-    document.querySelectorAll('.coksatan-grup').forEach(function(g){ g.style.width = wrap.clientWidth + 'px'; });
-    csGit(csPos);
-  });
+  function grupBoyutla(){
+    var w = wrap.clientWidth;
+    document.querySelectorAll('.coksatan-grup').forEach(function(g){ g.style.width = w + 'px'; g.style.minWidth = w + 'px'; });
+  }
+  grupBoyutla();
+  window.addEventListener('resize', function(){ grupBoyutla(); csGit(csPos); });
   csOto();
   wrap.addEventListener('mouseenter', csDur);
   wrap.addEventListener('mouseleave', csOto);
