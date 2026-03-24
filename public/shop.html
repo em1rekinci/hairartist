@@ -100,8 +100,13 @@
   .shop-page footer{padding:28px 24px}
 }
 @media(max-width:540px){
-  .shop-hero{padding:48px 16px 40px}
-  .shop-hero-sol h1{font-size:1.7rem}
+  .shop-hero{padding:24px 16px 20px;flex-direction:row;align-items:center;flex-wrap:nowrap}
+  .shop-hero-sol{flex:1}
+  .shop-hero-sol h1{font-size:1.7rem;margin-top:4px}
+  .yakinda-pill{margin-bottom:0;padding:5px 10px}
+  .yakinda-pill span{font-size:.52rem}
+  .shop-hero-sag{text-align:right;flex-shrink:0;max-width:140px;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+  .shop-hero-sag p{font-size:.6rem;max-width:140px;line-height:1.6}
   .coksatan-grup{gap:10px}
   .urunler-grid{padding:0 16px}
   .bilgi-slider-wrap{padding:0 16px}
@@ -150,10 +155,10 @@
   <!-- HERO -->
   <div class="shop-hero">
     <div class="shop-hero-sol">
-      <div class="yakinda-pill"><div class="yakinda-pill-dot"></div><span>Çok yakında</span></div>
+      <div class="yakinda-pill" id="yakinda-pill"><div class="yakinda-pill-dot"></div><span>Çok yakında</span></div>
       <h1>Saç Bakım<br><em>Ürünleri</em></h1>
     </div>
-    <div class="shop-hero-sag">
+    <div class="shop-hero-sag" id="shop-hero-sag">
       <p>Profesyonel saç bakımını eve taşıyın. Fatih Kurt tarafından özenle seçilmiş ürünler çok yakında sizlerle.</p>
     </div>
   </div>
@@ -376,6 +381,23 @@
 </footer>
 
 <script>
+// ── MOBİLDE YAKINDA PILL SAĞA TAŞI
+(function(){
+  function ayarla(){
+    var pill = document.getElementById('yakinda-pill');
+    var sag = document.getElementById('shop-hero-sag');
+    if(!pill || !sag) return;
+    if(window.innerWidth <= 540){
+      if(pill.parentElement !== sag) sag.prepend(pill);
+    } else {
+      var sol = document.querySelector('.shop-hero-sol');
+      if(pill.parentElement !== sol) sol.prepend(pill);
+    }
+  }
+  document.addEventListener('DOMContentLoaded', ayarla);
+  window.addEventListener('resize', ayarla);
+})();
+
 // ── NAV
 const hamburger = document.getElementById('hamburger');
 const mobileMenu = document.getElementById('mobileMenu');
