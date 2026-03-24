@@ -30,7 +30,7 @@
 .bolum-baslik-alt{font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
 
 /* ── ÇOK SATANLAR SLİDER ── */
-.coksatan-wrap{overflow:hidden;padding:0 56px 60px}
+.coksatan-wrap{overflow:hidden;padding:0 56px 60px;box-sizing:border-box}
 .coksatan-slider{display:flex;gap:0;transition:transform .5s cubic-bezier(.4,0,.2,1)}
 .coksatan-grup{display:grid;grid-template-columns:1fr 1fr;gap:16px;flex-shrink:0;width:100%}
 
@@ -421,7 +421,8 @@ function csGit(idx) {
   csPos = idx;
   var slider = document.getElementById('cs-slider');
   var wrap = document.querySelector('.coksatan-wrap');
-  var grupW = wrap.clientWidth;
+  var style = window.getComputedStyle(wrap);
+  var grupW = wrap.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
   slider.style.transform = 'translateX(-' + (csPos * grupW) + 'px)';
   document.querySelectorAll('#cs-dots .sdot').forEach(function(d,i){ d.classList.toggle('aktif', i===csPos); });
 }
@@ -429,7 +430,11 @@ function csOto() { csTimer = setInterval(function(){ csPos = (csPos+1) % documen
 function csDur() { clearInterval(csTimer); }
 document.addEventListener('DOMContentLoaded', function(){
   var wrap = document.querySelector('.coksatan-wrap');
-  function grupBoyutla(){ var w = wrap.clientWidth; document.querySelectorAll('.coksatan-grup').forEach(function(g){ g.style.width=w+'px'; g.style.minWidth=w+'px'; }); }
+  function getGrupW(){
+    var style = window.getComputedStyle(wrap);
+    return wrap.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+  }
+  function grupBoyutla(){ var w = getGrupW(); document.querySelectorAll('.coksatan-grup').forEach(function(g){ g.style.width=w+'px'; g.style.minWidth=w+'px'; }); }
   grupBoyutla();
   window.addEventListener('resize', function(){ grupBoyutla(); csGit(csPos); });
   csOto();
