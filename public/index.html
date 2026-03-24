@@ -7,6 +7,21 @@
 <link rel="icon" type="image/png" href="https://hairartist.com.tr/static/base/img/photos/hairartist_logo_w.png">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<style>
+.oneri-section{background:var(--off,#f7f4ef);padding:80px 56px;font-family:'Montserrat',sans-serif}
+.oneri-baslik{margin-bottom:40px}
+.oneri-alt{font-size:.75rem;color:rgba(8,8,8,.4);margin-top:10px;letter-spacing:.06em}
+.oneri-form-wrap{max-width:640px}
+.oneri-textarea{width:100%;background:#fff;border:1px solid #e0dbd2;padding:20px;font-family:'Montserrat',sans-serif;font-size:.82rem;color:#080808;resize:vertical;outline:none;transition:border .2s;line-height:1.8}
+.oneri-textarea:focus{border-color:#080808}
+.oneri-textarea::placeholder{color:rgba(8,8,8,.3)}
+.oneri-btn{margin-top:12px;background:#080808;color:#f7f4ef;border:none;padding:14px 36px;font-family:'Montserrat',sans-serif;font-size:.65rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;transition:opacity .2s}
+.oneri-btn:hover{opacity:.75}
+.oneri-mesaj{margin-top:14px;font-size:.72rem;color:rgba(8,8,8,.5);min-height:20px}
+.oneri-mesaj.basarili{color:#2d7a2d}
+.oneri-mesaj.hata{color:#b03030}
+@media(max-width:540px){.oneri-section{padding:56px 16px}}
+</style>
 </head>
 <body>
 
@@ -466,7 +481,19 @@
   </div>
 </section>
 
-
+<!-- ÖNERİ & ŞİKAYET -->
+<section class="oneri-section" id="oneri">
+  <span class="sec-tag" data-anim>Geri Bildirim</span>
+  <div class="oneri-baslik">
+    <h2 style="font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:700;margin:0">Öneri & <em style="font-style:italic;font-weight:400;color:rgba(8,8,8,.25)">Şikayet</em></h2>
+    <p class="oneri-alt">Görüşleriniz bizim için değerli.</p>
+  </div>
+  <div class="oneri-form-wrap" data-anim data-delay="1">
+    <textarea class="oneri-textarea" id="oneriMetin" placeholder="Öneri veya şikayetinizi buraya yazın..." rows="5"></textarea>
+    <button class="oneri-btn" onclick="oneriGonder()">Gönder</button>
+    <div class="oneri-mesaj" id="oneriMesaj"></div>
+  </div>
+</section>
 
 <!-- FOOTER -->
 <footer>
@@ -668,6 +695,22 @@ function goster(el, metin, tip) {
   el.style.background = tip === 'basari' ? 'rgba(200,255,0,.1)' : 'rgba(255,80,80,.1)';
   el.style.border     = tip === 'basari' ? '1px solid rgba(200,255,0,.3)' : '1px solid rgba(255,80,80,.3)';
   el.style.color      = tip === 'basari' ? '#c8ff00' : '#ff6b6b';
+}
+
+function oneriGonder() {
+  var metin = document.getElementById('oneriMetin').value.trim();
+  var mesajEl = document.getElementById('oneriMesaj');
+  mesajEl.className = 'oneri-mesaj';
+  if(!metin){ mesajEl.textContent = 'Lütfen bir şeyler yazın.'; mesajEl.className='oneri-mesaj hata'; return; }
+  mesajEl.textContent = 'Gönderiliyor...';
+  fetch('https://formsubmit.co/ajax/info@hairartist.com.tr', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json','Accept':'application/json'},
+    body: JSON.stringify({mesaj: metin, _subject: 'Yeni Öneri/Şikayet — Hair Artist'})
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(){ document.getElementById('oneriMetin').value=''; mesajEl.textContent='Geri bildiriminiz iletildi, teşekkürler!'; mesajEl.className='oneri-mesaj basarili'; })
+  .catch(function(){ mesajEl.textContent='Bir sorun oluştu, lütfen tekrar deneyin.'; mesajEl.className='oneri-mesaj hata'; });
 }
 </script>
 
