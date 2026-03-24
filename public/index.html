@@ -457,8 +457,8 @@
       </div>
     </div>
 
-    <!-- SAĞ: Çalışma Saatleri + Harita — 50px yukarı -->
-    <div style="grid-column:3;display:flex;flex-direction:column;gap:16px;align-self:start;margin-top:-50px">
+    <!-- SAĞ: Çalışma Saatleri + Harita — section'ın padding+margin-top'unu geçerek tam üste çık -->
+    <div style="grid-column:3;display:flex;flex-direction:column;gap:16px;align-self:start;margin-top:-128px">
       <div class="hours-box">
         <h4>Çalışma Saatleri</h4>
         <div class="hour-row" id="hr-0"><span class="day-name">Pazartesi</span><span class="hour-time">08:30 — 20:00</span></div>
@@ -484,7 +484,6 @@
 </footer>
 
 <script>
-// Hamburger Menü
 const hamburger = document.getElementById('hamburger');
 const mobileMenu = document.getElementById('mobileMenu');
 function closeMobileMenu(){
@@ -504,7 +503,6 @@ hamburger.addEventListener('click',()=>{
   }
 });
 
-// Scroll animasyonları
 (function(){
   const obs = new IntersectionObserver((entries) => {
     entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('anim-in'); obs.unobserve(e.target); } });
@@ -512,7 +510,6 @@ hamburger.addEventListener('click',()=>{
   document.querySelectorAll('[data-anim]').forEach(el => obs.observe(el));
 })();
 
-// Nav scroll state + Scroll Spy
 (function(){
   const nav = document.querySelector('nav');
   const navLinks = document.querySelectorAll('nav ul li a[href^="#"], nav ul li a[href="#"]');
@@ -526,9 +523,7 @@ hamburger.addEventListener('click',()=>{
   function updateActive() {
     const scrollY = window.scrollY + 80;
     let current = sections[0];
-    sections.forEach(s => {
-      if (s.el.offsetTop <= scrollY) current = s;
-    });
+    sections.forEach(s => { if (s.el.offsetTop <= scrollY) current = s; });
     navLinks.forEach(a => a.classList.remove('active'));
     if (current) current.link.classList.add('active');
   }
@@ -537,11 +532,9 @@ hamburger.addEventListener('click',()=>{
     nav.classList.toggle('scrolled', window.scrollY > 40);
     updateActive();
   }, { passive: true });
-
   updateActive();
 })();
 
-// Bugünkü günü vurgula
 (function(){
   const jsDay = new Date().getDay();
   const map = {0:6,1:0,2:1,3:2,4:3,5:4,6:5};
@@ -551,7 +544,6 @@ hamburger.addEventListener('click',()=>{
 })();
 </script>
 <script>
-// ─── YORUM SLİDER
 document.addEventListener('DOMContentLoaded', function() {
   var slider = document.getElementById('yorum-slider');
   if (!slider) return;
@@ -566,45 +558,6 @@ document.addEventListener('DOMContentLoaded', function() {
   slider.parentElement.addEventListener('mouseenter', function() { slider.style.animationPlayState = 'paused'; });
   slider.parentElement.addEventListener('mouseleave', function() { slider.style.animationPlayState = 'running'; });
 });
-
-async function rezervasyonGonder() {
-  const btn = document.getElementById('rez-btn');
-  const mesajDiv = document.getElementById('rez-mesaj');
-  const ad      = document.getElementById('rez-ad').value.trim();
-  const telefon = document.getElementById('rez-tel').value.trim();
-  const hizmet  = document.getElementById('rez-hizmet').value;
-  const tarih   = document.getElementById('rez-tarih').value;
-  const saat    = document.getElementById('rez-saat').value;
-  const not     = document.getElementById('rez-not').value.trim();
-  if (!ad || !telefon || !hizmet || !tarih) {
-    goster(mesajDiv, 'Lütfen tüm zorunlu alanları doldurun.', 'hata');
-    return;
-  }
-  btn.disabled = true;
-  btn.textContent = 'Gönderiliyor…';
-  try {
-    const SUNUCU = window.location.origin;
-    const res = await fetch(`${SUNUCU}/rezervasyon`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ad, telefon, hizmet, tarih, saat, not })
-    });
-    const veri = await res.json();
-    if (veri.ok) {
-      goster(mesajDiv, '✓ ' + veri.mesaj, 'basari');
-      ['rez-ad','rez-tel','rez-tarih','rez-not'].forEach(id => document.getElementById(id).value = '');
-      btn.textContent = 'Gönderildi ✓';
-    } else {
-      goster(mesajDiv, '✗ ' + veri.mesaj, 'hata');
-      btn.disabled = false;
-      btn.textContent = 'Rezervasyonu Gönder';
-    }
-  } catch (e) {
-    goster(mesajDiv, '✗ Bağlantı hatası. Lütfen tekrar deneyin.', 'hata');
-    btn.disabled = false;
-    btn.textContent = 'Rezervasyonu Gönder';
-  }
-}
 
 function goster(el, metin, tip) {
   el.textContent = metin;
