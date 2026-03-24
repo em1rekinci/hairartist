@@ -384,7 +384,7 @@
           <div class="yk-ust">
             <div class="yk-avatar" style="background:#558b2f">A</div>
             <div class="yk-kisi"><div class="yk-ad">Aleyna Gülmez</div><div class="yk-yildiz">★★★★★</div></div>
-            <div class="yk-google"><svg viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg></div>
+            <div class="yk-google"><svg viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.27h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg></div>
           </div>
           <p class="yk-yorum">Saçımı açma ve boyama işlemi yaptırdım, extra olarak botox işlemi de yaptırdım. Kesinlikle tavsiye ederim, gerçekten çok memnun kaldım, ilgi ve alakaları için ayrı teşekkür ediyorum.</p>
           <div class="yk-tarih">6 yıl önce</div>
@@ -425,7 +425,7 @@
   </div>
   <div class="contact-grid" data-anim data-delay="2" style="grid-template-columns:1fr 1.4fr 1fr;gap:24px;align-items:start">
 
-    <!-- SOL: adres + iletişim (2 satır kaplar) -->
+    <!-- SOL: adres + iletişim -->
     <div style="grid-column:1;display:flex;flex-direction:column;gap:24px">
       <div class="contact-item">
         <h4>Adres</h4>
@@ -457,8 +457,8 @@
       </div>
     </div>
 
-    <!-- SAĞ: Çalışma Saatleri + Harita (tek div, yukarıdan başlar) -->
-    <div style="grid-column:3;display:flex;flex-direction:column;gap:16px;align-self:start">
+    <!-- SAĞ: Çalışma Saatleri + Harita — 50px yukarı -->
+    <div style="grid-column:3;display:flex;flex-direction:column;gap:16px;align-self:start;margin-top:-50px">
       <div class="hours-box">
         <h4>Çalışma Saatleri</h4>
         <div class="hour-row" id="hr-0"><span class="day-name">Pazartesi</span><span class="hour-time">08:30 — 20:00</span></div>
@@ -503,15 +503,6 @@ hamburger.addEventListener('click',()=>{
     closeMobileMenu();
   }
 });
-
-// Saat seçici
-let selectedTime = '';
-function selectTime(btn, time) {
-  document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('selected'));
-  btn.classList.add('selected');
-  selectedTime = time;
-  document.getElementById('rez-saat').value = time;
-}
 
 // Scroll animasyonları
 (function(){
@@ -561,20 +552,6 @@ function selectTime(btn, time) {
 </script>
 <script>
 // ─── YORUM SLİDER
-var sliderPos = 0;
-var sliderTimer = null;
-
-function sliderKaydır(yon) {
-  var slider = document.getElementById('yorum-slider');
-  var kartlar = slider.querySelectorAll('.yorum-kart');
-  var kartW = kartlar[0].offsetWidth + 16;
-  var maxPos = kartlar.length - 1;
-  sliderPos = sliderPos + yon;
-  if (sliderPos > maxPos) sliderPos = 0;
-  if (sliderPos < 0) sliderPos = maxPos;
-  slider.style.transform = 'translateX(-' + (sliderPos * kartW) + 'px)';
-}
-
 document.addEventListener('DOMContentLoaded', function() {
   var slider = document.getElementById('yorum-slider');
   if (!slider) return;
@@ -590,62 +567,29 @@ document.addEventListener('DOMContentLoaded', function() {
   slider.parentElement.addEventListener('mouseleave', function() { slider.style.animationPlayState = 'running'; });
 });
 
-function csToggle() {
-  var dd = document.getElementById('cs-dropdown');
-  var arrow = document.getElementById('cs-arrow');
-  var open = dd.classList.toggle('open');
-  arrow.style.transform = open ? 'rotate(180deg)' : '';
-}
-document.addEventListener('click', function(e) {
-  if (!document.getElementById('cs-wrap').contains(e.target)) {
-    document.getElementById('cs-dropdown').classList.remove('open');
-    document.getElementById('cs-arrow').style.transform = '';
-  }
-});
-function hizmetSec(el, ad, indirimli, normal) {
-  document.querySelectorAll('.cs-option').forEach(i => i.classList.remove('secili'));
-  el.classList.add('secili');
-  document.getElementById('rez-hizmet').value = ad;
-  var lbl = document.getElementById('cs-label');
-  lbl.style.color = '';
-  lbl.innerHTML = '<strong>' + ad + '</strong>';
-  document.getElementById('cs-dropdown').classList.remove('open');
-  document.getElementById('cs-arrow').style.transform = '';
-  document.getElementById('fiyat-indirimli').textContent = indirimli.toLocaleString('tr-TR') + '₺';
-  document.getElementById('fiyat-normal').textContent = normal.toLocaleString('tr-TR') + '₺';
-  document.getElementById('fiyat-goster').style.display = 'flex';
-}
-
 async function rezervasyonGonder() {
   const btn = document.getElementById('rez-btn');
   const mesajDiv = document.getElementById('rez-mesaj');
-
   const ad      = document.getElementById('rez-ad').value.trim();
   const telefon = document.getElementById('rez-tel').value.trim();
   const hizmet  = document.getElementById('rez-hizmet').value;
   const tarih   = document.getElementById('rez-tarih').value;
   const saat    = document.getElementById('rez-saat').value;
   const not     = document.getElementById('rez-not').value.trim();
-
   if (!ad || !telefon || !hizmet || !tarih) {
     goster(mesajDiv, 'Lütfen tüm zorunlu alanları doldurun.', 'hata');
     return;
   }
-
   btn.disabled = true;
   btn.textContent = 'Gönderiliyor…';
-
   try {
     const SUNUCU = window.location.origin;
-
     const res = await fetch(`${SUNUCU}/rezervasyon`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ad, telefon, hizmet, tarih, saat, not })
     });
-
     const veri = await res.json();
-
     if (veri.ok) {
       goster(mesajDiv, '✓ ' + veri.mesaj, 'basari');
       ['rez-ad','rez-tel','rez-tarih','rez-not'].forEach(id => document.getElementById(id).value = '');
