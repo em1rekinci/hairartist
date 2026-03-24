@@ -31,8 +31,8 @@
 
 /* ── ÇOK SATANLAR SLİDER ── */
 .coksatan-wrap{overflow:hidden;padding:0 56px 48px}
-.coksatan-slider{display:flex;gap:16px;transition:transform .5s cubic-bezier(.4,0,.2,1);width:100%}
-.coksatan-grup{display:grid;grid-template-columns:1fr 1fr;gap:16px;flex-shrink:0;width:100%;min-width:100%;box-sizing:border-box}
+.coksatan-slider{display:flex;gap:0;transition:transform .5s cubic-bezier(.4,0,.2,1)}
+.coksatan-grup{display:grid;grid-template-columns:1fr 1fr;gap:16px;flex-shrink:0;width:calc(100vw - 112px);box-sizing:border-box}
 
 /* ── ÜRÜN KARTI ── */
 .urun-kart{background:#fff;border:1px solid #e8e4dc;display:flex;flex-direction:column;overflow:hidden;transition:box-shadow .25s}
@@ -90,7 +90,7 @@
   .shop-hero{padding:60px 24px 52px}
   .bolum-baslik{padding:48px 24px 24px}
   .coksatan-wrap{padding:0 24px 48px}
-  .coksatan-grup{grid-template-columns:1fr 1fr}
+  .coksatan-grup{grid-template-columns:1fr 1fr;width:calc(100vw - 48px)}
   .bolum-ayirici{margin:0 24px}
   .urunler-grid{grid-template-columns:1fr 1fr;padding:0 24px}
   .bilgi-section{padding:60px 0}
@@ -420,8 +420,8 @@ var csTimer;
 function csGit(idx) {
   csPos = idx;
   var slider = document.getElementById('cs-slider');
-  var wrap = document.querySelector('.coksatan-wrap');
-  var grupW = wrap.clientWidth;
+  var pad = window.innerWidth <= 540 ? 32 : window.innerWidth <= 900 ? 48 : 112;
+  var grupW = window.innerWidth - pad;
   slider.style.transform = 'translateX(-' + (csPos * grupW) + 'px)';
   document.querySelectorAll('#cs-dots .sdot').forEach(function(d,i){ d.classList.toggle('aktif', i===csPos); });
 }
