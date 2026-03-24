@@ -143,7 +143,7 @@ footer p{font-size:.62rem;color:rgba(247,244,239,.2);letter-spacing:.08em}
 .foot-credit:hover{opacity:.7}
 
 /* CONTACT SECTION */
-.contact-section{background:var(--mid);padding:80px 56px;border-top:1px solid rgba(247,244,239,.05)}
+.contact-section{background:var(--mid);padding:80px 56px 0;border-top:1px solid rgba(247,244,239,.05)}
 /* Masaüstü: başlık üstte, logo altında */
 .contact-baslik{display:flex;flex-direction:column;align-items:flex-start;gap:16px;margin-top:8px;margin-bottom:0}
 .contact-logo{height:52px;width:auto;object-fit:contain}
@@ -176,7 +176,7 @@ footer p{font-size:.62rem;color:rgba(247,244,239,.2);letter-spacing:.08em}
 .hour-row.today .day-name::before{content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);width:6px;height:6px;background:#c8ff00;border-radius:50%}
 .hour-row.today .hour-time{color:#c8ff00;font-weight:500}
 .hour-row.closed .hour-time{color:rgba(247,244,239,.2);font-style:italic}
-.map-box{border-radius:2px;overflow:hidden;border:1px solid rgba(247,244,239,.08)}
+.map-box{border-radius:2px;overflow:hidden;border:1px solid rgba(247,244,239,.08);border-bottom:none;border-radius:2px 2px 0 0}
 .map-box iframe{width:100%;height:280px;border:none;display:block;filter:grayscale(100%) invert(90%) contrast(85%)}
 
 /* ── HAMBURGEr MENÜ ── */
@@ -241,7 +241,7 @@ footer p{font-size:.62rem;color:rgba(247,244,239,.2);letter-spacing:.08em}
   .fr{grid-template-columns:1fr}
 
   /* Contact */
-  .contact-section{padding:60px 24px}
+  .contact-section{padding:60px 24px 0}
   .contact-grid{grid-template-columns:1fr;gap:20px}
   .map-box iframe{height:240px}
 
@@ -259,7 +259,7 @@ footer p{font-size:.62rem;color:rgba(247,244,239,.2);letter-spacing:.08em}
   .services{padding:60px 16px}
   .portfolio{padding:60px 16px}
   .booking{padding:60px 16px}
-  .contact-section{padding:48px 16px}
+  .contact-section{padding:48px 16px 0}
   .about-text{padding:40px 16px}
   footer{padding:24px 16px}
   .svc-card{aspect-ratio:16/10}
@@ -567,4 +567,3 @@ nav.scrolled {
   border-color: var(--black);
   box-shadow: 0 0 0 3px rgba(8,8,8,.08);
 }
-
