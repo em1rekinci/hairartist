@@ -32,7 +32,7 @@
 /* ── ÇOK SATANLAR SLİDER ── */
 .coksatan-wrap{overflow:hidden;padding:0 56px 60px;box-sizing:border-box;width:100%}
 .coksatan-slider{display:flex;gap:0;transition:transform .5s cubic-bezier(.4,0,.2,1);will-change:transform}
-.coksatan-grup{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;flex-shrink:0;width:100%;box-sizing:border-box}
+.coksatan-grup{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;flex-shrink:0;width:100%;min-width:0;box-sizing:border-box}
 
 /* ── ÜRÜN KARTI ── */
 .urun-kart{background:#fff;border:1px solid #e8e4dc;display:flex;flex-direction:column;overflow:hidden;transition:box-shadow .25s}
@@ -93,8 +93,8 @@ body{overflow-x:hidden}
 @media(max-width:900px){
   .shop-hero{padding:60px 24px 52px}
   .bolum-baslik{padding:48px 24px 24px}
-  .coksatan-wrap{padding:0 24px 48px}
-  .coksatan-grup{grid-template-columns:1fr 1fr}
+  .coksatan-wrap{padding:0 16px 48px}
+  .coksatan-grup{grid-template-columns:1fr 1fr;gap:12px}
   .bolum-ayirici{margin:0 24px}
   .urunler-grid{grid-template-columns:1fr 1fr;padding:0 24px}
   .bilgi-section{padding:60px 0}
@@ -112,8 +112,9 @@ body{overflow-x:hidden}
   .shop-hero-sag{text-align:right;flex-shrink:0;max-width:140px;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
   .shop-hero-sag p{font-size:.6rem;max-width:140px;line-height:1.6}
   .coksatan-wrap .urun-resim{aspect-ratio:1/1}
-  .coksatan-grup{gap:10px}
-  .urunler-grid{padding:0 16px}
+  .coksatan-wrap{padding:0 12px 40px}
+  .coksatan-grup{gap:8px}
+  .urunler-grid{padding:0 12px;gap:8px}
   .bilgi-slider-wrap{padding:0 16px}
   .bilgi-baslik{padding:0 16px 24px}
   .bolum-baslik{padding:40px 16px 20px}
@@ -425,7 +426,10 @@ function csGit(idx) {
   csPos = idx;
   var slider = document.getElementById('cs-slider');
   var wrap = document.querySelector('.coksatan-wrap');
-  var grupW = wrap.clientWidth - parseInt(window.getComputedStyle(wrap).paddingLeft) - parseInt(window.getComputedStyle(wrap).paddingRight);
+  var style = window.getComputedStyle(wrap);
+  var pl = parseFloat(style.paddingLeft) || 0;
+  var pr = parseFloat(style.paddingRight) || 0;
+  var grupW = wrap.offsetWidth - pl - pr;
   slider.style.transform = 'translateX(-' + (csPos * grupW) + 'px)';
   document.querySelectorAll('#cs-dots .sdot').forEach(function(d,i){ d.classList.toggle('aktif', i===csPos); });
 }
@@ -451,7 +455,10 @@ document.addEventListener('DOMContentLoaded', function(){
   mobiliAyarla();
 
   function grupBoyutla() {
-    var w = wrap.clientWidth - parseInt(window.getComputedStyle(wrap).paddingLeft) - parseInt(window.getComputedStyle(wrap).paddingRight);
+    var style = window.getComputedStyle(wrap);
+    var pl = parseFloat(style.paddingLeft) || 0;
+    var pr = parseFloat(style.paddingRight) || 0;
+    var w = wrap.offsetWidth - pl - pr;
     gruplar.forEach(function(g) { g.style.width = w + 'px'; g.style.minWidth = w + 'px'; });
   }
   grupBoyutla();
