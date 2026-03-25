@@ -19,7 +19,26 @@
 .oneri-mesaj{font-size:.7rem;min-height:16px;margin-top:4px}
 .oneri-mesaj.basarili{color:#a8ff6b}
 .oneri-mesaj.hata{color:#ff8080}
-@media(max-width:900px){.contact-oneri-col{display:none}}
+@media(max-width:900px){
+  .contact-oneri-col{display:none}
+  .oneri-section{display:block !important;background:var(--off,#f7f4ef);padding:56px 24px;font-family:'Montserrat',sans-serif}
+  .oneri-section .oneri-baslik{margin-bottom:28px}
+  .oneri-section .oneri-baslik h2{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,5vw,2.2rem);font-weight:700;margin:0;color:#080808}
+  .oneri-section .oneri-baslik h2 em{font-style:italic;font-weight:400;color:rgba(8,8,8,.3)}
+  .oneri-section .oneri-alt{font-size:.75rem;color:rgba(8,8,8,.4);margin-top:8px;letter-spacing:.06em}
+  .oneri-section .oneri-form-wrap{display:flex;flex-direction:column;gap:12px}
+  .oneri-section .oneri-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .oneri-section .oneri-input,.oneri-section .oneri-textarea{background:#fff;border:1px solid #e0dbd2;color:#080808;border-radius:0}
+  .oneri-section .oneri-input::placeholder,.oneri-section .oneri-textarea::placeholder{color:rgba(8,8,8,.3)}
+  .oneri-section .oneri-input:focus,.oneri-section .oneri-textarea:focus{border-color:#080808}
+  .oneri-section .oneri-btn{background:#080808;color:#f7f4ef;border-radius:0}
+  .oneri-section .oneri-mesaj.basarili{color:#2d7a2d}
+  .oneri-section .oneri-mesaj.hata{color:#b03030}
+}
+@media(max-width:540px){
+  .oneri-section{padding:48px 16px}
+  .oneri-section .oneri-row{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
@@ -249,6 +268,24 @@
   </div>
 </section>
 
+<!-- ÖNERİ & ŞİKAYET (sadece mobilde görünür) -->
+<section class="oneri-section" id="oneri">
+  <span class="sec-tag" data-anim>Geri Bildirim</span>
+  <div class="oneri-baslik">
+    <h2>Öneri & <em>Şikayet</em></h2>
+    <p class="oneri-alt">Görüşleriniz bizim için değerli.</p>
+  </div>
+  <div class="oneri-form-wrap" data-anim data-delay="1">
+    <div class="oneri-row">
+      <input class="oneri-input" id="oneriIsimMobil" type="text" placeholder="Adınız">
+      <input class="oneri-input" id="oneriMailMobil" type="email" placeholder="E-posta adresiniz">
+    </div>
+    <textarea class="oneri-textarea" id="oneriMetinMobil" placeholder="Öneri veya şikayetinizi buraya yazın..." rows="5"></textarea>
+    <button class="oneri-btn" onclick="oneriGonderMobil()">Gönder</button>
+    <div class="oneri-mesaj" id="oneriMesajMobil"></div>
+  </div>
+</section>
+
 <!-- FOOTER -->
 <footer>
   <p>© 2026 Hair Artist · Branded by Fatih Kurt</p>
@@ -353,6 +390,30 @@ function oneriGonder() {
     document.getElementById('oneriIsim').value='';
     document.getElementById('oneriMail').value='';
     document.getElementById('oneriMetin').value='';
+    mesajEl.textContent='Geri bildiriminiz iletildi, teşekkürler!';
+    mesajEl.className='oneri-mesaj basarili';
+  })
+  .catch(function(){ mesajEl.textContent='Bir sorun oluştu, lütfen tekrar deneyin.'; mesajEl.className='oneri-mesaj hata'; });
+}
+
+function oneriGonderMobil() {
+  var isim = document.getElementById('oneriIsimMobil').value.trim();
+  var mail = document.getElementById('oneriMailMobil').value.trim();
+  var metin = document.getElementById('oneriMetinMobil').value.trim();
+  var mesajEl = document.getElementById('oneriMesajMobil');
+  mesajEl.className = 'oneri-mesaj';
+  if(!isim || !mail || !metin){ mesajEl.textContent = 'Lütfen tüm alanları doldurun.'; mesajEl.className='oneri-mesaj hata'; return; }
+  mesajEl.textContent = 'Gönderiliyor...';
+  fetch('https://formsubmit.co/ajax/info@hairartist.com.tr', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json','Accept':'application/json'},
+    body: JSON.stringify({isim: isim, email: mail, mesaj: metin, _subject: 'Yeni Öneri/Şikayet — Hair Artist'})
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(){
+    document.getElementById('oneriIsimMobil').value='';
+    document.getElementById('oneriMailMobil').value='';
+    document.getElementById('oneriMetinMobil').value='';
     mesajEl.textContent='Geri bildiriminiz iletildi, teşekkürler!';
     mesajEl.className='oneri-mesaj basarili';
   })
