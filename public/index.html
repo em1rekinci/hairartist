@@ -19,6 +19,12 @@
 .oneri-mesaj{font-size:.7rem;min-height:16px;margin-top:4px}
 .oneri-mesaj.basarili{color:#a8ff6b}
 .oneri-mesaj.hata{color:#ff8080}
+@media(min-width:901px){
+  .contact-grid{grid-template-columns:1fr 1.4fr 1fr !important;gap:24px;align-items:start}
+}
+@media(max-width:900px){
+  .contact-sag-col{margin-top:0 !important;grid-column:auto !important}
+}
 @media(max-width:900px){
   .contact-oneri-col{display:none}
   .oneri-section{display:block !important;background:var(--off,#f7f4ef);padding:56px 24px;font-family:'Montserrat',sans-serif}
@@ -214,7 +220,7 @@
     <h2 style="font-family:'Playfair Display',serif;font-size:clamp(2rem,4vw,2.8rem);font-weight:700;margin:0">Bize <em style="font-style:italic;font-weight:400;color:rgba(247,244,239,.4)">Ulaşın</em></h2>
     <img src="images/logo2.png" alt="Hair Artist" class="contact-logo">
   </div>
-  <div class="contact-grid" data-anim data-delay="2" style="grid-template-columns:1fr 1.4fr 1fr;gap:24px;align-items:start">
+  <div class="contact-grid" data-anim data-delay="2">
 
     <!-- SOL -->
     <div style="grid-column:1;display:flex;flex-direction:column;gap:24px">
@@ -249,7 +255,7 @@
     </div>
 
     <!-- SAĞ: Çalışma Saatleri + Harita — margin-top:-180px ile yukarı çık -->
-    <div style="grid-column:3;display:flex;flex-direction:column;gap:16px;align-self:start;margin-top:-180px">
+    <div class="contact-sag-col" style="grid-column:3;display:flex;flex-direction:column;gap:16px;align-self:start;margin-top:-180px">
       <div class="hours-box">
         <h4>Çalışma Saatleri</h4>
         <div class="hour-row" id="hr-0"><span class="day-name">Pazartesi</span><span class="hour-time">08:30 — 20:00</span></div>
