@@ -1,0 +1,19 @@
+    <!-- SAĞ: Çalışma Saatleri + Harita -->
+    <div style="grid-column:3;display:flex;flex-direction:column;gap:16px;align-self:start;margin-top:-180px">
+      <div class="hours-box">
+        <h4>Çalışma Saatleri</h4>
+        <div class="hour-row" id="hr-0"><span class="day-name">Pazartesi</span><span class="hour-time">08:30 — 20:00</span></div>
+        <div class="hour-row closed" id="hr-1"><span class="day-name">Salı</span><span class="hour-time">Kapalı</span></div>
+        <div class="hour-row" id="hr-2"><span class="day-name">Çarşamba</span><span class="hour-time">08:30 — 20:00</span></div>
+        <div class="hour-row" id="hr-3"><span class="day-name">Perşembe</span><span class="hour-time">08:30 — 20:00</span></div>
+        <div class="hour-row" id="hr-4"><span class="day-name">Cuma</span><span class="hour-time">08:30 — 20:00</span></div>
+        <div class="hour-row" id="hr-5"><span class="day-name">Cumartesi</span><span class="hour-time">08:30 — 20:00</span></div>
+        <div class="hour-row" id="hr-6"><span class="day-name">Pazar</span><span class="hour-time">09:00 — 19:00</span></div>
+      </div>
+      <div class="map-box">
+        <iframe src="https://maps.google.com/maps?q=Fatih+KURT+Hair+Artist,+Yıldıztabya+Alibeyköy+Cd+No:5,+Eyüpsultan,+İstanbul&z=18&output=embed&hl=tr" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
+    </div>
+
+  </div>
+</section>
