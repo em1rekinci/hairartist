@@ -818,7 +818,7 @@ async function normalGonder() {
 
   try {
     await supabaseInsert('rezervasyonlar', {
-      ad, telefon, hizmet, tarih, saat, not,
+      ad, telefon, hizmet, tarih, saat, musteri_notu: not,
       durum: 'bekliyor',
       odeme_alindi: false,
       tip: 'normal'
