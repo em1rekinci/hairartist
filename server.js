@@ -278,6 +278,11 @@ app.get('/portfolio', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'portfolio.html'));
 });
 
+// ─── FİYATLAR TEMİZ URL
+app.get('/fiyatlar', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'fiyatlar.html'));
+});
+
 // ─── PORTFOLYo FOTOĞRAF LİSTESİ ─────────────────────────────────────────────
 const PORTFOLIO_DIR = path.join(__dirname, 'public', 'images', 'portfolio');
 const IMG_EXTS = ['.jpg', '.jpeg', '.png', '.webp'];
