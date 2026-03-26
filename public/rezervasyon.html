@@ -396,75 +396,124 @@
   .rez-bilgi { grid-template-columns: 1fr; }
 }
 
-/* ── PERSONEL SEÇİMİ */
-.personel-secim-wrap {
-  margin-bottom: 0;
-}
-.personel-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-top: 2px;
-}
-.personel-kart {
-  border: 1px solid #2a2a2a;
-  padding: 16px 12px;
-  cursor: pointer;
+/* ── PERSONEL SEÇİMİ — LİSTBOX */
+.personel-secim-wrap { margin-bottom: 0; }
+
+.personel-listbox {
   display: flex;
   flex-direction: column;
+  border: 1px solid #2a2a2a;
+  margin-top: 2px;
+  overflow: hidden;
+}
+
+.personel-row {
+  display: flex;
   align-items: center;
-  gap: 10px;
-  transition: border-color .2s, background .2s;
-  background: transparent;
+  gap: 16px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid #1e1e1e;
+  transition: background .18s;
   position: relative;
-  text-align: center;
+  background: transparent;
+  user-select: none;
 }
-.personel-kart:hover { border-color: #555; background: rgba(247,244,239,.03); }
-.personel-kart.secili { border-color: var(--off, #f7f4ef); background: rgba(247,244,239,.05); }
-.personel-kart.secili::after {
-  content: '✓';
-  position: absolute;
-  top: 8px; right: 10px;
-  font-size: .65rem;
-  color: var(--off, #f7f4ef);
-  font-weight: 700;
-}
-.personel-foto-wrap {
-  width: 64px;
-  height: 64px;
+.personel-row:last-child { border-bottom: none; }
+.personel-row:hover { background: rgba(247,244,239,.04); }
+.personel-row.secili { background: rgba(247,244,239,.06); }
+
+/* Fotoğraf */
+.personel-foto {
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   overflow: hidden;
+  flex-shrink: 0;
   background: #1a1a1a;
-  border: 2px solid #2a2a2a;
+  border: 1.5px solid #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  transition: border-color .18s;
+}
+.personel-row.secili .personel-foto { border-color: rgba(247,244,239,.6); }
+.personel-foto img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+
+/* İsim + Unvan */
+.personel-info { flex: 1; min-width: 0; }
+.personel-ad {
+  font-family: 'Montserrat', sans-serif;
+  font-size: .78rem;
+  font-weight: 600;
+  color: rgba(247,244,239,.9);
+  letter-spacing: .04em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.personel-unvan {
+  font-family: 'Montserrat', sans-serif;
+  font-size: .62rem;
+  color: rgba(247,244,239,.35);
+  margin-top: 2px;
+  letter-spacing: .03em;
+}
+
+/* Sağ taraf — seçim göstergesi */
+.personel-check {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid #3a3a3a;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.6rem;
-  transition: border-color .2s;
+  transition: all .18s;
 }
-.personel-kart.secili .personel-foto-wrap { border-color: var(--off, #f7f4ef); }
-.personel-foto-wrap img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: top;
+.personel-row.secili .personel-check {
+  background: var(--off, #f7f4ef);
+  border-color: var(--off, #f7f4ef);
 }
-.personel-ad {
-  font-family: 'Montserrat', sans-serif;
-  font-size: .7rem;
-  font-weight: 600;
-  color: rgba(247,244,239,.9);
-  letter-spacing: .06em;
+.personel-check::after {
+  content: '';
+  width: 0;
+  height: 0;
+  transition: all .18s;
 }
-.personel-unvan {
-  font-family: 'Montserrat', sans-serif;
-  font-size: .6rem;
-  color: rgba(247,244,239,.4);
-  letter-spacing: .04em;
-  margin-top: -4px;
+.personel-row.secili .personel-check::after {
+  content: '';
+  display: block;
+  width: 5px;
+  height: 8px;
+  border-right: 1.5px solid #080808;
+  border-bottom: 1.5px solid #080808;
+  transform: rotate(45deg) translate(-1px, -1px);
 }
-@media(max-width:500px) { .personel-grid { grid-template-columns: repeat(2,1fr); } }
+
+/* Sol accent bar seçilince */
+.personel-row::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 2px;
+  background: var(--off, #f7f4ef);
+  opacity: 0;
+  transition: opacity .18s;
+}
+.personel-row.secili::before { opacity: 1; }
+
+@media(max-width:500px) {
+  .personel-row { padding: 12px 14px; gap: 12px; }
+  .personel-foto { width: 44px; height: 44px; }
+}
 </style>
 </head>
 <body>
@@ -569,31 +618,34 @@
       <div class="fg form-grid-full personel-secim-wrap">
         <label class="fl">Personel Seçimi</label>
         <input type="hidden" id="n-personel" value="">
-        <div class="personel-grid">
-          <div class="personel-kart" onclick="personelSec(this,'n','Fatih Kurt')">
-            <div class="personel-foto-wrap">
-              <img src="images/fatih-kurt.jpg" alt="Fatih Kurt" onerror="this.style.display='none';this.parentElement.innerHTML='👨‍🎨'">
+        <div class="personel-listbox">
+          <div class="personel-row" onclick="personelSec(this,'n','Fatih Kurt')">
+            <div class="personel-foto">
+              <img src="images/fatih-kurt.jpg" alt="Fatih Kurt" onerror="this.style.display='none';this.parentElement.textContent='👨‍🎨'">
             </div>
-            <div>
+            <div class="personel-info">
               <div class="personel-ad">Fatih Kurt</div>
-              <div class="personel-unvan">Baş Stilist</div>
+              <div class="personel-unvan">Baş Stilist · 10+ yıl deneyim</div>
             </div>
+            <div class="personel-check"></div>
           </div>
-          <div class="personel-kart" onclick="personelSec(this,'n','Elif Demir')">
-            <div class="personel-foto-wrap">
-              <img src="images/personel-elif.jpg" alt="Elif Demir" onerror="this.style.display='none';this.parentElement.innerHTML='👩‍🎨'">
+          <div class="personel-row" onclick="personelSec(this,'n','Elif Demir')">
+            <div class="personel-foto">
+              <img src="images/personel-elif.jpg" alt="Elif Demir" onerror="this.style.display='none';this.parentElement.textContent='👩‍🎨'">
             </div>
-            <div>
+            <div class="personel-info">
               <div class="personel-ad">Elif Demir</div>
-              <div class="personel-unvan">Stilist</div>
+              <div class="personel-unvan">Stilist · Boyama uzmanı</div>
             </div>
+            <div class="personel-check"></div>
           </div>
-          <div class="personel-kart" onclick="personelSec(this,'n','Fark Etmez')">
-            <div class="personel-foto-wrap" style="font-size:1.8rem">🎲</div>
-            <div>
+          <div class="personel-row" onclick="personelSec(this,'n','Fark Etmez')">
+            <div class="personel-foto" style="font-size:1.4rem">🎲</div>
+            <div class="personel-info">
               <div class="personel-ad">Fark Etmez</div>
-              <div class="personel-unvan">İlk müsait</div>
+              <div class="personel-unvan">İlk müsait personel</div>
             </div>
+            <div class="personel-check"></div>
           </div>
         </div>
       </div>
@@ -700,31 +752,34 @@
       <div class="fg form-grid-full personel-secim-wrap">
         <label class="fl">Personel Seçimi</label>
         <input type="hidden" id="o-personel" value="">
-        <div class="personel-grid">
-          <div class="personel-kart" onclick="personelSec(this,'o','Fatih Kurt')">
-            <div class="personel-foto-wrap">
-              <img src="images/fatih-kurt.jpg" alt="Fatih Kurt" onerror="this.style.display='none';this.parentElement.innerHTML='👨‍🎨'">
+        <div class="personel-listbox">
+          <div class="personel-row" onclick="personelSec(this,'o','Fatih Kurt')">
+            <div class="personel-foto">
+              <img src="images/fatih-kurt.jpg" alt="Fatih Kurt" onerror="this.style.display='none';this.parentElement.textContent='👨‍🎨'">
             </div>
-            <div>
+            <div class="personel-info">
               <div class="personel-ad">Fatih Kurt</div>
-              <div class="personel-unvan">Baş Stilist</div>
+              <div class="personel-unvan">Baş Stilist · 10+ yıl deneyim</div>
             </div>
+            <div class="personel-check"></div>
           </div>
-          <div class="personel-kart" onclick="personelSec(this,'o','Elif Demir')">
-            <div class="personel-foto-wrap">
-              <img src="images/personel-elif.jpg" alt="Elif Demir" onerror="this.style.display='none';this.parentElement.innerHTML='👩‍🎨'">
+          <div class="personel-row" onclick="personelSec(this,'o','Elif Demir')">
+            <div class="personel-foto">
+              <img src="images/personel-elif.jpg" alt="Elif Demir" onerror="this.style.display='none';this.parentElement.textContent='👩‍🎨'">
             </div>
-            <div>
+            <div class="personel-info">
               <div class="personel-ad">Elif Demir</div>
-              <div class="personel-unvan">Stilist</div>
+              <div class="personel-unvan">Stilist · Boyama uzmanı</div>
             </div>
+            <div class="personel-check"></div>
           </div>
-          <div class="personel-kart" onclick="personelSec(this,'o','Fark Etmez')">
-            <div class="personel-foto-wrap" style="font-size:1.8rem">🎲</div>
-            <div>
+          <div class="personel-row" onclick="personelSec(this,'o','Fark Etmez')">
+            <div class="personel-foto" style="font-size:1.4rem">🎲</div>
+            <div class="personel-info">
               <div class="personel-ad">Fark Etmez</div>
-              <div class="personel-unvan">İlk müsait</div>
+              <div class="personel-unvan">İlk müsait personel</div>
             </div>
+            <div class="personel-check"></div>
           </div>
         </div>
       </div>
@@ -840,7 +895,7 @@ hamburger.addEventListener('click',()=>{
 
 // ── PERSONEL SEÇİM
 function personelSec(el, prefix, isim) {
-  el.closest('.personel-grid').querySelectorAll('.personel-kart').forEach(k => k.classList.remove('secili'));
+  el.closest('.personel-listbox').querySelectorAll('.personel-row').forEach(k => k.classList.remove('secili'));
   el.classList.add('secili');
   document.getElementById(prefix + '-personel').value = isim;
 }
@@ -975,7 +1030,7 @@ async function normalGonder() {
     ['n-ad','n-tel','n-tarih','n-not'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('n-hizmet').value = '';
     document.getElementById('n-personel').value = '';
-    document.querySelectorAll('#normal-form .personel-kart').forEach(k => k.classList.remove('secili'));
+    document.querySelectorAll('#normal-form .personel-row').forEach(k => k.classList.remove('secili'));
     document.getElementById('n-cs-label').textContent = '— Hizmet Seçin —';
     document.getElementById('n-cs-label').style.color = 'rgba(247,244,239,.25)';
     document.getElementById('n-fiyat-box').classList.remove('show');
