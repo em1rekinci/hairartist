@@ -396,123 +396,115 @@
   .rez-bilgi { grid-template-columns: 1fr; }
 }
 
-/* ── PERSONEL SEÇİMİ — LİSTBOX */
+/* ── PERSONEL SEÇİMİ — DROPDOWN */
 .personel-secim-wrap { margin-bottom: 0; }
 
-.personel-listbox {
-  display: flex;
-  flex-direction: column;
+.personel-dropdown-wrap { position: relative; }
+
+.personel-selected {
+  width: 100%;
+  background: transparent;
   border: 1px solid #2a2a2a;
-  margin-top: 2px;
-  overflow: hidden;
+  color: var(--off);
+  padding: 0 16px;
+  height: 52px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: .85rem;
+  font-weight: 300;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  transition: border-color .2s;
+  box-sizing: border-box;
+  user-select: none;
 }
+.personel-selected:hover { border-color: #555; }
+.personel-selected-inner { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+.personel-selected-foto {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+.personel-selected-foto img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
+.personel-selected-text { flex: 1; min-width: 0; }
+.personel-selected-ad { font-size: .82rem; font-weight: 500; color: rgba(247,244,239,.9); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.personel-selected-unvan { font-size: .62rem; color: rgba(247,244,239,.35); margin-top: 1px; }
+.personel-selected-placeholder { color: rgba(247,244,239,.25); font-size: .85rem; }
+.personel-dd-arrow { width: 10px; height: 6px; color: rgba(247,244,239,.3); flex-shrink: 0; transition: transform .2s; }
+
+.personel-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0; right: 0;
+  background: #111;
+  border: 1px solid #333;
+  z-index: 100;
+}
+.personel-dropdown.open { display: block; }
 
 .personel-row {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 14px 18px;
+  gap: 14px;
+  padding: 12px 16px;
   cursor: pointer;
   border-bottom: 1px solid #1e1e1e;
-  transition: background .18s;
+  transition: background .15s;
   position: relative;
   background: transparent;
   user-select: none;
 }
 .personel-row:last-child { border-bottom: none; }
-.personel-row:hover { background: rgba(247,244,239,.04); }
-.personel-row.secili { background: rgba(247,244,239,.06); }
+.personel-row:hover { background: rgba(247,244,239,.05); }
+.personel-row.secili { background: rgba(247,244,239,.07); }
 
-/* Fotoğraf */
 .personel-foto {
-  width: 52px;
-  height: 52px;
+  width: 40px; height: 40px;
   border-radius: 50%;
   overflow: hidden;
   flex-shrink: 0;
   background: #1a1a1a;
   border: 1.5px solid #333;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.4rem;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem;
   transition: border-color .18s;
 }
-.personel-row.secili .personel-foto { border-color: rgba(247,244,239,.6); }
-.personel-foto img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: top center;
-}
+.personel-row.secili .personel-foto { border-color: rgba(247,244,239,.5); }
+.personel-foto img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
 
-/* İsim + Unvan */
 .personel-info { flex: 1; min-width: 0; }
 .personel-ad {
   font-family: 'Montserrat', sans-serif;
-  font-size: .78rem;
-  font-weight: 600;
+  font-size: .78rem; font-weight: 600;
   color: rgba(247,244,239,.9);
-  letter-spacing: .04em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.personel-unvan {
-  font-family: 'Montserrat', sans-serif;
-  font-size: .62rem;
-  color: rgba(247,244,239,.35);
-  margin-top: 2px;
-  letter-spacing: .03em;
-}
+.personel-unvan { font-family: 'Montserrat', sans-serif; font-size: .62rem; color: rgba(247,244,239,.35); margin-top: 2px; }
 
-/* Sağ taraf — seçim göstergesi */
 .personel-check {
-  width: 18px;
-  height: 18px;
+  width: 16px; height: 16px;
   border-radius: 50%;
   border: 1.5px solid #3a3a3a;
   flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   transition: all .18s;
 }
-.personel-row.secili .personel-check {
-  background: var(--off, #f7f4ef);
-  border-color: var(--off, #f7f4ef);
-}
-.personel-check::after {
-  content: '';
-  width: 0;
-  height: 0;
-  transition: all .18s;
-}
+.personel-row.secili .personel-check { background: var(--off, #f7f4ef); border-color: var(--off, #f7f4ef); }
 .personel-row.secili .personel-check::after {
   content: '';
   display: block;
-  width: 5px;
-  height: 8px;
+  width: 4px; height: 7px;
   border-right: 1.5px solid #080808;
   border-bottom: 1.5px solid #080808;
   transform: rotate(45deg) translate(-1px, -1px);
-}
-
-/* Sol accent bar seçilince */
-.personel-row::before {
-  content: '';
-  position: absolute;
-  left: 0; top: 0; bottom: 0;
-  width: 2px;
-  background: var(--off, #f7f4ef);
-  opacity: 0;
-  transition: opacity .18s;
-}
-.personel-row.secili::before { opacity: 1; }
-
-@media(max-width:500px) {
-  .personel-row { padding: 12px 14px; gap: 12px; }
-  .personel-foto { width: 44px; height: 44px; }
 }
 </style>
 </head>
@@ -620,34 +612,42 @@
       <div class="fg form-grid-full personel-secim-wrap">
         <label class="fl">Personel Seçimi</label>
         <input type="hidden" id="n-personel" value="">
-        <div class="personel-listbox">
-          <div class="personel-row" onclick="personelSec(this,'n','Fatih Kurt')">
-            <div class="personel-foto">
-              <img src="images/fatih-kurt.jpg" alt="Fatih Kurt" onerror="this.style.display='none';this.parentElement.textContent='👨‍🎨'">
+        <div class="personel-dropdown-wrap" id="n-personel-wrap">
+          <div class="personel-selected" onclick="personelToggle('n')">
+            <div class="personel-selected-inner" id="n-personel-selected-inner">
+              <span class="personel-selected-placeholder">— Personel Seçin —</span>
             </div>
-            <div class="personel-info">
-              <div class="personel-ad">Fatih Kurt</div>
-              <div class="personel-unvan">Baş Stilist · 10+ yıl deneyim</div>
-            </div>
-            <div class="personel-check"></div>
+            <svg class="personel-dd-arrow" id="n-personel-arrow" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.2"/></svg>
           </div>
-          <div class="personel-row" onclick="personelSec(this,'n','Elif Demir')">
-            <div class="personel-foto">
-              <img src="images/personel-elif.jpg" alt="Elif Demir" onerror="this.style.display='none';this.parentElement.textContent='👩‍🎨'">
+          <div class="personel-dropdown" id="n-personel-dropdown">
+            <div class="personel-row" onclick="personelSec(this,'n','Fatih Kurt','Baş Stilist · 10+ yıl deneyim','images/fatih-kurt.jpg','👨‍🎨')">
+              <div class="personel-foto">
+                <img src="images/fatih-kurt.jpg" alt="Fatih Kurt" onerror="this.style.display='none';this.parentElement.textContent='👨‍🎨'">
+              </div>
+              <div class="personel-info">
+                <div class="personel-ad">Fatih Kurt</div>
+                <div class="personel-unvan">Baş Stilist · 10+ yıl deneyim</div>
+              </div>
+              <div class="personel-check"></div>
             </div>
-            <div class="personel-info">
-              <div class="personel-ad">Elif Demir</div>
-              <div class="personel-unvan">Stilist · Boyama uzmanı</div>
+            <div class="personel-row" onclick="personelSec(this,'n','Elif Demir','Stilist · Boyama uzmanı','images/personel-elif.jpg','👩‍🎨')">
+              <div class="personel-foto">
+                <img src="images/personel-elif.jpg" alt="Elif Demir" onerror="this.style.display='none';this.parentElement.textContent='👩‍🎨'">
+              </div>
+              <div class="personel-info">
+                <div class="personel-ad">Elif Demir</div>
+                <div class="personel-unvan">Stilist · Boyama uzmanı</div>
+              </div>
+              <div class="personel-check"></div>
             </div>
-            <div class="personel-check"></div>
-          </div>
-          <div class="personel-row" onclick="personelSec(this,'n','Fark Etmez')">
-            <div class="personel-foto" style="font-size:1.4rem">🎲</div>
-            <div class="personel-info">
-              <div class="personel-ad">Fark Etmez</div>
-              <div class="personel-unvan">İlk müsait personel</div>
+            <div class="personel-row" onclick="personelSec(this,'n','Fark Etmez','İlk müsait personel',null,'🎲')">
+              <div class="personel-foto" style="font-size:1.2rem">🎲</div>
+              <div class="personel-info">
+                <div class="personel-ad">Fark Etmez</div>
+                <div class="personel-unvan">İlk müsait personel</div>
+              </div>
+              <div class="personel-check"></div>
             </div>
-            <div class="personel-check"></div>
           </div>
         </div>
       </div>
@@ -656,7 +656,7 @@
         <input id="n-ad" class="fi" type="text" placeholder="Adınız" required>
       </div>
       <div class="fg">
-        <label class="fl">Telefon</label>
+        <label class="fl">Telefon <span style="color:rgba(247,244,239,.35);font-size:.55rem;letter-spacing:.1em;text-transform:none;font-weight:300">— Lütfen numaranızı doğru yazın</span></label>
         <input id="n-tel" class="fi" type="tel" placeholder="+90 5xx xxx xx xx" required>
       </div>
       <div class="fg form-grid-full">
@@ -700,6 +700,7 @@
         <div class="fiyat-box" id="n-fiyat-box">
           <span id="fiyat-indirimli"></span>
           <span id="fiyat-normal"></span>
+          <span id="n-sure-badge" class="fiyat-badge" style="background:rgba(247,244,239,.05);border-color:rgba(247,244,239,.1);color:rgba(247,244,239,.5)"></span>
           <span class="fiyat-badge">Tahmini fiyat</span>
         </div>
       </div>
@@ -754,34 +755,42 @@
       <div class="fg form-grid-full personel-secim-wrap">
         <label class="fl">Personel Seçimi</label>
         <input type="hidden" id="o-personel" value="">
-        <div class="personel-listbox">
-          <div class="personel-row" onclick="personelSec(this,'o','Fatih Kurt')">
-            <div class="personel-foto">
-              <img src="images/fatih-kurt.jpg" alt="Fatih Kurt" onerror="this.style.display='none';this.parentElement.textContent='👨‍🎨'">
+        <div class="personel-dropdown-wrap" id="o-personel-wrap">
+          <div class="personel-selected" onclick="personelToggle('o')">
+            <div class="personel-selected-inner" id="o-personel-selected-inner">
+              <span class="personel-selected-placeholder">— Personel Seçin —</span>
             </div>
-            <div class="personel-info">
-              <div class="personel-ad">Fatih Kurt</div>
-              <div class="personel-unvan">Baş Stilist · 10+ yıl deneyim</div>
-            </div>
-            <div class="personel-check"></div>
+            <svg class="personel-dd-arrow" id="o-personel-arrow" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.2"/></svg>
           </div>
-          <div class="personel-row" onclick="personelSec(this,'o','Elif Demir')">
-            <div class="personel-foto">
-              <img src="images/personel-elif.jpg" alt="Elif Demir" onerror="this.style.display='none';this.parentElement.textContent='👩‍🎨'">
+          <div class="personel-dropdown" id="o-personel-dropdown">
+            <div class="personel-row" onclick="personelSec(this,'o','Fatih Kurt','Baş Stilist · 10+ yıl deneyim','images/fatih-kurt.jpg','👨‍🎨')">
+              <div class="personel-foto">
+                <img src="images/fatih-kurt.jpg" alt="Fatih Kurt" onerror="this.style.display='none';this.parentElement.textContent='👨‍🎨'">
+              </div>
+              <div class="personel-info">
+                <div class="personel-ad">Fatih Kurt</div>
+                <div class="personel-unvan">Baş Stilist · 10+ yıl deneyim</div>
+              </div>
+              <div class="personel-check"></div>
             </div>
-            <div class="personel-info">
-              <div class="personel-ad">Elif Demir</div>
-              <div class="personel-unvan">Stilist · Boyama uzmanı</div>
+            <div class="personel-row" onclick="personelSec(this,'o','Elif Demir','Stilist · Boyama uzmanı','images/personel-elif.jpg','👩‍🎨')">
+              <div class="personel-foto">
+                <img src="images/personel-elif.jpg" alt="Elif Demir" onerror="this.style.display='none';this.parentElement.textContent='👩‍🎨'">
+              </div>
+              <div class="personel-info">
+                <div class="personel-ad">Elif Demir</div>
+                <div class="personel-unvan">Stilist · Boyama uzmanı</div>
+              </div>
+              <div class="personel-check"></div>
             </div>
-            <div class="personel-check"></div>
-          </div>
-          <div class="personel-row" onclick="personelSec(this,'o','Fark Etmez')">
-            <div class="personel-foto" style="font-size:1.4rem">🎲</div>
-            <div class="personel-info">
-              <div class="personel-ad">Fark Etmez</div>
-              <div class="personel-unvan">İlk müsait personel</div>
+            <div class="personel-row" onclick="personelSec(this,'o','Fark Etmez','İlk müsait personel',null,'🎲')">
+              <div class="personel-foto" style="font-size:1.2rem">🎲</div>
+              <div class="personel-info">
+                <div class="personel-ad">Fark Etmez</div>
+                <div class="personel-unvan">İlk müsait personel</div>
+              </div>
+              <div class="personel-check"></div>
             </div>
-            <div class="personel-check"></div>
           </div>
         </div>
       </div>
@@ -790,7 +799,7 @@
         <input id="o-ad" class="fi" type="text" placeholder="Adınız" required>
       </div>
       <div class="fg">
-        <label class="fl">Telefon</label>
+        <label class="fl">Telefon <span style="color:rgba(247,244,239,.35);font-size:.55rem;letter-spacing:.1em;text-transform:none;font-weight:300">— Lütfen numaranızı doğru yazın</span></label>
         <input id="o-tel" class="fi" type="tel" placeholder="+90 5xx xxx xx xx" required>
       </div>
       <div class="fg form-grid-full">
@@ -835,6 +844,7 @@
         <div class="fiyat-box" id="o-fiyat-box">
           <span id="o-fiyat-indirimli"></span>
           <span id="o-fiyat-normal"></span>
+          <span id="o-sure-badge" class="fiyat-badge" style="background:rgba(247,244,239,.05);border-color:rgba(247,244,239,.1);color:rgba(247,244,239,.5)"></span>
           <span class="fiyat-badge">Ödeme fiyatı</span>
         </div>
       </div>
@@ -895,11 +905,64 @@ hamburger.addEventListener('click',()=>{
   } else { closeMobileMenu(); }
 });
 
-// ── PERSONEL SEÇİM
-function personelSec(el, prefix, isim) {
-  el.closest('.personel-listbox').querySelectorAll('.personel-row').forEach(k => k.classList.remove('secili'));
+// ── PERSONEL DROPDOWN
+var SURE_MAP = {
+  'Fön': 45, 'Saç Kesimi': 60, 'Maşa': 60, 'Topuz': 90,
+  'Kaş Alımı': 15, 'Dudak Üstü': 10,
+  'Manikür': 45, 'Pedikür': 60,
+  'Günlük Makyaj': 45, 'Normal Makyaj': 60, 'Profesyonel Makyaj': 90,
+  'Gelin Saç & Makyaj': 240, 'Kına Saç & Makyaj': 180, 'Nişan Saç & Makyaj': 180,
+  'Ombre': 180, 'Sombre': 180, 'Facelights': 120, 'Balyaj': 180,
+  'Komple Boya': 120, 'Dip Boya': 60, 'Açma Boyama': 180, 'Dip Açma Boyama': 90,
+  'Pigmentasyon': 90, 'Protein Jel Botox': 120, 'Keratin Botoks': 90,
+  'Brezilya Fönü (Kalıcı Fön)': 180, 'Mikro Kaynak (Adet)': 30
+};
+
+function personelToggle(prefix) {
+  var dd = document.getElementById(prefix + '-personel-dropdown');
+  var arrow = document.getElementById(prefix + '-personel-arrow');
+  var open = dd.classList.toggle('open');
+  arrow.style.transform = open ? 'rotate(180deg)' : '';
+}
+
+document.addEventListener('click', function(e) {
+  ['n','o'].forEach(function(prefix) {
+    var wrap = document.getElementById(prefix + '-personel-wrap');
+    if (wrap && !wrap.contains(e.target)) {
+      var dd = document.getElementById(prefix + '-personel-dropdown');
+      var arrow = document.getElementById(prefix + '-personel-arrow');
+      if (dd) { dd.classList.remove('open'); arrow.style.transform = ''; }
+    }
+  });
+  if (document.getElementById('n-cs-wrap') && !document.getElementById('n-cs-wrap').contains(e.target)) {
+    document.getElementById('n-cs-dropdown').classList.remove('open');
+    document.getElementById('n-cs-arrow').style.transform = '';
+  }
+  if (document.getElementById('o-cs-wrap') && !document.getElementById('o-cs-wrap').contains(e.target)) {
+    document.getElementById('o-cs-dropdown').classList.remove('open');
+    document.getElementById('o-cs-arrow').style.transform = '';
+  }
+});
+
+function personelSec(el, prefix, isim, unvan, foto, emoji) {
+  el.closest('.personel-dropdown').querySelectorAll('.personel-row').forEach(k => k.classList.remove('secili'));
   el.classList.add('secili');
   document.getElementById(prefix + '-personel').value = isim;
+  // Dropdown kapat
+  var dd = document.getElementById(prefix + '-personel-dropdown');
+  var arrow = document.getElementById(prefix + '-personel-arrow');
+  dd.classList.remove('open');
+  arrow.style.transform = '';
+  // Seçili göster
+  var inner = document.getElementById(prefix + '-personel-selected-inner');
+  inner.innerHTML =
+    '<div class="personel-selected-foto">' +
+      (foto ? '<img src="' + foto + '" onerror="this.style.display=\'none\';this.parentElement.textContent=\'' + emoji + '\'">' : emoji) +
+    '</div>' +
+    '<div class="personel-selected-text">' +
+      '<div class="personel-selected-ad">' + isim + '</div>' +
+      '<div class="personel-unvan">' + unvan + '</div>' +
+    '</div>';
 }
 
 // ── EKRAN GEÇİŞ
@@ -931,16 +994,6 @@ function csToggleN() {
   var open = dd.classList.toggle('open');
   arrow.style.transform = open ? 'rotate(180deg)' : '';
 }
-document.addEventListener('click', function(e) {
-  if (!document.getElementById('n-cs-wrap').contains(e.target)) {
-    document.getElementById('n-cs-dropdown').classList.remove('open');
-    document.getElementById('n-cs-arrow').style.transform = '';
-  }
-  if (!document.getElementById('o-cs-wrap').contains(e.target)) {
-    document.getElementById('o-cs-dropdown').classList.remove('open');
-    document.getElementById('o-cs-arrow').style.transform = '';
-  }
-});
 function hizmetSecN(el, ad, min, max) {
   document.querySelectorAll('#n-cs-dropdown .cs-option').forEach(i => i.classList.remove('secili'));
   el.classList.add('secili');
@@ -953,6 +1006,10 @@ function hizmetSecN(el, ad, min, max) {
   var fiyatStr = min === max ? min.toLocaleString('tr-TR') + '₺' : min.toLocaleString('tr-TR') + ' – ' + max.toLocaleString('tr-TR') + '₺';
   document.getElementById('fiyat-indirimli').textContent = fiyatStr;
   document.getElementById('fiyat-normal').textContent = '';
+  var sure = SURE_MAP[ad];
+  var sureBadge = document.getElementById('n-sure-badge');
+  if (sure) { sureBadge.textContent = 'İşlem süresi: ' + sure + ' dk'; sureBadge.style.display = ''; }
+  else { sureBadge.textContent = ''; sureBadge.style.display = 'none'; }
   document.getElementById('n-fiyat-box').classList.add('show');
 }
 
@@ -975,6 +1032,10 @@ function hizmetSecO(el, ad, fiyat, _) {
   document.getElementById('o-cs-arrow').style.transform = '';
   document.getElementById('o-fiyat-indirimli').textContent = fiyat.toLocaleString('tr-TR') + '₺';
   document.getElementById('o-fiyat-normal').textContent = '';
+  var sure = SURE_MAP[ad];
+  var sureBadge = document.getElementById('o-sure-badge');
+  if (sure) { sureBadge.textContent = 'İşlem süresi: ' + sure + ' dk'; sureBadge.style.display = ''; }
+  else { sureBadge.textContent = ''; sureBadge.style.display = 'none'; }
   document.getElementById('o-fiyat-box').classList.add('show');
 }
 
