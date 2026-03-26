@@ -744,8 +744,12 @@ async function panelBaslat(){
 function saatGuncelle(){document.getElementById('tptime').textContent=new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});}
 async function verileriYukle(showToast=true){
   try{
-    const data=await sRest('rezervasyonlar?select=*&order=created_at.desc&limit=500');
-    TRZ=data.map(dbToLocal);
+    const [rezData, pData] = await Promise.all([
+      sRest('rezervasyonlar?select=*&order=created_at.desc&limit=500'),
+      sRest('personel?select=*&order=created_at.asc')
+    ]);
+    TRZ=rezData.map(dbToLocal);
+    personel=pData.map(p=>({id:p.id,ad:p.ad,rol:p.rol||'',tel:p.tel||'',durum:p.durum||'aktif'}));
     AKTLOG=logOlustur();
     if(showToast)toast('Yenilendi.','ok');
   }catch(e){
@@ -951,13 +955,14 @@ function detay(id){
   const fiyat=h?Math.round((h.min+h.max)/2).toLocaleString('tr-TR')+'₺':'—';
   const olusturma=new Date(r.tarihOlustur).toLocaleString('tr-TR',{day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
   const p=personel.find(x=>x.id===r.personelId);
+  const pOptions=personel.map(px=>`<option value="${px.id}"${px.id===r.personelId?' selected':''}>${px.ad} — ${px.rol||''}</option>`).join('');
   document.getElementById('mice').innerHTML=`
     <div class="mr"><span class="mk">Ad Soyad</span><span class="mv">${r.ad}</span></div>
     <div class="mr"><span class="mk">Telefon</span><span class="mv">${r.telefon}</span></div>
     <div class="mr"><span class="mk">Hizmet</span><span class="mv">${r.hizmet}</span></div>
     <div class="mr"><span class="mk">Fiyat</span><span class="mv" style="color:var(--green)">${fiyat}</span></div>
     <div class="mr"><span class="mk">Randevu</span><span class="mv">${r.tarih} saat ${r.saat||'—'}</span></div>
-    <div class="mr"><span class="mk">Personel</span><span class="mv">${p?p.ad:'—'}</span></div>
+    <div class="mr" style="align-items:center"><span class="mk">Personel</span><span class="mv"><select class="fsel" style="font-size:.75rem;padding:5px 8px" onchange="personelAta('${r.id}',this.value)"><option value="">— Atanmadı —</option>${pOptions}</select></span></div>
     <div class="mr"><span class="mk">Not</span><span class="mv">${r.not||'—'}</span></div>
     <div class="mr"><span class="mk">Durum</span><span class="mv">${bH(r.durum)}${r.odemeAlindi?'<span class="badge bo" style="font-size:.42rem;margin-left:6px">Ödendi</span>':''}</span></div>
     <div class="mr"><span class="mk">Oluşturulma</span><span class="mv">${olusturma}</span></div>
@@ -972,6 +977,15 @@ function detay(id){
   }
   document.getElementById('mbaslik').textContent=r.ad+' — Detay';
   document.getElementById('mov').classList.add('open');
+}
+async function personelAta(rezId, personelId){
+  try{
+    await sRest(`rezervasyonlar?id=eq.${rezId}`,{method:'PATCH',body:JSON.stringify({personel_id:personelId||null})});
+    const r=TRZ.find(x=>x.id===rezId);
+    if(r)r.personelId=personelId||null;
+    verileriRender();
+    toast('Personel atandı.','ok');
+  }catch(e){toast('Hata: '+e.message,'hata');}
 }
 function mKapat(){document.getElementById('mov').classList.remove('open');}
 
@@ -1022,24 +1036,29 @@ function pStatRender(){
     return`<tr><td><div class="tad">${p.ad}</div></td><td>${rez.length}</td><td class="tfyt">${ciro?ciro.toLocaleString('tr-TR')+'₺':'—'}</td></tr>`;
   }).join('');
 }
-function personelKaydet(){
+async function personelKaydet(){
   const editId=document.getElementById('pfid').value;
   const ad=document.getElementById('pfad').value.trim();
   const rol=document.getElementById('pfrol').value.trim();
   const tel=document.getElementById('pftel').value.trim();
   const durum=document.getElementById('pfdurum').value;
   if(!ad){toast('Ad Soyad giriniz.','hata');return;}
-  if(editId){
-    const p=personel.find(x=>x.id===editId);
-    if(p)Object.assign(p,{ad,rol,tel,durum});
-    toast('Personel güncellendi.','ok');
-  } else {
-    personel.push({id:'p'+Date.now(),ad,rol,tel,durum});
-    toast('Personel eklendi.','ok');
-  }
-  personelSifirla();
-  pListRender();pStatRender();
-  verileriRender();
+  try{
+    if(editId){
+      await sRest(`personel?id=eq.${editId}`,{method:'PATCH',body:JSON.stringify({ad,rol,tel,durum})});
+      const p=personel.find(x=>x.id===editId);
+      if(p)Object.assign(p,{ad,rol,tel,durum});
+      toast('Personel güncellendi.','ok');
+    } else {
+      const res=await sRest('personel',{method:'POST',body:JSON.stringify({ad,rol,tel,durum})});
+      const yeni=Array.isArray(res)?res[0]:res;
+      personel.push({id:yeni.id,ad,rol,tel,durum});
+      toast('Personel eklendi.','ok');
+    }
+    personelSifirla();
+    pListRender();pStatRender();
+    verileriRender();
+  }catch(e){toast('Hata: '+e.message,'hata');}
 }
 function personelDuzenle(id){
   const p=personel.find(x=>x.id===id);if(!p)return;
@@ -1051,10 +1070,13 @@ function personelDuzenle(id){
   document.getElementById('pformbaslik').textContent='Personel Düzenle';
   document.getElementById('pfiptal').style.display='';
 }
-function personelSil(id){
+async function personelSil(id){
   if(!confirm('Bu personeli silmek istediğinizden emin misiniz?'))return;
-  personel=personel.filter(x=>x.id!==id);
-  pListRender();pStatRender();toast('Personel silindi.','ok');
+  try{
+    await sRest(`personel?id=eq.${id}`,{method:'DELETE',headers:{'Prefer':'return=minimal'}});
+    personel=personel.filter(x=>x.id!==id);
+    pListRender();pStatRender();toast('Personel silindi.','ok');
+  }catch(e){toast('Hata: '+e.message,'hata');}
 }
 function personelSifirla(){
   document.getElementById('pfid').value='';
