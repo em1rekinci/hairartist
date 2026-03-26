@@ -8,10 +8,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <style>
-/* ── FİYATLAR SAYFA ── */
+/* ── FİYATLAR SAYFA — AÇIK TEMA ── */
 .fiyat-page {
   min-height: 100vh;
-  background: var(--black, #080808);
+  background: #f5f2ed;
   padding-top: 76px;
 }
 
@@ -19,27 +19,27 @@
   padding: 80px 40px 60px;
   max-width: 1200px;
   margin: 0 auto;
-  border-bottom: 1px solid #1a1a1a;
+  border-bottom: 1px solid #dedad4;
 }
-.fiyat-hero .sec-tag { color: rgba(247,244,239,.35); }
+.fiyat-hero .sec-tag { color: rgba(30,20,10,.4); }
 .fiyat-hero h1 {
   font-family: 'Playfair Display', serif;
   font-size: clamp(2.4rem, 5vw, 4rem);
   font-weight: 700;
-  color: var(--off, #f7f4ef);
+  color: #1a1209;
   margin-top: 14px;
   line-height: 1.05;
 }
 .fiyat-hero h1 em {
   font-style: italic;
   font-weight: 400;
-  color: rgba(247,244,239,.3);
+  color: rgba(30,20,10,.35);
 }
 .fiyat-hero-alt {
   margin-top: 16px;
   font-family: 'Montserrat', sans-serif;
   font-size: .82rem;
-  color: rgba(247,244,239,.4);
+  color: rgba(30,20,10,.5);
   line-height: 1.7;
   max-width: 520px;
 }
@@ -60,7 +60,7 @@
   gap: 14px;
   margin-bottom: 20px;
   padding-bottom: 16px;
-  border-bottom: 1px solid #1e1e1e;
+  border-bottom: 1px solid #dedad4;
 }
 .fiyat-bolum-ikon {
   font-size: 1.3rem;
@@ -72,7 +72,7 @@
   letter-spacing: .22em;
   text-transform: uppercase;
   font-weight: 600;
-  color: rgba(247,244,239,.55);
+  color: rgba(30,20,10,.5);
 }
 
 /* Fiyat listesi satırları */
@@ -86,12 +86,12 @@
   justify-content: space-between;
   align-items: baseline;
   padding: 13px 0;
-  border-bottom: 1px solid rgba(247,244,239,.05);
+  border-bottom: 1px solid rgba(30,20,10,.08);
   gap: 20px;
   transition: background .15s;
 }
 .fiyat-satir:hover {
-  background: rgba(247,244,239,.02);
+  background: rgba(30,20,10,.04);
   padding-left: 8px;
   padding-right: 8px;
   margin-left: -8px;
@@ -101,13 +101,13 @@
 .fiyat-satir-ad {
   font-family: 'Montserrat', sans-serif;
   font-size: .82rem;
-  color: rgba(247,244,239,.75);
+  color: rgba(30,20,10,.75);
   font-weight: 400;
   flex: 1;
 }
 .fiyat-satir-aciklama {
   font-size: .68rem;
-  color: rgba(247,244,239,.3);
+  color: rgba(30,20,10,.4);
   display: block;
   margin-top: 2px;
 }
@@ -115,11 +115,11 @@
   font-family: 'Montserrat', sans-serif;
   font-size: .85rem;
   font-weight: 600;
-  color: rgba(247,244,239,.95);
+  color: #1a1209;
   white-space: nowrap;
   text-align: right;
 }
-.fiyat-satir-tutar.ozel { color: #c8ff00; }
+.fiyat-satir-tutar.ozel { color: #7a5c00; }
 
 /* İki kolon grid - büyük ekranlar */
 .fiyat-2col {
@@ -130,13 +130,13 @@
 
 /* Özel gün highlight */
 .fiyat-satir.highlight-row {
-  background: rgba(200,255,0,.03);
-  border: 1px solid rgba(200,255,0,.08);
+  background: rgba(180,140,0,.06);
+  border: 1px solid rgba(180,140,0,.15);
   padding: 14px 12px;
   margin: 4px 0;
 }
 .fiyat-satir.highlight-row:hover {
-  background: rgba(200,255,0,.06);
+  background: rgba(180,140,0,.1);
   padding-left: 12px;
   padding-right: 12px;
   margin-left: 0;
@@ -145,8 +145,8 @@
 
 /* Not & CTA */
 .fiyat-cta-bar {
-  background: #0f0f0f;
-  border: 1px solid #1e1e1e;
+  background: #edeae4;
+  border: 1px solid #dedad4;
   padding: 40px;
   display: flex;
   align-items: center;
@@ -159,20 +159,20 @@
   font-family: 'Playfair Display', serif;
   font-size: 1.4rem;
   font-weight: 700;
-  color: var(--off, #f7f4ef);
+  color: #1a1209;
   margin-bottom: 8px;
 }
-.fiyat-cta-sol h3 em { font-style: italic; font-weight: 400; color: rgba(247,244,239,.35); }
+.fiyat-cta-sol h3 em { font-style: italic; font-weight: 400; color: rgba(30,20,10,.35); }
 .fiyat-cta-sol p {
   font-family: 'Montserrat', sans-serif;
   font-size: .75rem;
-  color: rgba(247,244,239,.4);
+  color: rgba(30,20,10,.5);
   line-height: 1.7;
 }
 .fiyat-cta-btn {
   display: inline-block;
-  background: var(--off, #f7f4ef);
-  color: #080808;
+  background: #1a1209;
+  color: #f5f2ed;
   padding: 14px 36px;
   font-family: 'Montserrat', sans-serif;
   font-size: .6rem;
@@ -183,13 +183,13 @@
   transition: opacity .2s;
   white-space: nowrap;
 }
-.fiyat-cta-btn:hover { opacity: .82; }
+.fiyat-cta-btn:hover { opacity: .78; }
 
 .fiyat-dipnot {
   margin-top: 24px;
   font-family: 'Montserrat', sans-serif;
   font-size: .7rem;
-  color: rgba(247,244,239,.2);
+  color: rgba(30,20,10,.35);
   line-height: 1.7;
 }
 
@@ -455,7 +455,7 @@
       <a href="/rezervasyon" class="fiyat-cta-btn">Rezervasyon Yap →</a>
     </div>
 
-    <p class="fiyat-dipnot">* Belirtilen fiyatlar ortalama fiyat aralıklarıdır. Saç uzunluğu, yoğunluğu ve kullanılan ürün miktarına göre değişiklik gösterebilir. Kesin fiyat için lütfen salonumuzu arayın: <a href="tel:+905317770203" style="color:rgba(247,244,239,.4)">0531 777 02 03</a></p>
+    <p class="fiyat-dipnot">* Belirtilen fiyatlar ortalama fiyat aralıklarıdır. Saç uzunluğu, yoğunluğu ve kullanılan ürün miktarına göre değişiklik gösterebilir. Kesin fiyat için lütfen salonumuzu arayın: <a href="tel:+905317770203" style="color:rgba(30,20,10,.45)">0531 777 02 03</a></p>
 
   </div>
 </div>
