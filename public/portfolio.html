@@ -20,31 +20,31 @@ html{scroll-behavior:smooth}
 body{background:var(--black);color:var(--off);font-family:"Montserrat",sans-serif;font-weight:300;overflow-x:hidden}
 
 /* ── NAV ── */
-nav{position:fixed;top:0;left:0;right:0;z-index:200;height:64px;padding:0 56px;display:flex;align-items:center;justify-content:space-between;background:rgba(8,8,8,.95);backdrop-filter:blur(14px);border-bottom:1px solid rgba(247,244,239,.07)}
+nav{position:fixed;top:0;left:0;right:0;z-index:200;height:76px;padding:0 56px;display:flex;align-items:center;justify-content:space-between;background:rgba(8,8,8,.95);backdrop-filter:blur(14px);border-bottom:1px solid rgba(247,244,239,.07)}
 .nav-logo{display:flex;align-items:center;text-decoration:none}
-.nav-logo img{height:38px;width:auto;object-fit:contain;filter:brightness(0) invert(1)}
+.nav-logo img{height:48px;width:auto;object-fit:contain;filter:brightness(0) invert(1)}
 nav ul{list-style:none;display:flex;gap:0}
-nav ul li a{color:rgba(247,244,239,.45);text-decoration:none;font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;transition:color .3s;padding:0 18px;line-height:64px;display:block}
+nav ul li a{color:rgba(247,244,239,.45);text-decoration:none;font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;transition:color .3s;padding:0 18px;line-height:76px;display:block}
 nav ul li a:hover{color:var(--off)}
 nav ul li a.active{color:var(--off);border-bottom:2px solid var(--off)}
 .nav-right{display:flex;align-items:center;gap:20px}
-.nav-book{background:var(--off);color:var(--black);padding:9px 22px;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;font-weight:600;text-decoration:none;transition:opacity .3s}
+.nav-book{background:var(--off);color:var(--black);padding:10px 26px;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;font-weight:600;text-decoration:none;transition:opacity .3s}
 .nav-book:hover{opacity:.8}
 
 /* ── PAGE HEADER ── */
-.page-header{padding:96px 56px 40px;position:relative;overflow:hidden}
-.page-header::before{content:"PORTFOLYO";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:"Playfair Display",serif;font-size:clamp(5rem,14vw,14rem);font-weight:900;color:rgba(247,244,239,.025);white-space:nowrap;pointer-events:none;line-height:1}
-.ph-tag{font-size:.58rem;letter-spacing:.42em;text-transform:uppercase;color:rgba(247,244,239,.3);display:flex;align-items:center;gap:14px;margin-bottom:14px}
-.ph-tag::before{content:"";width:28px;height:1px;background:rgba(247,244,239,.3)}
-.page-header h1{font-family:"Playfair Display",serif;font-weight:900;font-size:clamp(2rem,5vw,4rem);line-height:.95;letter-spacing:-.02em}
-.page-header h1 em{font-style:italic;font-weight:400;color:rgba(247,244,239,.3)}
-.ph-sub{margin-top:16px;font-size:.78rem;line-height:1.9;color:rgba(247,244,239,.35);max-width:420px}
-
-/* ── FILTER TABS ── */
-.filter-bar{padding:0 56px 48px;display:flex;gap:4px;flex-wrap:wrap}
-.ftab{background:none;border:1px solid rgba(247,244,239,.12);color:rgba(247,244,239,.4);font-family:"Montserrat",sans-serif;font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;padding:10px 24px;cursor:pointer;transition:all .3s}
-.ftab:hover{border-color:rgba(247,244,239,.4);color:var(--off)}
-.ftab.active{background:var(--off);color:var(--black);border-color:var(--off)}
+.page-header{padding:110px 56px 0;position:relative;overflow:hidden;display:flex;align-items:flex-end;justify-content:space-between;gap:48px;border-bottom:1px solid rgba(247,244,239,.07)}
+.ph-left{padding-bottom:44px}
+.ph-tag{font-size:.55rem;letter-spacing:.48em;text-transform:uppercase;color:rgba(247,244,239,.28);display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.ph-tag::before{content:"";width:28px;height:1px;background:rgba(247,244,239,.28)}
+.page-header h1{font-family:"Playfair Display",serif;font-weight:900;font-size:clamp(2.4rem,5.5vw,4.8rem);line-height:.92;letter-spacing:-.025em}
+.page-header h1 em{font-style:italic;font-weight:400;color:rgba(247,244,239,.22)}
+.ph-sub{margin-top:22px;font-size:.76rem;line-height:2;color:rgba(247,244,239,.32);max-width:360px}
+.ph-right{display:flex;align-items:flex-end;justify-content:flex-end;padding-bottom:44px;gap:0;flex-shrink:0}
+.ph-stat{text-align:center;padding:0 36px}
+.ph-stat:not(:last-child){border-right:1px solid rgba(247,244,239,.08)}
+.ph-stat-num{font-family:"Playfair Display",serif;font-size:2.6rem;font-weight:900;line-height:1;color:var(--off);display:block}
+.ph-stat-num em{font-style:italic;font-weight:400;font-size:1.8rem}
+.ph-stat-lbl{font-size:.5rem;letter-spacing:.3em;text-transform:uppercase;color:rgba(247,244,239,.28);margin-top:6px;display:block}
 
 /* ── GALLERY SECTION ── */
 .gallery-section{background:var(--mid);padding:60px 56px 100px}
@@ -109,22 +109,24 @@ footer p{font-size:.62rem;letter-spacing:.12em;color:rgba(247,244,239,.25)}
 .mobile-menu-close:hover{opacity:1}
 
 @media(max-width:900px){
-  nav{padding:0 24px;height:58px}
+  nav{padding:0 24px;height:64px}
   nav ul{display:none}
   .nav-right .nav-book{display:none}
   .hamburger{display:flex}
-  .page-header,.gallery-section,.filter-bar,.cta-strip{padding-left:24px;padding-right:24px}
+  .page-header,.gallery-section,.cta-strip{padding-left:24px;padding-right:24px}
+  .page-header{flex-direction:column;align-items:flex-start;padding-top:86px;gap:24px}
+  .ph-right{align-self:stretch;justify-content:flex-start;padding-bottom:32px}
+  .ph-stat{padding:0 28px}
   .gal-grid{columns:2}
   .cta-strip{flex-direction:column;gap:32px;text-align:center}
   footer{flex-direction:column;gap:10px;text-align:center;padding:24px}
-  .page-header{padding-top:80px;padding-bottom:28px}
 }
 @media(max-width:540px){
   nav{padding:0 16px}
-  .page-header,.gallery-section,.filter-bar,.cta-strip{padding-left:16px;padding-right:16px}
+  .page-header,.gallery-section,.cta-strip{padding-left:16px;padding-right:16px}
   .gal-grid{columns:1}
-  .filter-bar{gap:6px}
-  .ftab{padding:8px 16px;font-size:.55rem}
+  .ph-stat-num{font-size:2rem}
+  .ph-stat{padding:0 20px}
   footer{padding:24px 16px}
 }
 
@@ -172,17 +174,25 @@ footer p{font-size:.62rem;letter-spacing:.12em;color:rgba(247,244,239,.25)}
 
 <!-- PAGE HEADER -->
 <div class="page-header">
-  <span class="ph-tag">Fatih Kurt · Hair Artist</span>
-  <h1>Çalışma<br><em>Portfolyom</em></h1>
-  <p class="ph-sub">Her saç farklı bir hikâye anlatır. İşte o hikayelerin birkaçı.</p>
-</div>
-
-<!-- FILTER TABS -->
-<div class="filter-bar">
-  <button class="ftab active" data-filter="all">Tümü</button>
-  <button class="ftab" data-filter="balyaj">Balyaj</button>
-  <button class="ftab" data-filter="boya">Saç Boyama</button>
-  <button class="ftab" data-filter="kesim">Saç Kesimi</button>
+  <div class="ph-left">
+    <span class="ph-tag">Fatih Kurt · Hair Artist</span>
+    <h1>Çalışma<br><em>Portfolyom</em></h1>
+    <p class="ph-sub">Her saç farklı bir hikâye anlatır. İşte o hikayelerin birkaçı.</p>
+  </div>
+  <div class="ph-right">
+    <div class="ph-stat">
+      <span class="ph-stat-num">15<em>+</em></span>
+      <span class="ph-stat-lbl">Çalışma</span>
+    </div>
+    <div class="ph-stat">
+      <span class="ph-stat-num">10<em>+</em></span>
+      <span class="ph-stat-lbl">Yıl Deneyim</span>
+    </div>
+    <div class="ph-stat">
+      <span class="ph-stat-num">500<em>+</em></span>
+      <span class="ph-stat-lbl">Mutlu Müşteri</span>
+    </div>
+  </div>
 </div>
 
 <!-- GALLERY -->
@@ -398,23 +408,6 @@ footer p{font-size:.62rem;letter-spacing:.12em;color:rgba(247,244,239,.25)}
 </div>
 
 <script>
-/* ── FILTER ── */
-const ftabs = document.querySelectorAll('.ftab');
-const galItems = document.querySelectorAll('.gal-item');
-let currentFilter = 'all';
-
-ftabs.forEach(tab => {
-  tab.addEventListener('click', () => {
-    ftabs.forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    currentFilter = tab.dataset.filter;
-    galItems.forEach(item => {
-      const show = currentFilter === 'all' || item.dataset.cat === currentFilter;
-      item.style.display = show ? '' : 'none';
-    });
-  });
-});
-
 /* ── LIGHTBOX ── */
 const lb = document.getElementById('lightbox');
 const lbImg = document.getElementById('lb-img');
@@ -422,18 +415,15 @@ const lbCaption = document.getElementById('lb-caption');
 let lbList = [], lbIdx = 0;
 
 function buildLbList() {
-  lbList = [];
-  document.querySelectorAll('.gal-item').forEach(item => {
-    if (item.style.display === 'none') return;
-    lbList.push({
-      src: item.querySelector('img').src,
-      caption: item.querySelector('.gal-name').textContent
-    });
-  });
+  lbList = [...document.querySelectorAll('.gal-item')].map(item => ({
+    src: item.querySelector('img').src,
+    caption: item.querySelector('.gal-name').textContent
+  }));
 }
 
+buildLbList();
+
 function openLb(i) {
-  buildLbList();
   lbIdx = i;
   lbImg.src = lbList[i].src;
   lbCaption.textContent = lbList[i].caption;
@@ -451,12 +441,7 @@ function navLb(dir) {
 }
 
 document.querySelectorAll('.gal-item').forEach((item, i) => {
-  item.addEventListener('click', () => {
-    // recalculate visible index
-    const visible = [...document.querySelectorAll('.gal-item')].filter(el => el.style.display !== 'none');
-    const idx = visible.indexOf(item);
-    openLb(idx >= 0 ? idx : 0);
-  });
+  item.addEventListener('click', () => openLb(i));
 });
 
 document.getElementById('lb-close').addEventListener('click', closeLb);
