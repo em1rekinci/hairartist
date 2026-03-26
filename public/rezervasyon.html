@@ -630,21 +630,13 @@
               </div>
               <div class="personel-check"></div>
             </div>
-            <div class="personel-row" onclick="personelSec(this,'n','Elif Demir','Stilist · Boyama uzmanı','images/personel-elif.jpg','👩‍🎨')">
+            <div class="personel-row" onclick="personelSec(this,'n','Baran Kurt','Stilist','images/baran-kurt.jpg','💈')">
               <div class="personel-foto">
-                <img src="images/personel-elif.jpg" alt="Elif Demir" onerror="this.style.display='none';this.parentElement.textContent='👩‍🎨'">
+                <img src="images/baran-kurt.jpg" alt="Baran Kurt" onerror="this.style.display='none';this.parentElement.textContent='💈'">
               </div>
               <div class="personel-info">
-                <div class="personel-ad">Elif Demir</div>
-                <div class="personel-unvan">Stilist · Boyama uzmanı</div>
-              </div>
-              <div class="personel-check"></div>
-            </div>
-            <div class="personel-row" onclick="personelSec(this,'n','Fark Etmez','İlk müsait personel',null,'🎲')">
-              <div class="personel-foto" style="font-size:1.2rem">🎲</div>
-              <div class="personel-info">
-                <div class="personel-ad">Fark Etmez</div>
-                <div class="personel-unvan">İlk müsait personel</div>
+                <div class="personel-ad">Baran Kurt</div>
+                <div class="personel-unvan">Stilist</div>
               </div>
               <div class="personel-check"></div>
             </div>
@@ -656,7 +648,7 @@
         <input id="n-ad" class="fi" type="text" placeholder="Adınız" required>
       </div>
       <div class="fg">
-        <label class="fl">Telefon <span style="color:rgba(247,244,239,.35);font-size:.55rem;letter-spacing:.1em;text-transform:none;font-weight:300">— Lütfen numaranızı doğru yazın</span></label>
+        <label class="fl">Telefon <span style="color:#f7f4ef;font-size:.6rem;letter-spacing:.08em;text-transform:none;font-weight:500">— Lütfen numaranızı doğru yazın</span></label>
         <input id="n-tel" class="fi" type="tel" placeholder="+90 5xx xxx xx xx" required>
       </div>
       <div class="fg form-grid-full">
@@ -773,21 +765,13 @@
               </div>
               <div class="personel-check"></div>
             </div>
-            <div class="personel-row" onclick="personelSec(this,'o','Elif Demir','Stilist · Boyama uzmanı','images/personel-elif.jpg','👩‍🎨')">
+            <div class="personel-row" onclick="personelSec(this,'o','Baran Kurt','Stilist','images/baran-kurt.jpg','💈')">
               <div class="personel-foto">
-                <img src="images/personel-elif.jpg" alt="Elif Demir" onerror="this.style.display='none';this.parentElement.textContent='👩‍🎨'">
+                <img src="images/baran-kurt.jpg" alt="Baran Kurt" onerror="this.style.display='none';this.parentElement.textContent='💈'">
               </div>
               <div class="personel-info">
-                <div class="personel-ad">Elif Demir</div>
-                <div class="personel-unvan">Stilist · Boyama uzmanı</div>
-              </div>
-              <div class="personel-check"></div>
-            </div>
-            <div class="personel-row" onclick="personelSec(this,'o','Fark Etmez','İlk müsait personel',null,'🎲')">
-              <div class="personel-foto" style="font-size:1.2rem">🎲</div>
-              <div class="personel-info">
-                <div class="personel-ad">Fark Etmez</div>
-                <div class="personel-unvan">İlk müsait personel</div>
+                <div class="personel-ad">Baran Kurt</div>
+                <div class="personel-unvan">Stilist</div>
               </div>
               <div class="personel-check"></div>
             </div>
@@ -799,7 +783,7 @@
         <input id="o-ad" class="fi" type="text" placeholder="Adınız" required>
       </div>
       <div class="fg">
-        <label class="fl">Telefon <span style="color:rgba(247,244,239,.35);font-size:.55rem;letter-spacing:.1em;text-transform:none;font-weight:300">— Lütfen numaranızı doğru yazın</span></label>
+        <label class="fl">Telefon <span style="color:#f7f4ef;font-size:.6rem;letter-spacing:.08em;text-transform:none;font-weight:500">— Lütfen numaranızı doğru yazın</span></label>
         <input id="o-tel" class="fi" type="tel" placeholder="+90 5xx xxx xx xx" required>
       </div>
       <div class="fg form-grid-full">
@@ -1071,7 +1055,7 @@ async function normalGonder() {
   const tarih = document.getElementById('n-tarih').value;
   const saat = document.getElementById('n-saat').value;
   const not = document.getElementById('n-not').value.trim();
-  const personel = document.getElementById('n-personel').value || 'Fark Etmez';
+  const personel = document.getElementById('n-personel').value || 'Baran Kurt';
 
   if (!ad || !telefon || !hizmet || !tarih) {
     mesaj(mesajDiv, 'Lütfen tüm zorunlu alanları doldurun.', 'hata');
@@ -1117,7 +1101,7 @@ async function odemeGit() {
   const tarih = document.getElementById('o-tarih').value;
   const saat = document.getElementById('o-saat').value;
   const fiyat = document.getElementById('o-fiyat').value;
-  const personel = document.getElementById('o-personel').value || 'Fark Etmez';
+  const personel = document.getElementById('o-personel').value || 'Baran Kurt';
 
   if (!ad || !telefon || !hizmet || !tarih) {
     mesaj(mesajDiv, 'Lütfen tüm zorunlu alanları doldurun.', 'hata');
