@@ -165,6 +165,12 @@ footer p{font-size:.62rem;color:rgba(247,244,239,.2);letter-spacing:.08em}
 .social-btn{display:flex;align-items:center;gap:8px;background:rgba(247,244,239,.06);border:1px solid rgba(247,244,239,.1);padding:8px 14px;border-radius:2px;text-decoration:none;color:rgba(247,244,239,.5);font-size:.65rem;letter-spacing:.08em;transition:all .3s}
 .social-btn:hover{background:rgba(247,244,239,.12);color:var(--off)}
 .social-btn svg{width:14px;height:14px;fill:currentColor;flex-shrink:0}
+.social-btn-ig { color: rgba(247,244,239,.8) !important; border-color: rgba(225,48,108,.25); }
+.social-btn-ig:hover { background: rgba(225,48,108,.1) !important; border-color: rgba(225,48,108,.5) !important; color: #fff !important; }
+.social-btn-ig svg { width: 16px !important; height: 16px !important; fill: none !important; }
+.social-btn-fb { color: #1877F2 !important; border-color: rgba(24,119,242,.25); }
+.social-btn-fb:hover { background: rgba(24,119,242,.1) !important; border-color: rgba(24,119,242,.5) !important; color: #1877F2 !important; }
+.social-btn-fb svg { width: 16px !important; height: 16px !important; }
 .hours-box{background:rgba(247,244,239,.04);border:1px solid rgba(247,244,239,.08);padding:28px;border-radius:2px}
 .hours-box h4{font-family:"Playfair Display",serif;font-size:1rem;margin-bottom:14px;color:var(--off)}
 .hour-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(247,244,239,.05);font-size:.75rem;color:rgba(247,244,239,.35)}
