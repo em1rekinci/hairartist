@@ -70,9 +70,9 @@
   font-size: .6rem;
   letter-spacing: .3em;
   text-transform: uppercase;
-  color: rgba(247,244,239,.2);
+  color: rgba(247,244,239,.55);
 }
-.rez-kart.odeme .rez-kart-no { color: rgba(200,255,0,.4); }
+.rez-kart.odeme .rez-kart-no { color: rgba(200,255,0,.6); }
 .rez-kart h2 {
   font-family: 'Playfair Display', serif;
   font-size: 1.8rem;
@@ -90,7 +90,7 @@
 .rez-kart p {
   font-size: .8rem;
   line-height: 1.85;
-  color: rgba(247,244,239,.4);
+  color: rgba(247,244,239,.7);
 }
 .rez-kart-ozellik {
   display: flex;
@@ -103,7 +103,7 @@
   align-items: center;
   gap: 10px;
   font-size: .72rem;
-  color: rgba(247,244,239,.5);
+  color: rgba(247,244,239,.8);
 }
 .rez-oz-item::before {
   content: '';
@@ -189,7 +189,7 @@
   margin-top: 16px;
   font-size: .82rem;
   line-height: 1.8;
-  color: rgba(247,244,239,.4);
+  color: rgba(247,244,239,.75);
 }
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .form-grid-full { grid-column: 1 / -1; }
@@ -199,7 +199,7 @@
   font-size: .58rem;
   letter-spacing: .22em;
   text-transform: uppercase;
-  color: rgba(247,244,239,.3);
+  color: rgba(247,244,239,.75);
   margin-bottom: 8px;
   font-weight: 400;
 }
@@ -320,7 +320,7 @@
 .time-btn {
   background: transparent;
   border: 1px solid #2a2a2a;
-  color: rgba(247,244,239,.5);
+  color: rgba(247,244,239,.75);
   padding: 10px 4px;
   font-family: 'Montserrat', sans-serif;
   font-size: .72rem;
@@ -383,8 +383,8 @@
   grid-template-columns: 1fr 1fr;
   gap: 16px 32px;
 }
-.rez-bilgi-item { font-size: .78rem; color: rgba(247,244,239,.4); line-height: 1.7; }
-.rez-bilgi-item strong { display: block; font-size: .58rem; letter-spacing: .18em; text-transform: uppercase; color: rgba(247,244,239,.2); margin-bottom: 4px; font-weight: 400; }
+.rez-bilgi-item { font-size: .78rem; color: rgba(247,244,239,.75); line-height: 1.7; }
+.rez-bilgi-item strong { display: block; font-size: .58rem; letter-spacing: .18em; text-transform: uppercase; color: rgba(247,244,239,.5); margin-bottom: 4px; font-weight: 400; }
 
 @media(max-width:700px) {
   .rez-secim-grid { grid-template-columns: 1fr; }
@@ -395,6 +395,76 @@
   .time-grid { grid-template-columns: repeat(4, 1fr); }
   .rez-bilgi { grid-template-columns: 1fr; }
 }
+
+/* ── PERSONEL SEÇİMİ */
+.personel-secim-wrap {
+  margin-bottom: 0;
+}
+.personel-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 2px;
+}
+.personel-kart {
+  border: 1px solid #2a2a2a;
+  padding: 16px 12px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  transition: border-color .2s, background .2s;
+  background: transparent;
+  position: relative;
+  text-align: center;
+}
+.personel-kart:hover { border-color: #555; background: rgba(247,244,239,.03); }
+.personel-kart.secili { border-color: var(--off, #f7f4ef); background: rgba(247,244,239,.05); }
+.personel-kart.secili::after {
+  content: '✓';
+  position: absolute;
+  top: 8px; right: 10px;
+  font-size: .65rem;
+  color: var(--off, #f7f4ef);
+  font-weight: 700;
+}
+.personel-foto-wrap {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #1a1a1a;
+  border: 2px solid #2a2a2a;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  transition: border-color .2s;
+}
+.personel-kart.secili .personel-foto-wrap { border-color: var(--off, #f7f4ef); }
+.personel-foto-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+}
+.personel-ad {
+  font-family: 'Montserrat', sans-serif;
+  font-size: .7rem;
+  font-weight: 600;
+  color: rgba(247,244,239,.9);
+  letter-spacing: .06em;
+}
+.personel-unvan {
+  font-family: 'Montserrat', sans-serif;
+  font-size: .6rem;
+  color: rgba(247,244,239,.4);
+  letter-spacing: .04em;
+  margin-top: -4px;
+}
+@media(max-width:500px) { .personel-grid { grid-template-columns: repeat(2,1fr); } }
 </style>
 </head>
 <body>
@@ -496,6 +566,37 @@
     </div>
 
     <div class="form-grid">
+      <div class="fg form-grid-full personel-secim-wrap">
+        <label class="fl">Personel Seçimi</label>
+        <input type="hidden" id="n-personel" value="">
+        <div class="personel-grid">
+          <div class="personel-kart" onclick="personelSec(this,'n','Fatih Kurt')">
+            <div class="personel-foto-wrap">
+              <img src="images/fatih-kurt.jpg" alt="Fatih Kurt" onerror="this.style.display='none';this.parentElement.innerHTML='👨‍🎨'">
+            </div>
+            <div>
+              <div class="personel-ad">Fatih Kurt</div>
+              <div class="personel-unvan">Baş Stilist</div>
+            </div>
+          </div>
+          <div class="personel-kart" onclick="personelSec(this,'n','Elif Demir')">
+            <div class="personel-foto-wrap">
+              <img src="images/personel-elif.jpg" alt="Elif Demir" onerror="this.style.display='none';this.parentElement.innerHTML='👩‍🎨'">
+            </div>
+            <div>
+              <div class="personel-ad">Elif Demir</div>
+              <div class="personel-unvan">Stilist</div>
+            </div>
+          </div>
+          <div class="personel-kart" onclick="personelSec(this,'n','Fark Etmez')">
+            <div class="personel-foto-wrap" style="font-size:1.8rem">🎲</div>
+            <div>
+              <div class="personel-ad">Fark Etmez</div>
+              <div class="personel-unvan">İlk müsait</div>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="fg">
         <label class="fl">Ad Soyad</label>
         <input id="n-ad" class="fi" type="text" placeholder="Adınız" required>
@@ -596,6 +697,37 @@
     </div>
 
     <div class="form-grid">
+      <div class="fg form-grid-full personel-secim-wrap">
+        <label class="fl">Personel Seçimi</label>
+        <input type="hidden" id="o-personel" value="">
+        <div class="personel-grid">
+          <div class="personel-kart" onclick="personelSec(this,'o','Fatih Kurt')">
+            <div class="personel-foto-wrap">
+              <img src="images/fatih-kurt.jpg" alt="Fatih Kurt" onerror="this.style.display='none';this.parentElement.innerHTML='👨‍🎨'">
+            </div>
+            <div>
+              <div class="personel-ad">Fatih Kurt</div>
+              <div class="personel-unvan">Baş Stilist</div>
+            </div>
+          </div>
+          <div class="personel-kart" onclick="personelSec(this,'o','Elif Demir')">
+            <div class="personel-foto-wrap">
+              <img src="images/personel-elif.jpg" alt="Elif Demir" onerror="this.style.display='none';this.parentElement.innerHTML='👩‍🎨'">
+            </div>
+            <div>
+              <div class="personel-ad">Elif Demir</div>
+              <div class="personel-unvan">Stilist</div>
+            </div>
+          </div>
+          <div class="personel-kart" onclick="personelSec(this,'o','Fark Etmez')">
+            <div class="personel-foto-wrap" style="font-size:1.8rem">🎲</div>
+            <div>
+              <div class="personel-ad">Fark Etmez</div>
+              <div class="personel-unvan">İlk müsait</div>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="fg">
         <label class="fl">Ad Soyad</label>
         <input id="o-ad" class="fi" type="text" placeholder="Adınız" required>
@@ -706,6 +838,13 @@ hamburger.addEventListener('click',()=>{
   } else { closeMobileMenu(); }
 });
 
+// ── PERSONEL SEÇİM
+function personelSec(el, prefix, isim) {
+  el.closest('.personel-grid').querySelectorAll('.personel-kart').forEach(k => k.classList.remove('secili'));
+  el.classList.add('secili');
+  document.getElementById(prefix + '-personel').value = isim;
+}
+
 // ── EKRAN GEÇİŞ
 function goster(id) {
   document.getElementById('secim-ekrani').style.display = 'none';
@@ -814,6 +953,7 @@ async function normalGonder() {
   const tarih = document.getElementById('n-tarih').value;
   const saat = document.getElementById('n-saat').value;
   const not = document.getElementById('n-not').value.trim();
+  const personel = document.getElementById('n-personel').value || 'Fark Etmez';
 
   if (!ad || !telefon || !hizmet || !tarih) {
     mesaj(mesajDiv, 'Lütfen tüm zorunlu alanları doldurun.', 'hata');
@@ -826,6 +966,7 @@ async function normalGonder() {
   try {
     await supabaseInsert('rezervasyonlar', {
       ad, telefon, hizmet, tarih, saat, musteri_notu: not,
+      personel: personel,
       durum: 'bekliyor',
       odeme_alindi: false,
       tip: 'normal'
@@ -833,6 +974,8 @@ async function normalGonder() {
     mesaj(mesajDiv, '✓ Rezervasyonunuz alındı. En kısa sürede sizi arayacağız.', 'basari');
     ['n-ad','n-tel','n-tarih','n-not'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('n-hizmet').value = '';
+    document.getElementById('n-personel').value = '';
+    document.querySelectorAll('#normal-form .personel-kart').forEach(k => k.classList.remove('secili'));
     document.getElementById('n-cs-label').textContent = '— Hizmet Seçin —';
     document.getElementById('n-cs-label').style.color = 'rgba(247,244,239,.25)';
     document.getElementById('n-fiyat-box').classList.remove('show');
@@ -856,6 +999,7 @@ async function odemeGit() {
   const tarih = document.getElementById('o-tarih').value;
   const saat = document.getElementById('o-saat').value;
   const fiyat = document.getElementById('o-fiyat').value;
+  const personel = document.getElementById('o-personel').value || 'Fark Etmez';
 
   if (!ad || !telefon || !hizmet || !tarih) {
     mesaj(mesajDiv, 'Lütfen tüm zorunlu alanları doldurun.', 'hata');
@@ -869,6 +1013,7 @@ async function odemeGit() {
     await supabaseInsert('rezervasyonlar', {
       ad, telefon, hizmet, tarih, saat,
       fiyat: parseInt(fiyat) || 0,
+      personel: personel,
       durum: 'bekliyor',
       odeme_alindi: false,
       tip: 'odeme_bekleyen'

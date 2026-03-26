@@ -175,7 +175,7 @@ footer p{font-size:.62rem;color:rgba(247,244,239,.2);letter-spacing:.08em}
 .hour-row.today .hour-time{color:#c8ff00;font-weight:500}
 .hour-row.closed .hour-time{color:rgba(247,244,239,.2);font-style:italic}
 .map-box{border-radius:2px;overflow:hidden;border:1px solid rgba(247,244,239,.08);border-bottom:none;border-radius:2px 2px 0 0}
-.map-box iframe{width:100%;height:210px;border:none;display:block;filter:grayscale(100%) invert(90%) contrast(85%)}
+.map-box iframe{width:100%;height:210px;border:none;display:block;}
 
 /* ── HAMBURGEr MENÜ ── */
 .hamburger{display:none;flex-direction:column;justify-content:center;gap:5px;width:40px;height:40px;cursor:pointer;background:none;border:none;padding:4px;z-index:300}
