@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Admin Panel — Hair Artist</title>
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Hair Artist Admin">
+<meta name="theme-color" content="#080808">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="images/logo2.png">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -369,8 +376,8 @@ tbody td{padding:10px 13px;vertical-align:middle}
     <label class="glbl">Şifre</label>
     <input type="password" class="ginp" id="sinp" placeholder="••••••••" onkeydown="if(event.key==='Enter')girisYap()">
     <button class="gbtn" onclick="girisYap()">Panele Gir</button>
-    <div class="ghata" id="ghata">Şifre hatalı. Demo: <strong>admin123</strong></div>
-    <div class="gdemo">Demo şifresi: <strong>admin123</strong></div>
+    <div class="ghata" id="ghata">Şifre hatalı.</div>
+    
   </div>
 </div>
 
@@ -630,7 +637,7 @@ tbody td{padding:10px 13px;vertical-align:middle}
 // ─── SUPABASE ───
 const SUPA_URL='https://botxnihztrnwzjnrlwzv.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvdHhuaWh6dHJud3pqbnJsd3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MTg4MTAsImV4cCI6MjA5MDA5NDgxMH0.AcX4_2Aykf8J1jln9fvODh2rRffymfEJCAekzmN1ALg';
-const ADMIN_SIFRE='hairartist2026';
+const ADMIN_SIFRE='fatihkurt341905.';
 
 async function sRest(path,opts={}){
   const res=await fetch(SUPA_URL+'/rest/v1/'+path,{
