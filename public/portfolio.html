@@ -54,12 +54,20 @@ nav ul li a.active{color:var(--off);border-bottom:2px solid var(--off)}
 .gal-item{break-inside:avoid;margin-bottom:4px;position:relative;overflow:hidden;cursor:pointer}
 .gal-item img{width:100%;height:auto;display:block;filter:grayscale(10%);transition:transform .6s cubic-bezier(.4,0,.2,1),filter .4s}
 .gal-item:hover img{transform:scale(1.04);filter:grayscale(0%)}
-.gal-overlay{position:absolute;inset:0;background:rgba(8,8,8,0);transition:background .4s;display:flex;align-items:flex-end;padding:20px}
-.gal-item:hover .gal-overlay{background:rgba(8,8,8,.55)}
-.gal-info{opacity:0;transform:translateY(8px);transition:all .4s}
+.gal-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,8,.72) 0%,rgba(8,8,8,.1) 55%,transparent 100%);transition:background .4s;display:flex;align-items:flex-end;padding:18px}
+.gal-item:hover .gal-overlay{background:linear-gradient(to top,rgba(8,8,8,.82) 0%,rgba(8,8,8,.25) 60%,transparent 100%)}
+.gal-info{opacity:0;transform:translateY(6px);transition:all .4s}
 .gal-item:hover .gal-info{opacity:1;transform:translateY(0)}
-.gal-cat{font-size:.5rem;letter-spacing:.25em;text-transform:uppercase;color:rgba(247,244,239,.55);display:block;margin-bottom:5px}
-.gal-name{font-family:"Playfair Display",serif;font-size:.92rem;color:var(--off);font-weight:700;line-height:1.2}
+.gal-cat{font-size:.5rem;letter-spacing:.25em;text-transform:uppercase;color:rgba(247,244,239,.65);display:block;margin-bottom:5px}
+.gal-name{font-family:"Playfair Display",serif;font-size:.92rem;color:#fff;font-weight:700;line-height:1.25;text-shadow:0 1px 8px rgba(0,0,0,.5)}
+
+/* ── MOBİL: overlay her zaman görünür ── */
+@media(hover:none){
+  .gal-overlay{background:linear-gradient(to top,rgba(8,8,8,.78) 0%,rgba(8,8,8,.15) 50%,transparent 100%)}
+  .gal-info{opacity:1;transform:translateY(0)}
+  .gal-cat{color:rgba(247,244,239,.75)}
+  .gal-name{font-size:1rem;color:#fff}
+}
 
 /* ── LIGHTBOX ── */
 .lb{position:fixed;inset:0;background:rgba(8,8,8,.97);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
