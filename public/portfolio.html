@@ -20,66 +20,46 @@ html{scroll-behavior:smooth}
 body{background:var(--black);color:var(--off);font-family:"Montserrat",sans-serif;font-weight:300;overflow-x:hidden}
 
 /* ── NAV ── */
-nav{position:fixed;top:0;left:0;right:0;z-index:200;height:76px;padding:0 56px;display:flex;align-items:center;justify-content:space-between;background:rgba(8,8,8,.95);backdrop-filter:blur(14px);border-bottom:1px solid rgba(247,244,239,.07)}
+nav{position:fixed;top:0;left:0;right:0;z-index:200;height:64px;padding:0 56px;display:flex;align-items:center;justify-content:space-between;background:rgba(8,8,8,.95);backdrop-filter:blur(14px);border-bottom:1px solid rgba(247,244,239,.07)}
 .nav-logo{display:flex;align-items:center;text-decoration:none}
-.nav-logo img{height:48px;width:auto;object-fit:contain;filter:brightness(0) invert(1)}
+.nav-logo img{height:38px;width:auto;object-fit:contain;filter:brightness(0) invert(1)}
 nav ul{list-style:none;display:flex;gap:0}
-nav ul li a{color:rgba(247,244,239,.45);text-decoration:none;font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;transition:color .3s;padding:0 18px;line-height:76px;display:block}
+nav ul li a{color:rgba(247,244,239,.45);text-decoration:none;font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;transition:color .3s;padding:0 18px;line-height:64px;display:block}
 nav ul li a:hover{color:var(--off)}
 nav ul li a.active{color:var(--off);border-bottom:2px solid var(--off)}
 .nav-right{display:flex;align-items:center;gap:20px}
-.nav-book{background:var(--off);color:var(--black);padding:10px 26px;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;font-weight:600;text-decoration:none;transition:opacity .3s}
+.nav-book{background:var(--off);color:var(--black);padding:9px 22px;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;font-weight:600;text-decoration:none;transition:opacity .3s}
 .nav-book:hover{opacity:.8}
 
 /* ── PAGE HEADER ── */
-.page-header{padding:140px 56px 80px;position:relative;overflow:hidden}
-.page-header::before{content:"PORTFOLYO";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:"Playfair Display",serif;font-size:clamp(6rem,18vw,18rem);font-weight:900;color:rgba(247,244,239,.025);white-space:nowrap;pointer-events:none;line-height:1}
-.ph-tag{font-size:.6rem;letter-spacing:.45em;text-transform:uppercase;color:rgba(247,244,239,.3);display:flex;align-items:center;gap:16px;margin-bottom:20px}
-.ph-tag::before{content:"";width:32px;height:1px;background:rgba(247,244,239,.3)}
-.page-header h1{font-family:"Playfair Display",serif;font-weight:900;font-size:clamp(3rem,7vw,6.5rem);line-height:.9;letter-spacing:-.02em}
+.page-header{padding:96px 56px 40px;position:relative;overflow:hidden}
+.page-header::before{content:"PORTFOLYO";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:"Playfair Display",serif;font-size:clamp(5rem,14vw,14rem);font-weight:900;color:rgba(247,244,239,.025);white-space:nowrap;pointer-events:none;line-height:1}
+.ph-tag{font-size:.58rem;letter-spacing:.42em;text-transform:uppercase;color:rgba(247,244,239,.3);display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.ph-tag::before{content:"";width:28px;height:1px;background:rgba(247,244,239,.3)}
+.page-header h1{font-family:"Playfair Display",serif;font-weight:900;font-size:clamp(2rem,5vw,4rem);line-height:.95;letter-spacing:-.02em}
 .page-header h1 em{font-style:italic;font-weight:400;color:rgba(247,244,239,.3)}
-.ph-sub{margin-top:28px;font-size:.82rem;line-height:2;color:rgba(247,244,239,.35);max-width:440px}
+.ph-sub{margin-top:16px;font-size:.78rem;line-height:1.9;color:rgba(247,244,239,.35);max-width:420px}
 
 /* ── FILTER TABS ── */
-.filter-bar{padding:0 56px 56px;display:flex;gap:4px;flex-wrap:wrap}
+.filter-bar{padding:0 56px 48px;display:flex;gap:4px;flex-wrap:wrap}
 .ftab{background:none;border:1px solid rgba(247,244,239,.12);color:rgba(247,244,239,.4);font-family:"Montserrat",sans-serif;font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;padding:10px 24px;cursor:pointer;transition:all .3s}
 .ftab:hover{border-color:rgba(247,244,239,.4);color:var(--off)}
 .ftab.active{background:var(--off);color:var(--black);border-color:var(--off)}
 
-/* ── BEFORE / AFTER SECTION ── */
-.ba-section{padding:0 56px 100px}
-.section-label{font-size:.6rem;letter-spacing:.35em;text-transform:uppercase;color:rgba(247,244,239,.3);display:block;margin-bottom:40px;display:flex;align-items:center;gap:16px}
-.section-label::after{content:"";flex:1;height:1px;background:rgba(247,244,239,.08)}
-.ba-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:3px}
-
-/* Before/After Slider */
-.ba-card{position:relative;overflow:hidden;aspect-ratio:4/3;cursor:ew-resize;user-select:none}
-.ba-card .ba-before,
-.ba-card .ba-after{position:absolute;inset:0;width:100%;height:100%}
-.ba-card .ba-before img,
-.ba-card .ba-after img{width:100%;height:100%;object-fit:cover;display:block;filter:grayscale(15%)}
-.ba-card .ba-before{z-index:1}
-.ba-card .ba-after{z-index:2;clip-path:inset(0 50% 0 0);transition:clip-path 0s}
-.ba-divider{position:absolute;top:0;bottom:0;left:50%;width:2px;background:var(--off);z-index:10;transform:translateX(-50%);transition:left 0s}
-.ba-handle{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:44px;height:44px;background:var(--off);border-radius:50%;z-index:11;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,.5)}
-.ba-handle svg{width:20px;height:20px;fill:var(--black)}
-.ba-label-before,.ba-label-after{position:absolute;bottom:18px;z-index:12;font-size:.55rem;letter-spacing:.25em;text-transform:uppercase;font-weight:600;padding:6px 14px;background:rgba(8,8,8,.75);backdrop-filter:blur(8px)}
-.ba-label-before{left:16px}
-.ba-label-after{right:16px}
-.ba-title{position:absolute;top:18px;left:18px;z-index:12;font-family:"Playfair Display",serif;font-size:1rem;font-weight:700;color:var(--off);text-shadow:0 2px 12px rgba(0,0,0,.6)}
-
 /* ── GALLERY SECTION ── */
-.gallery-section{background:var(--mid);padding:80px 56px 100px}
+.gallery-section{background:var(--mid);padding:60px 56px 100px}
+.section-label{font-size:.6rem;letter-spacing:.35em;text-transform:uppercase;color:rgba(247,244,239,.3);display:flex;align-items:center;gap:16px;margin-bottom:40px}
+.section-label::after{content:"";flex:1;height:1px;background:rgba(247,244,239,.08)}
 .gal-grid{columns:3;gap:4px;column-fill:balance}
 .gal-item{break-inside:avoid;margin-bottom:4px;position:relative;overflow:hidden;cursor:pointer}
-.gal-item img{width:100%;height:auto;display:block;filter:grayscale(20%);transition:transform .6s cubic-bezier(.4,0,.2,1),filter .4s}
+.gal-item img{width:100%;height:auto;display:block;filter:grayscale(10%);transition:transform .6s cubic-bezier(.4,0,.2,1),filter .4s}
 .gal-item:hover img{transform:scale(1.04);filter:grayscale(0%)}
 .gal-overlay{position:absolute;inset:0;background:rgba(8,8,8,0);transition:background .4s;display:flex;align-items:flex-end;padding:20px}
-.gal-item:hover .gal-overlay{background:rgba(8,8,8,.45)}
+.gal-item:hover .gal-overlay{background:rgba(8,8,8,.55)}
 .gal-info{opacity:0;transform:translateY(8px);transition:all .4s}
 .gal-item:hover .gal-info{opacity:1;transform:translateY(0)}
-.gal-cat{font-size:.52rem;letter-spacing:.25em;text-transform:uppercase;color:rgba(247,244,239,.6);display:block;margin-bottom:4px}
-.gal-name{font-family:"Playfair Display",serif;font-size:.95rem;color:var(--off);font-weight:700}
+.gal-cat{font-size:.5rem;letter-spacing:.25em;text-transform:uppercase;color:rgba(247,244,239,.55);display:block;margin-bottom:5px}
+.gal-name{font-family:"Playfair Display",serif;font-size:.92rem;color:var(--off);font-weight:700;line-height:1.2}
 
 /* ── LIGHTBOX ── */
 .lb{position:fixed;inset:0;background:rgba(8,8,8,.97);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
@@ -87,22 +67,22 @@ nav ul li a.active{color:var(--off);border-bottom:2px solid var(--off)}
 .lb-img{max-width:90vw;max-height:88vh;object-fit:contain;display:block}
 .lb-close{position:absolute;top:28px;right:36px;background:none;border:none;color:var(--off);font-size:1.8rem;cursor:pointer;opacity:.5;transition:opacity .3s;line-height:1}
 .lb-close:hover{opacity:1}
-.lb-caption{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);font-size:.65rem;letter-spacing:.3em;text-transform:uppercase;color:rgba(247,244,239,.4)}
+.lb-caption{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);font-size:.65rem;letter-spacing:.3em;text-transform:uppercase;color:rgba(247,244,239,.4);white-space:nowrap}
 .lb-nav{position:absolute;top:50%;transform:translateY(-50%);background:none;border:1px solid rgba(247,244,239,.15);color:var(--off);width:48px;height:48px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;font-size:1.2rem}
 .lb-nav:hover{background:var(--off);color:var(--black);border-color:var(--off)}
 .lb-prev{left:24px}
 .lb-next{right:24px}
 
 /* ── MARQUEE ── */
-.marquee{background:var(--off);padding:15px 0;overflow:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.marquee{background:var(--off);padding:14px 0;overflow:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 .marquee-track{display:flex;white-space:nowrap;animation:marq 28s linear infinite}
-.mi{font-family:"Playfair Display",serif;font-style:italic;font-size:1.05rem;color:var(--black);padding:0 28px}
+.mi{font-family:"Playfair Display",serif;font-style:italic;font-size:1rem;color:var(--black);padding:0 28px}
 .msep{font-size:.7rem;color:var(--line);padding:0 4px}
 @keyframes marq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
 /* ── CTA ── */
-.cta-strip{padding:80px 56px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(247,244,239,.07)}
-.cta-strip h2{font-family:"Playfair Display",serif;font-size:clamp(1.6rem,3vw,2.4rem);font-weight:700}
+.cta-strip{padding:72px 56px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(247,244,239,.07)}
+.cta-strip h2{font-family:"Playfair Display",serif;font-size:clamp(1.5rem,3vw,2.2rem);font-weight:700}
 .cta-strip h2 em{font-style:italic;font-weight:400;color:rgba(247,244,239,.3)}
 .cta-btn{background:var(--off);color:var(--black);padding:16px 44px;font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;font-weight:600;text-decoration:none;transition:opacity .3s;white-space:nowrap}
 .cta-btn:hover{opacity:.8}
@@ -113,8 +93,7 @@ footer p{font-size:.62rem;letter-spacing:.12em;color:rgba(247,244,239,.25)}
 .foot-credit{font-size:.62rem;letter-spacing:.12em;color:#fff;text-decoration:none;transition:opacity .3s;font-weight:600}
 .foot-credit:hover{opacity:.7}
 
-/* ── RESPONSIVE ── */
-/* ── HAMBURGEr MENÜ ── */
+/* ── HAMBURGER ── */
 .hamburger{display:none;flex-direction:column;justify-content:center;gap:5px;width:40px;height:40px;cursor:pointer;background:none;border:none;padding:4px;z-index:300}
 .hamburger span{display:block;width:24px;height:1.5px;background:var(--off);transition:all .3s;transform-origin:center}
 .hamburger.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
@@ -130,20 +109,19 @@ footer p{font-size:.62rem;letter-spacing:.12em;color:rgba(247,244,239,.25)}
 .mobile-menu-close:hover{opacity:1}
 
 @media(max-width:900px){
-  nav{padding:0 24px}
+  nav{padding:0 24px;height:58px}
   nav ul{display:none}
   .nav-right .nav-book{display:none}
   .hamburger{display:flex}
-  .page-header,.ba-section,.gallery-section,.filter-bar,.cta-strip{padding-left:24px;padding-right:24px}
-  .ba-grid{grid-template-columns:1fr}
+  .page-header,.gallery-section,.filter-bar,.cta-strip{padding-left:24px;padding-right:24px}
   .gal-grid{columns:2}
   .cta-strip{flex-direction:column;gap:32px;text-align:center}
   footer{flex-direction:column;gap:10px;text-align:center;padding:24px}
-  .page-header{padding-top:110px;padding-bottom:48px}
+  .page-header{padding-top:80px;padding-bottom:28px}
 }
 @media(max-width:540px){
   nav{padding:0 16px}
-  .page-header,.ba-section,.gallery-section,.filter-bar,.cta-strip{padding-left:16px;padding-right:16px}
+  .page-header,.gallery-section,.filter-bar,.cta-strip{padding-left:16px;padding-right:16px}
   .gal-grid{columns:1}
   .filter-bar{gap:6px}
   .ftab{padding:8px 16px;font-size:.55rem}
@@ -171,7 +149,7 @@ footer p{font-size:.62rem;letter-spacing:.12em;color:rgba(247,244,239,.25)}
     <li><a href="/#contact">İletişim</a></li>
   </ul>
   <div class="nav-right">
-    <a href="/#booking" class="nav-book">Randevu Al</a>
+    <a href="/rezervasyon" class="nav-book">Randevu Al</a>
     <button class="hamburger" id="hamburger" aria-label="Menü">
       <span></span><span></span><span></span>
     </button>
@@ -189,96 +167,192 @@ footer p{font-size:.62rem;letter-spacing:.12em;color:rgba(247,244,239,.25)}
     <li><a href="/shop">Shop</a></li>
     <li><a href="/#contact">İletişim</a></li>
   </ul>
-  <a href="/#booking" class="m-book">Randevu Al</a>
+  <a href="/rezervasyon" class="m-book">Randevu Al</a>
 </div>
 
 <!-- PAGE HEADER -->
 <div class="page-header">
   <span class="ph-tag">Fatih Kurt · Hair Artist</span>
   <h1>Çalışma<br><em>Portfolyom</em></h1>
-  <p class="ph-sub">Her saç farklı bir hikâye anlatır. İşte o hikayelerin birkaçı — öncesi ve sonrasıyla.</p>
+  <p class="ph-sub">Her saç farklı bir hikâye anlatır. İşte o hikayelerin birkaçı.</p>
 </div>
 
 <!-- FILTER TABS -->
 <div class="filter-bar">
   <button class="ftab active" data-filter="all">Tümü</button>
-  <button class="ftab" data-filter="kesim">Saç Kesimi</button>
-  <button class="ftab" data-filter="boya">Saç Boyama</button>
-  <button class="ftab" data-filter="bakim">Bakım & Şekil</button>
   <button class="ftab" data-filter="balyaj">Balyaj</button>
+  <button class="ftab" data-filter="boya">Saç Boyama</button>
+  <button class="ftab" data-filter="kesim">Saç Kesimi</button>
 </div>
 
-<!-- BEFORE / AFTER -->
-<div class="ba-section">
-  <span class="section-label">Önce &amp; Sonra</span>
-  <div class="ba-grid" id="ba-grid">
+<!-- GALLERY -->
+<div class="gallery-section">
+  <span class="section-label">Çalışmalar</span>
+  <div class="gal-grid" id="gal-grid">
 
-    <!-- BA Card 1 -->
-    <div class="ba-card" data-cat="boya">
-      <div class="ba-before">
-        <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&q=80&grayscale" alt="Önce">
+    <!-- 1: Long wavy balayage warm brown-to-blonde -->
+    <div class="gal-item reveal" data-cat="balyaj">
+      <img src="images/portfolio/port1.jpeg" alt="Sıcak Ton Balyaj" loading="lazy">
+      <div class="gal-overlay">
+        <div class="gal-info">
+          <span class="gal-cat">Balyaj</span>
+          <span class="gal-name">Sıcak Ton Balyaj & Dalgalı Şekillendirme</span>
+        </div>
       </div>
-      <div class="ba-after">
-        <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&q=80" alt="Sonra">
-      </div>
-      <div class="ba-divider"></div>
-      <div class="ba-handle">
-        <svg viewBox="0 0 24 24"><path d="M8 5l-7 7 7 7M16 5l7 7-7 7"/><path d="M1 12h22" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"/></svg>
-      </div>
-      <span class="ba-label-before">Önce</span>
-      <span class="ba-label-after">Sonra</span>
-      <span class="ba-title">Saç Renklendirme</span>
     </div>
 
-    <!-- BA Card 2 -->
-    <div class="ba-card" data-cat="balyaj">
-      <div class="ba-before">
-        <img src="https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?w=800&q=80&grayscale" alt="Önce">
+    <!-- 2: Blonde bob with dark roots, tousled -->
+    <div class="gal-item reveal" data-cat="kesim">
+      <img src="images/portfolio/port2.jpeg" alt="Sarı Bob Kesim" loading="lazy">
+      <div class="gal-overlay">
+        <div class="gal-info">
+          <span class="gal-cat">Saç Kesimi</span>
+          <span class="gal-name">Sarı Balyaj & Bob Kesim</span>
+        </div>
       </div>
-      <div class="ba-after">
-        <img src="https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?w=800&q=80" alt="Sonra">
-      </div>
-      <div class="ba-divider"></div>
-      <div class="ba-handle">
-        <svg viewBox="0 0 24 24"><path d="M8 5l-7 7 7 7M16 5l7 7-7 7"/><path d="M1 12h22" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"/></svg>
-      </div>
-      <span class="ba-label-before">Önce</span>
-      <span class="ba-label-after">Sonra</span>
-      <span class="ba-title">Balyaj Tekniği</span>
     </div>
 
-    <!-- BA Card 3 -->
-    <div class="ba-card" data-cat="kesim">
-      <div class="ba-before">
-        <img src="https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=800&q=80&grayscale" alt="Önce">
+    <!-- 3: Back view, ash/silver balayage long wavy -->
+    <div class="gal-item reveal" data-cat="balyaj">
+      <img src="images/portfolio/port3.jpeg" alt="Gümüş Balyaj" loading="lazy">
+      <div class="gal-overlay">
+        <div class="gal-info">
+          <span class="gal-cat">Balyaj</span>
+          <span class="gal-name">Gümüş & Kül Balyaj</span>
+        </div>
       </div>
-      <div class="ba-after">
-        <img src="https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=800&q=80" alt="Sonra">
-      </div>
-      <div class="ba-divider"></div>
-      <div class="ba-handle">
-        <svg viewBox="0 0 24 24"><path d="M8 5l-7 7 7 7M16 5l7 7-7 7"/><path d="M1 12h22" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"/></svg>
-      </div>
-      <span class="ba-label-before">Önce</span>
-      <span class="ba-label-after">Sonra</span>
-      <span class="ba-title">Saç Kesimi</span>
     </div>
 
-    <!-- BA Card 4 -->
-    <div class="ba-card" data-cat="bakim">
-      <div class="ba-before">
-        <img src="https://images.unsplash.com/photo-1560869713-7d0a29430803?w=800&q=80&grayscale" alt="Önce">
+    <!-- 4: Golden blonde long, soft waves, face framing -->
+    <div class="gal-item reveal" data-cat="boya">
+      <img src="images/portfolio/port4.jpeg" alt="Altın Sarısı Boyama" loading="lazy">
+      <div class="gal-overlay">
+        <div class="gal-info">
+          <span class="gal-cat">Saç Boyama</span>
+          <span class="gal-name">Altın Sarısı Boyama & Şekillendirme</span>
+        </div>
       </div>
-      <div class="ba-after">
-        <img src="https://images.unsplash.com/photo-1560869713-7d0a29430803?w=800&q=80" alt="Sonra">
+    </div>
+
+    <!-- 5: Ash blonde balayage, long wavy, salon jacket -->
+    <div class="gal-item reveal" data-cat="balyaj">
+      <img src="images/portfolio/port5.jpeg" alt="Açık Balyaj" loading="lazy">
+      <div class="gal-overlay">
+        <div class="gal-info">
+          <span class="gal-cat">Balyaj</span>
+          <span class="gal-name">Açık Kül Balyaj & Dalgalı Stil</span>
+        </div>
       </div>
-      <div class="ba-divider"></div>
-      <div class="ba-handle">
-        <svg viewBox="0 0 24 24"><path d="M8 5l-7 7 7 7M16 5l7 7-7 7"/><path d="M1 12h22" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"/></svg>
+    </div>
+
+    <!-- 6: Back view, platinum white-blonde long wavy -->
+    <div class="gal-item reveal" data-cat="balyaj">
+      <img src="images/portfolio/port6.jpeg" alt="Platin Balyaj" loading="lazy">
+      <div class="gal-overlay">
+        <div class="gal-info">
+          <span class="gal-cat">Balyaj</span>
+          <span class="gal-name">Platin Sarısı Balyaj</span>
+        </div>
       </div>
-      <span class="ba-label-before">Önce</span>
-      <span class="ba-label-after">Sonra</span>
-      <span class="ba-title">Keratin Bakımı</span>
+    </div>
+
+    <!-- 7: Ash brown balayage, long wavy, salon interior -->
+    <div class="gal-item reveal" data-cat="balyaj">
+      <img src="images/portfolio/port7.jpeg" alt="Küllü Balyaj" loading="lazy">
+      <div class="gal-overlay">
+        <div class="gal-info">
+          <span class="gal-cat">Balyaj</span>
+          <span class="gal-name">Küllü Balyaj & Dalgalı Şekil</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8: Platinum blonde straight lob, pink jacket -->
+    <div class="gal-item reveal" data-cat="boya">
+      <img src="images/portfolio/port8.jpeg" alt="Platin Boyama" loading="lazy">
+      <div class="gal-overlay">
+        <div class="gal-info">
+          <span class="gal-cat">Saç Boyama</span>
+          <span class="gal-name">Platin Sarı Boyama & Düz Fön</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9: Back view, dark root silver balayage, straight -->
+    <div class="gal-item reveal" data-cat="balyaj">
+      <img src="images/portfolio/port9.jpeg" alt="Gri Balyaj Düz" loading="lazy">
+      <div class="gal-overlay">
+        <div class="gal-info">
+          <span class="gal-cat">Balyaj</span>
+          <span class="gal-name">Gri-Gümüş Balyaj & Düzleştirme</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 10: Blonde highlights, medium length, flicked out -->
+    <div class="gal-item reveal" data-cat="balyaj">
+      <img src="images/portfolio/port10.jpeg" alt="Sarı Highlight" loading="lazy">
+      <div class="gal-overlay">
+        <div class="gal-info">
+          <span class="gal-cat">Balyaj</span>
+          <span class="gal-name">Açık Sarı Balyaj & Şekillendirme</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 11: Back view, caramel balayage medium length straight -->
+    <div class="gal-item reveal" data-cat="balyaj">
+      <img src="images/portfolio/port11.jpeg" alt="Karamel Balyaj" loading="lazy">
+      <div class="gal-overlay">
+        <div class="gal-info">
+          <span class="gal-cat">Balyaj</span>
+          <span class="gal-name">Karamel Balyaj & Düz Stil</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 12: Back view, ash balayage short bob straight -->
+    <div class="gal-item reveal" data-cat="kesim">
+      <img src="images/portfolio/port12.jpeg" alt="Balyaj Bob" loading="lazy">
+      <div class="gal-overlay">
+        <div class="gal-info">
+          <span class="gal-cat">Saç Kesimi</span>
+          <span class="gal-name">Küllü Balyaj & Bob Kesim</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 13: Side/back, light ash balayage wavy medium -->
+    <div class="gal-item reveal" data-cat="balyaj">
+      <img src="images/portfolio/port13.jpeg" alt="Açık Kül Balyaj" loading="lazy">
+      <div class="gal-overlay">
+        <div class="gal-info">
+          <span class="gal-cat">Balyaj</span>
+          <span class="gal-name">Açık Balyaj & Dalgalı Fön</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 14: Back view, white-platinum balayage wavy medium -->
+    <div class="gal-item reveal" data-cat="balyaj">
+      <img src="images/portfolio/port14.jpeg" alt="Beyaz Platin Balyaj" loading="lazy">
+      <div class="gal-overlay">
+        <div class="gal-info">
+          <span class="gal-cat">Balyaj</span>
+          <span class="gal-name">Beyaz-Platin Balyaj & Dalgalar</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 15: Front, ash-caramel balayage long wavy, curtain bangs -->
+    <div class="gal-item reveal" data-cat="balyaj">
+      <img src="images/portfolio/port15.jpeg" alt="Kül Karamel Balyaj" loading="lazy">
+      <div class="gal-overlay">
+        <div class="gal-info">
+          <span class="gal-cat">Balyaj</span>
+          <span class="gal-name">Küllü Karamel Balyaj & Bukle Şekil</span>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -302,19 +376,10 @@ footer p{font-size:.62rem;letter-spacing:.12em;color:rgba(247,244,239,.25)}
   </div>
 </div>
 
-<!-- GALLERY -->
-<div class="gallery-section">
-  <span class="section-label" style="color:rgba(247,244,239,.3)">Galeri</span>
-  <div id="gal-empty" style="display:none;text-align:center;padding:60px 0;color:rgba(247,244,239,.25);font-size:.8rem;letter-spacing:.15em">
-    Henüz fotoğraf eklenmemiş.
-  </div>
-  <div class="gal-grid" id="gal-grid"></div>
-</div>
-
 <!-- CTA -->
 <div class="cta-strip">
   <h2>Sıradaki <em>dönüşüm</em><br>sizin olsun.</h2>
-  <a href="/#booking" class="cta-btn">Randevu Al</a>
+  <a href="/rezervasyon" class="cta-btn">Randevu Al</a>
 </div>
 
 <!-- FOOTER -->
@@ -333,45 +398,20 @@ footer p{font-size:.62rem;letter-spacing:.12em;color:rgba(247,244,239,.25)}
 </div>
 
 <script>
-/* ── BEFORE / AFTER SLIDER ── */
-document.querySelectorAll('.ba-card').forEach(card => {
-  const after = card.querySelector('.ba-after');
-  const divider = card.querySelector('.ba-divider');
-  let dragging = false;
-
-  function setPos(x) {
-    const rect = card.getBoundingClientRect();
-    let pct = ((x - rect.left) / rect.width) * 100;
-    pct = Math.min(Math.max(pct, 2), 98);
-    after.style.clipPath = `inset(0 ${100 - pct}% 0 0)`;
-    divider.style.left = pct + '%';
-  }
-
-  card.addEventListener('mousedown', e => { dragging = true; setPos(e.clientX); });
-  window.addEventListener('mousemove', e => { if(dragging) setPos(e.clientX); });
-  window.addEventListener('mouseup', () => dragging = false);
-
-  card.addEventListener('touchstart', e => { dragging = true; setPos(e.touches[0].clientX); }, {passive:true});
-  window.addEventListener('touchmove', e => { if(dragging) setPos(e.touches[0].clientX); }, {passive:true});
-  window.addEventListener('touchend', () => dragging = false);
-});
-
 /* ── FILTER ── */
 const ftabs = document.querySelectorAll('.ftab');
-const baCards = document.querySelectorAll('.ba-card');
+const galItems = document.querySelectorAll('.gal-item');
+let currentFilter = 'all';
 
 ftabs.forEach(tab => {
   tab.addEventListener('click', () => {
     ftabs.forEach(t => t.classList.remove('active'));
     tab.classList.add('active');
-    const f = tab.dataset.filter;
-    currentFilter = f;
-    // Before/After kartları
-    baCards.forEach(el => {
-      el.style.display = (f === 'all' || el.dataset.cat === f) ? '' : 'none';
+    currentFilter = tab.dataset.filter;
+    galItems.forEach(item => {
+      const show = currentFilter === 'all' || item.dataset.cat === currentFilter;
+      item.style.display = show ? '' : 'none';
     });
-    // Galeri dinamik render
-    renderGaleri(galList);
   });
 });
 
@@ -381,11 +421,22 @@ const lbImg = document.getElementById('lb-img');
 const lbCaption = document.getElementById('lb-caption');
 let lbList = [], lbIdx = 0;
 
-function openLb(i, photos) {
-  if(photos) lbList = photos;
+function buildLbList() {
+  lbList = [];
+  document.querySelectorAll('.gal-item').forEach(item => {
+    if (item.style.display === 'none') return;
+    lbList.push({
+      src: item.querySelector('img').src,
+      caption: item.querySelector('.gal-name').textContent
+    });
+  });
+}
+
+function openLb(i) {
+  buildLbList();
   lbIdx = i;
   lbImg.src = lbList[i].src;
-  lbCaption.textContent = lbList[i].catLabel || lbList[i].caption || '';
+  lbCaption.textContent = lbList[i].caption;
   lb.classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -396,8 +447,17 @@ function closeLb() {
 function navLb(dir) {
   lbIdx = (lbIdx + dir + lbList.length) % lbList.length;
   lbImg.src = lbList[lbIdx].src;
-  lbCaption.textContent = lbList[lbIdx].catLabel || lbList[lbIdx].caption || '';
+  lbCaption.textContent = lbList[lbIdx].caption;
 }
+
+document.querySelectorAll('.gal-item').forEach((item, i) => {
+  item.addEventListener('click', () => {
+    // recalculate visible index
+    const visible = [...document.querySelectorAll('.gal-item')].filter(el => el.style.display !== 'none');
+    const idx = visible.indexOf(item);
+    openLb(idx >= 0 ? idx : 0);
+  });
+});
 
 document.getElementById('lb-close').addEventListener('click', closeLb);
 document.getElementById('lb-prev').addEventListener('click', () => navLb(-1));
@@ -410,66 +470,13 @@ document.addEventListener('keydown', e => {
   if(e.key === 'ArrowRight') navLb(1);
 });
 
-/* ── GALERİ API'DEN YÜKLE ── */
-let galList = [];
-let currentFilter = 'all';
-
-async function galeriYukle() {
-  try {
-    const res = await fetch('/api/portfolio');
-    const data = await res.json();
-    const photos = data.photos || [];
-
-    const grid = document.getElementById('gal-grid');
-    const empty = document.getElementById('gal-empty');
-
-    if (photos.length === 0) {
-      empty.style.display = 'block';
-      return;
-    }
-
-    galList = photos;
-    renderGaleri(photos);
-  } catch(e) {
-    console.error('Galeri yükleme hatası:', e);
-  }
-}
-
-function renderGaleri(photos) {
-  const grid = document.getElementById('gal-grid');
-  const empty = document.getElementById('gal-empty');
-  const filtered = currentFilter === 'all' ? photos : photos.filter(p => p.cat === currentFilter);
-
-  if (filtered.length === 0) {
-    grid.innerHTML = '';
-    empty.style.display = 'block';
-    return;
-  }
-  empty.style.display = 'none';
-
-  grid.innerHTML = filtered.map((p, i) => `
-    <div class="gal-item reveal" data-cat="${p.cat}" data-src="${p.src}" data-caption="${p.catLabel}" data-idx="${i}">
-      <img src="${p.src}" alt="${p.catLabel}" loading="lazy">
-      <div class="gal-overlay"><div class="gal-info"><span class="gal-cat">${p.catLabel}</span><span class="gal-name">${p.name}</span></div></div>
-    </div>
-  `).join('');
-
-  // Lightbox ve reveal
-  grid.querySelectorAll('.gal-item').forEach((item, i) => {
-    item.addEventListener('click', () => openLb(i, filtered));
-    obs.observe(item);
-  });
-}
-
-galeriYukle();
-
 /* ── SCROLL REVEAL ── */
 const obs = new IntersectionObserver(entries => {
-  entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }});
-}, { threshold: 0.12 });
+  entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('visible'); obs.unobserve(e.target); }});
+}, { threshold: 0.08 });
 document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 
-/* ── HAMBURGER MENÜ ── */
+/* ── HAMBURGER ── */
 const hamburger = document.getElementById('hamburger');
 const mobileMenu = document.getElementById('mobileMenu');
 function closeMobileMenu(){
