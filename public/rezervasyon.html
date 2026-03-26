@@ -775,6 +775,28 @@ function hizmetSecO(el, ad, fiyat, _) {
   document.getElementById('o-fiyat-box').classList.add('show');
 }
 
+// ── SUPABASE CONFIG
+const SUPABASE_URL = 'https://botxnihztrnwzjnrlwzv.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvdHhuaWh6dHJud3pqbnJsd3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MTg4MTAsImV4cCI6MjA5MDA5NDgxMH0.AcX4_2Aykf8J1jln9fvODh2rRffymfEJCAekzmN1ALg';
+
+async function supabaseInsert(tablo, veri) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${tablo}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Prefer': 'return=minimal'
+    },
+    body: JSON.stringify(veri)
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(err);
+  }
+  return true;
+}
+
 // ── NORMAL REZERVASYON GÖNDER
 async function normalGonder() {
   const btn = document.getElementById('n-btn');
@@ -795,21 +817,21 @@ async function normalGonder() {
   btn.textContent = 'Gönderiliyor…';
 
   try {
-    const res = await fetch('/rezervasyon', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ad, telefon, hizmet, tarih, saat, not })
+    await supabaseInsert('rezervasyonlar', {
+      ad, telefon, hizmet, tarih, saat, not,
+      durum: 'bekliyor',
+      odeme_alindi: false,
+      tip: 'normal'
     });
-    const veri = await res.json();
-    if (veri.ok) {
-      mesaj(mesajDiv, '✓ ' + veri.mesaj, 'basari');
-      ['n-ad','n-tel','n-tarih','n-not'].forEach(id => document.getElementById(id).value = '');
-      btn.textContent = 'Gönderildi ✓';
-    } else {
-      mesaj(mesajDiv, '✗ ' + veri.mesaj, 'hata');
-      btn.disabled = false;
-      btn.textContent = 'Rezervasyonu Gönder';
-    }
+    mesaj(mesajDiv, '✓ Rezervasyonunuz alındı. En kısa sürede sizi arayacağız.', 'basari');
+    ['n-ad','n-tel','n-tarih','n-not'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('n-hizmet').value = '';
+    document.getElementById('n-cs-label').textContent = '— Hizmet Seçin —';
+    document.getElementById('n-cs-label').style.color = 'rgba(247,244,239,.25)';
+    document.getElementById('n-fiyat-box').classList.remove('show');
+    document.querySelectorAll('#normal-form .time-btn').forEach(b => b.classList.remove('selected'));
+    document.getElementById('n-saat').value = '';
+    btn.textContent = 'Gönderildi ✓';
   } catch(e) {
     mesaj(mesajDiv, '✗ Bağlantı hatası. Lütfen tekrar deneyin.', 'hata');
     btn.disabled = false;
@@ -818,8 +840,9 @@ async function normalGonder() {
 }
 
 // ── ÖDEMEYE GİT
-function odemeGit() {
+async function odemeGit() {
   const mesajDiv = document.getElementById('o-mesaj');
+  const btn = document.getElementById('o-btn');
   const ad = document.getElementById('o-ad').value.trim();
   const telefon = document.getElementById('o-tel').value.trim();
   const hizmet = document.getElementById('o-hizmet').value;
@@ -832,9 +855,24 @@ function odemeGit() {
     return;
   }
 
-  // Ödeme sayfasına parametrelerle yönlendir
-  const params = new URLSearchParams({ ad, telefon, hizmet, tarih, saat, fiyat });
-  window.location.href = '/odeme?' + params.toString();
+  btn.disabled = true;
+  btn.textContent = 'Kaydediliyor…';
+
+  try {
+    await supabaseInsert('rezervasyonlar', {
+      ad, telefon, hizmet, tarih, saat,
+      fiyat: parseInt(fiyat) || 0,
+      durum: 'bekliyor',
+      odeme_alindi: false,
+      tip: 'odeme_bekleyen'
+    });
+    const params = new URLSearchParams({ ad, telefon, hizmet, tarih, saat, fiyat });
+    window.location.href = '/odeme?' + params.toString();
+  } catch(e) {
+    mesaj(mesajDiv, '✗ Bağlantı hatası. Lütfen tekrar deneyin.', 'hata');
+    btn.disabled = false;
+    btn.textContent = 'Ödemeye Geç →';
+  }
 }
 
 function mesaj(el, metin, tip) {

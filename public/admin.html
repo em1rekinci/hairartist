@@ -627,8 +627,41 @@ tbody td{padding:10px 13px;vertical-align:middle}
 <div class="toast" id="toast"></div>
 
 <script>
+// ─── SUPABASE ───
+const SUPA_URL='https://botxnihztrnwzjnrlwzv.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvdHhuaWh6dHJud3pqbnJsd3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MTg4MTAsImV4cCI6MjA5MDA5NDgxMH0.AcX4_2Aykf8J1jln9fvODh2rRffymfEJCAekzmN1ALg';
+const ADMIN_SIFRE='hairartist2026';
+
+async function sRest(path,opts={}){
+  const res=await fetch(SUPA_URL+'/rest/v1/'+path,{
+    headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=representation',...(opts.headers||{})},
+    ...opts
+  });
+  if(!res.ok){const t=await res.text();throw new Error(t);}
+  const txt=await res.text();
+  return txt?JSON.parse(txt):[];
+}
+
+function dbToLocal(r){
+  return {
+    id: r.id,
+    ad: r.ad,
+    telefon: r.telefon,
+    hizmet: r.hizmet,
+    tarih: r.tarih,
+    saat: r.saat||'',
+    not: r.not||'',
+    durum: r.durum||'bekliyor',
+    odemeAlindi: r.odeme_alindi||false,
+    fiyat: r.fiyat||0,
+    tip: r.tip||'normal',
+    tarihOlustur: r.created_at||new Date().toISOString(),
+    personelId: r.personel_id||null,
+  };
+}
+
 // ─── VERİ ───
-const DS='admin123';
+const DS=ADMIN_SIFRE;
 let SFR='',TRZ=[],AKT_FILTRE='hepsi',AKT_ARAMA='',AKTLOG=[];
 let tkYil=new Date().getFullYear(),tkAy=new Date().getMonth(),tkSec=null;
 let bekleyenOdemeId=null;
@@ -686,9 +719,13 @@ function demoData(){
 // ─── GİRİŞ ───
 async function girisYap(){
   const s=document.getElementById('sinp').value.trim();if(!s)return;
-  if(s===DS){SFR=s;TRZ=demoData();AKTLOG=logOlustur();panelAc();return;}
-  try{const r=await fetch('/admin/giris',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sifre:s})});const v=await r.json();if(v.ok){SFR=s;panelAc();}else{document.getElementById('ghata').style.display='block';}}
-  catch{document.getElementById('ghata').style.display='block';}
+  if(s===DS){
+    SFR=s;
+    document.getElementById('ghata').style.display='none';
+    panelAc();
+    return;
+  }
+  document.getElementById('ghata').style.display='block';
 }
 function panelAc(){
   const ge=document.getElementById('ge');ge.style.opacity='0';
@@ -697,14 +734,25 @@ function panelAc(){
 function cikisYap(){SFR='';TRZ=[];document.getElementById('panel').style.display='none';const ge=document.getElementById('ge');ge.style.display='flex';ge.style.opacity='1';document.getElementById('sinp').value='';document.getElementById('ghata').style.display='none';}
 
 // ─── PANEL BAŞLAT ───
-function panelBaslat(){
+async function panelBaslat(){
   saatGuncelle();setInterval(saatGuncelle,1000);
   cgridOlustur();hizRender();pListRender();shopRender();
-  verileriRender();tkBugune();
+  tkBugune();
   document.getElementById('dtarih').textContent=new Date().toLocaleDateString('tr-TR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  await verileriYukle(false);
 }
 function saatGuncelle(){document.getElementById('tptime').textContent=new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});}
-async function verileriYukle(){try{const r=await fetch(`/admin/rezervasyonlar?sifre=${encodeURIComponent(SFR)}`);const v=await r.json();if(!v.ok){toast('Oturum doldu.','hata');return;}TRZ=v.rezervasyonlar;}catch{}verileriRender();toast('Yenilendi.','ok');}
+async function verileriYukle(showToast=true){
+  try{
+    const data=await sRest('rezervasyonlar?select=*&order=created_at.desc&limit=500');
+    TRZ=data.map(dbToLocal);
+    AKTLOG=logOlustur();
+    if(showToast)toast('Yenilendi.','ok');
+  }catch(e){
+    if(showToast)toast('Veri yüklenemedi: '+e.message,'hata');
+  }
+  verileriRender();
+}
 function verileriRender(){statsGuncelle();tabloRender(AKT_FILTRE);bugRandevu();sonRez();hDagitim();mustRender();aktRender();nbGuncelle();pStatRender();tkRender();}
 
 // ─── STATS ───
@@ -840,37 +888,26 @@ function bH(d){const m={bekliyor:['bb','Bekliyor'],onaylandi:['bo','Onaylandı']
 // ─── ONAY / RED / SİL ───
 async function onayEt(id){
   try{
-    const res=await fetch(`/admin/onay/${id}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sifre:SFR})});
-    const v=await res.json();
-    if(v.ok){const r=TRZ.find(x=>x.id===id);if(r)r.durum='onaylandi';verileriRender();toast('Onaylandı.','ok');}
-    else toast(v.mesaj||'Hata.','hata');
-  }catch{
+    await sRest(`rezervasyonlar?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({durum:'onaylandi'})});
     const r=TRZ.find(x=>x.id===id);
     if(r){r.durum='onaylandi';AKTLOG.unshift({tip:'g',txt:`<strong>${r.ad}</strong> — ${r.hizmet} onaylandı`,z:new Date()});}
     verileriRender();toast('Rezervasyon onaylandı.','ok');
-  }
+  }catch(e){toast('Hata: '+e.message,'hata');}
 }
 async function reddet(id){
   try{
-    const res=await fetch(`/admin/red/${id}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sifre:SFR})});
-    const v=await res.json();
-    if(v.ok){const r=TRZ.find(x=>x.id===id);if(r)r.durum='reddedildi';verileriRender();toast('Reddedildi.','ok');}
-    else toast(v.mesaj||'Hata.','hata');
-  }catch{
+    await sRest(`rezervasyonlar?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({durum:'reddedildi'})});
     const r=TRZ.find(x=>x.id===id);
     if(r){r.durum='reddedildi';AKTLOG.unshift({tip:'r',txt:`<strong>${r.ad}</strong> — reddedildi`,z:new Date()});}
     verileriRender();toast('Reddedildi.','hata');
-  }
+  }catch(e){toast('Hata: '+e.message,'hata');}
 }
 async function sil(id){
   if(!confirm('Bu rezervasyonu silmek istediğinizden emin misiniz?'))return;
   try{
-    const res=await fetch(`/admin/sil/${id}`,{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({sifre:SFR})});
-    const v=await res.json();
-    if(v.ok){toast('Silindi.','ok');TRZ=TRZ.filter(x=>x.id!==id);verileriRender();}
-  }catch{
+    await sRest(`rezervasyonlar?id=eq.${id}`,{method:'DELETE',headers:{'Prefer':'return=minimal'}});
     TRZ=TRZ.filter(x=>x.id!==id);verileriRender();toast('Silindi.','ok');
-  }
+  }catch(e){toast('Hata: '+e.message,'hata');}
 }
 
 // ─── ÖDEME AL (Onay ile ciro'ya yansıt) ───
@@ -889,17 +926,20 @@ function odemeAl(id){
   bekleyenOdemeId=id;
   document.getElementById('cmov').classList.add('open');
 }
-function odemeOnayla(){
+async function odemeOnayla(){
   if(!bekleyenOdemeId)return;
-  const r=TRZ.find(x=>x.id===bekleyenOdemeId);
-  if(r){
-    r.odemeAlindi=true;
-    AKTLOG.unshift({tip:'g',txt:`<strong>${r.ad}</strong> — ödeme alındı, ciro'ya yansıtıldı`,z:new Date()});
-  }
-  bekleyenOdemeId=null;
-  document.getElementById('cmov').classList.remove('open');
-  verileriRender();
-  toast('Ödeme alındı, ciro güncellendi.','ok');
+  try{
+    await sRest(`rezervasyonlar?id=eq.${bekleyenOdemeId}`,{method:'PATCH',body:JSON.stringify({odeme_alindi:true})});
+    const r=TRZ.find(x=>x.id===bekleyenOdemeId);
+    if(r){
+      r.odemeAlindi=true;
+      AKTLOG.unshift({tip:'g',txt:`<strong>${r.ad}</strong> — ödeme alındı, ciro'ya yansıtıldı`,z:new Date()});
+    }
+    bekleyenOdemeId=null;
+    document.getElementById('cmov').classList.remove('open');
+    verileriRender();
+    toast('Ödeme alındı, ciro güncellendi.','ok');
+  }catch(e){toast('Hata: '+e.message,'hata');}
 }
 function cmKapat(){document.getElementById('cmov').classList.remove('open');bekleyenOdemeId=null;}
 
