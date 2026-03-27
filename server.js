@@ -15,6 +15,13 @@ const NETGSM_MSGHEADER = process.env.NETGSM_MSGHEADER;
 const ALICI_TELEFON    = process.env.ALICI_TELEFON;    // Fatih Kurt
 const SITE_URL         = process.env.SITE_URL;         // site adresi güncel unutma
 const ADMIN_SIFRE      = process.env.ADMIN_SIFRE || 'hairartist2026';  // admin şifresi
+// ─── PAYTR AYARLARI ─────────────────────────────────────────
+const MERCHANT_ID = "685596";
+const MERCHANT_KEY = "aPqa74hp7yn9uXHg";
+const MERCHANT_SALT = "Z7uQTT2ZTeYFxbsN";
+
+const OK_URL = `${SITE_URL}/odeme-basarili`;
+const FAIL_URL = `${SITE_URL}/odeme-basarisiz`;
 
 // ─── GEÇİCİ REZERVASYON DEPOSU ───────────────────────────────────────────────
 const rezervasyonlar = new Map();
@@ -47,7 +54,105 @@ app.post('/rezervasyon', async (req, res) => {
   if (!ad || !telefon || !hizmet || !tarih || !saat) {
     return res.status(400).json({ ok: false, mesaj: 'Lütfen tüm zorunlu alanları doldurun.' });
   }
+// ─── PAYTR TOKEN AL ─────────────────────────────────────────
+app.post("/api/paytr-token", async (req, res) => {
+  try {
+    const { ad, telefon, hizmet, tarih, saat, fiyat } = req.body;
 
+    if (!ad || !telefon || !hizmet || !fiyat) {
+      return res.status(400).json({ status: "fail", reason: "Eksik bilgi" });
+    }
+
+    const [isim, soyad = "-"] = ad.split(" ");
+
+    let tel = telefon.replace(/\D/g, "");
+    if (tel.startsWith("0")) tel = tel.slice(1);
+    if (!tel.startsWith("90")) tel = "90" + tel;
+
+    const tutar_kurus = fiyat * 100;
+    const merchant_oid = "HA" + Date.now();
+
+    const user_ip =
+      req.headers["x-forwarded-for"]?.split(",")[0] ||
+      req.socket.remoteAddress;
+
+    const sepet = JSON.stringify([
+      [`${hizmet} (${tarih} ${saat})`, fiyat.toFixed(2), 1],
+    ]);
+    const user_basket = Buffer.from(sepet).toString("base64");
+
+    const no_installment = 0;
+    const max_installment = 0;
+    const currency = "TL";
+    const test_mode = 0;
+
+    const hash_str =
+      MERCHANT_ID +
+      user_ip +
+      merchant_oid +
+      "info@hairartist.com.tr" +
+      tutar_kurus +
+      user_basket +
+      no_installment +
+      max_installment +
+      currency +
+      test_mode +
+      MERCHANT_SALT;
+
+    const paytr_token = crypto
+      .createHmac("sha256", MERCHANT_KEY)
+      .update(hash_str)
+      .digest("base64");
+
+    const params = new URLSearchParams({
+      merchant_id: MERCHANT_ID,
+      user_ip,
+      merchant_oid,
+      email: "info@hairartist.com.tr",
+      payment_amount: tutar_kurus,
+      paytr_token,
+      user_basket,
+      debug_on: 0,
+      no_installment,
+      max_installment,
+      user_name: isim + " " + soyad,
+      user_address: "İstanbul",
+      user_phone: tel,
+      merchant_ok_url: OK_URL,
+      merchant_fail_url: FAIL_URL,
+      timeout_limit: 30,
+      currency,
+      test_mode,
+      lang: "tr",
+    });
+
+    const response = await fetch(
+      "https://www.paytr.com/odeme/api/get-token",
+      {
+        method: "POST",
+        body: params,
+      }
+    );
+
+    const data = await response.json();
+
+    if (data.status === "success") {
+      return res.json({
+        status: "success",
+        token: data.token,
+        oid: merchant_oid
+      });
+    } else {
+      return res.json({
+        status: "fail",
+        reason: data.reason || "Token alınamadı",
+      });
+    }
+  } catch (err) {
+    console.error("PAYTR HATA:", err);
+    res.status(500).json({ status: "fail", reason: "Server hatası" });
+  }
+});
   const id = crypto.randomBytes(8).toString('hex');
 
   rezervasyonlar.set(id, {
