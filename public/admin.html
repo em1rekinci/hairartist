@@ -984,22 +984,88 @@ function tabloRender(f){
 }
 function bH(d){const m={bekliyor:['bb','Bekliyor'],onaylandi:['bo','Onaylandı'],reddedildi:['br','Reddedildi'],tamamlandi:['bt','Tamamlandı']};const[c,l]=m[d]||['',''+d];return`<span class="badge ${c}">${l}</span>`;}
 
+// ─── WHATSAPP ONAY MESAJI ───
+const WA_PHONE_ID='2031615784405426';
+const WA_TOKEN='EAAc3vmkmSbIBRMtIY86Qf6T6OHQjeGMt9CYZAOqjKcqpOCooyZCrWPAop2ZBjyofDfe7KnxaxrwY1nROrnfya8418Dc79COSPtW39DjLVFtFIETALw6ohRHPThdZCXVc9wntcDq1FtzUI5ZCw6jk1PYxxGjApaYwvmdZCuHHoLVXGd4o6dr984SHx1LAQZAN5TTrKZCIas4s6wt9u88QvvwKi875BZCIyQMpGWxGrXW4ZBuzHmMJFKcAJ4tqmIh5ILdA9YliMBZBPFtrk8ZB4YnnZCqIuCGb6';
+
+async function waOnayMesaji(r){
+  let tel=r.telefon.replace(/\s/g,'').replace(/[^0-9]/g,'');
+  if(tel.startsWith('0'))tel=tel.substring(1);
+  if(!tel.startsWith('90'))tel='90'+tel;
+  const p=personel.find(x=>x.id===r.personelId);
+  const metin=
+    `✅ *Rezervasyon Onaylandı — Hair Artist*\n\n`+
+    `Merhaba ${r.ad},\n\n`+
+    `Rezervasyonunuz onaylandı!\n\n`+
+    `📋 *Detaylar:*\n`+
+    `• Hizmet: ${r.hizmet}\n`+
+    `• Tarih: ${r.tarih}\n`+
+    `• Saat: ${r.saat||'Belirtilmedi'}\n`+
+    `• Personel: ${p?p.ad:'Baran Kurt'}\n\n`+
+    `Randevunuzu iptal etmek veya değiştirmek için bizi arayın.\n\n`+
+    `_Hair Artist — hairartist.com.tr_`;
+  try{
+    const res=await fetch(`https://graph.facebook.com/v22.0/${WA_PHONE_ID}/messages`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+WA_TOKEN},
+      body:JSON.stringify({messaging_product:'whatsapp',to:tel,type:'text',text:{body:metin}})
+    });
+    const data=await res.json();
+    if(!res.ok)console.warn('WhatsApp gönderilemedi:',data);
+    else console.log('WhatsApp onay mesajı gönderildi ✓');
+  }catch(e){console.warn('WhatsApp hata:',e);}
+}
+
 // ─── ONAY / RED / SİL ───
 async function onayEt(id){
   try{
     await sRest(`rezervasyonlar?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({durum:'onaylandi'})});
     const r=TRZ.find(x=>x.id===id);
-    if(r){r.durum='onaylandi';AKTLOG.unshift({tip:'g',txt:`<strong>${r.ad}</strong> — ${r.hizmet} onaylandı`,z:new Date()});}
-    verileriRender();toast('Rezervasyon onaylandı.','ok');
+    if(r){
+      r.durum='onaylandi';
+      AKTLOG.unshift({tip:'g',txt:`<strong>${r.ad}</strong> — ${r.hizmet} onaylandı`,z:new Date()});
+      waOnayMesaji(r);
+    }
+    verileriRender();toast('Rezervasyon onaylandı, WhatsApp gönderildi.','ok');
   }catch(e){toast('Hata: '+e.message,'hata');}
 }
 async function reddet(id){
   try{
     await sRest(`rezervasyonlar?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({durum:'reddedildi'})});
     const r=TRZ.find(x=>x.id===id);
-    if(r){r.durum='reddedildi';AKTLOG.unshift({tip:'r',txt:`<strong>${r.ad}</strong> — reddedildi`,z:new Date()});}
-    verileriRender();toast('Reddedildi.','hata');
+    if(r){
+      r.durum='reddedildi';
+      AKTLOG.unshift({tip:'r',txt:`<strong>${r.ad}</strong> — reddedildi`,z:new Date()});
+      waRedMesaji(r);
+    }
+    verileriRender();toast('Reddedildi, WhatsApp gönderildi.','hata');
   }catch(e){toast('Hata: '+e.message,'hata');}
+}
+
+async function waRedMesaji(r){
+  let tel=r.telefon.replace(/\s/g,'').replace(/[^0-9]/g,'');
+  if(tel.startsWith('0'))tel=tel.substring(1);
+  if(!tel.startsWith('90'))tel='90'+tel;
+  const metin=
+    `❌ *Rezervasyon Talebi — Hair Artist*\n\n`+
+    `Merhaba ${r.ad},\n\n`+
+    `Maalesef rezervasyon talebinizi bu seferlik karşılayamıyoruz.\n\n`+
+    `📋 *Talep Detayları:*\n`+
+    `• Hizmet: ${r.hizmet}\n`+
+    `• Tarih: ${r.tarih}\n`+
+    `• Saat: ${r.saat||'Belirtilmedi'}\n\n`+
+    `Farklı bir tarih veya saat için bizi arayabilirsiniz.\n\n`+
+    `_Hair Artist — hairartist.com.tr_`;
+  try{
+    const res=await fetch(`https://graph.facebook.com/v22.0/${WA_PHONE_ID}/messages`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+WA_TOKEN},
+      body:JSON.stringify({messaging_product:'whatsapp',to:tel,type:'text',text:{body:metin}})
+    });
+    const data=await res.json();
+    if(!res.ok)console.warn('WhatsApp gönderilemedi:',data);
+    else console.log('WhatsApp red mesajı gönderildi ✓');
+  }catch(e){console.warn('WhatsApp hata:',e);}
 }
 async function sil(id){
   if(!confirm('Bu rezervasyonu silmek istediğinizden emin misiniz?'))return;
