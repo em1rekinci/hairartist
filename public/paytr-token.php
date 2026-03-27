@@ -1,7 +1,7 @@
 <?php
 /**
  * PayTR iFrame Token Endpoint
- * Hair Artist — hairartist.com.tr
+ * Hair Artist — fatihkurthairartist.com
  *
  * Bu dosyayı sunucunuzda /api/paytr-token adresine yerleştirin.
  * (Örn: /var/www/html/api/paytr-token.php veya Next.js/Node için ayrı uyarlama yapın)
@@ -10,7 +10,7 @@
  */
 
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: https://hairartist.com.tr'); // Güvenlik için domain kısıtlayın
+header('Access-Control-Allow-Origin: https://fatihkurthairartist.com'); // Güvenlik için domain kısıtlayın
 header('Access-Control-Allow-Methods: POST');
 header('Access-Control-Allow-Headers: Content-Type');
 
@@ -25,12 +25,12 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // ─── PAYTR BİLGİLERİNİZİ GİRİN ────────────────────────────────────────────
-define('PAYTR_MERCHANT_ID',   'XXXXXXX');         // PayTR Mağaza No
-define('PAYTR_MERCHANT_KEY',  'XXXXXXXXXXXXXXXX'); // API Anahtarı
-define('PAYTR_MERCHANT_SALT', 'XXXXXXXXXXXXXXXX'); // Gizli Anahtar
+define('PAYTR_MERCHANT_ID',   '685596');         // PayTR Mağaza No
+define('PAYTR_MERCHANT_KEY',  'aPqa74hp7yn9uXHg'); // API Anahtarı
+define('PAYTR_MERCHANT_SALT', 'Z7uQTT2ZTeYFxbsN'); // Gizli Anahtar
 
-define('PAYTR_OK_URL',   'https://hairartist.com.tr/odeme-basarili'); // Ödeme başarılı URL
-define('PAYTR_FAIL_URL', 'https://hairartist.com.tr/odeme-basarisiz'); // Ödeme hatalı URL
+define('PAYTR_OK_URL',   'https://fatihkurthairartist.com/odeme-basarili'); // Ödeme başarılı URL
+define('PAYTR_FAIL_URL', 'https://fatihkurthairartist.com/odeme-basarisiz'); // Ödeme hatalı URL
 // ───────────────────────────────────────────────────────────────────────────
 
 // Gelen JSON verisini oku
@@ -93,7 +93,7 @@ $timeout_limit   = 30;
 $hash_str = PAYTR_MERCHANT_ID
     . $user_ip
     . $merchant_oid
-    . 'musteri@hairartist.com.tr' // Müşteri e-posta (sabit ya da dinamik)
+    . 'info@hairtartist.com.tr' // Müşteri e-posta (sabit ya da dinamik)
     . $tutar_kurus
     . $user_basket
     . $no_installment
@@ -109,7 +109,7 @@ $post_params = [
     'merchant_id'       => PAYTR_MERCHANT_ID,
     'user_ip'           => $user_ip,
     'merchant_oid'      => $merchant_oid,
-    'email'             => 'musteri@hairartist.com.tr',
+    'email'             => 'info@hairartist.com.tr',
     'payment_amount'    => $tutar_kurus,
     'paytr_token'       => $paytr_token,
     'user_basket'       => $user_basket,
