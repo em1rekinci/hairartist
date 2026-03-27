@@ -21,6 +21,7 @@ const MERCHANT_ID   = "685596";
 const MERCHANT_KEY  = "aPqa74hp7yn9uXHg";
 const MERCHANT_SALT = "Z7uQTT2ZTeYFxbsN";
 
+// OK_URL ve FAIL_URL doğrudan SITE_URL'den türetiliyor — Railway'de ayrı env gerekmez
 const OK_URL   = `${SITE_URL}/odeme-basarili`;
 const FAIL_URL = `${SITE_URL}/odeme-basarisiz`;
 
@@ -110,7 +111,7 @@ app.post('/rezervasyon', async (req, res) => {
 });
 
 // ════════════════════════════════════════════════════════════════════════════
-// PAYTR TOKEN AL  ← Artık kendi başına ayrı bir route
+// PAYTR TOKEN AL
 // ════════════════════════════════════════════════════════════════════════════
 app.post('/api/paytr-token', async (req, res) => {
   try {
@@ -120,35 +121,45 @@ app.post('/api/paytr-token', async (req, res) => {
       return res.status(400).json({ status: 'fail', reason: 'Eksik bilgi' });
     }
 
-    const [isim, soyad = '-'] = ad.split(' ');
+    const adParcalar = ad.trim().split(' ');
+    const isim = adParcalar[0];
+    const soyad = adParcalar.length > 1 ? adParcalar.slice(1).join(' ') : '-';
 
     let tel = telefon.replace(/\D/g, '');
     if (tel.startsWith('0')) tel = tel.slice(1);
     if (!tel.startsWith('90')) tel = '90' + tel;
 
-    const tutar_kurus = fiyat * 100;
+    // tutar_kurus tam sayı olmalı (kuruş cinsinden)
+    const tutar_kurus = Math.round(Number(fiyat) * 100);
     const merchant_oid = 'HA' + Date.now();
 
-    const user_ip =
-      req.headers['x-forwarded-for']?.split(',')[0] ||
-      req.socket.remoteAddress;
+    // Railway'de genellikle x-forwarded-for gelir; IPv6 loopback'i engelle
+    let user_ip =
+      req.headers['x-forwarded-for']?.split(',')[0].trim() ||
+      req.socket.remoteAddress ||
+      '1.2.3.4';
+    // PayTR localhost/loopback IP kabul etmez
+    if (user_ip === '::1' || user_ip === '127.0.0.1') user_ip = '1.2.3.4';
 
+    const sepetAdi = `${hizmet}${tarih ? ' (' + tarih + (saat ? ' ' + saat : '') + ')' : ''}`;
     const sepet = JSON.stringify([
-      [`${hizmet} (${tarih} ${saat})`, fiyat.toFixed(2), 1],
+      [sepetAdi, Number(fiyat).toFixed(2), 1],
     ]);
     const user_basket = Buffer.from(sepet).toString('base64');
 
-    const no_installment  = 0;
-    const max_installment = 0;
+    // Sabit değerler — string olarak tanımla
+    const no_installment  = '0';
+    const max_installment = '0';
     const currency        = 'TL';
-    const test_mode       = 0;
+    const test_mode       = '0';
 
+    // ÖNEMLİ: Tüm değerler string olarak birleştirilmeli
     const hash_str =
       MERCHANT_ID +
       user_ip +
       merchant_oid +
       'info@hairartist.com.tr' +
-      tutar_kurus +
+      String(tutar_kurus) +
       user_basket +
       no_installment +
       max_installment +
@@ -161,25 +172,31 @@ app.post('/api/paytr-token', async (req, res) => {
       .update(hash_str)
       .digest('base64');
 
+    console.log('[PayTR] merchant_oid:', merchant_oid);
+    console.log('[PayTR] user_ip:', user_ip);
+    console.log('[PayTR] tutar_kurus:', tutar_kurus);
+    console.log('[PayTR] OK_URL:', OK_URL);
+    console.log('[PayTR] FAIL_URL:', FAIL_URL);
+
     const params = new URLSearchParams({
       merchant_id:       MERCHANT_ID,
-      user_ip,
-      merchant_oid,
+      user_ip:           user_ip,
+      merchant_oid:      merchant_oid,
       email:             'info@hairartist.com.tr',
-      payment_amount:    tutar_kurus,
-      paytr_token,
-      user_basket,
-      debug_on:          0,
-      no_installment,
-      max_installment,
-      user_name:         isim + ' ' + soyad,
-      user_address:      'İstanbul',
+      payment_amount:    String(tutar_kurus),
+      paytr_token:       paytr_token,
+      user_basket:       user_basket,
+      debug_on:          '1',           // hata ayıklama açık — sorun çözülünce '0' yap
+      no_installment:    no_installment,
+      max_installment:   max_installment,
+      user_name:         `${isim} ${soyad}`,
+      user_address:      'Istanbul',    // Türkçe karakter yok
       user_phone:        tel,
       merchant_ok_url:   OK_URL,
       merchant_fail_url: FAIL_URL,
-      timeout_limit:     30,
-      currency,
-      test_mode,
+      timeout_limit:     '30',
+      currency:          currency,
+      test_mode:         test_mode,
       lang:              'tr',
     });
 
@@ -189,16 +206,18 @@ app.post('/api/paytr-token', async (req, res) => {
     });
 
     const data = await response.json();
+    console.log('[PayTR] Yanıt:', JSON.stringify(data));
 
     if (data.status === 'success') {
       return res.json({ status: 'success', token: data.token, oid: merchant_oid });
     } else {
+      console.error('[PayTR] HATA reason:', data.reason);
       return res.json({ status: 'fail', reason: data.reason || 'Token alınamadı' });
     }
 
   } catch (err) {
     console.error('PAYTR HATA:', err);
-    res.status(500).json({ status: 'fail', reason: 'Server hatası' });
+    res.status(500).json({ status: 'fail', reason: 'Server hatası: ' + err.message });
   }
 });
 
@@ -441,4 +460,9 @@ function sayfaHTML(baslik, icerik, renk) {
 }
 
 // ─── SUNUCU BAŞLAT ────────────────────────────────────────────────────────────
-app.listen(PORT, () => console.log(`✓ Sunucu: http://localhost:${PORT}`));
+app.listen(PORT, () => {
+  console.log(`✓ Sunucu: http://localhost:${PORT}`);
+  console.log(`✓ SITE_URL: ${SITE_URL}`);
+  console.log(`✓ OK_URL: ${OK_URL}`);
+  console.log(`✓ FAIL_URL: ${FAIL_URL}`);
+});
