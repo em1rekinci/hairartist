@@ -1074,19 +1074,19 @@ function csToggleO() {
   var open = dd.classList.toggle('open');
   arrow.style.transform = open ? 'rotate(180deg)' : '';
 }
-function hizmetSecO(el, ad, fiyat, _) {
+function hizmetSecO(el, ad, min, max, sure) {
   document.querySelectorAll('#o-cs-dropdown .cs-option').forEach(i => i.classList.remove('secili'));
   el.classList.add('secili');
   document.getElementById('o-hizmet').value = ad;
-  document.getElementById('o-fiyat').value = fiyat;
+  document.getElementById('o-fiyat').value = max; // Online ödemede max fiyat alınıyor
+  document.getElementById('o-sure').value = sure;
   var lbl = document.getElementById('o-cs-label');
   lbl.style.color = '';
   lbl.textContent = ad;
   document.getElementById('o-cs-dropdown').classList.remove('open');
   document.getElementById('o-cs-arrow').style.transform = '';
-  document.getElementById('o-fiyat-indirimli').textContent = fiyat.toLocaleString('tr-TR') + '₺';
+  document.getElementById('o-fiyat-indirimli').textContent = max.toLocaleString('tr-TR') + '₺';
   document.getElementById('o-fiyat-normal').textContent = '';
-  var sure = SURE_MAP[ad];
   var sureBadge = document.getElementById('o-sure-badge');
   if (sure) { sureBadge.textContent = 'İşlem süresi: ' + sure + ' dk'; sureBadge.style.display = ''; }
   else { sureBadge.textContent = ''; sureBadge.style.display = 'none'; }
