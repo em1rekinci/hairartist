@@ -1422,20 +1422,6 @@ document.addEventListener('DOMContentLoaded', function() {
   personelYukle();
   // ── Hizmetleri Supabase'den yükle
   hizmetleriYukle();
-  
-  // ── Her 30 saniyede bir hizmetleri yeniden yükle (güncelleme kontrolü)
-  setInterval(function() {
-    hizmetleriYukle();
-    personelYukle();
-  }, 30000); // 30 saniye
-  
-  // ── Sayfa görünür olduğunda yeniden yükle
-  document.addEventListener('visibilitychange', function() {
-    if (!document.hidden) {
-      hizmetleriYukle();
-      personelYukle();
-    }
-  });
 });
 
 async function hizmetleriYukle() {

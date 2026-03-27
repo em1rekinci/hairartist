@@ -1295,16 +1295,10 @@ async function hizKaydet(){
   if(!ad){toast('Hizmet adı giriniz.','hata');return;}
   try{
     if(editId){
-      const h=hizmetler.find(x=>x.id===editId);
-      const eskiAd=h?h.ad:'';
       await sRest(`hizmetler?id=eq.${editId}`,{method:'PATCH',body:JSON.stringify({ad,kat,min_fiyat:min,max_fiyat:max,sure})});
-      if(h){
-        Object.assign(h,{ad,kat,min,max,sure});
-        // Eski adı FYT'den sil
-        if(eskiAd&&eskiAd!==ad)delete FYT[eskiAd];
-        // Yeni veya güncel ad ile FYT'yi güncelle
-        FYT[ad]={min,max,sure,kat};
-      }
+      const h=hizmetler.find(x=>x.id===editId);
+      if(h)Object.assign(h,{ad,kat,min,max,sure});
+      FYT[ad]={min,max,sure,kat};
       toast('Hizmet güncellendi.','ok');
     } else {
       const sira=hizmetler.length;
@@ -1314,7 +1308,7 @@ async function hizKaydet(){
       FYT[ad]={min,max,sure,kat};
       toast('Hizmet eklendi.','ok');
     }
-    hizSifirla();hizRender();verileriRender();
+    hizSifirla();hizRender();
   }catch(e){toast('Hata: '+e.message,'hata');}
 }
 function hizDuzenle(id){
@@ -1331,13 +1325,9 @@ function hizDuzenle(id){
 async function hizSil(id){
   if(!confirm('Bu hizmeti silmek istediğinizden emin misiniz?'))return;
   try{
-    const h=hizmetler.find(x=>x.id===id);
-    const silinecekAd=h?h.ad:'';
     await sRest(`hizmetler?id=eq.${id}`,{method:'DELETE'});
     hizmetler=hizmetler.filter(x=>x.id!==id);
-    // FYT'den de sil
-    if(silinecekAd)delete FYT[silinecekAd];
-    hizRender();verileriRender();toast('Hizmet silindi.','ok');
+    hizRender();toast('Hizmet silindi.','ok');
   }catch(e){toast('Hata: '+e.message,'hata');}
 }
 function hizSifirla(){
