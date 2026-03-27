@@ -1452,8 +1452,12 @@ async function hizmetleriYukle() {
     const liste = await res.json();
     if (!liste || !liste.length) return;
 
+    const benzersizListe = liste.filter((hizmet, index, arr) => {
+      return index === arr.findIndex(aday => aday.ad === hizmet.ad);
+    });
+
     ['n','o'].forEach(prefix => {
-      dropdownBas(prefix, liste);
+      dropdownBas(prefix, benzersizListe);
     });
 
   } catch (e) {
