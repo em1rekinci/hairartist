@@ -1178,23 +1178,61 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!el) return;
     el.min = bugun;
     el.addEventListener('change', function() {
-      // Geçmiş tarih seçildiyse bugüne sıfırla
-      if (el.value < bugun) {
-        el.value = bugun;
-      }
+      if (el.value < bugun) { el.value = bugun; }
       saatleriGuncelle(prefix);
     });
-    // Input event'i de dinle (iOS için)
     el.addEventListener('input', function() {
-      if (el.value < bugun) {
-        el.value = bugun;
-      }
+      if (el.value < bugun) { el.value = bugun; }
       saatleriGuncelle(prefix);
     });
   });
   saatleriGuncelle('n');
   saatleriGuncelle('o');
+
+  // ── Personeli Supabase'den yükle
+  personelYukle();
 });
+
+async function personelYukle() {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/personel?select=*&order=created_at.asc`, {
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY
+      }
+    });
+    if (!res.ok) return;
+    const personelListesi = await res.json();
+    // Sadece aktif ve rezervasyon açık personeli al
+    const aktifler = personelListesi.filter(p => p.durum === 'aktif' && p.rez_aktif !== false);
+    if (!aktifler.length) return;
+    // Her iki form için dropdown'ları güncelle
+    ['n', 'o'].forEach(prefix => personelDropdownOlustur(prefix, aktifler));
+  } catch(e) {
+    console.warn('Personel yüklenemedi:', e);
+  }
+}
+
+function personelDropdownOlustur(prefix, liste) {
+  const dropdown = document.getElementById(prefix + '-personel-dropdown');
+  if (!dropdown) return;
+  dropdown.innerHTML = liste.map(p => {
+    const foto = p.foto ? `images/${p.foto}` : '';
+    const initials = p.ad.split(' ').map(x=>x[0]).join('').substring(0,2).toUpperCase();
+    const fotoHtml = foto
+      ? `<img src="${foto}" alt="${p.ad}" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=\\'font-size:.9rem\\'>${initials}</span>'">`
+      : `<span style="font-size:.9rem">${initials}</span>`;
+    return `<div class="personel-row" onclick="personelSec(this,'${prefix}','${p.ad}','${p.rol||''}','${foto}','${initials}')">
+      <div class="personel-foto">${fotoHtml}</div>
+      <div class="personel-info">
+        <div class="personel-ad">${p.ad}</div>
+        <div class="personel-unvan">${p.rol||''}</div>
+      </div>
+      <div class="personel-check"></div>
+    </div>`;
+  }).join('');
+}
+
 </script>
 </body>
 </html>

@@ -412,6 +412,9 @@ tbody td{padding:10px 13px;vertical-align:middle}
       <div class="ni" onclick="sayfaGec('personel',this)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="5"/><path d="M3 21v-1a9 9 0 0 1 18 0v1"/></svg>Personel
       </div>
+      <div class="ni" onclick="sayfaGec('ciro',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Ciro & Raporlar
+      </div>
       <div class="ni" onclick="sayfaGec('hizmetler',this)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>Hizmetler & Fiyatlar
       </div>
@@ -526,7 +529,15 @@ tbody td{padding:10px 13px;vertical-align:middle}
               <div class="ff"><label class="fl">Ad Soyad</label><input class="fi" type="text" id="pfad" placeholder="Personel adı"></div>
               <div class="ff"><label class="fl">Uzmanlık / Rol</label><input class="fi" type="text" id="pfrol" placeholder="ör. Saç Uzmanı"></div>
               <div class="ff"><label class="fl">Telefon</label><input class="fi" type="tel" id="pftel" placeholder="05xx xxx xx xx"></div>
+              <div class="ff"><label class="fl">Fotoğraf Dosya Adı</label><input class="fi" type="text" id="pffoto" placeholder="ör. fatih-kurt.jpg"></div>
               <div class="ff"><label class="fl">Durum</label><select class="fsel" id="pfdurum"><option value="aktif">Aktif</option><option value="pasif">Pasif</option></select></div>
+              <div class="ff">
+                <label class="fl">Rezervasyon Kabulü</label>
+                <div style="display:flex;align-items:center;gap:10px;padding:9px 0">
+                  <label class="tgl"><input type="checkbox" id="pfrezaktif" checked><span class="tsl"></span></label>
+                  <span style="font-size:.72rem;color:var(--text2)">Açık — rezervasyon alıyor</span>
+                </div>
+              </div>
               <button class="sbtn" onclick="personelKaydet()">Kaydet</button>
               <button class="sbtn sec" id="pfiptal" onclick="personelSifirla()" style="display:none">İptal</button>
             </div>
@@ -540,7 +551,7 @@ tbody td{padding:10px 13px;vertical-align:middle}
     <div class="page" id="page-hizmetler">
       <div style="margin-bottom:16px"><h2 style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700">Hizmetler <em style="font-style:italic;font-weight:400;color:var(--text3)">& Fiyatlar</em></h2><p style="font-size:.7rem;color:var(--text3);margin-top:3px">Hizmetleri ve fiyatları yönetin</p></div>
       <div style="display:grid;grid-template-columns:1fr 285px;gap:14px;align-items:start">
-        <div class="card"><div class="ch"><h3>Hizmet Listesi</h3><span style="font-size:.6rem;color:var(--text3)" id="hizlbl"></span></div><div class="cb0 tw"><table><thead><tr><th>Hizmet</th><th>Kategori</th><th>Fiyat Aralığı</th><th>Süre</th><th>Rezervasyon</th><th>İşlem</th></tr></thead><tbody id="hizbody"></tbody></table></div></div>
+        <div class="card"><div class="ch"><h3>Hizmet Listesi</h3><span style="font-size:.6rem;color:var(--text3)" id="hizlbl"></span></div><div class="cb0 tw"><table><thead><tr><th>Sıra</th><th>Hizmet</th><th>Kategori</th><th>Fiyat Aralığı</th><th>Süre</th><th>Rez.</th><th>İşlem</th></tr></thead><tbody id="hizbody"></tbody></table></div></div>
         <div class="card"><div class="ch"><h3 id="hizformbaslik">Yeni Hizmet</h3></div><div class="cb">
           <div style="display:flex;flex-direction:column;gap:11px">
             <input type="hidden" id="hfid">
@@ -553,6 +564,58 @@ tbody td{padding:10px 13px;vertical-align:middle}
             <button class="sbtn sec" id="hfiptal" onclick="hizSifirla()" style="display:none">İptal</button>
           </div>
         </div></div>
+      </div>
+    </div>
+
+    <!-- ══ CİRO & RAPORLAR ══ -->
+    <div class="page" id="page-ciro">
+      <div style="margin-bottom:16px"><h2 style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700">Ciro <em style="font-style:italic;font-weight:400;color:var(--text3)">& Raporlar</em></h2><p style="font-size:.7rem;color:var(--text3);margin-top:3px">Gelir takibi ve ödeme analizi</p></div>
+
+      <!-- Periyot filtresi -->
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:14px;flex-wrap:wrap">
+        <div class="fbar">
+          <button class="fbtn ak" onclick="ciroFiltrele('gun',this)">Bugün</button>
+          <button class="fbtn" onclick="ciroFiltrele('hafta',this)">Bu Hafta</button>
+          <button class="fbtn" onclick="ciroFiltrele('ay',this)">Bu Ay</button>
+          <button class="fbtn" onclick="ciroFiltrele('yil',this)">Bu Yıl</button>
+          <button class="fbtn" onclick="ciroFiltrele('hepsi',this)">Tüm Zamanlar</button>
+        </div>
+        <div style="display:flex;gap:6px;margin-left:auto">
+          <button class="fbtn ak" id="ciro-nakit-btn" onclick="ciroYontemFiltrele('hepsi')">Tümü</button>
+          <button class="fbtn" id="ciro-tum-btn" onclick="ciroYontemFiltrele('nakit')">💵 Nakit</button>
+          <button class="fbtn" id="ciro-kart-btn" onclick="ciroYontemFiltrele('kart')">💳 Kart</button>
+        </div>
+      </div>
+
+      <!-- Stat kartları -->
+      <div class="sgrid" style="margin-bottom:14px">
+        <div class="sc g"><div class="sct"></div><span class="slbl2">Toplam Ciro</span><div class="sval g" id="c-toplam">—</div><div class="ssub" id="c-toplam-sub">Seçili dönem</div></div>
+        <div class="sc b"><div class="sct"></div><span class="slbl2">💵 Nakit</span><div class="sval b" id="c-nakit">—</div><div class="ssub">Nakit ödemeler</div></div>
+        <div class="sc y"><div class="sct"></div><span class="slbl2">💳 Kart</span><div class="sval y" id="c-kart">—</div><div class="ssub">Kart ödemeleri</div></div>
+        <div class="sc g"><div class="sct"></div><span class="slbl2">İşlem Sayısı</span><div class="sval" id="c-sayi">—</div><div class="ssub">Ödeme alınan rez.</div></div>
+      </div>
+
+      <div class="dgrid">
+        <div class="dsol">
+          <!-- Grafik -->
+          <div class="card"><div class="ch"><h3>Gelir Grafiği</h3><span style="font-size:.6rem;color:var(--text3)" id="c-grafik-lbl"></span></div>
+            <div class="cb">
+              <div class="mchart" id="c-chart" style="height:80px"></div>
+              <div class="mclbl" id="c-chartlbl"></div>
+            </div>
+          </div>
+          <!-- Tablo -->
+          <div class="card"><div class="ch"><h3>Ödeme Detayları</h3></div>
+            <div class="cb0 tw"><table><thead><tr><th>Müşteri</th><th>Hizmet</th><th>Ücret</th><th>Yöntem</th><th>Tarih</th><th>Personel</th></tr></thead>
+            <tbody id="c-tbody"></tbody></table>
+          </div></div>
+        </div>
+        <div class="dsag">
+          <!-- Hizmet bazlı -->
+          <div class="card"><div class="ch"><h3>Hizmete Göre</h3></div><div class="cb" id="c-hizdag"></div></div>
+          <!-- Personel bazlı -->
+          <div class="card"><div class="ch"><h3>Personele Göre</h3></div><div class="cb" id="c-perdag"></div></div>
+        </div>
       </div>
     </div>
 
@@ -624,9 +687,28 @@ tbody td{padding:10px 13px;vertical-align:middle}
       <h3>Ödeme Onayı</h3>
     </div>
     <div class="cmb" id="cmb">Bu rezervasyon için ödeme alındığını onaylıyor musunuz?</div>
+    <div style="padding:0 18px 12px">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div>
+          <label style="font-size:.5rem;letter-spacing:.17em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px">Alınan Ücret (₺)</label>
+          <input type="number" id="manuelUcret" class="fi" placeholder="Tutarı girin" style="background:var(--bg);border:1px solid var(--line2)">
+        </div>
+        <div>
+          <label style="font-size:.5rem;letter-spacing:.17em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px">Ödeme Yöntemi</label>
+          <div style="display:flex;gap:8px">
+            <label style="flex:1;display:flex;align-items:center;gap:7px;padding:9px 12px;border:1px solid var(--line2);border-radius:4px;cursor:pointer;font-size:.74rem;color:var(--text2)" id="lbl-nakit">
+              <input type="radio" name="odemeYontemi" value="nakit" id="r-nakit" checked style="accent-color:var(--green)"> 💵 Nakit
+            </label>
+            <label style="flex:1;display:flex;align-items:center;gap:7px;padding:9px 12px;border:1px solid var(--line2);border-radius:4px;cursor:pointer;font-size:.74rem;color:var(--text2)" id="lbl-kart">
+              <input type="radio" name="odemeYontemi" value="kart" id="r-kart" style="accent-color:var(--green)"> 💳 Kart
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="cmact">
       <button class="tbtn" onclick="cmKapat()">İptal</button>
-      <button class="tbtn pri" id="cmOnayBtn" onclick="odemeOnayla()">Eminim, Onayla</button>
+      <button class="tbtn pri" id="cmOnayBtn" onclick="odemeOnayla()">Ödemeyi Kaydet</button>
     </div>
   </div>
 </div>
@@ -661,6 +743,7 @@ function dbToLocal(r){
     durum: r.durum||'bekliyor',
     odemeAlindi: r.odeme_alindi||false,
     fiyat: r.fiyat||0,
+    odemeYontemi: r.odeme_yontemi||'nakit',
     tip: r.tip||'normal',
     tarihOlustur: r.created_at||new Date().toISOString(),
     personelId: r.personel_id||null,
@@ -756,7 +839,7 @@ async function verileriYukle(showToast=true){
       sRest('personel?select=*&order=created_at.asc')
     ]);
     TRZ=rezData.map(dbToLocal);
-    personel=pData.map(p=>({id:p.id,ad:p.ad,rol:p.rol||'',tel:p.tel||'',durum:p.durum||'aktif'}));
+    personel=pData.map(p=>({id:p.id,ad:p.ad,rol:p.rol||'',tel:p.tel||'',durum:p.durum||'aktif',foto:p.foto||'',rezaktif:p.rez_aktif!==false}));
     AKTLOG=logOlustur();
     if(showToast)toast('Yenilendi.','ok');
   }catch(e){
@@ -767,7 +850,7 @@ async function verileriYukle(showToast=true){
 function verileriRender(){statsGuncelle();tabloRender(AKT_FILTRE);bugRandevu();sonRez();hDagitim();mustRender();aktRender();nbGuncelle();pStatRender();tkRender();}
 
 // ─── STATS ───
-function fHesapla(r){if(r.odemeAlindi&&r.durum==='onaylandi'){const h=FYT[r.hizmet];return h?Math.round((h.min+h.max)/2):0;}return 0;}
+function fHesapla(r){if(r.odemeAlindi&&r.durum==='onaylandi'){if(r.fiyat)return r.fiyat;const h=FYT[r.hizmet];return h?Math.round((h.min+h.max)/2):0;}return 0;}
 function statsGuncelle(){
   const t=TRZ.length,bek=TRZ.filter(r=>r.durum==='bekliyor').length;
   const onay=TRZ.filter(r=>r.durum==='onaylandi');
@@ -929,22 +1012,29 @@ function odemeAl(id){
   const fiyat=h?Math.round((h.min+h.max)/2).toLocaleString('tr-TR')+'₺':'?';
   const p=personel.find(x=>x.id===r.personelId);
   document.getElementById('cmb').innerHTML=`
-    <strong>${r.ad}</strong> adlı müşteri için <strong>${r.hizmet}</strong> hizmetinden<br>
-    tahmini <strong style="color:var(--green)">${fiyat}</strong> ödeme alındığını onaylıyor musunuz?<br><br>
-    ${p?`<span style="font-size:.72rem;color:var(--text3)">İlgili Personel: ${p.ad}</span><br>`:''}
-    <span style="font-size:.72rem;color:var(--text3)">Bu işlem cironuza yansıyacaktır.</span>
+    <strong>${r.ad}</strong> adlı müşteri — <strong>${r.hizmet}</strong><br>
+    ${p?`<span style="font-size:.72rem;color:var(--text3)">Personel: ${p.ad}</span><br>`:''}
+    <span style="font-size:.72rem;color:var(--text3)">Tahmini fiyat: <strong style="color:var(--green)">${fiyat}</strong> · Gerçek tutarı girin:</span>
   `;
+  const tahFiyat=h?Math.round((h.min+h.max)/2):0;
+  document.getElementById('manuelUcret').value=tahFiyat||'';
+  document.getElementById('r-nakit').checked=true;
   bekleyenOdemeId=id;
   document.getElementById('cmov').classList.add('open');
 }
 async function odemeOnayla(){
   if(!bekleyenOdemeId)return;
   try{
-    await sRest(`rezervasyonlar?id=eq.${bekleyenOdemeId}`,{method:'PATCH',body:JSON.stringify({odeme_alindi:true})});
+    const manuelUcret=parseInt(document.getElementById('manuelUcret').value)||0;
+    const odemeYontemi=document.querySelector('input[name="odemeYontemi"]:checked')?.value||'nakit';
+    if(!manuelUcret){toast('Lütfen ücret giriniz.','hata');return;}
+    await sRest(`rezervasyonlar?id=eq.${bekleyenOdemeId}`,{method:'PATCH',body:JSON.stringify({odeme_alindi:true,fiyat:manuelUcret,odeme_yontemi:odemeYontemi})});
     const r=TRZ.find(x=>x.id===bekleyenOdemeId);
     if(r){
       r.odemeAlindi=true;
-      AKTLOG.unshift({tip:'g',txt:`<strong>${r.ad}</strong> — ödeme alındı, ciro'ya yansıtıldı`,z:new Date()});
+      r.fiyat=manuelUcret;
+      r.odemeYontemi=odemeYontemi;
+      AKTLOG.unshift({tip:'g',txt:`<strong>${r.ad}</strong> — ${manuelUcret.toLocaleString('tr-TR')}₺ ${odemeYontemi} ödeme alındı`,z:new Date()});
     }
     bekleyenOdemeId=null;
     document.getElementById('cmov').classList.remove('open');
@@ -967,7 +1057,7 @@ function detay(id){
     <div class="mr"><span class="mk">Ad Soyad</span><span class="mv">${r.ad}</span></div>
     <div class="mr"><span class="mk">Telefon</span><span class="mv">${r.telefon}</span></div>
     <div class="mr"><span class="mk">Hizmet</span><span class="mv">${r.hizmet}</span></div>
-    <div class="mr"><span class="mk">Fiyat</span><span class="mv" style="color:var(--green)">${fiyat}</span></div>
+    <div class="mr"><span class="mk">Fiyat</span><span class="mv" style="color:var(--green)">${fiyat}${r.odemeAlindi&&r.odemeYontemi?'<span style="font-size:.65rem;color:var(--text3);margin-left:6px">'+( r.odemeYontemi==='kart'?'💳 Kart':'💵 Nakit')+'</span>':''}</span></div>
     <div class="mr"><span class="mk">Randevu</span><span class="mv">${r.tarih} saat ${r.saat||'—'}</span></div>
     <div class="mr" style="align-items:center"><span class="mk">Personel</span><span class="mv"><select class="fsel" style="font-size:.75rem;padding:5px 8px" onchange="personelAta('${r.id}',this.value)"><option value="">— Atanmadı —</option>${pOptions}</select></span></div>
     <div class="mr"><span class="mk">Not</span><span class="mv">${r.not||'—'}</span></div>
@@ -1017,15 +1107,20 @@ function pListRender(){
   if(!personel.length){e.innerHTML='<div class="bos">Henüz personel yok.</div>';return;}
   e.innerHTML=personel.map(p=>{
     const initials=p.ad.split(' ').map(x=>x[0]).join('').substring(0,2).toUpperCase();
+    const fotoHtml=p.foto?`<img src="images/${p.foto}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;object-position:top;border:2px solid var(--line)" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`:'';
+    const rezDurumu=p.rezaktif!==false;
     return`<div class="pkart">
-      <div class="pavtr">${initials}</div>
+      <div class="pavtr" style="position:relative;overflow:hidden">${fotoHtml}<span ${p.foto?'style="display:none"':''}>${initials}</span></div>
       <div class="pblg">
         <div class="pad">${p.ad}</div>
         <div class="prol">${p.rol}</div>
-        <div style="display:flex;align-items:center;gap:5px;margin-top:4px">
-          <div class="pdot pdk ${p.durum}"></div>
-          <span style="font-size:.6rem;color:var(--text3)">${p.durum==='aktif'?'Aktif':'Pasif'}</span>
-          ${p.tel?`<span style="font-size:.6rem;color:var(--text3);margin-left:6px">${p.tel}</span>`:''}
+        <div style="display:flex;align-items:center;gap:8px;margin-top:5px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:4px">
+            <div class="pdot pdk ${p.durum}"></div>
+            <span style="font-size:.6rem;color:var(--text3)">${p.durum==='aktif'?'Aktif':'Pasif'}</span>
+          </div>
+          <span style="font-size:.6rem;padding:2px 7px;border-radius:8px;border:1px solid;${rezDurumu?'background:rgba(74,122,0,.1);border-color:rgba(74,122,0,.25);color:var(--green)':'background:rgba(176,48,32,.1);border-color:rgba(176,48,32,.25);color:var(--red)'}">${rezDurumu?'Rezervasyon Açık':'Rezervasyon Kapalı'}</span>
+          ${p.tel?`<span style="font-size:.6rem;color:var(--text3)">${p.tel}</span>`:''}
         </div>
       </div>
       <div style="display:flex;gap:5px">
@@ -1049,17 +1144,19 @@ async function personelKaydet(){
   const rol=document.getElementById('pfrol').value.trim();
   const tel=document.getElementById('pftel').value.trim();
   const durum=document.getElementById('pfdurum').value;
+  const foto=document.getElementById('pffoto').value.trim();
+  const rezaktif=document.getElementById('pfrezaktif').checked;
   if(!ad){toast('Ad Soyad giriniz.','hata');return;}
   try{
     if(editId){
-      await sRest(`personel?id=eq.${editId}`,{method:'PATCH',body:JSON.stringify({ad,rol,tel,durum})});
+      await sRest(`personel?id=eq.${editId}`,{method:'PATCH',body:JSON.stringify({ad,rol,tel,durum,foto,rez_aktif:rezaktif})});
       const p=personel.find(x=>x.id===editId);
-      if(p)Object.assign(p,{ad,rol,tel,durum});
+      if(p)Object.assign(p,{ad,rol,tel,durum,foto,rezaktif});
       toast('Personel güncellendi.','ok');
     } else {
-      const res=await sRest('personel',{method:'POST',body:JSON.stringify({ad,rol,tel,durum})});
+      const res=await sRest('personel',{method:'POST',body:JSON.stringify({ad,rol,tel,durum,foto,rez_aktif:rezaktif})});
       const yeni=Array.isArray(res)?res[0]:res;
-      personel.push({id:yeni.id,ad,rol,tel,durum});
+      personel.push({id:yeni.id,ad,rol,tel,durum,foto,rezaktif});
       toast('Personel eklendi.','ok');
     }
     personelSifirla();
@@ -1074,6 +1171,8 @@ function personelDuzenle(id){
   document.getElementById('pfrol').value=p.rol;
   document.getElementById('pftel').value=p.tel||'';
   document.getElementById('pfdurum').value=p.durum;
+  document.getElementById('pffoto').value=p.foto||'';
+  document.getElementById('pfrezaktif').checked=p.rezaktif!==false;
   document.getElementById('pformbaslik').textContent='Personel Düzenle';
   document.getElementById('pfiptal').style.display='';
 }
@@ -1090,6 +1189,8 @@ function personelSifirla(){
   document.getElementById('pfad').value='';
   document.getElementById('pfrol').value='';
   document.getElementById('pftel').value='';
+  document.getElementById('pffoto').value='';
+  document.getElementById('pfrezaktif').checked=true;
   document.getElementById('pformbaslik').textContent='Personel Ekle';
   document.getElementById('pfiptal').style.display='none';
 }
@@ -1101,7 +1202,9 @@ function hizRender(){
   e.innerHTML=hizmetler.map(h=>{
     const rezSayi=TRZ.filter(r=>r.hizmet===h.ad).length;
     const fiyatStr=h.min===h.max?h.min.toLocaleString('tr-TR')+'₺':h.min.toLocaleString('tr-TR')+' – '+h.max.toLocaleString('tr-TR')+'₺';
+    const idx=hizmetler.indexOf(h);
     return`<tr>
+      <td><div style="display:flex;gap:2px"><button class="bsm bdet" onclick="hizSirala('${h.id}',-1)" ${idx===0?'disabled':''} style="${idx===0?'opacity:.3':''}">↑</button><button class="bsm bdet" onclick="hizSirala('${h.id}',1)" ${idx===hizmetler.length-1?'disabled':''} style="${idx===hizmetler.length-1?'opacity:.3':''}">↓</button></div></td>
       <td class="thiz">${h.ad}</td>
       <td><span class="badge bo" style="font-size:.5rem">${h.kat}</span></td>
       <td class="tfyt">${fiyatStr}</td>
@@ -1253,7 +1356,122 @@ function saatKaydet(){
   toast('Çalışma saatleri kaydedildi.','ok');
 }
 
-// ─── SIDEBAR MOBİL ───
+// ─── HİZMET SIRALAMA ───
+function hizSirala(id, yon){
+  const idx=hizmetler.findIndex(x=>x.id===id);
+  const yeniIdx=idx+yon;
+  if(yeniIdx<0||yeniIdx>=hizmetler.length)return;
+  [hizmetler[idx],hizmetler[yeniIdx]]=[hizmetler[yeniIdx],hizmetler[idx]];
+  hizRender();
+}
+
+// ─── CİRO & RAPORLAR ───
+let CIRO_PERIYOT='gun', CIRO_YONTEM='hepsi';
+
+function ciroFiltrele(p,btn){
+  CIRO_PERIYOT=p;
+  document.querySelectorAll('#page-ciro .fbar .fbtn').forEach(b=>b.classList.remove('ak'));
+  btn.classList.add('ak');
+  ciroRender();
+}
+function ciroYontemFiltrele(y){
+  CIRO_YONTEM=y;
+  ['hepsi','nakit','kart'].forEach(k=>{
+    const ids={'hepsi':'ciro-nakit-btn','nakit':'ciro-tum-btn','kart':'ciro-kart-btn'};
+    document.getElementById(ids[k])?.classList.remove('ak');
+  });
+  const aktifId={'hepsi':'ciro-nakit-btn','nakit':'ciro-tum-btn','kart':'ciro-kart-btn'}[y];
+  document.getElementById(aktifId)?.classList.add('ak');
+  ciroRender();
+}
+
+function ciroPeriyotAralik(p){
+  const n=new Date();
+  let bas,bit=new Date(n);
+  if(p==='gun'){bas=new Date(n.getFullYear(),n.getMonth(),n.getDate());}
+  else if(p==='hafta'){bas=new Date(n);bas.setDate(n.getDate()-n.getDay()+(n.getDay()===0?-6:1));bas.setHours(0,0,0,0);}
+  else if(p==='ay'){bas=new Date(n.getFullYear(),n.getMonth(),1);}
+  else if(p==='yil'){bas=new Date(n.getFullYear(),0,1);}
+  else{bas=new Date(0);}
+  return{bas,bit};
+}
+
+function ciroRender(){
+  const {bas,bit}=ciroPeriyotAralik(CIRO_PERIYOT);
+  let odemeler=TRZ.filter(r=>{
+    if(!r.odemeAlindi||r.durum!=='onaylandi')return false;
+    const t=new Date(r.tarih+'T12:00');
+    return t>=bas&&t<=bit;
+  });
+  if(CIRO_YONTEM!=='hepsi')odemeler=odemeler.filter(r=>(r.odemeYontemi||'nakit')===CIRO_YONTEM);
+
+  const toplam=odemeler.reduce((s,r)=>s+fHesapla(r),0);
+  const nakit=odemeler.filter(r=>(r.odemeYontemi||'nakit')==='nakit').reduce((s,r)=>s+fHesapla(r),0);
+  const kart=odemeler.filter(r=>r.odemeYontemi==='kart').reduce((s,r)=>s+fHesapla(r),0);
+
+  document.getElementById('c-toplam').textContent=toplam.toLocaleString('tr-TR')+'₺';
+  document.getElementById('c-nakit').textContent=nakit.toLocaleString('tr-TR')+'₺';
+  document.getElementById('c-kart').textContent=kart.toLocaleString('tr-TR')+'₺';
+  document.getElementById('c-sayi').textContent=odemeler.length;
+
+  const pLbl={gun:'Bugün',hafta:'Bu Hafta',ay:'Bu Ay',yil:'Bu Yıl',hepsi:'Tüm Zamanlar'};
+  document.getElementById('c-toplam-sub').textContent=pLbl[CIRO_PERIYOT]||'';
+
+  // Grafik
+  ciroGrafik(bas,bit,odemeler);
+
+  // Tablo
+  const tbody=document.getElementById('c-tbody');
+  if(!odemeler.length){tbody.innerHTML='<tr><td colspan="6" class="bos">Bu dönem için ödeme bulunamadı.</td></tr>';return;}
+  const sirali=[...odemeler].sort((a,b)=>new Date(b.tarih)-new Date(a.tarih));
+  tbody.innerHTML=sirali.map(r=>{
+    const p=personel.find(x=>x.id===r.personelId);
+    const f=fHesapla(r);
+    const yont=(r.odemeYontemi||'nakit')==='kart'?'💳 Kart':'💵 Nakit';
+    return`<tr><td><div class="tad">${r.ad}</div></td><td class="thiz">${r.hizmet}</td><td class="tfyt">${f.toLocaleString('tr-TR')}₺</td><td style="font-size:.72rem">${yont}</td><td class="ttar">${r.tarih}</td><td style="font-size:.7rem;color:var(--text2)">${p?p.ad:'—'}</td></tr>`;
+  }).join('');
+
+  // Hizmet dağılım
+  const hizS={};odemeler.forEach(r=>{hizS[r.hizmet]=(hizS[r.hizmet]||0)+fHesapla(r);});
+  const hizSv=Object.entries(hizS).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const hizMx=hizSv[0]?.[1]||1;
+  const chd=document.getElementById('c-hizdag');
+  chd.innerHTML=hizSv.length?hizSv.map(([ad,ciro])=>`<div class="hdi"><div class="hdlbl"><span style="font-size:.68rem">${ad}</span><span>${ciro.toLocaleString('tr-TR')}₺</span></div><div class="hdb"><div class="hdf" style="width:${Math.round((ciro/hizMx)*100)}%"></div></div></div>`).join(''):'<div class="bos" style="padding:12px">Veri yok.</div>';
+
+  // Personel dağılım
+  const perS={};odemeler.forEach(r=>{if(r.personelId){perS[r.personelId]=(perS[r.personelId]||0)+fHesapla(r);}});
+  const perSv=Object.entries(perS).sort((a,b)=>b[1]-a[1]);
+  const perMx=perSv[0]?.[1]||1;
+  const cpd=document.getElementById('c-perdag');
+  cpd.innerHTML=perSv.length?perSv.map(([pid,ciro])=>{const p=personel.find(x=>x.id===pid);return`<div class="hdi"><div class="hdlbl"><span style="font-size:.68rem">${p?p.ad:'Atanmamış'}</span><span>${ciro.toLocaleString('tr-TR')}₺</span></div><div class="hdb"><div class="hdf" style="width:${Math.round((ciro/perMx)*100)}%;background:var(--blue)"></div></div></div>`;}).join(''):'<div class="bos" style="padding:12px">Veri yok.</div>';
+}
+
+function ciroGrafik(bas,bit,odemeler){
+  const p=CIRO_PERIYOT;
+  let noktalar=[];
+  const n=new Date();
+
+  if(p==='gun'){
+    for(let h=8;h<=20;h++) noktalar.push({lbl:`${h}:00`,val:odemeler.filter(r=>{const [sh]=r.saat?r.saat.split(':'):['0'];return parseInt(sh)===h;}).reduce((s,r)=>s+fHesapla(r),0)});
+  } else if(p==='hafta'){
+    const GA=['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
+    for(let i=0;i<7;i++){const d=new Date(bas);d.setDate(bas.getDate()+i);const ts=d.toISOString().split('T')[0];noktalar.push({lbl:GA[i],val:odemeler.filter(r=>r.tarih===ts).reduce((s,r)=>s+fHesapla(r),0)});}
+  } else if(p==='ay'){
+    const sonGun=new Date(n.getFullYear(),n.getMonth()+1,0).getDate();
+    for(let g=1;g<=sonGun;g++){const ts=`${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(g).padStart(2,'0')}`;noktalar.push({lbl:String(g),val:odemeler.filter(r=>r.tarih===ts).reduce((s,r)=>s+fHesapla(r),0)});}
+  } else if(p==='yil'){
+    const AYK=['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'];
+    for(let m=0;m<12;m++){noktalar.push({lbl:AYK[m],val:odemeler.filter(r=>{const d=new Date(r.tarih+'T12:00');return d.getMonth()===m&&d.getFullYear()===n.getFullYear();}).reduce((s,r)=>s+fHesapla(r),0)});}
+  } else {
+    const AYK=['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'];
+    for(let m=0;m<12;m++){noktalar.push({lbl:AYK[m],val:odemeler.filter(r=>{const d=new Date(r.tarih+'T12:00');return d.getMonth()===m&&d.getFullYear()===n.getFullYear();}).reduce((s,r)=>s+fHesapla(r),0)});}
+  }
+
+  const mx=Math.max(...noktalar.map(x=>x.val),1);
+  document.getElementById('c-chart').innerHTML=noktalar.map((x,i)=>`<div class="mcbar${i===noktalar.length-1&&(p==='gun'||p==='hafta')?' tod':''}" style="height:${Math.max(4,Math.round((x.val/mx)*100))}%;background:${x.val?'var(--green)':'var(--gbg)'};border-color:${x.val?'var(--green)':'var(--gbdr)'}" title="${x.lbl}: ${x.val.toLocaleString('tr-TR')}₺"></div>`).join('');
+  document.getElementById('c-chartlbl').innerHTML=noktalar.filter((_,i)=>noktalar.length<=12||i%Math.ceil(noktalar.length/12)===0).map(x=>`<span>${x.lbl}</span>`).join('');
+}
+
 function sidebarAc(){
   document.getElementById('sidebar').classList.add('open');
   document.getElementById('sbov').classList.add('open');
@@ -1268,7 +1486,7 @@ const BASLIKLAR={
   dashboard:'Dashboard',takvim:'Takvim',
   rezervasyonlar:'Rezervasyonlar',musteriler:'Müşteriler',
   personel:'Personel',hizmetler:'Hizmetler & Fiyatlar',
-  shop:'Shop',ayarlar:'Ayarlar',
+  shop:'Shop',ayarlar:'Ayarlar',ciro:'Ciro & Raporlar',
 };
 function sayfaGec(sayfa,navEl){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('ak'));
@@ -1284,6 +1502,7 @@ function sayfaGec(sayfa,navEl){
   if(sayfa==='takvim')tkRender();
   if(sayfa==='shop')shopRender();
   if(sayfa==='personel'){pListRender();pStatRender();}
+  if(sayfa==='ciro')ciroRender();
 }
 
 // ─── TOAST ───
