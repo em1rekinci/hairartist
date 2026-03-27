@@ -12,15 +12,16 @@ const PORT = process.env.PORT || 3000;
 const NETGSM_USERCODE  = process.env.NETGSM_USERCODE;
 const NETGSM_PASSWORD  = process.env.NETGSM_PASSWORD;
 const NETGSM_MSGHEADER = process.env.NETGSM_MSGHEADER;
-const ALICI_TELEFON    = process.env.ALICI_TELEFON;    // Fatih Kurt
-const SITE_URL         = process.env.SITE_URL;         // site adresi güncel unutma
-const ADMIN_SIFRE      = process.env.ADMIN_SIFRE || 'hairartist2026';  // admin şifresi
-// ─── PAYTR AYARLARI ─────────────────────────────────────────
-const MERCHANT_ID = "685596";
-const MERCHANT_KEY = "aPqa74hp7yn9uXHg";
+const ALICI_TELEFON    = process.env.ALICI_TELEFON;
+const SITE_URL         = process.env.SITE_URL;
+const ADMIN_SIFRE      = process.env.ADMIN_SIFRE || 'hairartist2026';
+
+// ─── PAYTR AYARLARI ──────────────────────────────────────────────────────────
+const MERCHANT_ID   = "685596";
+const MERCHANT_KEY  = "aPqa74hp7yn9uXHg";
 const MERCHANT_SALT = "Z7uQTT2ZTeYFxbsN";
 
-const OK_URL = `${SITE_URL}/odeme-basarili`;
+const OK_URL   = `${SITE_URL}/odeme-basarili`;
 const FAIL_URL = `${SITE_URL}/odeme-basarisiz`;
 
 // ─── GEÇİCİ REZERVASYON DEPOSU ───────────────────────────────────────────────
@@ -30,129 +31,43 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ─── SHOP SAYFASI
+// ─── STATIC DOSYALAR ─────────────────────────────────────────────────────────
+// (Özel route'lar static'ten ÖNCE tanımlanmalı)
+
+// ─── SAYFA ROUTE'LARI ─────────────────────────────────────────────────────────
 app.get('/shop', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'shop.html'));
 });
 
-// ─── REZERVASYON SAYFASI
 app.get('/rezervasyon', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'rezervasyon.html'));
 });
 
-// ─── ADMİN PANELİ — static'ten önce tanımlanmalı ─────────────────────────────
 app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
+app.get('/portfolio', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'portfolio.html'));
+});
+
+app.get('/fiyatlar', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'fiyatlar.html'));
+});
+
+// ─── STATIC MIDDLEWARE (sayfa route'larından sonra) ───────────────────────────
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ─── REZERVASYON AL ──────────────────────────────────────────────────────────
+// ════════════════════════════════════════════════════════════════════════════
+// REZERVASYON AL
+// ════════════════════════════════════════════════════════════════════════════
 app.post('/rezervasyon', async (req, res) => {
   const { ad, telefon, hizmet, tarih, saat, not: musteri_notu } = req.body;
 
   if (!ad || !telefon || !hizmet || !tarih || !saat) {
     return res.status(400).json({ ok: false, mesaj: 'Lütfen tüm zorunlu alanları doldurun.' });
   }
-// ─── PAYTR TOKEN AL ─────────────────────────────────────────
-app.post("/api/paytr-token", async (req, res) => {
-  try {
-    const { ad, telefon, hizmet, tarih, saat, fiyat } = req.body;
 
-    if (!ad || !telefon || !hizmet || !fiyat) {
-      return res.status(400).json({ status: "fail", reason: "Eksik bilgi" });
-    }
-
-    const [isim, soyad = "-"] = ad.split(" ");
-
-    let tel = telefon.replace(/\D/g, "");
-    if (tel.startsWith("0")) tel = tel.slice(1);
-    if (!tel.startsWith("90")) tel = "90" + tel;
-
-    const tutar_kurus = fiyat * 100;
-    const merchant_oid = "HA" + Date.now();
-
-    const user_ip =
-      req.headers["x-forwarded-for"]?.split(",")[0] ||
-      req.socket.remoteAddress;
-
-    const sepet = JSON.stringify([
-      [`${hizmet} (${tarih} ${saat})`, fiyat.toFixed(2), 1],
-    ]);
-    const user_basket = Buffer.from(sepet).toString("base64");
-
-    const no_installment = 0;
-    const max_installment = 0;
-    const currency = "TL";
-    const test_mode = 0;
-
-    const hash_str =
-      MERCHANT_ID +
-      user_ip +
-      merchant_oid +
-      "info@hairartist.com.tr" +
-      tutar_kurus +
-      user_basket +
-      no_installment +
-      max_installment +
-      currency +
-      test_mode +
-      MERCHANT_SALT;
-
-    const paytr_token = crypto
-      .createHmac("sha256", MERCHANT_KEY)
-      .update(hash_str)
-      .digest("base64");
-
-    const params = new URLSearchParams({
-      merchant_id: MERCHANT_ID,
-      user_ip,
-      merchant_oid,
-      email: "info@hairartist.com.tr",
-      payment_amount: tutar_kurus,
-      paytr_token,
-      user_basket,
-      debug_on: 0,
-      no_installment,
-      max_installment,
-      user_name: isim + " " + soyad,
-      user_address: "İstanbul",
-      user_phone: tel,
-      merchant_ok_url: OK_URL,
-      merchant_fail_url: FAIL_URL,
-      timeout_limit: 30,
-      currency,
-      test_mode,
-      lang: "tr",
-    });
-
-    const response = await fetch(
-      "https://www.paytr.com/odeme/api/get-token",
-      {
-        method: "POST",
-        body: params,
-      }
-    );
-
-    const data = await response.json();
-
-    if (data.status === "success") {
-      return res.json({
-        status: "success",
-        token: data.token,
-        oid: merchant_oid
-      });
-    } else {
-      return res.json({
-        status: "fail",
-        reason: data.reason || "Token alınamadı",
-      });
-    }
-  } catch (err) {
-    console.error("PAYTR HATA:", err);
-    res.status(500).json({ status: "fail", reason: "Server hatası" });
-  }
-});
   const id = crypto.randomBytes(8).toString('hex');
 
   rezervasyonlar.set(id, {
@@ -185,7 +100,102 @@ app.post("/api/paytr-token", async (req, res) => {
   }
 });
 
-// ─── ONAY LİNKİ ──────────────────────────────────────────────────────────────
+// ════════════════════════════════════════════════════════════════════════════
+// PAYTR TOKEN AL  ← Artık kendi başına ayrı bir route
+// ════════════════════════════════════════════════════════════════════════════
+app.post('/api/paytr-token', async (req, res) => {
+  try {
+    const { ad, telefon, hizmet, tarih, saat, fiyat } = req.body;
+
+    if (!ad || !telefon || !hizmet || !fiyat) {
+      return res.status(400).json({ status: 'fail', reason: 'Eksik bilgi' });
+    }
+
+    const [isim, soyad = '-'] = ad.split(' ');
+
+    let tel = telefon.replace(/\D/g, '');
+    if (tel.startsWith('0')) tel = tel.slice(1);
+    if (!tel.startsWith('90')) tel = '90' + tel;
+
+    const tutar_kurus = fiyat * 100;
+    const merchant_oid = 'HA' + Date.now();
+
+    const user_ip =
+      req.headers['x-forwarded-for']?.split(',')[0] ||
+      req.socket.remoteAddress;
+
+    const sepet = JSON.stringify([
+      [`${hizmet} (${tarih} ${saat})`, fiyat.toFixed(2), 1],
+    ]);
+    const user_basket = Buffer.from(sepet).toString('base64');
+
+    const no_installment  = 0;
+    const max_installment = 0;
+    const currency        = 'TL';
+    const test_mode       = 0;
+
+    const hash_str =
+      MERCHANT_ID +
+      user_ip +
+      merchant_oid +
+      'info@hairartist.com.tr' +
+      tutar_kurus +
+      user_basket +
+      no_installment +
+      max_installment +
+      currency +
+      test_mode +
+      MERCHANT_SALT;
+
+    const paytr_token = crypto
+      .createHmac('sha256', MERCHANT_KEY)
+      .update(hash_str)
+      .digest('base64');
+
+    const params = new URLSearchParams({
+      merchant_id:       MERCHANT_ID,
+      user_ip,
+      merchant_oid,
+      email:             'info@hairartist.com.tr',
+      payment_amount:    tutar_kurus,
+      paytr_token,
+      user_basket,
+      debug_on:          0,
+      no_installment,
+      max_installment,
+      user_name:         isim + ' ' + soyad,
+      user_address:      'İstanbul',
+      user_phone:        tel,
+      merchant_ok_url:   OK_URL,
+      merchant_fail_url: FAIL_URL,
+      timeout_limit:     30,
+      currency,
+      test_mode,
+      lang:              'tr',
+    });
+
+    const response = await fetch('https://www.paytr.com/odeme/api/get-token', {
+      method: 'POST',
+      body: params,
+    });
+
+    const data = await response.json();
+
+    if (data.status === 'success') {
+      return res.json({ status: 'success', token: data.token, oid: merchant_oid });
+    } else {
+      return res.json({ status: 'fail', reason: data.reason || 'Token alınamadı' });
+    }
+
+  } catch (err) {
+    console.error('PAYTR HATA:', err);
+    res.status(500).json({ status: 'fail', reason: 'Server hatası' });
+  }
+});
+
+// ════════════════════════════════════════════════════════════════════════════
+// ONAY LİNKİ
+// ════════════════════════════════════════════════════════════════════════════
 app.get('/onay/:id', async (req, res) => {
   const rez = rezervasyonlar.get(req.params.id);
 
@@ -217,7 +227,9 @@ app.get('/onay/:id', async (req, res) => {
   }
 });
 
-// ─── RED LİNKİ ───────────────────────────────────────────────────────────────
+// ════════════════════════════════════════════════════════════════════════════
+// RED LİNKİ
+// ════════════════════════════════════════════════════════════════════════════
 app.get('/red/:id', async (req, res) => {
   const rez = rezervasyonlar.get(req.params.id);
 
@@ -247,67 +259,15 @@ app.get('/red/:id', async (req, res) => {
   }
 });
 
-// ─── YARDIMCI: SMS GÖNDER ────────────────────────────────────────────────────
-async function smsSend(numara, mesaj) {
-  const xml =
-    `<?xml version="1.0" encoding="UTF-8"?>` +
-    `<mainbody><header>` +
-      `<usercode>${NETGSM_USERCODE}</usercode>` +
-      `<password>${NETGSM_PASSWORD}</password>` +
-      `<msgheader>${NETGSM_MSGHEADER}</msgheader>` +
-    `</header><body>` +
-      `<msg><![CDATA[${mesaj}]]></msg>` +
-      `<no>${numara}</no>` +
-    `</body></mainbody>`;
-
-  const res  = await fetch('https://api.netgsm.com.tr/sms/send/xml', {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/xml; charset=UTF-8' },
-    body: xml
-  });
-  const text = await res.text();
-  console.log('Netgsm:', text.trim());
-  if (!['00','01','02'].some(k => text.trim().startsWith(k)))
-    throw new Error('Netgsm hata: ' + text.trim());
-}
-
-// ─── YARDIMCI: TELEFON FORMAT ────────────────────────────────────────────────
-function telefonFormat(tel) {
-  let t = tel.replace(/[\s\-\(\)]/g, '').replace(/^\+/, '');
-  if (t.startsWith('0')) t = '9' + t;
-  return t;
-}
-
-// ─── YARDIMCI: HTML SAYFA ────────────────────────────────────────────────────
-function sayfaHTML(baslik, icerik, renk) {
-  return `<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>${baslik} — Hair Artist</title>
-  <style>
-    body{margin:0;font-family:sans-serif;background:#0a0a0a;color:#f5f0e8;
-         display:flex;align-items:center;justify-content:center;min-height:100vh}
-    .box{background:#161616;border:1px solid #2a2a2a;padding:48px 40px;
-         border-radius:8px;max-width:480px;text-align:center}
-    h1{font-size:1.6rem;margin-bottom:16px;color:${renk}}
-    p{font-size:.95rem;line-height:1.7;color:rgba(245,240,232,.6)}
-    a{display:inline-block;margin-top:24px;color:${renk};font-size:.85rem;
-      text-decoration:none;border-bottom:1px solid ${renk};padding-bottom:2px}
-  </style></head><body>
-  <div class="box"><h1>${baslik}</h1><p>${icerik}</p>
-  <a href="/">← Anasayfaya Dön</a></div>
-  </body></html>`;
-}
-
-// ─── ADMİN: GİRİŞ ───────────────────────────────────────────────────────────
+// ════════════════════════════════════════════════════════════════════════════
+// ADMİN PANELİ
+// ════════════════════════════════════════════════════════════════════════════
 app.post('/admin/giris', (req, res) => {
   const { sifre } = req.body;
-  if (sifre === ADMIN_SIFRE) {
-    return res.json({ ok: true });
-  }
+  if (sifre === ADMIN_SIFRE) return res.json({ ok: true });
   return res.status(401).json({ ok: false, mesaj: 'Şifre hatalı.' });
 });
 
-// ─── ADMİN: TÜM REZERVASYONLAR ───────────────────────────────────────────────
 app.get('/admin/rezervasyonlar', (req, res) => {
   const { sifre } = req.query;
   if (sifre !== ADMIN_SIFRE) return res.status(401).json({ ok: false });
@@ -318,7 +278,6 @@ app.get('/admin/rezervasyonlar', (req, res) => {
   return res.json({ ok: true, rezervasyonlar: liste });
 });
 
-// ─── ADMİN: ONAY (panel üzerinden) ───────────────────────────────────────────
 app.post('/admin/onay/:id', async (req, res) => {
   const { sifre } = req.body;
   if (sifre !== ADMIN_SIFRE) return res.status(401).json({ ok: false });
@@ -345,7 +304,6 @@ app.post('/admin/onay/:id', async (req, res) => {
   }
 });
 
-// ─── ADMİN: RED (panel üzerinden) ────────────────────────────────────────────
 app.post('/admin/red/:id', async (req, res) => {
   const { sifre } = req.body;
   if (sifre !== ADMIN_SIFRE) return res.status(401).json({ ok: false });
@@ -370,7 +328,6 @@ app.post('/admin/red/:id', async (req, res) => {
   }
 });
 
-// ─── ADMİN: SİL ──────────────────────────────────────────────────────────────
 app.delete('/admin/sil/:id', (req, res) => {
   const { sifre } = req.body;
   if (sifre !== ADMIN_SIFRE) return res.status(401).json({ ok: false });
@@ -378,29 +335,19 @@ app.delete('/admin/sil/:id', (req, res) => {
   return res.json({ ok: true });
 });
 
-// ─── PORTFOLYO TEMİZ URL
-app.get('/portfolio', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'portfolio.html'));
-});
-
-// ─── FİYATLAR TEMİZ URL
-app.get('/fiyatlar', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'fiyatlar.html'));
-});
-
-// ─── PORTFOLYo FOTOĞRAF LİSTESİ ─────────────────────────────────────────────
+// ════════════════════════════════════════════════════════════════════════════
+// PORTFOLYo FOTOĞRAF API
+// ════════════════════════════════════════════════════════════════════════════
 const PORTFOLIO_DIR = path.join(__dirname, 'public', 'images', 'portfolio');
 const IMG_EXTS = ['.jpg', '.jpeg', '.png', '.webp'];
 
-// Dosya adından kategori ve başlık çıkar
-// Format: kategori-sayi.jpg → ör: kesim-01.jpg, balayaj-03.webp
 const KATEGORİ_MAP = {
-  kesim:    'Saç Kesimi',
-  boya:     'Saç Boyama',
-  balyaj:   'Balyaj',
-  bakim:    'Bakım & Şekil',
-  gelin:    'Gelin Saçı',
-  sekil:    'Şekillendirme',
+  kesim:  'Saç Kesimi',
+  boya:   'Saç Boyama',
+  balyaj: 'Balyaj',
+  bakim:  'Bakım & Şekil',
+  gelin:  'Gelin Saçı',
+  sekil:  'Şekillendirme',
 };
 
 app.get('/api/portfolio', (req, res) => {
@@ -413,16 +360,16 @@ app.get('/api/portfolio', (req, res) => {
       .sort();
 
     const photos = files.map(f => {
-      const base = path.basename(f, path.extname(f)); // ör: kesim-01
-      const parts = base.split('-');
+      const base   = path.basename(f, path.extname(f));
+      const parts  = base.split('-');
       const catKey = parts[0].toLowerCase();
-      const cat = KATEGORİ_MAP[catKey] || catKey;
+      const cat    = KATEGORİ_MAP[catKey] || catKey;
       return {
-        src: `/images/portfolio/${f}`,
-        cat: catKey,
+        src:      `/images/portfolio/${f}`,
+        cat:      catKey,
         catLabel: cat,
-        name: cat,
-        file: f
+        name:     cat,
+        file:     f
       };
     });
 
@@ -432,6 +379,57 @@ app.get('/api/portfolio', (req, res) => {
     res.status(500).json({ photos: [] });
   }
 });
+
+// ════════════════════════════════════════════════════════════════════════════
+// YARDIMCI FONKSİYONLAR
+// ════════════════════════════════════════════════════════════════════════════
+async function smsSend(numara, mesaj) {
+  const xml =
+    `<?xml version="1.0" encoding="UTF-8"?>` +
+    `<mainbody><header>` +
+      `<usercode>${NETGSM_USERCODE}</usercode>` +
+      `<password>${NETGSM_PASSWORD}</password>` +
+      `<msgheader>${NETGSM_MSGHEADER}</msgheader>` +
+    `</header><body>` +
+      `<msg><![CDATA[${mesaj}]]></msg>` +
+      `<no>${numara}</no>` +
+    `</body></mainbody>`;
+
+  const res  = await fetch('https://api.netgsm.com.tr/sms/send/xml', {
+    method:  'POST',
+    headers: { 'Content-Type': 'text/xml; charset=UTF-8' },
+    body:    xml
+  });
+  const text = await res.text();
+  console.log('Netgsm:', text.trim());
+  if (!['00', '01', '02'].some(k => text.trim().startsWith(k)))
+    throw new Error('Netgsm hata: ' + text.trim());
+}
+
+function telefonFormat(tel) {
+  let t = tel.replace(/[\s\-\(\)]/g, '').replace(/^\+/, '');
+  if (t.startsWith('0')) t = '9' + t;
+  return t;
+}
+
+function sayfaHTML(baslik, icerik, renk) {
+  return `<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>${baslik} — Hair Artist</title>
+  <style>
+    body{margin:0;font-family:sans-serif;background:#0a0a0a;color:#f5f0e8;
+         display:flex;align-items:center;justify-content:center;min-height:100vh}
+    .box{background:#161616;border:1px solid #2a2a2a;padding:48px 40px;
+         border-radius:8px;max-width:480px;text-align:center}
+    h1{font-size:1.6rem;margin-bottom:16px;color:${renk}}
+    p{font-size:.95rem;line-height:1.7;color:rgba(245,240,232,.6)}
+    a{display:inline-block;margin-top:24px;color:${renk};font-size:.85rem;
+      text-decoration:none;border-bottom:1px solid ${renk};padding-bottom:2px}
+  </style></head><body>
+  <div class="box"><h1>${baslik}</h1><p>${icerik}</p>
+  <a href="/">← Anasayfaya Dön</a></div>
+  </body></html>`;
+}
 
 // ─── SUNUCU BAŞLAT ────────────────────────────────────────────────────────────
 app.listen(PORT, () => console.log(`✓ Sunucu: http://localhost:${PORT}`));
