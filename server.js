@@ -13,7 +13,7 @@ const NETGSM_USERCODE  = process.env.NETGSM_USERCODE;
 const NETGSM_PASSWORD  = process.env.NETGSM_PASSWORD;
 const NETGSM_MSGHEADER = process.env.NETGSM_MSGHEADER;
 const ALICI_TELEFON    = process.env.ALICI_TELEFON;
-const SITE_URL         = process.env.SITE_URL;
+const SITE_URL         = process.env.SITE_URL || 'https://www.fatihkurthairartist.com';
 const ADMIN_SIFRE      = process.env.ADMIN_SIFRE || 'hairartist2026';
 
 // ─── PAYTR AYARLARI ──────────────────────────────────────────────────────────
@@ -30,6 +30,15 @@ const rezervasyonlar = new Map();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// ─── WWW YÖNLENDİRME (fatihkurthairartist.com → www.fatihkurthairartist.com) ─
+app.use((req, res, next) => {
+  const host = req.headers.host || '';
+  if (host && !host.startsWith('www.') && !host.startsWith('localhost')) {
+    return res.redirect(301, `https://www.${host}${req.url}`);
+  }
+  next();
+});
 
 // ─── STATIC DOSYALAR ─────────────────────────────────────────────────────────
 // (Özel route'lar static'ten ÖNCE tanımlanmalı)
