@@ -506,6 +506,104 @@
   border-bottom: 1.5px solid #080808;
   transform: rotate(45deg) translate(-1px, -1px);
 }
+
+/* ── PAYTR MODAL ── */
+.paytr-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(8,8,8,.92);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.paytr-overlay.aktif { display: flex; }
+.paytr-modal {
+  background: #111;
+  border: 1px solid #2a2a2a;
+  width: 100%;
+  max-width: 480px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.paytr-modal-baslik {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  border-bottom: 1px solid #1e1e1e;
+}
+.paytr-modal-baslik span {
+  font-size: .6rem;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: rgba(247,244,239,.5);
+}
+.paytr-modal-tutar {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #c8ff00;
+}
+.paytr-kapat {
+  background: none;
+  border: none;
+  color: rgba(247,244,239,.4);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: color .2s;
+  line-height: 1;
+}
+.paytr-kapat:hover { color: var(--off); }
+.paytr-iframe-wrap {
+  position: relative;
+  width: 100%;
+  min-height: 440px;
+}
+.paytr-iframe-wrap iframe {
+  width: 100%;
+  height: 100%;
+  min-height: 440px;
+  border: none;
+  display: block;
+}
+.paytr-yukleniyor {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: #111;
+}
+.paytr-yukleniyor-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #c8ff00;
+  animation: paytrPulse 1s infinite alternate;
+}
+.paytr-yukleniyor p {
+  font-size: .72rem;
+  color: rgba(247,244,239,.4);
+  letter-spacing: .1em;
+}
+@keyframes paytrPulse { from { opacity: .2; } to { opacity: 1; } }
+
+.paytr-hata-kutu {
+  padding: 32px 24px;
+  text-align: center;
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+.paytr-hata-kutu.goster { display: flex; }
+.paytr-hata-kutu p { font-size: .82rem; color: rgba(247,244,239,.7); line-height: 1.7; }
+.paytr-hata-kutu strong { color: #ff6b6b; font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; }
 </style>
 </head>
 <body>
@@ -812,6 +910,30 @@
 
 </div>
 
+<!-- PAYTR ÖDEME MODALI -->
+<div class="paytr-overlay" id="paytr-overlay">
+  <div class="paytr-modal">
+    <div class="paytr-modal-baslik">
+      <div>
+        <span>Güvenli Ödeme</span><br>
+        <span class="paytr-modal-tutar" id="paytr-tutar-goster"></span>
+      </div>
+      <button class="paytr-kapat" onclick="paytrKapat()">✕</button>
+    </div>
+    <div class="paytr-iframe-wrap" id="paytr-iframe-wrap">
+      <div class="paytr-yukleniyor" id="paytr-yukleniyor">
+        <div class="paytr-yukleniyor-dot"></div>
+        <p>Ödeme sayfası yükleniyor…</p>
+      </div>
+    </div>
+    <div class="paytr-hata-kutu" id="paytr-hata-kutu">
+      <strong>⚠ Bağlantı Hatası</strong>
+      <p id="paytr-hata-metin">Ödeme sayfası açılamadı. Lütfen tekrar deneyin.</p>
+      <button class="fsub odeme-btn" style="width:auto;padding:12px 28px;margin-top:8px" onclick="paytrKapat()">Kapat</button>
+    </div>
+  </div>
+</div>
+
 <!-- FOOTER -->
 <footer>
   <p>© 2026 Hair Artist · Branded by Fatih Kurt</p>
@@ -1086,7 +1208,12 @@ async function normalGonder() {
   }
 }
 
-// ── ÖDEMEYE GİT
+// ── PAYTR CONFIG — Kendi bilgilerinizle değiştirin
+// Bu değerler GÜVENLİ DEĞİLDİR; gerçek entegrasyonda backend'e taşıyın!
+// Aşağıdaki endpoint'i kendi sunucunuzda oluşturmalısınız (bkz: paytr-token.php)
+const PAYTR_TOKEN_ENDPOINT = '/api/paytr-token'; // Backend endpoint adresi
+
+// ── ÖDEMEYE GİT (PayTR iFrame)
 async function odemeGit() {
   const mesajDiv = document.getElementById('o-mesaj');
   const btn = document.getElementById('o-btn');
@@ -1102,27 +1229,134 @@ async function odemeGit() {
     mesaj(mesajDiv, 'Lütfen tüm zorunlu alanları doldurun.', 'hata');
     return;
   }
+  if (!fiyat || parseInt(fiyat) <= 0) {
+    mesaj(mesajDiv, 'Lütfen geçerli bir hizmet seçin.', 'hata');
+    return;
+  }
 
   btn.disabled = true;
   btn.textContent = 'Kaydediliyor…';
 
   try {
+    // 1) Rezervasyonu Supabase'e kaydet
     await supabaseInsert('rezervasyonlar', {
       ad, telefon, hizmet, tarih, saat,
       fiyat: parseInt(fiyat) || 0,
       personel_id: personel,
-      durum: 'bekliyor',
+      durum: 'odeme_bekleniyor',
       odeme_alindi: false,
       tip: 'odeme_bekleyen'
     });
-    const params = new URLSearchParams({ ad, telefon, hizmet, tarih, saat, fiyat });
-    window.location.href = '/odeme?' + params.toString();
+
+    btn.textContent = 'Ödeme açılıyor…';
+
+    // 2) Backend'den PayTR iframe_token al
+    const tokenRes = await fetch(PAYTR_TOKEN_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ad,
+        telefon,
+        hizmet,
+        tarih,
+        saat,
+        fiyat: parseInt(fiyat),
+        personel
+      })
+    });
+
+    const tokenData = await tokenRes.json();
+
+    if (!tokenRes.ok || tokenData.status !== 'success') {
+      throw new Error(tokenData.reason || 'Token alınamadı');
+    }
+
+    // 3) PayTR modalını aç
+    paytrAc(tokenData.token, parseInt(fiyat));
+
+    btn.disabled = false;
+    btn.textContent = 'Ödemeye Geç →';
+
   } catch(e) {
-    mesaj(mesajDiv, '✗ Bağlantı hatası. Lütfen tekrar deneyin.', 'hata');
+    console.error('Ödeme hatası:', e);
+    // Backend erişilemiyorsa direkt yönlendirmeye geri dön
+    if (e.message && e.message.includes('fetch')) {
+      mesaj(mesajDiv, '⚠ Backend endpoint bulunamadı. /api/paytr-token adresini kontrol edin.', 'hata');
+    } else {
+      mesaj(mesajDiv, '✗ ' + (e.message || 'Ödeme başlatılamadı. Tekrar deneyin.'), 'hata');
+    }
     btn.disabled = false;
     btn.textContent = 'Ödemeye Geç →';
   }
 }
+
+// ── PAYTR MODAL AÇ/KAPAT
+function paytrAc(iframeToken, fiyat) {
+  const overlay = document.getElementById('paytr-overlay');
+  const wrap = document.getElementById('paytr-iframe-wrap');
+  const yukleniyor = document.getElementById('paytr-yukleniyor');
+  const hataKutu = document.getElementById('paytr-hata-kutu');
+
+  // Önceki iframe varsa temizle
+  const eskiIframe = wrap.querySelector('iframe');
+  if (eskiIframe) eskiIframe.remove();
+  yukleniyor.style.display = 'flex';
+  hataKutu.classList.remove('goster');
+
+  // Tutarı göster
+  document.getElementById('paytr-tutar-goster').textContent =
+    fiyat.toLocaleString('tr-TR') + ' ₺';
+
+  // Modal aç
+  overlay.classList.add('aktif');
+  document.body.style.overflow = 'hidden';
+
+  // PayTR iFrame oluştur
+  const iframe = document.createElement('iframe');
+  iframe.src = 'https://www.paytr.com/odeme/guvenli/' + iframeToken;
+  iframe.style.cssText = 'width:100%;border:none;display:block;min-height:440px;';
+  iframe.setAttribute('allowfullscreen', '');
+  iframe.setAttribute('scrolling', 'yes');
+
+  iframe.onload = function() {
+    yukleniyor.style.display = 'none';
+  };
+  iframe.onerror = function() {
+    yukleniyor.style.display = 'none';
+    hataKutu.classList.add('goster');
+  };
+
+  wrap.appendChild(iframe);
+
+  // PayTR'dan gelen mesajları dinle (ödeme sonucu)
+  window.addEventListener('message', paytrMesajDinle);
+}
+
+function paytrKapat() {
+  const overlay = document.getElementById('paytr-overlay');
+  overlay.classList.remove('aktif');
+  document.body.style.overflow = '';
+  window.removeEventListener('message', paytrMesajDinle);
+  // iframe'i temizle
+  const wrap = document.getElementById('paytr-iframe-wrap');
+  const iframe = wrap.querySelector('iframe');
+  if (iframe) iframe.remove();
+}
+
+function paytrMesajDinle(e) {
+  // PayTR ödeme sonucu bildirimi
+  if (e.data && e.data.status) {
+    if (e.data.status === 'success') {
+      paytrKapat();
+      // Ödeme başarılı sayfasına yönlendir
+      window.location.href = '/odeme-basarili';
+    } else if (e.data.status === 'fail') {
+      paytrKapat();
+      alert('Ödeme başarısız. Lütfen tekrar deneyin.');
+    }
+  }
+}
+
 
 function mesaj(el, metin, tip) {
   el.textContent = metin;
