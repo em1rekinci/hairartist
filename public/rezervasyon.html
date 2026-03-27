@@ -1062,7 +1062,7 @@ async function normalGonder() {
   try {
     await supabaseInsert('rezervasyonlar', {
       ad, telefon, hizmet, tarih, saat, musteri_notu: not,
-      personel: personel,
+      personel_id: personel,
       durum: 'bekliyor',
       odeme_alindi: false,
       tip: 'normal'
@@ -1110,7 +1110,7 @@ async function odemeGit() {
     await supabaseInsert('rezervasyonlar', {
       ad, telefon, hizmet, tarih, saat,
       fiyat: parseInt(fiyat) || 0,
-      personel: personel,
+      personel_id: personel,
       durum: 'bekliyor',
       odeme_alindi: false,
       tip: 'odeme_bekleyen'
