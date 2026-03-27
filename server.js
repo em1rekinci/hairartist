@@ -65,6 +65,25 @@ app.get('/fiyatlar', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'fiyatlar.html'));
 });
 
+// ─── PAYTR ÖDEME SONUÇ SAYFALARI ──────────────────────────────────────────────
+app.get('/odeme-basarili', (req, res) => {
+  const html = sayfaHTML(
+    'Ödeme Başarılı! ✓',
+    'Ödemeniz başarıyla alındı. Rezervasyon detaylarınız SMS ile gönderilecek. En kısa sürede sizinle iletişime geçeceğiz.',
+    '#10b981' // yeşil
+  );
+  res.send(html);
+});
+
+app.get('/odeme-basarisiz', (req, res) => {
+  const html = sayfaHTML(
+    'Ödeme Başarısız',
+    'Ödeme işlemi tamamlanamadı. Lütfen tekrar deneyin veya farklı bir ödeme yöntemi kullanın. Sorun devam ederse bizimle iletişime geçebilirsiniz: 0531 777 02 03',
+    '#ef4444' // kırmızı
+  );
+  res.send(html);
+});
+
 // ─── STATIC MIDDLEWARE (sayfa route'larından sonra) ───────────────────────────
 app.use(express.static(path.join(__dirname, 'public')));
 
