@@ -1259,7 +1259,7 @@ function hizDuzenle(id){
 async function hizSil(id){
   if(!confirm('Bu hizmeti silmek istediğinizden emin misiniz?'))return;
   try{
-    await sRest(`hizmetler?id=eq.${id}`,{method:'DELETE',headers:{'Prefer':'return=minimal'}});
+    await sRest(`hizmetler?id=eq.${id}`,{method:'DELETE'});
     hizmetler=hizmetler.filter(x=>x.id!==id);
     hizRender();toast('Hizmet silindi.','ok');
   }catch(e){toast('Hata: '+e.message,'hata');}
