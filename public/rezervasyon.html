@@ -1421,83 +1421,42 @@ document.addEventListener('DOMContentLoaded', function() {
   // ── Personeli Supabase'den yükle
   personelYukle();
   // ── Hizmetleri Supabase'den yükle
- });
-
-// ─────────────────────────────
-// HİZMETLER (TEK VE TEMİZ)
-// ─────────────────────────────
-
-let hizmetlerYuklendi = false;
-
-// SAYFA YÜKLENİNCE
-document.addEventListener('DOMContentLoaded', () => {
   hizmetleriYukle();
 });
 
 async function hizmetleriYukle() {
-  if (hizmetlerYuklendi) return; // 🔥 duplicate engel
-  hizmetlerYuklendi = true;
-
   try {
-    const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/hizmetler?select=*&order=sira.asc`,
-      {
-        headers: {
-          'apikey': SUPABASE_KEY,
-          'Authorization': 'Bearer ' + SUPABASE_KEY
-        }
-      }
-    );
-
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/hizmetler?select=*&order=sira.asc,created_at.asc`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+    });
+    if (!res.ok) return;
     const liste = await res.json();
-    if (!liste || !liste.length) return;
-
-    const benzersizListe = liste.filter((hizmet, index, arr) => {
-      return index === arr.findIndex(aday => aday.ad === hizmet.ad);
-    });
-
-    ['n','o'].forEach(prefix => {
-      dropdownBas(prefix, benzersizListe);
-    });
-
-  } catch (e) {
-    console.warn(e);
+    if (!liste.length) return;
+    ['n', 'o'].forEach(prefix => hizmetDropdownOlustur(prefix, liste));
+  } catch(e) {
+    console.warn('Hizmetler yüklenemedi:', e);
   }
 }
 
-// dropdown oluştur
-function dropdownBas(prefix, liste) {
+function hizmetFiyatStr(min, max) {
+  if (min === max) return min.toLocaleString('tr-TR') + '₺';
+  return min.toLocaleString('tr-TR') + ' – ' + max.toLocaleString('tr-TR') + '₺';
+}
+
+function hizmetDropdownOlustur(prefix, liste) {
   const dd = document.getElementById(prefix + '-cs-dropdown');
   if (!dd) return;
-
-  dd.innerHTML = ''; // 🔥 en kritik satır
-
-  liste.forEach(h => {
-    const item = document.createElement('div');
-    item.className = 'cs-option';
-
-    let fiyat = h.min_fiyat === h.max_fiyat
-      ? h.min_fiyat.toLocaleString('tr-TR') + '₺'
-      : h.min_fiyat.toLocaleString('tr-TR') + ' – ' + h.max_fiyat.toLocaleString('tr-TR') + '₺';
-
-    item.innerHTML = `
+  const fn = prefix === 'n' ? 'hizmetSecN' : 'hizmetSecO';
+  dd.innerHTML = liste.map(h => {
+    const fiyatStr = hizmetFiyatStr(h.min_fiyat || 0, h.max_fiyat || 0);
+    const adSafe = h.ad.replace(/'/g, "\'").replace(/"/g, '&quot;');
+    return `<div class="cs-option" onclick="${fn}(this,'${adSafe}',${h.min_fiyat||0},${h.max_fiyat||0},${h.sure||60})">
       <span class="cs-ad">${h.ad}</span>
-      <span class="cs-fiyatlar">
-        <span class="cs-indirimli">${fiyat}</span>
-      </span>
-    `;
-
-    item.onclick = () => {
-      if (prefix === 'n') {
-        hizmetSecN(item, h.ad, h.min_fiyat, h.max_fiyat, h.sure);
-      } else {
-        hizmetSecO(item, h.ad, h.min_fiyat, h.max_fiyat, h.sure);
-      }
-    };
-
-    dd.appendChild(item);
-  });
+      <span class="cs-fiyatlar"><span class="cs-indirimli">${fiyatStr}</span></span>
+    </div>`;
+  }).join('');
 }
+
 
 async function personelYukle() {
   try {
