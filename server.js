@@ -69,7 +69,7 @@ app.get('/fiyatlar', (req, res) => {
 app.get('/odeme-basarili', (req, res) => {
   const html = sayfaHTML(
     'Ödeme Başarılı! ✓',
-    'Ödemeniz başarıyla alındı. Rezervasyon detaylarınız SMS ile gönderilecek. En kısa sürede sizinle iletişime geçeceğiz.',
+    'Ödemeniz başarıyla alındı. Rezervasyon detaylarınız en kısa sürede size gönderilecek. En kısa sürede sizinle iletişime geçeceğiz.',
     '#10b981' // yeşil
   );
   res.send(html);
