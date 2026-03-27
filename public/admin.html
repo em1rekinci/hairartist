@@ -834,12 +834,17 @@ async function panelBaslat(){
 function saatGuncelle(){document.getElementById('tptime').textContent=new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});}
 async function verileriYukle(showToast=true){
   try{
-    const [rezData, pData] = await Promise.all([
+    const [rezData, pData, hizData] = await Promise.all([
       sRest('rezervasyonlar?select=*&order=created_at.desc&limit=500'),
-      sRest('personel?select=*&order=created_at.asc')
+      sRest('personel?select=*&order=created_at.asc'),
+      sRest('hizmetler?select=*&order=sira.asc,created_at.asc')
     ]);
     TRZ=rezData.map(dbToLocal);
     personel=pData.map(p=>({id:p.id,ad:p.ad,rol:p.rol||'',tel:p.tel||'',durum:p.durum||'aktif',foto:p.foto||'',rezaktif:p.rez_aktif!==false}));
+    if(hizData&&hizData.length){
+      hizmetler=hizData.map(h=>({id:h.id,ad:h.ad,kat:h.kat||'Diğer',min:h.min_fiyat||0,max:h.max_fiyat||0,sure:h.sure||60,sira:h.sira||0}));
+      hizmetler.forEach(h=>{FYT[h.ad]={min:h.min,max:h.max,sure:h.sure,kat:h.kat};});
+    }
     AKTLOG=logOlustur();
     if(showToast)toast('Yenilendi.','ok');
   }catch(e){
@@ -1214,7 +1219,7 @@ function hizRender(){
     </tr>`;
   }).join('');
 }
-function hizKaydet(){
+async function hizKaydet(){
   const editId=document.getElementById('hfid').value;
   const ad=document.getElementById('hfad').value.trim();
   const kat=document.getElementById('hfkat').value;
@@ -1222,16 +1227,23 @@ function hizKaydet(){
   const max=parseInt(document.getElementById('hfmax').value)||0;
   const sure=parseInt(document.getElementById('hfsure').value)||60;
   if(!ad){toast('Hizmet adı giriniz.','hata');return;}
-  if(editId){
-    const h=hizmetler.find(x=>x.id===editId);
-    if(h)Object.assign(h,{ad,kat,min,max,sure});
-    toast('Hizmet güncellendi.','ok');
-  } else {
-    hizmetler.push({id:Math.random().toString(36).substr(2,9),ad,kat,min,max,sure});
-    FYT[ad]={min,max,sure,kat};
-    toast('Hizmet eklendi.','ok');
-  }
-  hizSifirla();hizRender();
+  try{
+    if(editId){
+      await sRest(`hizmetler?id=eq.${editId}`,{method:'PATCH',body:JSON.stringify({ad,kat,min_fiyat:min,max_fiyat:max,sure})});
+      const h=hizmetler.find(x=>x.id===editId);
+      if(h)Object.assign(h,{ad,kat,min,max,sure});
+      FYT[ad]={min,max,sure,kat};
+      toast('Hizmet güncellendi.','ok');
+    } else {
+      const sira=hizmetler.length;
+      const res=await sRest('hizmetler',{method:'POST',body:JSON.stringify({ad,kat,min_fiyat:min,max_fiyat:max,sure,sira})});
+      const yeni=Array.isArray(res)?res[0]:res;
+      hizmetler.push({id:yeni.id,ad,kat,min,max,sure,sira});
+      FYT[ad]={min,max,sure,kat};
+      toast('Hizmet eklendi.','ok');
+    }
+    hizSifirla();hizRender();
+  }catch(e){toast('Hata: '+e.message,'hata');}
 }
 function hizDuzenle(id){
   const h=hizmetler.find(x=>x.id===id);if(!h)return;
@@ -1244,10 +1256,13 @@ function hizDuzenle(id){
   document.getElementById('hizformbaslik').textContent='Hizmet Düzenle';
   document.getElementById('hfiptal').style.display='';
 }
-function hizSil(id){
+async function hizSil(id){
   if(!confirm('Bu hizmeti silmek istediğinizden emin misiniz?'))return;
-  hizmetler=hizmetler.filter(x=>x.id!==id);
-  hizRender();toast('Hizmet silindi.','ok');
+  try{
+    await sRest(`hizmetler?id=eq.${id}`,{method:'DELETE',headers:{'Prefer':'return=minimal'}});
+    hizmetler=hizmetler.filter(x=>x.id!==id);
+    hizRender();toast('Hizmet silindi.','ok');
+  }catch(e){toast('Hata: '+e.message,'hata');}
 }
 function hizSifirla(){
   document.getElementById('hfid').value='';
@@ -1357,12 +1372,16 @@ function saatKaydet(){
 }
 
 // ─── HİZMET SIRALAMA ───
-function hizSirala(id, yon){
+async function hizSirala(id, yon){
   const idx=hizmetler.findIndex(x=>x.id===id);
   const yeniIdx=idx+yon;
   if(yeniIdx<0||yeniIdx>=hizmetler.length)return;
   [hizmetler[idx],hizmetler[yeniIdx]]=[hizmetler[yeniIdx],hizmetler[idx]];
   hizRender();
+  // Supabase'e sıraları güncelle
+  try{
+    await Promise.all(hizmetler.map((h,i)=>sRest(`hizmetler?id=eq.${h.id}`,{method:'PATCH',body:JSON.stringify({sira:i})})));
+  }catch(e){console.warn('Sıra kaydedilemedi:',e);}
 }
 
 // ─── CİRO & RAPORLAR ───
