@@ -64,15 +64,15 @@
   overflow: hidden;
 }
 .rez-kart:hover { background: #161616; border-color: #333; }
-.rez-kart.odeme { border-color: rgba(200,255,0,.15); }
-.rez-kart.odeme:hover { background: rgba(200,255,0,.04); border-color: rgba(200,255,0,.35); }
+.rez-kart.odeme { border-color: rgba(212,175,55,.15); }
+.rez-kart.odeme:hover { background: rgba(212,175,55,.04); border-color: rgba(212,175,55,.35); }
 .rez-kart-no {
   font-size: .6rem;
   letter-spacing: .3em;
   text-transform: uppercase;
   color: rgba(247,244,239,.55);
 }
-.rez-kart.odeme .rez-kart-no { color: rgba(200,255,0,.6); }
+.rez-kart.odeme .rez-kart-no { color: rgba(212,175,55,.6); }
 .rez-kart h2 {
   font-family: 'Playfair Display', serif;
   font-size: 1.8rem;
@@ -113,7 +113,7 @@
   border-radius: 50%;
   flex-shrink: 0;
 }
-.rez-kart.odeme .rez-oz-item::before { background: rgba(200,255,0,.5); }
+.rez-kart.odeme .rez-oz-item::before { background: rgba(212,175,55,.5); }
 .rez-kart-btn {
   margin-top: auto;
   display: inline-flex;
@@ -129,15 +129,15 @@
   transition: color .2s;
 }
 .rez-kart:hover .rez-kart-btn { color: var(--off); }
-.rez-kart.odeme .rez-kart-btn { color: rgba(200,255,0,.6); border-top-color: rgba(200,255,0,.1); }
-.rez-kart.odeme:hover .rez-kart-btn { color: #c8ff00; }
+.rez-kart.odeme .rez-kart-btn { color: rgba(212,175,55,.6); border-top-color: rgba(212,175,55,.1); }
+.rez-kart.odeme:hover .rez-kart-btn { color: #d4af37; }
 .rez-kart-btn-arrow { font-size: 1rem; transition: transform .2s; }
 .rez-kart:hover .rez-kart-btn-arrow { transform: translateX(4px); }
 .indirim-badge {
   position: absolute;
   top: 20px;
   right: 20px;
-  background: #c8ff00;
+  background: #d4af37;
   color: #080808;
   font-size: .55rem;
   font-weight: 700;
@@ -161,7 +161,7 @@
   font-size: .62rem;
   letter-spacing: .18em;
   text-transform: uppercase;
-  color: rgba(247,244,239,.3);
+  color: rgba(247,244,239,.7);
   cursor: pointer;
   margin-bottom: 48px;
   background: none;
@@ -189,7 +189,7 @@
   margin-top: 16px;
   font-size: .82rem;
   line-height: 1.8;
-  color: rgba(247,244,239,.75);
+  color: rgba(247,244,239,.95);
 }
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .form-grid-full { grid-column: 1 / -1; }
@@ -199,7 +199,7 @@
   font-size: .58rem;
   letter-spacing: .22em;
   text-transform: uppercase;
-  color: rgba(247,244,239,.75);
+  color: rgba(247,244,239,.95);
   margin-bottom: 8px;
   font-weight: 400;
 }
@@ -258,18 +258,18 @@
   cursor: pointer;
   border-bottom: 1px solid #1e1e1e;
   font-size: .82rem;
-  color: rgba(247,244,239,.7);
+  color: rgba(247,244,239,.95);
   gap: 12px;
   transition: background .15s;
 }
 .cs-option:last-child { border-bottom: none; }
 .cs-option:hover { background: rgba(247,244,239,.05); }
-.cs-option.secili { background: rgba(200,255,0,.07); color: var(--off); }
-.cs-option.secili .cs-indirimli { color: #c8ff00; }
+.cs-option.secili { background: rgba(212,175,55,.07); color: var(--off); }
+.cs-option.secili .cs-indirimli { color: #d4af37; }
 .cs-option.secili .cs-normal { color: rgba(247,244,239,.25); text-decoration-color: rgba(247,244,239,.25); }
 .cs-ad { flex: 1; font-weight: 400; }
 .cs-fiyatlar { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-.cs-indirimli { font-weight: 600; font-size: .82rem; color: rgba(247,244,239,.8); }
+.cs-indirimli { font-weight: 600; font-size: .82rem; color: rgba(247,244,239,.95); }
 .cs-normal { font-size: .72rem; color: rgba(247,244,239,.3); text-decoration: line-through; }
 
 /* Fiyat kutusu */
@@ -279,8 +279,8 @@
   gap: 12px;
   margin-top: 10px;
   padding: 13px 16px;
-  background: rgba(200,255,0,.05);
-  border: 1px solid rgba(200,255,0,.15);
+  background: rgba(212,175,55,.05);
+  border: 1px solid rgba(212,175,55,.15);
   flex-wrap: wrap;
 }
 .fiyat-box.show { display: flex; }
@@ -288,7 +288,14 @@
   font-family: 'Playfair Display', serif;
   font-size: 1.5rem;
   font-weight: 700;
-  color: #c8ff00;
+  color: #d4af37;
+  line-height: 1;
+}
+#o-fiyat-indirimli {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #d4af37;
   line-height: 1;
 }
 #fiyat-normal, #o-fiyat-normal {
@@ -302,9 +309,9 @@
   font-size: .58rem;
   letter-spacing: .12em;
   text-transform: uppercase;
-  color: #c8ff00;
-  background: rgba(200,255,0,.08);
-  border: 1px solid rgba(200,255,0,.2);
+  color: #d4af37;
+  background: rgba(212,175,55,.08);
+  border: 1px solid rgba(212,175,55,.2);
   padding: 4px 10px;
   margin-left: auto;
   white-space: nowrap;
@@ -320,7 +327,7 @@
 .time-btn {
   background: transparent;
   border: 1px solid #2a2a2a;
-  color: rgba(247,244,239,.75);
+  color: rgba(247,244,239,.95);
   padding: 10px 4px;
   font-family: 'Montserrat', sans-serif;
   font-size: .72rem;
@@ -341,9 +348,9 @@
   border-radius: 2px;
 }
 .rez-mesaj.basari {
-  background: rgba(200,255,0,.08);
-  border: 1px solid rgba(200,255,0,.25);
-  color: #c8ff00;
+  background: rgba(212,175,55,.08);
+  border: 1px solid rgba(212,175,55,.25);
+  color: #d4af37;
 }
 .rez-mesaj.hata {
   background: rgba(255,85,85,.08);
@@ -369,7 +376,7 @@
 }
 .fsub:hover { opacity: .85; }
 .fsub.odeme-btn {
-  background: #c8ff00;
+  background: #d4af37;
   color: #080808;
 }
 
@@ -383,8 +390,8 @@
   grid-template-columns: 1fr 1fr;
   gap: 16px 32px;
 }
-.rez-bilgi-item { font-size: .78rem; color: rgba(247,244,239,.75); line-height: 1.7; }
-.rez-bilgi-item strong { display: block; font-size: .58rem; letter-spacing: .18em; text-transform: uppercase; color: rgba(247,244,239,.5); margin-bottom: 4px; font-weight: 400; }
+.rez-bilgi-item { font-size: .78rem; color: rgba(247,244,239,.95); line-height: 1.7; }
+.rez-bilgi-item strong { display: block; font-size: .58rem; letter-spacing: .18em; text-transform: uppercase; color: rgba(247,244,239,.95); margin-bottom: 4px; font-weight: 400; }
 
 @media(max-width:700px) {
   .rez-secim-grid { grid-template-columns: 1fr; }
@@ -435,8 +442,8 @@
 .personel-selected-foto img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
 .personel-selected-text { flex: 1; min-width: 0; }
 .personel-selected-ad { font-size: .82rem; font-weight: 500; color: rgba(247,244,239,.9); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.personel-selected-unvan { font-size: .62rem; color: rgba(247,244,239,.35); margin-top: 1px; }
-.personel-selected-placeholder { color: rgba(247,244,239,.25); font-size: .85rem; }
+.personel-selected-unvan { font-size: .62rem; color: rgba(247,244,239,.8); margin-top: 1px; }
+.personel-selected-placeholder { color: rgba(247,244,239,.7); font-size: .85rem; }
 .personel-dd-arrow { width: 10px; height: 6px; color: rgba(247,244,239,.3); flex-shrink: 0; transition: transform .2s; }
 
 .personel-dropdown {
@@ -487,7 +494,7 @@
   color: rgba(247,244,239,.9);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.personel-unvan { font-family: 'Montserrat', sans-serif; font-size: .62rem; color: rgba(247,244,239,.35); margin-top: 2px; }
+.personel-unvan { font-family: 'Montserrat', sans-serif; font-size: .62rem; color: rgba(247,244,239,.8); margin-top: 2px; }
 
 .personel-check {
   width: 16px; height: 16px;
@@ -539,13 +546,13 @@
   font-size: .6rem;
   letter-spacing: .22em;
   text-transform: uppercase;
-  color: rgba(247,244,239,.5);
+  color: rgba(247,244,239,.95);
 }
 .paytr-modal-tutar {
   font-family: 'Playfair Display', serif;
   font-size: 1.4rem;
   font-weight: 700;
-  color: #c8ff00;
+  color: #d4af37;
 }
 .paytr-kapat {
   background: none;
@@ -602,7 +609,7 @@
   align-items: center;
 }
 .paytr-hata-kutu.goster { display: flex; }
-.paytr-hata-kutu p { font-size: .82rem; color: rgba(247,244,239,.7); line-height: 1.7; }
+.paytr-hata-kutu p { font-size: .82rem; color: rgba(247,244,239,.95); line-height: 1.7; }
 .paytr-hata-kutu strong { color: #ff6b6b; font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; }
 </style>
 </head>
@@ -764,7 +771,7 @@
         <div class="fiyat-box" id="n-fiyat-box">
           <span id="fiyat-indirimli"></span>
           <span id="fiyat-normal"></span>
-          <span id="n-sure-badge" class="fiyat-badge" style="background:rgba(247,244,239,.05);border-color:rgba(247,244,239,.1);color:rgba(247,244,239,.5)"></span>
+          <span id="n-sure-badge" class="fiyat-badge" style="background:rgba(247,244,239,.05);border-color:rgba(247,244,239,.1);color:rgba(247,244,239,.95)"></span>
           <span class="fiyat-badge">Tahmini fiyat</span>
         </div>
       </div>
@@ -874,7 +881,7 @@
         <div class="fiyat-box" id="o-fiyat-box">
           <span id="o-fiyat-indirimli"></span>
           <span id="o-fiyat-normal"></span>
-          <span id="o-sure-badge" class="fiyat-badge" style="background:rgba(247,244,239,.05);border-color:rgba(247,244,239,.1);color:rgba(247,244,239,.5)"></span>
+          <span id="o-sure-badge" class="fiyat-badge" style="background:rgba(247,244,239,.05);border-color:rgba(247,244,239,.1);color:rgba(247,244,239,.95)"></span>
           <span class="fiyat-badge">Ödeme fiyatı</span>
         </div>
       </div>
