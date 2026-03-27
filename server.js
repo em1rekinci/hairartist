@@ -209,6 +209,28 @@ app.post('/api/paytr-token', async (req, res) => {
     console.log('[PayTR] Yanıt:', JSON.stringify(data));
 
     if (data.status === 'success') {
+      // merchant_oid'i Supabase'e kaydet — callback geldiğinde eşleştirmek için
+      try {
+        const SB_URL = 'https://botxnihztrnwzjnrlwzv.supabase.co';
+        const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvdHhuaWh6dHJud3pqbnJsd3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MTg4MTAsImV4cCI6MjA5MDA5NDgxMH0.AcX4_2Aykf8J1jln9fvODh2rRffymfEJCAekzmN1ALg';
+        const telTemiz = telefon.replace(/\D/g, '').slice(-10);
+        await fetch(
+          `${SB_URL}/rest/v1/rezervasyonlar?telefon=ilike.*${telTemiz}*&durum=eq.odeme_bekleniyor&order=created_at.desc&limit=1`,
+          {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              'apikey': SB_KEY,
+              'Authorization': 'Bearer ' + SB_KEY,
+              'Prefer': 'return=minimal',
+            },
+            body: JSON.stringify({ merchant_oid }),
+          }
+        );
+        console.log('[PayTR] merchant_oid Supabase\'e yazıldı:', merchant_oid);
+      } catch (e) {
+        console.warn('[PayTR] merchant_oid Supabase\'e yazılamadı:', e.message);
+      }
       return res.json({ status: 'success', token: data.token, oid: merchant_oid });
     } else {
       console.error('[PayTR] HATA reason:', data.reason);
@@ -407,6 +429,91 @@ app.get('/api/portfolio', (req, res) => {
     res.status(500).json({ photos: [] });
   }
 });
+
+// ════════════════════════════════════════════════════════════════════════════
+// PAYTR CALLBACK — PayTR ödeme sonucunu buraya bildirir
+// PayTR Paneli > Ayarlar > Bildirim Adresi: https://www.fatihkurthairartist.com/api/paytr-callback
+// ════════════════════════════════════════════════════════════════════════════
+app.post('/api/paytr-callback', async (req, res) => {
+  try {
+    const {
+      merchant_oid,
+      status,
+      total_amount,
+      hash,
+      failed_reason_code,
+      failed_reason_msg,
+      test_mode,
+      payment_type,
+      currency,
+      payment_amount,
+    } = req.body;
+
+    // ── Hash doğrulama (güvenlik)
+    const hash_str   = merchant_oid + MERCHANT_SALT + status + total_amount;
+    const beklenen   = crypto.createHmac('sha256', MERCHANT_KEY).update(hash_str).digest('base64');
+
+    if (beklenen !== hash) {
+      console.error('[PayTR Callback] Hash uyuşmadı! Sahte istek olabilir.');
+      return res.send('PAYTR_HASH_ERROR');
+    }
+
+    console.log(`[PayTR Callback] merchant_oid=${merchant_oid} status=${status} tutar=${total_amount}`);
+
+    if (status === 'success') {
+      // Supabase'de ödeme durumunu güncelle
+      await supabaseGuncelle(merchant_oid, {
+        durum: 'odeme_alindi',
+        odeme_alindi: true,
+        odeme_tarihi: new Date().toISOString(),
+        odeme_turu: payment_type || '',
+      });
+      console.log(`[PayTR Callback] ✓ Ödeme başarılı: ${merchant_oid}`);
+    } else {
+      // Ödeme başarısız
+      await supabaseGuncelle(merchant_oid, {
+        durum: 'odeme_basarisiz',
+        odeme_alindi: false,
+        odeme_hata_kodu: failed_reason_code || '',
+        odeme_hata_mesaj: failed_reason_msg || '',
+      });
+      console.log(`[PayTR Callback] ✗ Ödeme başarısız: ${merchant_oid} — ${failed_reason_msg}`);
+    }
+
+    // PayTR'a mutlaka "OK" dönmemiz gerekiyor, aksi hâlde tekrar tekrar bildirim gönderir
+    return res.send('OK');
+
+  } catch (err) {
+    console.error('[PayTR Callback] Hata:', err);
+    return res.send('OK'); // yine de OK dön, PayTR'ın döngüye girmesini önle
+  }
+});
+
+// ── Supabase: merchant_oid'e göre rezervasyonu güncelle
+async function supabaseGuncelle(merchant_oid, guncelleme) {
+  const SUPABASE_URL = 'https://botxnihztrnwzjnrlwzv.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvdHhuaWh6dHJud3pqbnJsd3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MTg4MTAsImV4cCI6MjA5MDA5NDgxMH0.AcX4_2Aykf8J1jln9fvODh2rRffymfEJCAekzmN1ALg';
+
+  // merchant_oid'i rezervasyonlar tablosunda eşleştiriyoruz
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/rezervasyonlar?merchant_oid=eq.${encodeURIComponent(merchant_oid)}`,
+    {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Prefer': 'return=minimal',
+      },
+      body: JSON.stringify(guncelleme),
+    }
+  );
+
+  if (!res.ok) {
+    const hata = await res.text();
+    console.error('[Supabase Güncelle] Hata:', hata);
+  }
+}
 
 // ════════════════════════════════════════════════════════════════════════════
 // YARDIMCI FONKSİYONLAR
