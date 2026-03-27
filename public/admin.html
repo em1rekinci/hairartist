@@ -529,7 +529,7 @@ tbody td{padding:10px 13px;vertical-align:middle}
               <div class="ff"><label class="fl">Ad Soyad</label><input class="fi" type="text" id="pfad" placeholder="Personel adı"></div>
               <div class="ff"><label class="fl">Uzmanlık / Rol</label><input class="fi" type="text" id="pfrol" placeholder="ör. Saç Uzmanı"></div>
               <div class="ff"><label class="fl">Telefon</label><input class="fi" type="tel" id="pftel" placeholder="05xx xxx xx xx"></div>
-              <div class="ff"><label class="fl">Fotoğraf</label><input class="fi" type="file" id="pffoto-file" accept="image/*" onchange="personelFotoYukle(this)"><input type="hidden" id="pffoto" value=""><div id="pffoto-preview" style="margin-top:6px"></div></div>
+              <div class="ff"><label class="fl">Fotoğraf Dosya Adı</label><input class="fi" type="text" id="pffoto" placeholder="ör. fatih-kurt.jpg"></div>
               <div class="ff"><label class="fl">Durum</label><select class="fsel" id="pfdurum"><option value="aktif">Aktif</option><option value="pasif">Pasif</option></select></div>
               <div class="ff">
                 <label class="fl">Rezervasyon Kabulü</label>
@@ -963,20 +963,17 @@ function tabloRender(f){
   const e=document.getElementById('reztbody');
   if(!l.length){e.innerHTML=`<tr><td colspan="8" class="bos">Rezervasyon bulunamadı.</td></tr>`;return;}
   e.innerHTML=l.map(r=>{
-    const h=FYT[r.hizmet];
-    const tahmini=h?Math.round((h.min+h.max)/2):0;
-    const gosterFiyat=r.fiyat?r.fiyat.toLocaleString('tr-TR')+'₺':(tahmini?tahmini.toLocaleString('tr-TR')+'₺':'—');
+    const h=FYT[r.hizmet];const fiyat=h?Math.round((h.min+h.max)/2).toLocaleString('tr-TR')+'₺':'—';
     const p=personel.find(x=>x.id===r.personelId);
     let aks;
     if(r.durum==='bekliyor')aks=`<div style="display:flex;gap:4px;white-space:nowrap"><button class="bsm bonay" onclick="onayEt('${r.id}')">Onayla</button><button class="bsm bred" onclick="reddet('${r.id}')">Reddet</button><button class="bsm bdet" onclick="detay('${r.id}')">···</button></div>`;
     else if(r.durum==='onaylandi'&&!r.odemeAlindi)aks=`<div style="display:flex;gap:4px;white-space:nowrap"><button class="bsm bblue" onclick="odemeAl('${r.id}')">Ödeme Al</button><button class="bsm bdet" onclick="detay('${r.id}')">···</button><button class="bsm bsil" onclick="sil('${r.id}')">✕</button></div>`;
     else aks=`<div style="display:flex;gap:4px;white-space:nowrap"><button class="bsm bdet" onclick="detay('${r.id}')">Detay</button><button class="bsm bsil" onclick="sil('${r.id}')">✕</button></div>`;
     const otag=r.odemeAlindi?`<span class="badge bo" style="font-size:.42rem;margin-left:3px">Ödendi</span>`:'';
-    const ucretDuzenle=(!r.odemeAlindi && r.tip!=='odeme_bekleyen')?`<button class="bsm bdet" onclick="ucretDuzenleAc('${r.id}')" style="font-size:.42rem;margin-left:3px" title="Ücreti Düzenle">✏️</button>`:'';
     return`<tr id="row-${r.id}">
       <td><div class="tad">${r.ad}</div><div class="ttel">${r.telefon}</div></td>
       <td class="thiz">${r.hizmet}</td>
-      <td class="tfyt">${gosterFiyat}${otag}${ucretDuzenle}</td>
+      <td class="tfyt">${fiyat}${otag}</td>
       <td class="ttar">${r.tarih}<br>${r.saat||'—'}</td>
       <td class="tnot" title="${r.not||''}">${r.not||'—'}</td>
       <td style="font-size:.7rem;color:var(--text2)">${p?p.ad:'—'}</td>
@@ -1181,8 +1178,7 @@ function pListRender(){
   if(!personel.length){e.innerHTML='<div class="bos">Henüz personel yok.</div>';return;}
   e.innerHTML=personel.map(p=>{
     const initials=p.ad.split(' ').map(x=>x[0]).join('').substring(0,2).toUpperCase();
-    const fotoSrc=p.foto?(p.foto.startsWith('http')?p.foto:'images/'+p.foto):'';
-    const fotoHtml=fotoSrc?`<img src="${fotoSrc}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;object-position:top;border:2px solid var(--line)" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`:'';
+    const fotoHtml=p.foto?`<img src="images/${p.foto}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;object-position:top;border:2px solid var(--line)" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`:'';
     const rezDurumu=p.rezaktif!==false;
     return`<div class="pkart">
       <div class="pavtr" style="position:relative;overflow:hidden">${fotoHtml}<span ${p.foto?'style="display:none"':''}>${initials}</span></div>
@@ -1247,12 +1243,6 @@ function personelDuzenle(id){
   document.getElementById('pftel').value=p.tel||'';
   document.getElementById('pfdurum').value=p.durum;
   document.getElementById('pffoto').value=p.foto||'';
-  if(p.foto){
-    const fotoSrc=p.foto.startsWith('http')?p.foto:'images/'+p.foto;
-    document.getElementById('pffoto-preview').innerHTML=`<img src="${fotoSrc}" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid var(--line)">`;
-  } else {
-    document.getElementById('pffoto-preview').innerHTML='';
-  }
   document.getElementById('pfrezaktif').checked=p.rezaktif!==false;
   document.getElementById('pformbaslik').textContent='Personel Düzenle';
   document.getElementById('pfiptal').style.display='';
@@ -1271,8 +1261,6 @@ function personelSifirla(){
   document.getElementById('pfrol').value='';
   document.getElementById('pftel').value='';
   document.getElementById('pffoto').value='';
-  document.getElementById('pffoto-file').value='';
-  document.getElementById('pffoto-preview').innerHTML='';
   document.getElementById('pfrezaktif').checked=true;
   document.getElementById('pformbaslik').textContent='Personel Ekle';
   document.getElementById('pfiptal').style.display='none';
@@ -1609,56 +1597,6 @@ function toast(msg,tip){
   el.textContent=msg;el.className='toast show '+(tip||'');
   clearTimeout(toastTimer);
   toastTimer=setTimeout(()=>el.classList.remove('show'),3200);
-}
-
-// ─── ÜCRET DÜZENLE (Ödemesiz Rezervasyon) ───
-async function ucretDuzenleAc(id){
-  const r=TRZ.find(x=>x.id===id);
-  if(!r)return;
-  const h=FYT[r.hizmet];
-  const mevcutFiyat=r.fiyat||(h?Math.round((h.min+h.max)/2):0);
-  const yeniFiyat=prompt('Ücreti girin (₺):',mevcutFiyat);
-  if(yeniFiyat===null)return;
-  const fiyat=parseInt(yeniFiyat)||0;
-  if(!fiyat){toast('Geçerli bir ücret giriniz.','hata');return;}
-  try{
-    await sRest(`rezervasyonlar?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({fiyat:fiyat})});
-    r.fiyat=fiyat;
-    verileriRender();
-    toast('Ücret güncellendi: '+fiyat.toLocaleString('tr-TR')+'₺','ok');
-  }catch(e){toast('Hata: '+e.message,'hata');}
-}
-
-// ─── PERSONEL FOTOĞRAF YÜKLE ───
-async function personelFotoYukle(input){
-  const file=input.files[0];
-  if(!file)return;
-  const preview=document.getElementById('pffoto-preview');
-  preview.innerHTML='<span style="font-size:.68rem;color:var(--text3)">Yükleniyor...</span>';
-  try{
-    const dosyaAdi='personel-'+Date.now()+'-'+file.name.replace(/[^a-zA-Z0-9._-]/g,'');
-    const res=await fetch(`${SUPA_URL}/storage/v1/object/personel-photos/${dosyaAdi}`,{
-      method:'POST',
-      headers:{
-        'apikey':SUPA_KEY,
-        'Authorization':'Bearer '+SUPA_KEY,
-        'Content-Type':file.type,
-        'x-upsert':'true'
-      },
-      body:file
-    });
-    if(!res.ok){
-      const err=await res.text();
-      throw new Error(err);
-    }
-    const publicUrl=`${SUPA_URL}/storage/v1/object/public/personel-photos/${dosyaAdi}`;
-    document.getElementById('pffoto').value=publicUrl;
-    preview.innerHTML=`<img src="${publicUrl}" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid var(--line)">`;
-    toast('Fotoğraf yüklendi.','ok');
-  }catch(e){
-    preview.innerHTML=`<span style="font-size:.68rem;color:var(--red)">Yükleme başarısız: ${e.message}</span>`;
-    toast('Fotoğraf yüklenemedi.','hata');
-  }
 }
 </script>
 </body>
