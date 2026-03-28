@@ -1,0 +1,21 @@
+{
+  "name": "Hair Artist Admin",
+  "short_name": "HA Admin",
+  "description": "Hair Artist Yönetim Paneli",
+  "start_url": "/admin",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "icons": [
+    {
+      "src": "images/logoapp.jpeg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "images/logo_icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
