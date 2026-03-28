@@ -604,6 +604,132 @@
 .paytr-hata-kutu.goster { display: flex; }
 .paytr-hata-kutu p { font-size: .82rem; color: rgba(247,244,239,.7); line-height: 1.7; }
 .paytr-hata-kutu strong { color: #ff6b6b; font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; }
+
+/* ── SÖZLEŞME CHECKBOXLARI ── */
+.sozlesme-container {
+  margin-top: 32px;
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+  background: rgba(247,244,239,.02);
+  border: 1px solid #1e1e1e;
+}
+.sozlesme-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+.sozlesme-checkbox input[type="checkbox"] {
+  margin-top: 3px;
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  accent-color: #d4af37;
+}
+.sozlesme-text {
+  font-size: .78rem;
+  line-height: 1.6;
+  color: rgba(247,244,239,.8);
+}
+.sozlesme-text a {
+  color: #d4af37;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(212,175,55,.3);
+  transition: border-color .2s;
+}
+.sozlesme-text a:hover {
+  border-bottom-color: #d4af37;
+}
+
+/* ── SÖZLEŞME MODAL ── */
+.sozlesme-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.85);
+  backdrop-filter: blur(4px);
+  z-index: 10000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow-y: auto;
+}
+.sozlesme-modal-overlay.aktif {
+  display: flex;
+}
+.sozlesme-modal {
+  background: #111;
+  border: 1px solid #333;
+  max-width: 800px;
+  width: 100%;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  margin: auto;
+}
+.sozlesme-modal-baslik {
+  padding: 24px 28px;
+  border-bottom: 1px solid #1e1e1e;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.sozlesme-modal-baslik h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--off);
+}
+.sozlesme-kapat {
+  background: none;
+  border: none;
+  color: rgba(247,244,239,.4);
+  font-size: 1.3rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: color .2s;
+  line-height: 1;
+}
+.sozlesme-kapat:hover {
+  color: var(--off);
+}
+.sozlesme-modal-icerik {
+  padding: 28px;
+  overflow-y: auto;
+  flex: 1;
+  font-size: .85rem;
+  line-height: 1.8;
+  color: rgba(247,244,239,.8);
+}
+.sozlesme-modal-icerik h4 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--off);
+  margin-top: 20px;
+  margin-bottom: 12px;
+}
+.sozlesme-modal-icerik h4:first-child {
+  margin-top: 0;
+}
+.sozlesme-modal-icerik p {
+  margin-bottom: 16px;
+}
+.sozlesme-modal-icerik ul {
+  margin-bottom: 16px;
+  padding-left: 24px;
+}
+.sozlesme-modal-icerik li {
+  margin-bottom: 8px;
+}
+
 </style>
 </head>
 <body>
@@ -794,6 +920,22 @@
       </div>
     </div>
 
+    <!-- Sözleşme Checkboxları -->
+    <div class="sozlesme-container">
+      <label class="sozlesme-checkbox">
+        <input type="checkbox" id="n-kvkk" required>
+        <span class="sozlesme-text">
+          <a href="#" onclick="sozlesmeAc('kvkk'); return false;">KVKK Aydınlatma Metni</a>'ni okudum, kabul ediyorum.
+        </span>
+      </label>
+      <label class="sozlesme-checkbox">
+        <input type="checkbox" id="n-gizlilik" required>
+        <span class="sozlesme-text">
+          <a href="#" onclick="sozlesmeAc('gizlilik'); return false;">Gizlilik Sözleşmesi</a>'ni okudum, kabul ediyorum.
+        </span>
+      </label>
+    </div>
+
     <div class="rez-mesaj" id="n-mesaj"></div>
     <button class="fsub" id="n-btn" onclick="normalGonder()">Rezervasyonu Gönder</button>
   </div>
@@ -904,6 +1046,34 @@
       </div>
     </div>
 
+    <!-- Sözleşme Checkboxları -->
+    <div class="sozlesme-container">
+      <label class="sozlesme-checkbox">
+        <input type="checkbox" id="o-kvkk" required>
+        <span class="sozlesme-text">
+          <a href="#" onclick="sozlesmeAc('kvkk'); return false;">KVKK Aydınlatma Metni</a>'ni okudum, kabul ediyorum.
+        </span>
+      </label>
+      <label class="sozlesme-checkbox">
+        <input type="checkbox" id="o-gizlilik" required>
+        <span class="sozlesme-text">
+          <a href="#" onclick="sozlesmeAc('gizlilik'); return false;">Gizlilik Sözleşmesi</a>'ni okudum, kabul ediyorum.
+        </span>
+      </label>
+      <label class="sozlesme-checkbox">
+        <input type="checkbox" id="o-mesafeli" required>
+        <span class="sozlesme-text">
+          <a href="#" onclick="sozlesmeAc('mesafeli'); return false;">Mesafeli Satış Sözleşmesi</a>'ni okudum, kabul ediyorum.
+        </span>
+      </label>
+      <label class="sozlesme-checkbox">
+        <input type="checkbox" id="o-teslimat" required>
+        <span class="sozlesme-text">
+          <a href="#" onclick="sozlesmeAc('teslimat'); return false;">Teslimat ve İade Koşulları</a>'nı okudum, kabul ediyorum.
+        </span>
+      </label>
+    </div>
+
     <div class="rez-mesaj" id="o-mesaj"></div>
     <button class="fsub odeme-btn" id="o-btn" onclick="odemeGit()">Ödemeye Geç →</button>
   </div>
@@ -930,6 +1100,19 @@
       <strong>⚠ Bağlantı Hatası</strong>
       <p id="paytr-hata-metin">Ödeme sayfası açılamadı. Lütfen tekrar deneyin.</p>
       <button class="fsub odeme-btn" style="width:auto;padding:12px 28px;margin-top:8px" onclick="paytrKapat()">Kapat</button>
+    </div>
+  </div>
+</div>
+
+<!-- SÖZLEŞME MODALI -->
+<div class="sozlesme-modal-overlay" id="sozlesme-modal">
+  <div class="sozlesme-modal">
+    <div class="sozlesme-modal-baslik">
+      <h3 id="sozlesme-baslik">Sözleşme</h3>
+      <button class="sozlesme-kapat" onclick="sozlesmeKapat()">✕</button>
+    </div>
+    <div class="sozlesme-modal-icerik" id="sozlesme-icerik">
+      <!-- İçerik JavaScript ile doldurulacak -->
     </div>
   </div>
 </div>
@@ -1180,9 +1363,18 @@ async function normalGonder() {
   const saat = document.getElementById('n-saat').value;
   const not = document.getElementById('n-not').value.trim();
   const personel = document.getElementById('n-personel').value || 'Baran Kurt';
+  
+  // Checkbox kontrolleri
+  const kvkkCheck = document.getElementById('n-kvkk');
+  const gizlilikCheck = document.getElementById('n-gizlilik');
 
   if (!ad || !telefon || !hizmet || !tarih) {
     mesaj(mesajDiv, 'Lütfen tüm zorunlu alanları doldurun.', 'hata');
+    return;
+  }
+  
+  if (!kvkkCheck.checked || !gizlilikCheck.checked) {
+    mesaj(mesajDiv, 'Lütfen sözleşmeleri okuyup onaylayın.', 'hata');
     return;
   }
 
@@ -1208,6 +1400,8 @@ async function normalGonder() {
     document.getElementById('n-fiyat-box').classList.remove('show');
     document.querySelectorAll('#normal-form .time-btn').forEach(b => b.classList.remove('selected'));
     document.getElementById('n-saat').value = '';
+    kvkkCheck.checked = false;
+    gizlilikCheck.checked = false;
     btn.textContent = 'Gönderildi ✓';
   } catch(e) {
     mesaj(mesajDiv, '✗ Bağlantı hatası. Lütfen tekrar deneyin.', 'hata');
@@ -1232,11 +1426,23 @@ async function odemeGit() {
   const saat = document.getElementById('o-saat').value;
   const fiyat = document.getElementById('o-fiyat').value;
   const personel = document.getElementById('o-personel').value || 'Baran Kurt';
+  
+  // Checkbox kontrolleri
+  const kvkkCheck = document.getElementById('o-kvkk');
+  const gizlilikCheck = document.getElementById('o-gizlilik');
+  const mesafeliCheck = document.getElementById('o-mesafeli');
+  const teslimatCheck = document.getElementById('o-teslimat');
 
   if (!ad || !telefon || !hizmet || !tarih) {
     mesaj(mesajDiv, 'Lütfen tüm zorunlu alanları doldurun.', 'hata');
     return;
   }
+  
+  if (!kvkkCheck.checked || !gizlilikCheck.checked || !mesafeliCheck.checked || !teslimatCheck.checked) {
+    mesaj(mesajDiv, 'Lütfen tüm sözleşmeleri okuyup onaylayın.', 'hata');
+    return;
+  }
+  
   if (!fiyat || parseInt(fiyat) <= 0) {
     mesaj(mesajDiv, 'Lütfen geçerli bir hizmet seçin.', 'hata');
     return;
@@ -1371,6 +1577,119 @@ function mesaj(el, metin, tip) {
   el.className = 'rez-mesaj ' + tip;
   el.style.display = 'block';
 }
+
+// ─── SÖZLEŞME MODAL
+const SOZLESMELER = {
+  kvkk: {
+    baslik: 'KVKK Aydınlatma Metni',
+    icerik: `
+      <h4>Veri Sorumlusu</h4>
+      <p>Hair Artist olarak 6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") uyarınca veri sorumlusu sıfatıyla, kişisel verileriniz aşağıda açıklandığı çerçevede işlenebilecektir.</p>
+      
+      <h4>Kişisel Verilerin İşlenme Amacı</h4>
+      <p>Toplanan kişisel verileriniz; rezervasyon işlemlerinizin gerçekleştirilmesi, hizmet kalitemizin artırılması, müşteri memnuniyetinin sağlanması, iletişim faaliyetlerinin yürütülmesi ve yasal yükümlülüklerin yerine getirilmesi amaçlarıyla işlenmektedir.</p>
+      
+      <h4>İşlenen Kişisel Veriler</h4>
+      <ul>
+        <li>Ad, soyad bilgisi</li>
+        <li>İletişim bilgisi (telefon numarası)</li>
+        <li>Rezervasyon bilgileri (tarih, saat, hizmet tercihi)</li>
+      </ul>
+      
+      <h4>Haklarınız</h4>
+      <p>KVKK'nın 11. maddesi uyarınca, kişisel verileriniz hakkında bilgi talep etme, düzeltme, silme ve işlenmesine itiraz etme haklarınız bulunmaktadır. Bu haklarınızı kullanmak için bizimle iletişime geçebilirsiniz.</p>
+    `
+  },
+  gizlilik: {
+    baslik: 'Gizlilik Sözleşmesi',
+    icerik: `
+      <h4>Gizlilik Politikası</h4>
+      <p>Hair Artist olarak müşterilerimizin gizliliğine saygı duyuyor ve kişisel verilerinizi korumak için gerekli tüm tedbirleri alıyoruz.</p>
+      
+      <h4>Toplanan Bilgiler</h4>
+      <p>Rezervasyon sürecinde ad, soyad ve telefon numaranız gibi kişisel bilgilerinizi topluyoruz.</p>
+      
+      <h4>Bilgilerin Kullanımı</h4>
+      <p>Toplanan bilgiler yalnızca rezervasyon işlemlerinizi gerçekleştirmek, sizinle iletişim kurmak ve hizmet kalitemizi artırmak amacıyla kullanılmaktadır.</p>
+      
+      <h4>Bilgi Güvenliği</h4>
+      <p>Kişisel verileriniz güvenli sunucularda saklanmakta ve yetkisiz erişimlere karşı korunmaktadır. Bilgileriniz üçüncü şahıslarla paylaşılmamaktadır.</p>
+      
+      <h4>İletişim</h4>
+      <p>Gizlilik politikamız hakkında sorularınız için bizimle iletişime geçebilirsiniz.</p>
+    `
+  },
+  mesafeli: {
+    baslik: 'Mesafeli Satış Sözleşmesi',
+    icerik: `
+      <h4>Taraflar</h4>
+      <p>İşbu sözleşme Hair Artist ile müşteri arasında akdedilmiştir.</p>
+      
+      <h4>Sözleşme Konusu</h4>
+      <p>Bu sözleşme, online ödeme ile yapılan rezervasyonlarda tarafların hak ve yükümlülüklerini düzenler.</p>
+      
+      <h4>Hizmetin Özellikleri</h4>
+      <p>Rezervasyon yaptırdığınız hizmetin adı, süresi ve ücreti rezervasyon formunda belirtilmiştir.</p>
+      
+      <h4>Ödeme Bilgileri</h4>
+      <p>Ödeme, güvenli ödeme altyapısı kullanılarak gerçekleştirilmektedir. Ödeme bilgileriniz tarafımızca saklanmamaktadır.</p>
+      
+      <h4>Cayma Hakkı</h4>
+      <p>Müşteri, randevu tarihinden en az 24 saat önce bildirimde bulunarak cayma hakkını kullanabilir.</p>
+      
+      <h4>Genel Hükümler</h4>
+      <p>İşbu sözleşme müşteri tarafından onaylandığı anda yürürlüğe girer.</p>
+    `
+  },
+  teslimat: {
+    baslik: 'Teslimat ve İade Koşulları',
+    icerik: `
+      <h4>Hizmet Sunumu</h4>
+      <p>Rezervasyon yaptırdığınız hizmet, belirlenen tarih ve saatte salonumuzda sunulacaktır.</p>
+      
+      <h4>İptal ve Değişiklik</h4>
+      <p>Randevunuzu iptal etmek veya değiştirmek isterseniz, randevu tarihinden en az 24 saat önce bizimle iletişime geçmeniz gerekmektedir.</p>
+      
+      <h4>Geç Kalma Durumu</h4>
+      <p>Randevunuza 15 dakikadan fazla geç kalmanız durumunda, randevunuz iptal edilebilir veya hizmet süresi kısaltılabilir.</p>
+      
+      <h4>İade Koşulları</h4>
+      <p>Online ödeme ile yapılan rezervasyonlarda, iptal işlemi randevu tarihinden en az 24 saat önce yapılması halinde ücret iadesi gerçekleştirilir. İade işlemi 5-10 iş günü içerisinde tamamlanır.</p>
+      
+      <h4>Hizmet Memnuniyetsizliği</h4>
+      <p>Aldığınız hizmetten memnun kalmamanız durumunda, durum salonumuz yönetimine iletilmeli ve çözüm aranmalıdır.</p>
+    `
+  }
+};
+
+function sozlesmeAc(tip) {
+  const modal = document.getElementById('sozlesme-modal');
+  const baslik = document.getElementById('sozlesme-baslik');
+  const icerik = document.getElementById('sozlesme-icerik');
+  
+  const sozlesme = SOZLESMELER[tip];
+  if (!sozlesme) return;
+  
+  baslik.textContent = sozlesme.baslik;
+  icerik.innerHTML = sozlesme.icerik;
+  
+  modal.classList.add('aktif');
+  document.body.style.overflow = 'hidden';
+}
+
+function sozlesmeKapat() {
+  const modal = document.getElementById('sozlesme-modal');
+  modal.classList.remove('aktif');
+  document.body.style.overflow = '';
+}
+
+// Modal dışına tıklanınca kapat
+document.addEventListener('click', function(e) {
+  const modal = document.getElementById('sozlesme-modal');
+  if (e.target === modal) {
+    sozlesmeKapat();
+  }
+});
 
 // ─── SAAT SEÇİCİ
 function selectTime(btn, time, prefix) {
