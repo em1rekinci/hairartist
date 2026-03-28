@@ -30,7 +30,7 @@
   text-align: center;
   margin-bottom: 60px;
 }
-.rez-secim-baslik .sec-tag { color: rgba(247,244,239,.35); }
+.rez-secim-baslik .sec-tag { color: rgba(247,244,239,.65); }
 .rez-secim-baslik h1 {
   font-family: 'Playfair Display', serif;
   font-size: clamp(2.2rem, 5vw, 3.5rem);
@@ -42,7 +42,7 @@
 .rez-secim-baslik h1 em {
   font-style: italic;
   font-weight: 400;
-  color: rgba(247,244,239,.35);
+  color: rgba(247,244,239,.65);
 }
 .rez-secim-grid {
   display: grid;
@@ -64,15 +64,15 @@
   overflow: hidden;
 }
 .rez-kart:hover { background: #161616; border-color: #333; }
-.rez-kart.odeme { border-color: rgba(200,255,0,.15); }
-.rez-kart.odeme:hover { background: rgba(200,255,0,.04); border-color: rgba(200,255,0,.35); }
+.rez-kart.odeme { border-color: rgba(212,175,55,.15); }
+.rez-kart.odeme:hover { background: rgba(212,175,55,.04); border-color: rgba(212,175,55,.35); }
 .rez-kart-no {
   font-size: .6rem;
   letter-spacing: .3em;
   text-transform: uppercase;
-  color: rgba(247,244,239,.55);
+  color: rgba(247,244,239,.85);
 }
-.rez-kart.odeme .rez-kart-no { color: rgba(200,255,0,.6); }
+.rez-kart.odeme .rez-kart-no { color: rgba(212,175,55,.6); }
 .rez-kart h2 {
   font-family: 'Playfair Display', serif;
   font-size: 1.8rem;
@@ -83,7 +83,7 @@
 .rez-kart h2 em {
   font-style: italic;
   font-weight: 400;
-  color: rgba(247,244,239,.4);
+  color: rgba(247,244,239,.7);
   display: block;
   font-size: 1.1rem;
 }
@@ -109,11 +109,11 @@
   content: '';
   width: 4px;
   height: 4px;
-  background: rgba(247,244,239,.3);
+  background: rgba(247,244,239,.6);
   border-radius: 50%;
   flex-shrink: 0;
 }
-.rez-kart.odeme .rez-oz-item::before { background: rgba(200,255,0,.5); }
+.rez-kart.odeme .rez-oz-item::before { background: rgba(212,175,55,.5); }
 .rez-kart-btn {
   margin-top: auto;
   display: inline-flex;
@@ -123,21 +123,21 @@
   letter-spacing: .2em;
   text-transform: uppercase;
   font-weight: 600;
-  color: rgba(247,244,239,.5);
+  color: rgba(247,244,239,.8);
   padding-top: 20px;
   border-top: 1px solid #1e1e1e;
   transition: color .2s;
 }
 .rez-kart:hover .rez-kart-btn { color: var(--off); }
-.rez-kart.odeme .rez-kart-btn { color: rgba(200,255,0,.6); border-top-color: rgba(200,255,0,.1); }
-.rez-kart.odeme:hover .rez-kart-btn { color: #c8ff00; }
+.rez-kart.odeme .rez-kart-btn { color: rgba(212,175,55,.6); border-top-color: rgba(212,175,55,.1); }
+.rez-kart.odeme:hover .rez-kart-btn { color: #d4af37; }
 .rez-kart-btn-arrow { font-size: 1rem; transition: transform .2s; }
 .rez-kart:hover .rez-kart-btn-arrow { transform: translateX(4px); }
 .indirim-badge {
   position: absolute;
   top: 20px;
   right: 20px;
-  background: #c8ff00;
+  background: #d4af37;
   color: #080808;
   font-size: .55rem;
   font-weight: 700;
@@ -161,7 +161,7 @@
   font-size: .62rem;
   letter-spacing: .18em;
   text-transform: uppercase;
-  color: rgba(247,244,239,.3);
+  color: rgba(247,244,239,.65);
   cursor: pointer;
   margin-bottom: 48px;
   background: none;
@@ -183,7 +183,7 @@
 .rez-form-baslik h2 em {
   font-style: italic;
   font-weight: 400;
-  color: rgba(247,244,239,.35);
+  color: rgba(247,244,239,.65);
 }
 .rez-form-baslik p {
   margin-top: 16px;
@@ -239,7 +239,7 @@
   box-sizing: border-box;
 }
 .cs-selected:hover { border-color: #555; }
-.cs-arrow { width: 10px; height: 6px; color: rgba(247,244,239,.3); flex-shrink: 0; transition: transform .2s; }
+.cs-arrow { width: 10px; height: 6px; color: rgba(247,244,239,.6); flex-shrink: 0; transition: transform .2s; }
 .cs-dropdown {
   display: none;
   position: absolute;
@@ -264,8 +264,8 @@
 }
 .cs-option:last-child { border-bottom: none; }
 .cs-option:hover { background: rgba(247,244,239,.05); }
-.cs-option.secili { background: rgba(200,255,0,.07); color: var(--off); }
-.cs-option.secili .cs-indirimli { color: #c8ff00; }
+.cs-option.secili { background: rgba(212,175,55,.07); color: var(--off); }
+.cs-option.secili .cs-indirimli { color: #d4af37; }
 .cs-option.secili .cs-normal { color: rgba(247,244,239,.25); text-decoration-color: rgba(247,244,239,.25); }
 .cs-ad { flex: 1; font-weight: 400; }
 .cs-fiyatlar { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
