@@ -1060,10 +1060,14 @@ function hizmetSecN(el, ad, min, max, sure) {
   var fiyatStr = min === max ? min.toLocaleString('tr-TR') + '₺' : min.toLocaleString('tr-TR') + ' – ' + max.toLocaleString('tr-TR') + '₺';
   document.getElementById('fiyat-indirimli').textContent = fiyatStr;
   document.getElementById('fiyat-normal').textContent = '';
-  var sure = SURE_MAP[ad];
   var sureBadge = document.getElementById('n-sure-badge');
-  if (sure) { sureBadge.textContent = 'İşlem süresi: ' + sure + ' dk'; sureBadge.style.display = ''; }
-  else { sureBadge.textContent = ''; sureBadge.style.display = 'none'; }
+  if (sure && sure > 0) { 
+    sureBadge.textContent = 'İşlem süresi: ' + sure + ' dk'; 
+    sureBadge.style.display = ''; 
+  } else { 
+    sureBadge.textContent = ''; 
+    sureBadge.style.display = 'none'; 
+  }
   document.getElementById('n-fiyat-box').classList.add('show');
 }
 
@@ -1074,7 +1078,7 @@ function csToggleO() {
   var open = dd.classList.toggle('open');
   arrow.style.transform = open ? 'rotate(180deg)' : '';
 }
-function hizmetSecO(el, ad, fiyat, _) {
+function hizmetSecO(el, ad, fiyat, sure) {
   document.querySelectorAll('#o-cs-dropdown .cs-option').forEach(i => i.classList.remove('secili'));
   el.classList.add('secili');
   document.getElementById('o-hizmet').value = ad;
@@ -1086,10 +1090,14 @@ function hizmetSecO(el, ad, fiyat, _) {
   document.getElementById('o-cs-arrow').style.transform = '';
   document.getElementById('o-fiyat-indirimli').textContent = fiyat.toLocaleString('tr-TR') + '₺';
   document.getElementById('o-fiyat-normal').textContent = '';
-  var sure = SURE_MAP[ad];
   var sureBadge = document.getElementById('o-sure-badge');
-  if (sure) { sureBadge.textContent = 'İşlem süresi: ' + sure + ' dk'; sureBadge.style.display = ''; }
-  else { sureBadge.textContent = ''; sureBadge.style.display = 'none'; }
+  if (sure && sure > 0) { 
+    sureBadge.textContent = 'İşlem süresi: ' + sure + ' dk'; 
+    sureBadge.style.display = ''; 
+  } else { 
+    sureBadge.textContent = ''; 
+    sureBadge.style.display = 'none'; 
+  }
   document.getElementById('o-fiyat-box').classList.add('show');
 }
 
@@ -1449,11 +1457,23 @@ function hizmetDropdownOlustur(prefix, liste) {
   const fn = prefix === 'n' ? 'hizmetSecN' : 'hizmetSecO';
   dd.innerHTML = liste.map(h => {
     const fiyatStr = hizmetFiyatStr(h.min_fiyat || 0, h.max_fiyat || 0);
-    const adSafe = h.ad.replace(/'/g, "\'").replace(/"/g, '&quot;');
-    return `<div class="cs-option" onclick="${fn}(this,'${adSafe}',${h.min_fiyat||0},${h.max_fiyat||0},${h.sure||60})">
-      <span class="cs-ad">${h.ad}</span>
-      <span class="cs-fiyatlar"><span class="cs-indirimli">${fiyatStr}</span></span>
-    </div>`;
+    const adSafe = h.ad.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    const sure = h.sure || 60;
+    const minFiyat = h.min_fiyat || 0;
+    const maxFiyat = h.max_fiyat || 0;
+    
+    if (prefix === 'n') {
+      return `<div class="cs-option" onclick="${fn}(this,'${adSafe}',${minFiyat},${maxFiyat},${sure})">
+        <span class="cs-ad">${h.ad}</span>
+        <span class="cs-fiyatlar"><span class="cs-indirimli">${fiyatStr}</span></span>
+      </div>`;
+    } else {
+      // Ödeme formu için fiyat tek bir değer (min_fiyat kullan)
+      return `<div class="cs-option" onclick="${fn}(this,'${adSafe}',${minFiyat},${sure})">
+        <span class="cs-ad">${h.ad}</span>
+        <span class="cs-fiyatlar"><span class="cs-indirimli">${fiyatStr}</span></span>
+      </div>`;
+    }
   }).join('');
 }
 
