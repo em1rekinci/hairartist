@@ -529,7 +529,14 @@ tbody td{padding:10px 13px;vertical-align:middle}
               <div class="ff"><label class="fl">Ad Soyad</label><input class="fi" type="text" id="pfad" placeholder="Personel adı"></div>
               <div class="ff"><label class="fl">Uzmanlık / Rol</label><input class="fi" type="text" id="pfrol" placeholder="ör. Saç Uzmanı"></div>
               <div class="ff"><label class="fl">Telefon</label><input class="fi" type="tel" id="pftel" placeholder="05xx xxx xx xx"></div>
-              <div class="ff"><label class="fl">Fotoğraf Dosya Adı</label><input class="fi" type="text" id="pffoto" placeholder="ör. fatih-kurt.jpg"></div>
+              <div class="ff">
+                <label class="fl">Fotoğraf</label>
+                <input class="fi" type="file" id="pffoto" accept="image/*" style="padding:8px">
+                <input type="hidden" id="pffotoUrl">
+                <div id="fotoOnizleme" style="margin-top:8px;display:none">
+                  <img id="fotoOnizlemeImg" style="max-width:120px;max-height:120px;border-radius:6px;border:1px solid var(--line)">
+                </div>
+              </div>
               <div class="ff"><label class="fl">Durum</label><select class="fsel" id="pfdurum"><option value="aktif">Aktif</option><option value="pasif">Pasif</option></select></div>
               <div class="ff">
                 <label class="fl">Rezervasyon Kabulü</label>
@@ -756,11 +763,7 @@ let SFR='',TRZ=[],AKT_FILTRE='hepsi',AKT_ARAMA='',AKTLOG=[];
 let tkYil=new Date().getFullYear(),tkAy=new Date().getMonth(),tkSec=null;
 let bekleyenOdemeId=null;
 
-let personel=[
-  {id:'p1',ad:'Fatih Kurt',rol:'Baş Stilist',tel:'05001234567',durum:'aktif'},
-  {id:'p2',ad:'Ayşe Demir',rol:'Renk Uzmanı',tel:'05001234568',durum:'aktif'},
-  {id:'p3',ad:'Mert Yılmaz',rol:'Saç Uzmanı',tel:'05001234569',durum:'aktif'},
-];
+let personel=[];
 
 let shop=[
   {id:'u1',ad:'Argan Yağı Şampuanı',kat:'Şampuan',fiyat:280,stok:15,acik:'Yoğun nemlendirici'},
@@ -1173,6 +1176,25 @@ function mustRender(){
 }
 
 // ─── PERSONEL ───
+// Fotoğraf önizleme
+document.addEventListener('DOMContentLoaded', function() {
+  const fotoInput = document.getElementById('pffoto');
+  if(fotoInput) {
+    fotoInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if(file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('fotoOnizlemeImg').src = e.target.result;
+          document.getElementById('fotoOnizleme').style.display = 'block';
+          document.getElementById('pffotoUrl').value = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+});
+
 function pListRender(){
   const e=document.getElementById('plist');
   if(!personel.length){e.innerHTML='<div class="bos">Henüz personel yok.</div>';return;}
@@ -1215,25 +1237,30 @@ async function personelKaydet(){
   const rol=document.getElementById('pfrol').value.trim();
   const tel=document.getElementById('pftel').value.trim();
   const durum=document.getElementById('pfdurum').value;
-  const foto=document.getElementById('pffoto').value.trim();
+  const fotoUrl=document.getElementById('pffotoUrl').value || '';
   const rezaktif=document.getElementById('pfrezaktif').checked;
   if(!ad){toast('Ad Soyad giriniz.','hata');return;}
   try{
     if(editId){
-      await sRest(`personel?id=eq.${editId}`,{method:'PATCH',body:JSON.stringify({ad,rol,tel,durum,foto,rez_aktif:rezaktif})});
+      // Güncelleme - Supabase
+      await sRest(`personel?id=eq.${editId}`,{method:'PATCH',body:JSON.stringify({ad,rol,tel,durum,foto:fotoUrl,rez_aktif:rezaktif})});
       const p=personel.find(x=>x.id===editId);
-      if(p)Object.assign(p,{ad,rol,tel,durum,foto,rezaktif});
+      if(p) Object.assign(p,{ad,rol,tel,durum,foto:fotoUrl,rezaktif});
       toast('Personel güncellendi.','ok');
     } else {
-      const res=await sRest('personel',{method:'POST',body:JSON.stringify({ad,rol,tel,durum,foto,rez_aktif:rezaktif})});
+      // Yeni ekleme - Supabase
+      const res=await sRest('personel',{method:'POST',body:JSON.stringify({ad,rol,tel,durum,foto:fotoUrl,rez_aktif:rezaktif})});
       const yeni=Array.isArray(res)?res[0]:res;
-      personel.push({id:yeni.id,ad,rol,tel,durum,foto,rezaktif});
+      personel.push({id:yeni.id,ad,rol,tel,durum,foto:fotoUrl,rezaktif});
       toast('Personel eklendi.','ok');
     }
     personelSifirla();
-    pListRender();pStatRender();
+    pListRender();
+    pStatRender();
     verileriRender();
-  }catch(e){toast('Hata: '+e.message,'hata');}
+  }catch(e){
+    toast('Hata: '+e.message,'hata');
+  }
 }
 function personelDuzenle(id){
   const p=personel.find(x=>x.id===id);if(!p)return;
@@ -1242,7 +1269,11 @@ function personelDuzenle(id){
   document.getElementById('pfrol').value=p.rol;
   document.getElementById('pftel').value=p.tel||'';
   document.getElementById('pfdurum').value=p.durum;
-  document.getElementById('pffoto').value=p.foto||'';
+  document.getElementById('pffotoUrl').value=p.foto||'';
+  if(p.foto) {
+    document.getElementById('fotoOnizlemeImg').src=p.foto;
+    document.getElementById('fotoOnizleme').style.display='block';
+  }
   document.getElementById('pfrezaktif').checked=p.rezaktif!==false;
   document.getElementById('pformbaslik').textContent='Personel Düzenle';
   document.getElementById('pfiptal').style.display='';
@@ -1250,10 +1281,15 @@ function personelDuzenle(id){
 async function personelSil(id){
   if(!confirm('Bu personeli silmek istediğinizden emin misiniz?'))return;
   try{
+    // Supabase'den sil
     await sRest(`personel?id=eq.${id}`,{method:'DELETE',headers:{'Prefer':'return=minimal'}});
     personel=personel.filter(x=>x.id!==id);
-    pListRender();pStatRender();toast('Personel silindi.','ok');
-  }catch(e){toast('Hata: '+e.message,'hata');}
+    pListRender();
+    pStatRender();
+    toast('Personel silindi.','ok');
+  }catch(e){
+    toast('Hata: '+e.message,'hata');
+  }
 }
 function personelSifirla(){
   document.getElementById('pfid').value='';
@@ -1261,6 +1297,8 @@ function personelSifirla(){
   document.getElementById('pfrol').value='';
   document.getElementById('pftel').value='';
   document.getElementById('pffoto').value='';
+  document.getElementById('pffotoUrl').value='';
+  document.getElementById('fotoOnizleme').style.display='none';
   document.getElementById('pfrezaktif').checked=true;
   document.getElementById('pformbaslik').textContent='Personel Ekle';
   document.getElementById('pfiptal').style.display='none';
