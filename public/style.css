@@ -242,7 +242,7 @@ footer p{font-size:.62rem;color:rgba(247,244,239,.2);letter-spacing:.08em}
   nav{padding:0 16px}
   .hero{padding:70px 16px 0}
   .hero-top-bar{padding:20px 16px}
-  .hero-model-wrap{left:0;opacity:.18}
+  .hero-model-wrap{left:0;opacity:.55}
   .hero h1{font-size:clamp(2.8rem,14vw,4rem)}
   .hero-tagline-top{font-size:1rem}
   .services{padding:60px 16px}
