@@ -729,14 +729,28 @@ const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 const ADMIN_SIFRE='fatihkurt341905.';
 
 async function sRest(path,opts={}){
+  const {headers:extraHeaders,...restOpts}=opts;
   const res=await fetch(SUPA_URL+'/rest/v1/'+path,{
-    headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=representation',...(opts.headers||{})},
-    ...opts
+    headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=representation',...(extraHeaders||{})},
+    ...restOpts
   });
   if(!res.ok){const t=await res.text();throw new Error(t);}
   const txt=await res.text();
   return txt?JSON.parse(txt):[];
 }
+
+async function fotoYukle(file){
+  const ext=file.name.split('.').pop()||'jpg';
+  const dosyaAdi=`personel_${Date.now()}.${ext}`;
+  const res=await fetch(`${SUPA_URL}/storage/v1/object/personel-fotolar/${dosyaAdi}`,{
+    method:'POST',
+    headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':file.type,'x-upsert':'true'},
+    body:file
+  });
+  if(!res.ok){const t=await res.text();throw new Error('Fotoğraf yüklenemedi: '+t);}
+  return `${SUPA_URL}/storage/v1/object/public/personel-fotolar/${dosyaAdi}`;
+}
+
 
 function dbToLocal(r){
   return {
@@ -1184,12 +1198,13 @@ document.addEventListener('DOMContentLoaded', function() {
       const file = e.target.files[0];
       if(file) {
         const reader = new FileReader();
-        reader.onload = function(e) {
-          document.getElementById('fotoOnizlemeImg').src = e.target.result;
-          document.getElementById('fotoOnizleme').style.display = 'block';
-          document.getElementById('pffotoUrl').value = e.target.result;
-        };
-        reader.readAsDataURL(file);
+                window._pendingFotoFile = file;
+                reader.onload = function(ev) {
+                   document.getElementById('fotoOnizlemeImg').src = ev.target.result;
+                   document.getElementById('fotoOnizleme').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+
       }
     });
   }
@@ -1200,7 +1215,8 @@ function pListRender(){
   if(!personel.length){e.innerHTML='<div class="bos">Henüz personel yok.</div>';return;}
   e.innerHTML=personel.map(p=>{
     const initials=p.ad.split(' ').map(x=>x[0]).join('').substring(0,2).toUpperCase();
-    const fotoHtml=p.foto?`<img src="images/${p.foto}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;object-position:top;border:2px solid var(--line)" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`:'';
+    const fotoSrc=p.foto?(p.foto.startsWith('http')||p.foto.startsWith('data:')?p.foto:'images/'+p.foto):'';
+    const fotoHtml=p.foto?`<img src="${fotoSrc}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;object-position:top;border:2px solid var(--line)" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`:'';
     const rezDurumu=p.rezaktif!==false;
     return`<div class="pkart">
       <div class="pavtr" style="position:relative;overflow:hidden">${fotoHtml}<span ${p.foto?'style="display:none"':''}>${initials}</span></div>
@@ -1237,9 +1253,17 @@ async function personelKaydet(){
   const rol=document.getElementById('pfrol').value.trim();
   const tel=document.getElementById('pftel').value.trim();
   const durum=document.getElementById('pfdurum').value;
-  const fotoUrl=document.getElementById('pffotoUrl').value || '';
+    let fotoUrl=document.getElementById('pffotoUrl').value||'';
   const rezaktif=document.getElementById('pfrezaktif').checked;
   if(!ad){toast('Ad Soyad giriniz.','hata');return;}
+  if(window._pendingFotoFile){
+    try{
+      toast('Fotoğraf yükleniyor...','bilgi');
+      fotoUrl=await fotoYukle(window._pendingFotoFile);
+      window._pendingFotoFile=null;
+    }catch(e){toast(e.message,'hata');return;}
+  }
+  
   try{
     if(editId){
       // Güncelleme - Supabase
@@ -1301,7 +1325,10 @@ function personelSifirla(){
   document.getElementById('fotoOnizleme').style.display='none';
   document.getElementById('pfrezaktif').checked=true;
   document.getElementById('pformbaslik').textContent='Personel Ekle';
-  document.getElementById('pfiptal').style.display='none';
+   document.getElementById('pfiptal').style.display='none';
+   window._pendingFotoFile=null;
+}
+
 }
 
 // ─── HİZMETLER ───
