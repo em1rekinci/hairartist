@@ -794,6 +794,22 @@
       </div>
     </div>
 
+    <!-- Sözleşme Onayları -->
+    <div class="sozlesme-grup">
+      <div class="checkbox-item">
+        <input type="checkbox" id="n-kvkk" required>
+        <label class="checkbox-label" for="n-kvkk">
+          <a href="#" onclick="event.preventDefault(); sozlesmeAc('kvkk')">KVKK Aydınlatma Metni</a>'ni okudum ve kabul ediyorum.
+        </label>
+      </div>
+      <div class="checkbox-item">
+        <input type="checkbox" id="n-gizlilik" required>
+        <label class="checkbox-label" for="n-gizlilik">
+          <a href="#" onclick="event.preventDefault(); sozlesmeAc('gizlilik')">Gizlilik Politikası</a>'nı okudum ve kabul ediyorum.
+        </label>
+      </div>
+    </div>
+
     <div class="rez-mesaj" id="n-mesaj"></div>
     <button class="fsub" id="n-btn" onclick="normalGonder()">Rezervasyonu Gönder</button>
   </div>
@@ -904,6 +920,34 @@
       </div>
     </div>
 
+    <!-- Sözleşme Onayları -->
+    <div class="sozlesme-grup">
+      <div class="checkbox-item">
+        <input type="checkbox" id="o-kvkk" required>
+        <label class="checkbox-label" for="o-kvkk">
+          <a href="#" onclick="event.preventDefault(); sozlesmeAc('kvkk')">KVKK Aydınlatma Metni</a>'ni okudum ve kabul ediyorum.
+        </label>
+      </div>
+      <div class="checkbox-item">
+        <input type="checkbox" id="o-gizlilik" required>
+        <label class="checkbox-label" for="o-gizlilik">
+          <a href="#" onclick="event.preventDefault(); sozlesmeAc('gizlilik')">Gizlilik Politikası</a>'nı okudum ve kabul ediyorum.
+        </label>
+      </div>
+      <div class="checkbox-item">
+        <input type="checkbox" id="o-mesafeli" required>
+        <label class="checkbox-label" for="o-mesafeli">
+          <a href="#" onclick="event.preventDefault(); sozlesmeAc('mesafeli')">Mesafeli Satış Sözleşmesi</a>'ni okudum ve kabul ediyorum.
+        </label>
+      </div>
+      <div class="checkbox-item">
+        <input type="checkbox" id="o-teslimat" required>
+        <label class="checkbox-label" for="o-teslimat">
+          <a href="#" onclick="event.preventDefault(); sozlesmeAc('teslimat')">Teslimat ve İade Politikası</a>'nı okudum ve kabul ediyorum.
+        </label>
+      </div>
+    </div>
+
     <div class="rez-mesaj" id="o-mesaj"></div>
     <button class="fsub odeme-btn" id="o-btn" onclick="odemeGit()">Ödemeye Geç →</button>
   </div>
@@ -931,6 +975,163 @@
       <p id="paytr-hata-metin">Ödeme sayfası açılamadı. Lütfen tekrar deneyin.</p>
       <button class="fsub odeme-btn" style="width:auto;padding:12px 28px;margin-top:8px" onclick="paytrKapat()">Kapat</button>
     </div>
+  </div>
+</div>
+
+<!-- SÖZLEŞME MODALLARI -->
+<div class="sozlesme-modal" id="modal-kvkk">
+  <div class="sozlesme-icerik">
+    <button class="sozlesme-kapat" onclick="sozlesmeKapat('kvkk')">×</button>
+    <h2>KVKK Aydınlatma Metni</h2>
+    <p>6698 sayılı KVKK kapsamında, tarafıma kampanya, tanıtım ve bilgilendirme amaçlı ticari elektronik iletilerin (SMS, arama, e-posta) gönderilmesini ve kişisel verilerimin bu amaçla işlenmesini kabul ediyorum. Dilediğim zaman ücretsiz olarak reddetme hakkım bulunmaktadır.</p>
+  </div>
+</div>
+
+<div class="sozlesme-modal" id="modal-gizlilik">
+  <div class="sozlesme-icerik">
+    <button class="sozlesme-kapat" onclick="sozlesmeKapat('gizlilik')">×</button>
+    <h2>Gizlilik Politikası</h2>
+    
+    <h3>1. Genel Bilgilendirme</h3>
+    <p>İşbu gizlilik politikası, Fatih Kurt Hair Artist tarafından işletilen web sitesi üzerinden alınan hizmet ve ürün satışlarına ilişkin olarak kullanıcıların kişisel verilerinin işlenmesine dair esasları düzenler.</p>
+    
+    <h3>2. Toplanan Veriler</h3>
+    <p>Web sitemiz üzerinden aşağıdaki bilgiler toplanabilir:</p>
+    <ul>
+      <li>Ad, soyad</li>
+      <li>Telefon numarası</li>
+      <li>E-posta adresi</li>
+      <li>Ödeme bilgileri</li>
+      <li>Randevu bilgileri</li>
+      <li>Görsel ve video kayıtları</li>
+    </ul>
+    
+    <h3>3. Kişisel Verilerin Kullanımı</h3>
+    <p>Toplanan veriler aşağıdaki amaçlarla kullanılmaktadır:</p>
+    <ul>
+      <li>Randevu oluşturma ve yönetme</li>
+      <li>Ödeme işlemlerini gerçekleştirme</li>
+      <li>Ürün siparişlerini hazırlama ve teslim etme</li>
+      <li>Müşteri memnuniyeti ve hizmet geliştirme</li>
+      <li>Kampanya ve bilgilendirme</li>
+    </ul>
+    
+    <h3>4. Görsel ve Video Kayıtları</h3>
+    <p>Salonumuzda hizmet sırasında saç uygulamalarına ait fotoğraf ve video çekimi yapılabilir. Bu içerikler sosyal medya, web sitesi ve reklam çalışmaları için kullanılabilir.</p>
+    
+    <h3>5. Veri Güvenliği</h3>
+    <p>Kişisel verileriniz, yetkisiz erişime karşı korunmakta olup gerekli teknik ve idari önlemler alınmaktadır.</p>
+    
+    <h3>6. Üçüncü Taraflarla Paylaşım</h3>
+    <p>Verileriniz yalnızca aşağıdaki durumlarda paylaşılır:</p>
+    <ul>
+      <li>Ödeme altyapı sağlayıcıları</li>
+      <li>Kargo firmaları</li>
+      <li>Yasal yükümlülükler</li>
+    </ul>
+    
+    <h3>7. Haklarınız</h3>
+    <p>KVKK kapsamında verilerinize erişme ve düzeltme haklarına sahipsiniz.</p>
+    
+    <h3>8. İletişim</h3>
+    <p>Talepleriniz için:<br>
+    <strong>Fatih Kurt Hair Artist</strong><br>
+    Esentepe, Yıldıztabya<br>
+    Alibeyköy Cd No:5<br>
+    34065 Eyüpsultan / İstanbul<br>
+    0531 777 02 03<br>
+    info@hairartist.com.tr</p>
+  </div>
+</div>
+
+<div class="sozlesme-modal" id="modal-mesafeli">
+  <div class="sozlesme-icerik">
+    <button class="sozlesme-kapat" onclick="sozlesmeKapat('mesafeli')">×</button>
+    <h2>Mesafeli Satış Sözleşmesi</h2>
+    
+    <h3>1. Taraflar</h3>
+    <p><strong>Satıcı:</strong> Fatih Kurt Hair Artist<br>
+    <strong>Alıcı:</strong> Web sitesi üzerinden işlem yapan müşteri</p>
+    
+    <h3>2. Konu</h3>
+    <p>Bu sözleşme, web sitesi üzerinden yapılan online randevu hizmetleri ve kozmetik ürün satışları ile ilgili hak ve yükümlülükleri kapsar.</p>
+    
+    <h3>3. Hizmet (Randevu) Şartları</h3>
+    <ul>
+      <li>Randevu, ödeme tamamlandıktan sonra kesinleşir</li>
+      <li>Müşteri, randevu saatine zamanında gelmekle yükümlüdür</li>
+      <li>24 saatten kısa süre kala iptallerde ücret iadesi yapılmaz</li>
+    </ul>
+    
+    <h3>4. Ürün Satışı</h3>
+    <ul>
+      <li>Satın alınan ürünler stok durumuna göre hazırlanır</li>
+      <li>Ürün açıklamaları sitede belirtildiği gibidir</li>
+    </ul>
+    
+    <h3>5. Cayma Hakkı</h3>
+    <ul>
+      <li>Ürünlerde 14 gün içinde cayma hakkı vardır</li>
+      <li>Kullanılmış, açılmış kozmetik ürünlerde iade kabul edilmez</li>
+      <li>Hizmet (randevu) satın alımlarında cayma hakkı, hizmet başlamadan önce geçerlidir</li>
+    </ul>
+    
+    <h3>6. Ödeme</h3>
+    <ul>
+      <li>Tüm ödemeler online olarak alınır</li>
+      <li>Ödeme yöntemleri: kredi kartı / banka kartı</li>
+    </ul>
+    
+    <h3>7. Teslimat</h3>
+    <ul>
+      <li>Ürünler kargo ile gönderilir</li>
+      <li>Teslim süresi 7-14 iş günü arasındadır</li>
+    </ul>
+    
+    <h3>8. Uyuşmazlık Durumu</h3>
+    <p>Tüketici hakem heyetleri ve mahkemeleri yetkilidir.</p>
+  </div>
+</div>
+
+<div class="sozlesme-modal" id="modal-teslimat">
+  <div class="sozlesme-icerik">
+    <button class="sozlesme-kapat" onclick="sozlesmeKapat('teslimat')">×</button>
+    <h2>Teslimat ve İade Politikası</h2>
+    
+    <h3>1. Teslimat</h3>
+    <ul>
+      <li>Kargo süresi bulunduğunuz bölgeye göre değişebilir</li>
+      <li>Teslimat sırasında ürün kontrol edilmelidir</li>
+    </ul>
+    
+    <h3>2. İade Şartları</h3>
+    <p>Aşağıdaki şartlarda iade kabul edilir:</p>
+    <ul>
+      <li>Ürün kullanılmamış olmalı</li>
+      <li>Ambalajı bozulmamış olmalı</li>
+      <li>14 gün içinde talep edilmelidir</li>
+    </ul>
+    
+    <p><strong>İade kabul edilmeyen durumlar:</strong></p>
+    <ul>
+      <li>Açılmış kozmetik ürünler</li>
+      <li>Kişisel bakım ürünleri</li>
+      <li>Hijyen açısından uygun olmayan ürünler</li>
+    </ul>
+    
+    <h3>3. Hasarlı Ürünler</h3>
+    <ul>
+      <li>Kargo sırasında hasar varsa tutanak tutulmalıdır</li>
+      <li>Tutanaksız iade kabul edilmeyebilir</li>
+    </ul>
+    
+    <h3>4. İade Süreci</h3>
+    <p>Onaylanan iadeler 14 iş günü içinde ödeme yapılan karta iade edilir</p>
+    
+    <h3>5. İletişim</h3>
+    <p>İade talepleri için:<br>
+    info@hairartist.com.tr<br>
+    0531 777 02 03</p>
   </div>
 </div>
 
@@ -1185,6 +1386,15 @@ async function normalGonder() {
     mesaj(mesajDiv, 'Lütfen tüm zorunlu alanları doldurun.', 'hata');
     return;
   }
+  
+  // Checkbox kontrolleri
+  const kvkkCheck = document.getElementById('n-kvkk').checked;
+  const gizlilikCheck = document.getElementById('n-gizlilik').checked;
+  
+  if (!kvkkCheck || !gizlilikCheck) {
+    mesaj(mesajDiv, 'Lütfen tüm sözleşmeleri onaylayın.', 'hata');
+    return;
+  }
 
   btn.disabled = true;
   btn.textContent = 'Gönderiliyor…';
@@ -1239,6 +1449,17 @@ async function odemeGit() {
   }
   if (!fiyat || parseInt(fiyat) <= 0) {
     mesaj(mesajDiv, 'Lütfen geçerli bir hizmet seçin.', 'hata');
+    return;
+  }
+  
+  // Checkbox kontrolleri
+  const kvkkCheck = document.getElementById('o-kvkk').checked;
+  const gizlilikCheck = document.getElementById('o-gizlilik').checked;
+  const mesafeliCheck = document.getElementById('o-mesafeli').checked;
+  const teslimatCheck = document.getElementById('o-teslimat').checked;
+  
+  if (!kvkkCheck || !gizlilikCheck || !mesafeliCheck || !teslimatCheck) {
+    mesaj(mesajDiv, 'Lütfen tüm sözleşmeleri onaylayın.', 'hata');
     return;
   }
 
@@ -1370,6 +1591,118 @@ function mesaj(el, metin, tip) {
   el.textContent = metin;
   el.className = 'rez-mesaj ' + tip;
   el.style.display = 'block';
+}
+
+/* ── CHECKBOX & SÖZLEŞME STİLLERİ ── */
+.sozlesme-grup {
+  margin-top: 32px;
+  padding-top: 32px;
+  border-top: 1px solid #1e1e1e;
+}
+.checkbox-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+  cursor: pointer;
+}
+.checkbox-item input[type="checkbox"] {
+  margin-top: 3px;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  flex-shrink: 0;
+  accent-color: #d4af37;
+}
+.checkbox-label {
+  font-size: .78rem;
+  line-height: 1.7;
+  color: rgba(247,244,239,.8);
+  cursor: pointer;
+}
+.checkbox-label a {
+  color: #d4af37;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(212,175,55,.3);
+  transition: border-color .2s;
+}
+.checkbox-label a:hover {
+  border-bottom-color: #d4af37;
+}
+
+/* Modal */
+.sozlesme-modal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,.92);
+  z-index: 9999;
+  padding: 20px;
+  overflow-y: auto;
+}
+.sozlesme-modal.aktif { display: flex; align-items: center; justify-content: center; }
+.sozlesme-icerik {
+  background: #111;
+  border: 1px solid #2a2a2a;
+  max-width: 700px;
+  width: 100%;
+  padding: 40px;
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.sozlesme-kapat {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  color: rgba(247,244,239,.6);
+  font-size: 1.8rem;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color .2s;
+  line-height: 1;
+}
+.sozlesme-kapat:hover { color: var(--off); }
+.sozlesme-icerik h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--off);
+  margin-bottom: 24px;
+}
+.sozlesme-icerik h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--off);
+  margin-top: 24px;
+  margin-bottom: 12px;
+}
+.sozlesme-icerik p,
+.sozlesme-icerik ul,
+.sozlesme-icerik ol {
+  font-size: .85rem;
+  line-height: 1.8;
+  color: rgba(247,244,239,.8);
+  margin-bottom: 16px;
+}
+.sozlesme-icerik ul,
+.sozlesme-icerik ol {
+  padding-left: 20px;
+}
+.sozlesme-icerik li {
+  margin-bottom: 8px;
+}
+.sozlesme-icerik strong {
+  color: var(--off);
+  font-weight: 600;
 }
 
 // ─── SAAT SEÇİCİ
@@ -1530,6 +1863,41 @@ function personelDropdownOlustur(prefix, liste) {
     </div>`;
   }).join('');
 }
+
+// ── SÖZLEŞME MODAL FONKSİYONLARI
+function sozlesmeAc(tip) {
+  const modal = document.getElementById('modal-' + tip);
+  if (modal) {
+    modal.classList.add('aktif');
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+function sozlesmeKapat(tip) {
+  const modal = document.getElementById('modal-' + tip);
+  if (modal) {
+    modal.classList.remove('aktif');
+    document.body.style.overflow = '';
+  }
+}
+
+// Modal dışına tıklanınca kapat
+document.addEventListener('click', function(e) {
+  if (e.target.classList.contains('sozlesme-modal')) {
+    e.target.classList.remove('aktif');
+    document.body.style.overflow = '';
+  }
+});
+
+// ESC tuşu ile kapat
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.sozlesme-modal.aktif').forEach(function(modal) {
+      modal.classList.remove('aktif');
+      document.body.style.overflow = '';
+    });
+  }
+});
 
 </script>
 </body>
