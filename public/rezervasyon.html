@@ -279,8 +279,8 @@
   gap: 12px;
   margin-top: 10px;
   padding: 13px 16px;
-  background: rgba(200,255,0,.05);
-  border: 1px solid rgba(200,255,0,.15);
+  background: rgba(212,175,55,.05);
+  border: 1px solid rgba(212,175,55,.15);
   flex-wrap: wrap;
 }
 .fiyat-box.show { display: flex; }
@@ -288,7 +288,7 @@
   font-family: 'Playfair Display', serif;
   font-size: 1.5rem;
   font-weight: 700;
-  color: #c8ff00;
+  color: #d4af37;
   line-height: 1;
 }
 #fiyat-normal, #o-fiyat-normal {
@@ -302,9 +302,9 @@
   font-size: .58rem;
   letter-spacing: .12em;
   text-transform: uppercase;
-  color: #c8ff00;
-  background: rgba(200,255,0,.08);
-  border: 1px solid rgba(200,255,0,.2);
+  color: #d4af37;
+  background: rgba(212,175,55,.08);
+  border: 1px solid rgba(212,175,55,.2);
   padding: 4px 10px;
   margin-left: auto;
   white-space: nowrap;
@@ -341,9 +341,9 @@
   border-radius: 2px;
 }
 .rez-mesaj.basari {
-  background: rgba(200,255,0,.08);
-  border: 1px solid rgba(200,255,0,.25);
-  color: #c8ff00;
+  background: rgba(212,175,55,.08);
+  border: 1px solid rgba(212,175,55,.25);
+  color: #d4af37;
 }
 .rez-mesaj.hata {
   background: rgba(255,85,85,.08);
@@ -369,7 +369,7 @@
 }
 .fsub:hover { opacity: .85; }
 .fsub.odeme-btn {
-  background: #c8ff00;
+  background: #d4af37;
   color: #080808;
 }
 
@@ -545,7 +545,7 @@
   font-family: 'Playfair Display', serif;
   font-size: 1.4rem;
   font-weight: 700;
-  color: #c8ff00;
+  color: #d4af37;
 }
 .paytr-kapat {
   background: none;
@@ -583,7 +583,7 @@
 .paytr-yukleniyor-dot {
   width: 8px; height: 8px;
   border-radius: 50%;
-  background: #c8ff00;
+  background: #d4af37;
   animation: paytrPulse 1s infinite alternate;
 }
 .paytr-yukleniyor p {
@@ -1468,8 +1468,8 @@ function hizmetDropdownOlustur(prefix, liste) {
         <span class="cs-fiyatlar"><span class="cs-indirimli">${fiyatStr}</span></span>
       </div>`;
     } else {
-      // Ödeme formu için fiyat tek bir değer (min_fiyat kullan)
-      return `<div class="cs-option" onclick="${fn}(this,'${adSafe}',${minFiyat},${sure})">
+      // Ödeme formu için fiyat tek bir değer (max_fiyat kullan)
+      return `<div class="cs-option" onclick="${fn}(this,'${adSafe}',${maxFiyat},${sure})">
         <span class="cs-ad">${h.ad}</span>
         <span class="cs-fiyatlar"><span class="cs-indirimli">${fiyatStr}</span></span>
       </div>`;
