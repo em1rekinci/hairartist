@@ -139,7 +139,7 @@ nav ul li a.active{color:var(--off);border-bottom:2px solid var(--off);transitio
 footer{background:var(--black);border-top:1px solid rgba(247,244,239,.06);padding:40px 56px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;position:relative}
 .foot-logo img{height:28px;width:auto;filter:brightness(0) invert(1);opacity:.6}
 .foot-logo-txt{font-family:"Playfair Display",serif;font-weight:700;font-size:.95rem;color:rgba(247,244,239,.5);letter-spacing:.1em}
-footer p{font-size:.62rem;color:rgba(247,244,239,.2);letter-spacing:.08em}
+footer p{font-size:.62rem;color:rgba(247,244,239,.65);letter-spacing:.08em}
 .foot-credit{font-size:.82rem;color:#fff;text-decoration:none;transition:opacity .3s;letter-spacing:.04em;font-weight:600}
 .foot-credit:hover{opacity:.7}
 
@@ -153,14 +153,14 @@ footer p{font-size:.62rem;color:rgba(247,244,239,.2);letter-spacing:.08em}
 }
 .contact-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1.4fr;gap:24px;margin-top:48px;align-items:start}
 .contact-item h4{font-family:"Playfair Display",serif;font-size:1rem;margin-bottom:14px;color:var(--off)}
-.contact-item p,.contact-item a{font-size:.8rem;line-height:1.9;color:rgba(247,244,239,.45);text-decoration:none;display:block}
+.contact-item p,.contact-item a{font-size:.8rem;line-height:1.9;color:rgba(247,244,239,.75);text-decoration:none;display:block}
 .contact-item a:hover{color:var(--off)}
 .contact-phone-box{background:rgba(247,244,239,.04);border:1px solid rgba(247,244,239,.08);padding:28px;border-radius:2px}
 .contact-phone-box h4{font-family:"Playfair Display",serif;font-size:1rem;margin-bottom:14px;color:var(--off)}
 .phone-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
 .phone-row:last-of-type{margin-bottom:0}
 .phone-icon{width:32px;height:32px;background:rgba(247,244,239,.07);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.9rem}
-.phone-row a{font-size:.8rem;color:rgba(247,244,239,.45);text-decoration:none;transition:color .3s;line-height:1.4}
+.phone-row a{font-size:.8rem;color:rgba(247,244,239,.8);text-decoration:none;transition:color .3s;line-height:1.4}
 .phone-row a:hover{color:var(--off)}
 .social-row{display:flex;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid rgba(247,244,239,.07)}
 .social-btn{display:flex;align-items:center;gap:8px;background:rgba(247,244,239,.06);border:1px solid rgba(247,244,239,.1);padding:8px 14px;border-radius:2px;text-decoration:none;color:rgba(247,244,239,.5);font-size:.65rem;letter-spacing:.08em;transition:all .3s}
@@ -174,7 +174,7 @@ footer p{font-size:.62rem;color:rgba(247,244,239,.2);letter-spacing:.08em}
 .social-btn-fb svg { width: 16px !important; height: 16px !important; }
 .hours-box{background:rgba(247,244,239,.04);border:1px solid rgba(247,244,239,.08);padding:28px;border-radius:2px}
 .hours-box h4{font-family:"Playfair Display",serif;font-size:1rem;margin-bottom:14px;color:var(--off)}
-.hour-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(247,244,239,.05);font-size:.75rem;color:rgba(247,244,239,.35)}
+.hour-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(247,244,239,.07);font-size:.75rem;color:rgba(247,244,239,.7)}
 .hour-row:last-child{border-bottom:none}
 .hour-row.today{color:var(--off)}
 .hour-row.today .day-name{position:relative;padding-left:14px}
