@@ -75,8 +75,9 @@ nav ul li a.active{color:var(--off);border-bottom:2px solid var(--off);transitio
 .af-card.af-light{background:#fff;color:#080808;border:1px solid #e0dbd2;}
 .af-icon{font-size:1.6rem;display:block;margin-bottom:12px;}
 .af-card h3{font-family:"Playfair Display",serif;font-size:1.1rem;font-weight:700;margin-bottom:8px;line-height:1.3;}
-.af-card p{font-family:"Montserrat",sans-serif;font-size:.8rem;line-height:1.65;opacity:.75;}
-.af-card.af-dark p{opacity:.7;}
+.af-card p{font-family:"Montserrat",sans-serif;font-size:.8rem;line-height:1.65;}
+.af-card.af-dark p{color:#f5f0e8;opacity:.85;}
+.af-card.af-light p{color:#1a1a1a;opacity:.8;}
 
 /* SERVICES */
 .services{background:var(--black);padding:100px 56px}

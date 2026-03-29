@@ -19,8 +19,14 @@
   font-weight: 700 !important;
   filter: none !important;
 }
-.af-dark p { color: rgba(247,244,239,.85) !important; }
-.af-light p { color: rgba(8,8,8,.75) !important; }
+.af-dark p { color: #f5f0e8 !important; opacity: .85 !important; }
+.af-light p { color: #1a1a1a !important; opacity: .85 !important; }
+
+/* Mobil için de geçerli */
+@media (max-width: 768px) {
+  .af-dark p { color: #f5f0e8 !important; opacity: .85 !important; }
+  .af-light p { color: #1a1a1a !important; opacity: .85 !important; }
+}
 
 
 /* WhatsApp butonu */
