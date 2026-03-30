@@ -580,19 +580,28 @@ tbody td{padding:10px 13px;vertical-align:middle}
       <div style="margin-bottom:16px"><h2 style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700">Ciro <em style="font-style:italic;font-weight:400;color:var(--text3)">& Raporlar</em></h2><p style="font-size:.7rem;color:var(--text3);margin-top:3px">Gelir takibi ve ödeme analizi</p></div>
 
       <!-- Periyot filtresi -->
-      <div style="display:flex;align-items:center;gap:6px;margin-bottom:14px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;flex-wrap:wrap">
         <div class="fbar">
-          <button class="fbtn ak" onclick="ciroFiltrele('gun',this)">Bugün</button>
-          <button class="fbtn" onclick="ciroFiltrele('hafta',this)">Bu Hafta</button>
-          <button class="fbtn" onclick="ciroFiltrele('ay',this)">Bu Ay</button>
-          <button class="fbtn" onclick="ciroFiltrele('yil',this)">Bu Yıl</button>
-          <button class="fbtn" onclick="ciroFiltrele('hepsi',this)">Tüm Zamanlar</button>
+          <button class="fbtn ak" id="ciro-gun-btn" onclick="ciroFiltrele('gun',this)">Bugün</button>
+          <button class="fbtn" id="ciro-hafta-btn" onclick="ciroFiltrele('hafta',this)">Bu Hafta</button>
+          <button class="fbtn" id="ciro-ay-btn" onclick="ciroFiltrele('ay',this)">Bu Ay</button>
+          <button class="fbtn" id="ciro-yil-btn" onclick="ciroFiltrele('yil',this)">Bu Yıl</button>
+          <button class="fbtn" id="ciro-hepsi-btn" onclick="ciroFiltrele('hepsi',this)">Tüm Zamanlar</button>
+          <button class="fbtn" id="ciro-aralik-btn" onclick="ciroFiltrele('aralik',this)">📅 Tarih Aralığı</button>
         </div>
         <div style="display:flex;gap:6px;margin-left:auto">
           <button class="fbtn ak" id="ciro-nakit-btn" onclick="ciroYontemFiltrele('hepsi')">Tümü</button>
           <button class="fbtn" id="ciro-tum-btn" onclick="ciroYontemFiltrele('nakit')">💵 Nakit</button>
           <button class="fbtn" id="ciro-kart-btn" onclick="ciroYontemFiltrele('kart')">💳 Kart</button>
         </div>
+      </div>
+      <!-- Tarih aralığı seçici (sadece aralik modunda göster) -->
+      <div id="ciro-aralik-wrap" style="display:none;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;background:var(--white);border:1px solid var(--line);padding:10px 14px;border-radius:var(--r)">
+        <span style="font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)">Başlangıç</span>
+        <input type="date" id="ciro-bas-inp" class="fi" style="width:auto;padding:5px 9px;font-size:.78rem" oninput="ciroAralikUygula()">
+        <span style="font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)">Bitiş</span>
+        <input type="date" id="ciro-bit-inp" class="fi" style="width:auto;padding:5px 9px;font-size:.78rem" oninput="ciroAralikUygula()">
+        <button class="tbtn" onclick="ciroAralikUygula()" style="padding:5px 12px">Uygula</button>
       </div>
 
       <!-- Stat kartları -->
@@ -878,7 +887,7 @@ function statsGuncelle(){
   const t=TRZ.length,bek=TRZ.filter(r=>r.durum==='bekliyor').length;
   const onay=TRZ.filter(r=>r.durum==='onaylandi');
   const n=new Date();
-  const buay=onay.filter(r=>{const d=new Date(r.tarihOlustur);return d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear();});
+  const buay=onay.filter(r=>{const d=new Date(r.tarih+'T12:00');return d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear();});
   const tc=onay.reduce((s,r)=>s+fHesapla(r),0);
   const ac=buay.reduce((s,r)=>s+fHesapla(r),0);
   const AY=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
@@ -1540,12 +1549,32 @@ async function hizSirala(id, yon){
 }
 
 // ─── CİRO & RAPORLAR ───
-let CIRO_PERIYOT='gun', CIRO_YONTEM='hepsi';
+let CIRO_PERIYOT='gun', CIRO_YONTEM='hepsi', CIRO_BAS=null, CIRO_BIT=null;
 
 function ciroFiltrele(p,btn){
   CIRO_PERIYOT=p;
   document.querySelectorAll('#page-ciro .fbar .fbtn').forEach(b=>b.classList.remove('ak'));
   btn.classList.add('ak');
+  const arl=document.getElementById('ciro-aralik-wrap');
+  if(p==='aralik'){
+    arl.style.display='flex';
+    // Bugünü varsayılan olarak doldur
+    const bugun=new Date().toISOString().split('T')[0];
+    if(!document.getElementById('ciro-bas-inp').value) document.getElementById('ciro-bas-inp').value=bugun;
+    if(!document.getElementById('ciro-bit-inp').value) document.getElementById('ciro-bit-inp').value=bugun;
+    ciroAralikUygula();
+  } else {
+    arl.style.display='none';
+    CIRO_BAS=null; CIRO_BIT=null;
+    ciroRender();
+  }
+}
+function ciroAralikUygula(){
+  const bas=document.getElementById('ciro-bas-inp').value;
+  const bit=document.getElementById('ciro-bit-inp').value;
+  if(!bas||!bit) return;
+  CIRO_BAS=new Date(bas+'T00:00');
+  CIRO_BIT=new Date(bit+'T23:59:59');
   ciroRender();
 }
 function ciroYontemFiltrele(y){
@@ -1562,6 +1591,8 @@ function ciroYontemFiltrele(y){
 function ciroPeriyotAralik(p){
   const n=new Date();
   let bas,bit=new Date(n);
+  bit.setHours(23,59,59,999);
+  if(p==='aralik'&&CIRO_BAS&&CIRO_BIT){return{bas:CIRO_BAS,bit:CIRO_BIT};}
   if(p==='gun'){bas=new Date(n.getFullYear(),n.getMonth(),n.getDate());}
   else if(p==='hafta'){bas=new Date(n);bas.setDate(n.getDate()-n.getDay()+(n.getDay()===0?-6:1));bas.setHours(0,0,0,0);}
   else if(p==='ay'){bas=new Date(n.getFullYear(),n.getMonth(),1);}
@@ -1588,7 +1619,10 @@ function ciroRender(){
   document.getElementById('c-kart').textContent=kart.toLocaleString('tr-TR')+'₺';
   document.getElementById('c-sayi').textContent=odemeler.length;
 
-  const pLbl={gun:'Bugün',hafta:'Bu Hafta',ay:'Bu Ay',yil:'Bu Yıl',hepsi:'Tüm Zamanlar'};
+  const bas_inp=document.getElementById('ciro-bas-inp')?.value||'';
+  const bit_inp=document.getElementById('ciro-bit-inp')?.value||'';
+  const aralikLbl=bas_inp&&bit_inp?`${bas_inp} — ${bit_inp}`:'Tarih Aralığı';
+  const pLbl={gun:'Bugün',hafta:'Bu Hafta',ay:'Bu Ay',yil:'Bu Yıl',hepsi:'Tüm Zamanlar',aralik:aralikLbl};
   document.getElementById('c-toplam-sub').textContent=pLbl[CIRO_PERIYOT]||'';
 
   // Grafik
@@ -1617,7 +1651,7 @@ function ciroRender(){
   const perSv=Object.entries(perS).sort((a,b)=>b[1]-a[1]);
   const perMx=perSv[0]?.[1]||1;
   const cpd=document.getElementById('c-perdag');
-  cpd.innerHTML=perSv.length?perSv.map(([pid,ciro])=>{const p=personel.find(x=>x.id===pid);return`<div class="hdi"><div class="hdlbl"><span style="font-size:.68rem">${p?p.ad:'Atanmamış'}</span><span>${ciro.toLocaleString('tr-TR')}₺</span></div><div class="hdb"><div class="hdf" style="width:${Math.round((ciro/perMx)*100)}%;background:var(--blue)"></div></div></div>`;}).join(''):'<div class="bos" style="padding:12px">Veri yok.</div>';
+  cpd.innerHTML=perSv.length?perSv.map(([pid,ciro])=>{const p=personel.find(x=>x.id===pid)||personel.find(x=>x.ad===pid);return`<div class="hdi"><div class="hdlbl"><span style="font-size:.68rem">${p?p.ad:pid||'Atanmamış'}</span><span>${ciro.toLocaleString('tr-TR')}₺</span></div><div class="hdb"><div class="hdf" style="width:${Math.round((ciro/perMx)*100)}%;background:var(--blue)"></div></div></div>`;}).join(''):'<div class="bos" style="padding:12px">Veri yok.</div>';
 }
 
 function ciroGrafik(bas,bit,odemeler){
