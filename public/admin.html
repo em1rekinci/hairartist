@@ -885,7 +885,7 @@ function verileriRender(){statsGuncelle();tabloRender(AKT_FILTRE);bugRandevu();s
 function fHesapla(r){if(r.odemeAlindi&&r.durum==='onaylandi'){if(r.fiyat)return r.fiyat;const h=FYT[r.hizmet];return h?Math.round((h.min+h.max)/2):0;}return 0;}
 function statsGuncelle(){
   const t=TRZ.length,bek=TRZ.filter(r=>r.durum==='bekliyor').length;
-  const onay=TRZ.filter(r=>r.durum==='onaylandi');
+  const onay=TRZ.filter(r=>r.durum==='onaylandi'&&r.odemeAlindi);
   const n=new Date();
   const buay=onay.filter(r=>{const d=new Date(r.tarih+'T12:00');return d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear();});
   const tc=onay.reduce((s,r)=>s+fHesapla(r),0);
