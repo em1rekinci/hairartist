@@ -1043,6 +1043,21 @@ async function onayEt(id){
       r.durum='onaylandi';
       AKTLOG.unshift({tip:'g',txt:`<strong>${r.ad}</strong> — ${r.hizmet} onaylandı`,z:new Date()});
       waOnayMesaji(r);
+      // Personelin o gün+saatini kapat (sadece o personel için)
+      if(r.personelId && r.tarih && r.saat){
+        try{
+          await sRest('kapali_saatler',{
+            method:'POST',
+            headers:{'Prefer':'return=minimal'},
+            body:JSON.stringify({
+              personel_id: r.personelId,
+              tarih: r.tarih,
+              saat: r.saat,
+              rezervasyon_id: r.id
+            })
+          });
+        }catch(e2){console.warn('Kapalı saat kaydedilemedi:',e2);}
+      }
     }
     verileriRender();toast('Rezervasyon onaylandı, WhatsApp gönderildi.','ok');
   }catch(e){toast('Hata: '+e.message,'hata');}
@@ -1055,6 +1070,13 @@ async function reddet(id){
       r.durum='reddedildi';
       AKTLOG.unshift({tip:'r',txt:`<strong>${r.ad}</strong> — reddedildi`,z:new Date()});
       waRedMesaji(r);
+      // Kapalı saati geri aç
+      try{
+        await sRest(`kapali_saatler?rezervasyon_id=eq.${r.id}`,{
+          method:'DELETE',
+          headers:{'Prefer':'return=minimal'}
+        });
+      }catch(e2){console.warn('Kapalı saat silinemedi:',e2);}
     }
     verileriRender();toast('Reddedildi, WhatsApp gönderildi.','hata');
   }catch(e){toast('Hata: '+e.message,'hata');}

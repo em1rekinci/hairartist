@@ -814,9 +814,9 @@ footer p { color: #f7f4ef !important; }
       <div class="rez-kart" onclick="goster('normal-form')">
         <div class="rez-kart-no">01 — Ücretsiz</div>
         <h2>Rezervasyon Yap <em>Ödeme yok</em></h2>
-        <p>Randevunuzu ayırtın, En kısa sürede onaylansın. Salona geldiğinizde ödeme yaparsınız.</p>
+        <p>Randevunuzu ayırtın, onay SMS'i gelsin. Salona geldiğinizde ödeme yaparsınız.</p>
         <div class="rez-kart-ozellik">
-          <div class="rez-oz-item">En kısa sürede onay</div>
+          <div class="rez-oz-item">Anında SMS onayı</div>
           <div class="rez-oz-item">Ödeme salonda</div>
         </div>
         <div class="rez-kart-btn">
@@ -1233,6 +1233,8 @@ function personelSec(el, prefix, isim, unvan, foto, emoji) {
       '<div class="personel-selected-ad">' + isim + '</div>' +
       '<div class="personel-unvan">' + unvan + '</div>' +
     '</div>';
+  // Personel değişince saatleri yenile
+  saatleriGuncelle(prefix);
 }
 
 // ── EKRAN GEÇİŞ
@@ -1732,7 +1734,24 @@ function selectTime(btn, time, prefix) {
   document.getElementById(prefix + '-saat').value = time;
 }
 
-function saatleriGuncelle(prefix) {
+// Personelin seçili tarihte dolu saatlerini Supabase'den çek
+async function doluSaatleriCek(personelId, tarih) {
+  if (!personelId || !tarih) return [];
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/kapali_saatler?personel_id=eq.${personelId}&tarih=eq.${tarih}&select=saat`,
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }
+    );
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.map(x => x.saat); // ['10:00', '14:00', ...]
+  } catch(e) {
+    console.warn('Dolu saatler alınamadı:', e);
+    return [];
+  }
+}
+
+async function saatleriGuncelle(prefix) {
   var tarihEl = document.getElementById(prefix + '-tarih');
   if (!tarihEl) return;
   var tarih = tarihEl.value;
@@ -1740,22 +1759,31 @@ function saatleriGuncelle(prefix) {
   var bugun = simdi.toISOString().split('T')[0];
   var bugunMu = tarih === bugun;
   var suAnSaat = simdi.getHours();
+  var personelId = document.getElementById(prefix + '-personel').value;
 
-  // Prefix'e ait time-grid'leri bul
+  // Supabase'den dolu saatleri çek
+  var doluSaatler = tarih ? await doluSaatleriCek(personelId, tarih) : [];
+
   var formId = prefix === 'n' ? 'normal-form' : 'odeme-form';
   document.querySelectorAll('#' + formId + ' .time-btn').forEach(function(btn) {
-    var saat = parseInt(btn.textContent.split(':')[0]);
-    if (bugunMu && saat <= suAnSaat) {
+    var saatStr = btn.textContent.trim(); // '10:00'
+    var saatInt = parseInt(saatStr.split(':')[0]);
+    var gecmisMi = bugunMu && saatInt <= suAnSaat;
+    var doluMu = doluSaatler.includes(saatStr);
+
+    if (gecmisMi || doluMu) {
       btn.disabled = true;
       btn.classList.remove('selected');
-      btn.style.opacity = '.2';
+      btn.style.opacity = doluMu ? '.35' : '.2';
       btn.style.cursor = 'not-allowed';
       btn.style.textDecoration = 'line-through';
+      btn.title = doluMu ? 'Bu saat dolu' : 'Geçmiş saat';
     } else {
       btn.disabled = false;
       btn.style.opacity = '';
       btn.style.cursor = '';
       btn.style.textDecoration = '';
+      btn.title = '';
     }
   });
 }
