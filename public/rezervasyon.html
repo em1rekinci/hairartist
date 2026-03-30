@@ -1214,10 +1214,11 @@ document.addEventListener('click', function(e) {
   }
 });
 
-function personelSec(el, prefix, isim, unvan, foto, emoji) {
+function personelSec(el, prefix, isim, unvan, foto, emoji, personelId) {
   el.closest('.personel-dropdown').querySelectorAll('.personel-row').forEach(k => k.classList.remove('secili'));
   el.classList.add('secili');
-  document.getElementById(prefix + '-personel').value = isim;
+  // UUID varsa onu kaydet, yoksa isim (geriye uyumluluk)
+  document.getElementById(prefix + '-personel').value = personelId || isim;
   // Dropdown kapat
   var dd = document.getElementById(prefix + '-personel-dropdown');
   var arrow = document.getElementById(prefix + '-personel-arrow');
@@ -1900,7 +1901,7 @@ function personelDropdownOlustur(prefix, liste) {
       </div>`;
     }
 
-    return `<div class="personel-row" onclick="personelSec(this,'${prefix}','${p.ad}','${p.rol||''}','${foto}','${initials}')">
+    return `<div class="personel-row" onclick="personelSec(this,'${prefix}','${p.ad}','${p.rol||''}','${foto}','${initials}','${p.id}')">
       <div class="personel-foto">${fotoHtml}</div>
       <div class="personel-info">
         <div class="personel-ad">${p.ad}</div>

@@ -906,7 +906,7 @@ function bugRandevu(){
   document.getElementById('bugsayi').textContent=l.length+' randevu';
   const e=document.getElementById('bugliste');
   if(!l.length){e.innerHTML='<div class="bos">Bugün onaylı randevu yok.</div>';return;}
-  e.innerHTML=l.map(r=>{const h=FYT[r.hizmet];const f=h?Math.round((h.min+h.max)/2).toLocaleString('tr-TR')+'₺':'—';const[sa,dk]=((r.saat||'--:--').split(':'));const p=personel.find(x=>x.id===r.personelId);
+  e.innerHTML=l.map(r=>{const h=FYT[r.hizmet];const f=h?Math.round((h.min+h.max)/2).toLocaleString('tr-TR')+'₺':'—';const[sa,dk]=((r.saat||'--:--').split(':'));const p=personel.find(x=>x.id===r.personelId)||personel.find(x=>x.ad===r.personelId);
   return`<div class="bi"><div class="bsaat">${sa}<span>${dk||'00'}</span></div><div class="bciz"></div><div class="bblg"><div class="bmus">${r.ad}</div><div class="bhiz">${r.hizmet}${p?' · '+p.ad:''}</div></div><div class="bfyt">${f}</div></div>`;}).join('');
 }
 function sonRez(){
@@ -962,7 +962,7 @@ function tkDetay(t){
   saatler.forEach(sa=>{
     const rb=gr.filter(r=>(r.saat||'').startsWith(sa+':'));
     h+=`<div class="ss"><div class="ssl">${sa}:00</div><div class="ssb">`;
-    rb.forEach(r=>{const p=personel.find(x=>x.id===r.personelId);h+=`<div class="ssr${r.durum==='bekliyor'?' br2':''}" onclick="detay('${r.id}')"><div class="ssrad">${r.ad}</div><div class="ssrb">${r.hizmet}${p?' · '+p.ad:''} · ${bH(r.durum)}</div></div>`;});
+    rb.forEach(r=>{const p=personel.find(x=>x.id===r.personelId)||personel.find(x=>x.ad===r.personelId);h+=`<div class="ssr${r.durum==='bekliyor'?' br2':''}" onclick="detay('${r.id}')"><div class="ssrad">${r.ad}</div><div class="ssrb">${r.hizmet}${p?' · '+p.ad:''} · ${bH(r.durum)}</div></div>`;});
     h+='</div></div>';
   });
   h+='</div>';e.innerHTML=h;
@@ -982,7 +982,7 @@ function tabloRender(f){
   if(!l.length){e.innerHTML=`<tr><td colspan="8" class="bos">Rezervasyon bulunamadı.</td></tr>`;return;}
   e.innerHTML=l.map(r=>{
     const h=FYT[r.hizmet];const fiyat=h?Math.round((h.min+h.max)/2).toLocaleString('tr-TR')+'₺':'—';
-    const p=personel.find(x=>x.id===r.personelId);
+    const p=personel.find(x=>x.id===r.personelId)||personel.find(x=>x.ad===r.personelId);
     let aks;
     if(r.durum==='bekliyor')aks=`<div style="display:flex;gap:4px;white-space:nowrap"><button class="bsm bonay" onclick="onayEt('${r.id}')">Onayla</button><button class="bsm bred" onclick="reddet('${r.id}')">Reddet</button><button class="bsm bdet" onclick="detay('${r.id}')">···</button></div>`;
     else if(r.durum==='onaylandi'&&!r.odemeAlindi)aks=`<div style="display:flex;gap:4px;white-space:nowrap"><button class="bsm bblue" onclick="odemeAl('${r.id}')">Ödeme Al</button><button class="bsm bdet" onclick="detay('${r.id}')">···</button><button class="bsm bsil" onclick="sil('${r.id}')">✕</button></div>`;
@@ -1010,7 +1010,7 @@ async function waOnayMesaji(r){
   let tel=r.telefon.replace(/\s/g,'').replace(/[^0-9]/g,'');
   if(tel.startsWith('0'))tel=tel.substring(1);
   if(!tel.startsWith('90'))tel='90'+tel;
-  const p=personel.find(x=>x.id===r.personelId);
+  const p=personel.find(x=>x.id===r.personelId)||personel.find(x=>x.ad===r.personelId);
   const metin=
     `✅ *Rezervasyon Onaylandı — Hair Artist*\n\n`+
     `Merhaba ${r.ad},\n\n`+
@@ -1121,7 +1121,7 @@ function odemeAl(id){
   if(!r)return;
   const h=FYT[r.hizmet];
   const fiyat=h?Math.round((h.min+h.max)/2).toLocaleString('tr-TR')+'₺':'?';
-  const p=personel.find(x=>x.id===r.personelId);
+  const p=personel.find(x=>x.id===r.personelId)||personel.find(x=>x.ad===r.personelId);
   document.getElementById('cmb').innerHTML=`
     <strong>${r.ad}</strong> adlı müşteri — <strong>${r.hizmet}</strong><br>
     ${p?`<span style="font-size:.72rem;color:var(--text3)">Personel: ${p.ad}</span><br>`:''}
@@ -1162,15 +1162,16 @@ function detay(id){
   const h=FYT[r.hizmet];
   const fiyat=h?Math.round((h.min+h.max)/2).toLocaleString('tr-TR')+'₺':'—';
   const olusturma=new Date(r.tarihOlustur).toLocaleString('tr-TR',{day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
-  const p=personel.find(x=>x.id===r.personelId);
-  const pOptions=personel.map(px=>`<option value="${px.id}"${px.id===r.personelId?' selected':''}>${px.ad} — ${px.rol||''}</option>`).join('');
+   const p=personel.find(x=>x.id===r.personelId)||personel.find(x=>x.ad===r.personelId)||personel.find(x=>x.ad===r.personelId);
+   const pOptions=personel.map(px=>`<option value="${px.id}"${(px.id===r.personelId||px.ad===r.personelId)?' selected':''}>${px.ad} — ${px.rol||''}</option>`).join('');
+   const personelGoster=p?`<strong>${p.ad}</strong><span style="font-size:.68rem;color:var(--text3);margin-left:6px">${p.rol||''}</span>`:'<span style="color:var(--text3)">—</span>';
   document.getElementById('mice').innerHTML=`
     <div class="mr"><span class="mk">Ad Soyad</span><span class="mv">${r.ad}</span></div>
     <div class="mr"><span class="mk">Telefon</span><span class="mv">${r.telefon}</span></div>
     <div class="mr"><span class="mk">Hizmet</span><span class="mv">${r.hizmet}</span></div>
     <div class="mr"><span class="mk">Fiyat</span><span class="mv" style="color:var(--green)">${fiyat}${r.odemeAlindi&&r.odemeYontemi?'<span style="font-size:.65rem;color:var(--text3);margin-left:6px">'+( r.odemeYontemi==='kart'?'💳 Kart':'💵 Nakit')+'</span>':''}</span></div>
     <div class="mr"><span class="mk">Randevu</span><span class="mv">${r.tarih} saat ${r.saat||'—'}</span></div>
-    <div class="mr" style="align-items:center"><span class="mk">Personel</span><span class="mv"><select class="fsel" style="font-size:.75rem;padding:5px 8px" onchange="personelAta('${r.id}',this.value)"><option value="">— Atanmadı —</option>${pOptions}</select></span></div>
+     <div class="mr" style="align-items:center"><span class="mk">Personel</span><span class="mv" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">${personelGoster}<select class="fsel" style="font-size:.7rem;padding:3px 7px" onchange="personelAta('${r.id}',this.value)"><option value="">Değiştir…</option>${pOptions}</select></span></div>
     <div class="mr"><span class="mk">Not</span><span class="mv">${r.not||'—'}</span></div>
     <div class="mr"><span class="mk">Durum</span><span class="mv">${bH(r.durum)}${r.odemeAlindi?'<span class="badge bo" style="font-size:.42rem;margin-left:6px">Ödendi</span>':''}</span></div>
     <div class="mr"><span class="mk">Oluşturulma</span><span class="mv">${olusturma}</span></div>
@@ -1598,7 +1599,7 @@ function ciroRender(){
   if(!odemeler.length){tbody.innerHTML='<tr><td colspan="6" class="bos">Bu dönem için ödeme bulunamadı.</td></tr>';return;}
   const sirali=[...odemeler].sort((a,b)=>new Date(b.tarih)-new Date(a.tarih));
   tbody.innerHTML=sirali.map(r=>{
-    const p=personel.find(x=>x.id===r.personelId);
+    const p=personel.find(x=>x.id===r.personelId)||personel.find(x=>x.ad===r.personelId);
     const f=fHesapla(r);
     const yont=(r.odemeYontemi||'nakit')==='kart'?'💳 Kart':'💵 Nakit';
     return`<tr><td><div class="tad">${r.ad}</div></td><td class="thiz">${r.hizmet}</td><td class="tfyt">${f.toLocaleString('tr-TR')}₺</td><td style="font-size:.72rem">${yont}</td><td class="ttar">${r.tarih}</td><td style="font-size:.7rem;color:var(--text2)">${p?p.ad:'—'}</td></tr>`;
