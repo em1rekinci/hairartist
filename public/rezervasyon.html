@@ -730,6 +730,29 @@
 .sozlesme-modal-icerik li {
   margin-bottom: 8px;
 }
+/* Tel linkleri gold */
+a[href^="tel"] {
+  color: #ffdf00 !important;
+  text-decoration: none;
+  font-weight: 600;
+  text-shadow: 0 0 12px rgba(255,223,0,.35);
+}
+
+/* Gold yazı güçlendirme */
+.rez-kart.odeme .rez-kart-no,
+.rez-kart.odeme .rez-kart-btn,
+.rez-kart.odeme:hover .rez-kart-btn,
+#fiyat-indirimli,
+#o-fiyat-indirimli,
+.cs-option.secili .cs-indirimli,
+.fiyat-badge,
+.paytr-modal-tutar,
+.paytr-yukleniyor-dot {
+  color: #ffdf00 !important;
+  font-weight: 700;
+  text-shadow: 0 0 12px rgba(255,223,0,.35);
+}
+
 /* Footer override */
 footer p { color: #f7f4ef !important; }
 .foot-credit { color: #fff !important; }
@@ -791,9 +814,9 @@ footer p { color: #f7f4ef !important; }
       <div class="rez-kart" onclick="goster('normal-form')">
         <div class="rez-kart-no">01 — Ücretsiz</div>
         <h2>Rezervasyon Yap <em>Ödeme yok</em></h2>
-        <p>Randevunuzu ayırtın, onay SMS'i gelsin. Salona geldiğinizde ödeme yaparsınız.</p>
+        <p>Randevunuzu ayırtın, En kısa sürede onaylansın. Salona geldiğinizde ödeme yaparsınız.</p>
         <div class="rez-kart-ozellik">
-          <div class="rez-oz-item">Anında SMS onayı</div>
+          <div class="rez-oz-item">En kısa sürede onay</div>
           <div class="rez-oz-item">Ödeme salonda</div>
         </div>
         <div class="rez-kart-btn">
