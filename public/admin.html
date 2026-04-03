@@ -701,17 +701,11 @@ tbody td{padding:10px 13px;vertical-align:middle}
             <div style="display:flex;flex-direction:column;gap:11px">
               <input type="hidden" id="sfid">
 
-              <!-- Fotoğraf -->
+              <!-- Çoklu Fotoğraf -->
               <div class="ff">
-                <label class="fl">Ürün Fotoğrafı</label>
-                <input type="file" id="sf-foto-input" accept="image/*" style="display:none" onchange="shopFotoSecildi(this)">
-                <div onclick="document.getElementById('sf-foto-input').click()" style="cursor:pointer">
-                  <div class="port-foto-placeholder" id="sf-placeholder" style="aspect-ratio:1/1">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--text3)"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                    <span>Fotoğraf seç</span>
-                  </div>
-                  <img id="sf-onizleme" style="display:none;width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:3px;margin-bottom:4px" src="" alt="">
-                </div>
+                <label class="fl">Ürün Fotoğrafları <span style="color:var(--text3);font-weight:400">(max 5)</span></label>
+                <input type="file" id="sf-foto-input" accept="image/*" multiple style="display:none" onchange="shopFotoSecildi(this)">
+                <div id="sf-foto-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:4px"></div>
                 <input type="hidden" id="sf-foto-url">
               </div>
 
@@ -1623,6 +1617,8 @@ function hizSifirla(){
 // ─── SHOP ───
 let SHOP_FILTRE = 'hepsi';
 let _pendingShopFoto = null;
+let _shopFotolar = []; // max 5 foto url listesi (yüklenmiş)
+let _pendingShopFotolar = []; // max 5 bekleyen file
 
 async function shopYukle() {
   try {
@@ -1630,7 +1626,7 @@ async function shopYukle() {
     shop = res.map(u => ({
       id: u.id, ad: u.ad, kat: u.kat, fiyat: u.fiyat || 0,
       stok: u.stok ?? 0, stokuyari: u.stok_uyari ?? 3,
-      acik: u.acik || '', foto: u.foto_url || '', yayinda: u.yayinda !== false
+      acik: u.acik || '', foto: u.foto_url || '', fotolar: (() => { try { const v = u.foto_url || ''; if (v.startsWith('[')) return JSON.parse(v); return v ? [v] : []; } catch(e){ return u.foto_url ? [u.foto_url] : []; } })(), yayinda: u.yayinda !== false
     }));
   } catch(e) {
     console.warn('Shop tablosu henüz yok:', e.message);
@@ -1673,7 +1669,7 @@ function shopRender() {
     return `
     <div class="usat">
       <div class="ures" style="overflow:hidden;border-radius:3px">
-        ${u.foto ? `<img src="${u.foto}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">` : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 7V5a2 2 0 0 0-4 0v2"/></svg>`}
+        ${u.foto ? `<img src="${u.foto}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">${(u.fotolar&&u.fotolar.length>1)?`<span style="position:absolute;bottom:2px;right:2px;background:rgba(0,0,0,.7);color:#fff;font-size:.44rem;padding:1px 4px;border-radius:2px">${u.fotolar.length}📷</span>`:''}` : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 7V5a2 2 0 0 0-4 0v2"/></svg>`}
       </div>
       <div class="ublg">
         <div class="uad">${u.ad}</div>
@@ -1696,16 +1692,57 @@ function shopRender() {
 }
 
 function shopFotoSecildi(input) {
-  const file = input.files[0];
-  if (!file) return;
-  _pendingShopFoto = file;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    document.getElementById('sf-onizleme').src = ev.target.result;
-    document.getElementById('sf-onizleme').style.display = 'block';
-    document.getElementById('sf-placeholder').style.display = 'none';
-  };
-  reader.readAsDataURL(file);
+  const files = Array.from(input.files);
+  if (!files.length) return;
+  const toplam = _shopFotolar.length + _pendingShopFotolar.length;
+  const eklenecek = files.slice(0, 5 - toplam);
+  if (!eklenecek.length) { toast('Maksimum 5 fotoğraf eklenebilir.', 'hata'); return; }
+  eklenecek.forEach(file => {
+    _pendingShopFotolar.push(file);
+    const reader = new FileReader();
+    reader.onload = ev => shopFotoGridGuncelle(ev.target.result, null, _pendingShopFotolar.indexOf(file));
+    reader.readAsDataURL(file);
+  });
+  input.value = '';
+}
+
+function shopFotoGridGuncelle(previewUrl, url, pendingIdx) {
+  const grid = document.getElementById('sf-foto-grid');
+  const mevcutlar = _shopFotolar.map((url, i) => `
+    <div style="position:relative;aspect-ratio:1/1">
+      <img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:4px;border:1px solid var(--line)">
+      <button onclick="shopFotoSil('url',${i})" style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,.7);border:none;color:#fff;border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1">×</button>
+      ${i===0?'<span style="position:absolute;bottom:2px;left:2px;font-size:.42rem;background:var(--green);color:#fff;padding:1px 4px;border-radius:2px">Ana</span>':''}
+    </div>`).join('');
+  const bekleyenler = _pendingShopFotolar.map((file, i) => {
+    const idx = _shopFotolar.length + i;
+    return `<div style="position:relative;aspect-ratio:1/1" id="pend-${i}">
+      <img src="" data-pending="${i}" style="width:100%;height:100%;object-fit:cover;border-radius:4px;border:1px solid var(--ybdr);opacity:.7">
+      <button onclick="shopFotoSil('pending',${i})" style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,.7);border:none;color:#fff;border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1">×</button>
+      ${_shopFotolar.length===0&&i===0?'<span style="position:absolute;bottom:2px;left:2px;font-size:.42rem;background:var(--yellow);color:#fff;padding:1px 4px;border-radius:2px">Ana</span>':''}
+    </div>`;
+  }).join('');
+  const toplam = _shopFotolar.length + _pendingShopFotolar.length;
+  const ekleBtn = toplam < 5 ? `<div onclick="document.getElementById('sf-foto-input').click()" style="aspect-ratio:1/1;border:2px dashed var(--line2);border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-direction:column;gap:3px;transition:all .2s" onmouseenter="this.style.borderColor='var(--text3)'" onmouseleave="this.style.borderColor='var(--line2)'">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text3)"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    <span style="font-size:.44rem;color:var(--text3)">${toplam}/5</span>
+  </div>` : '';
+  grid.innerHTML = mevcutlar + bekleyenler + ekleBtn;
+  // pending preview yükle
+  _pendingShopFotolar.forEach((file, i) => {
+    const img = grid.querySelector(\`img[data-pending="\${i}"]\`);
+    if (img && !img.src.startsWith('data')) {
+      const r = new FileReader();
+      r.onload = ev => { if(img) img.src = ev.target.result; };
+      r.readAsDataURL(file);
+    }
+  });
+}
+
+function shopFotoSil(tip, idx) {
+  if (tip === 'url') _shopFotolar.splice(idx, 1);
+  else _pendingShopFotolar.splice(idx, 1);
+  shopFotoGridGuncelle();
 }
 
 async function shopFotoYukle(file) {
@@ -1733,26 +1770,33 @@ async function shopKaydet() {
 
   if (!ad) { toast('Ürün adı giriniz.', 'hata'); return; }
 
-  if (_pendingShopFoto) {
+  // Bekleyen fotoğrafları yükle
+  if (_pendingShopFotolar.length > 0) {
     try {
-      toast('Fotoğraf yükleniyor...', 'bilgi');
-      fotoUrl = await shopFotoYukle(_pendingShopFoto);
-      _pendingShopFoto = null;
+      toast('Fotoğraflar yükleniyor...', 'bilgi');
+      for (const file of _pendingShopFotolar) {
+        const url = await shopFotoYukle(file);
+        _shopFotolar.push(url);
+      }
+      _pendingShopFotolar = [];
     } catch(e) { toast(e.message, 'hata'); return; }
   }
 
-  const payload = { ad, kat, fiyat, stok, stok_uyari: stokuyari, acik, yayinda, foto_url: fotoUrl };
+  // foto_url: tek foto varsa string, çoklu varsa JSON array
+  const fotoSonuc = _shopFotolar.length === 0 ? '' :
+    _shopFotolar.length === 1 ? _shopFotolar[0] : JSON.stringify(_shopFotolar);
+  const payload = { ad, kat, fiyat, stok, stok_uyari: stokuyari, acik, yayinda, foto_url: fotoSonuc };
 
   try {
     if (editId) {
       await sRest(`shop?id=eq.${editId}`, { method: 'PATCH', body: JSON.stringify(payload) });
       const u = shop.find(x => x.id === editId);
-      if (u) Object.assign(u, { ad, kat, fiyat, stok, stokuyari, acik, yayinda, foto: fotoUrl });
+      if (u) Object.assign(u, { ad, kat, fiyat, stok, stokuyari, acik, yayinda, foto: _shopFotolar[0]||'', fotolar: [..._shopFotolar] });
       toast('Ürün güncellendi.', 'ok');
     } else {
       const res = await sRest('shop', { method: 'POST', body: JSON.stringify(payload) });
       const yeni = Array.isArray(res) ? res[0] : res;
-      shop.unshift({ id: yeni.id, ad, kat, fiyat, stok, stokuyari, acik, yayinda, foto: fotoUrl });
+      shop.unshift({ id: yeni.id, ad, kat, fiyat, stok, stokuyari, acik, yayinda, foto: _shopFotolar[0]||'', fotolar: [..._shopFotolar] });
       toast('Ürün eklendi.', 'ok');
     }
     shopSifirla();
@@ -1785,11 +1829,9 @@ function shopDuzenle(id) {
   document.getElementById('sf-yayinda').checked = u.yayinda;
   document.getElementById('sf-foto-url').value = u.foto || '';
   shopDurumLblGuncelle();
-  if (u.foto) {
-    document.getElementById('sf-onizleme').src = u.foto;
-    document.getElementById('sf-onizleme').style.display = 'block';
-    document.getElementById('sf-placeholder').style.display = 'none';
-  }
+  _shopFotolar = u.fotolar ? [...u.fotolar] : (u.foto ? [u.foto] : []);
+  _pendingShopFotolar = [];
+  shopFotoGridGuncelle();
   document.getElementById('shopformbaslik').textContent = 'Ürün Düzenle';
   document.getElementById('sfiptal').style.display = '';
 }
@@ -1818,14 +1860,16 @@ function shopSifirla() {
   document.getElementById('sfacik').value = '';
   document.getElementById('sf-foto-input').value = '';
   document.getElementById('sf-foto-url').value = '';
-  document.getElementById('sf-onizleme').style.display = 'none';
-  document.getElementById('sf-placeholder').style.display = 'flex';
+  _shopFotolar = [];
+  _pendingShopFotolar = [];
+  shopFotoGridGuncelle();
   document.getElementById('sf-yayinda').checked = true;
   document.getElementById('shopformbaslik').textContent = 'Ürün Ekle';
   document.getElementById('sfiptal').style.display = 'none';
   shopDurumLblGuncelle();
   _pendingShopFoto = null;
 }
+
 
 function shopDurumLblGuncelle() {
   const chk = document.getElementById('sf-yayinda');
@@ -2283,6 +2327,8 @@ function portSqlKopyala() {
 document.addEventListener('DOMContentLoaded', () => {
   const chk = document.getElementById('port-yayinda-chk');
   if (chk) chk.addEventListener('change', portDurumLblGuncelle);
+  // Shop foto grid ilk render
+  shopFotoGridGuncelle();
 });
 
 // ─── TOAST ───
