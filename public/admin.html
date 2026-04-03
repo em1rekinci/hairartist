@@ -1890,11 +1890,13 @@ function portRender() {
         </div>
       </div>
       <div class="port-kart-meta">
-        <span class="port-kart-yayinda ${p.yayinda ? 'ac' : 'kp'}">${p.yayinda ? '● Yayında' : '○ Taslak'}</span>
-        <div class="port-kart-islemler">
-          <button class="bsm ${p.yayinda ? 'bred' : 'bonay'}" onclick="portToggleYayin('${p.id}')">${p.yayinda ? 'Kaldır' : 'Yayınla'}</button>
-          <button class="bsm bdet" onclick="portDuzenle('${p.id}')">Düzenle</button>
-          <button class="bsm bsil" onclick="portSil('${p.id}')">Sil</button>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:4px">
+          <span class="port-kart-yayinda ${p.yayinda ? 'ac' : 'kp'}">${p.yayinda ? '● Yayında' : '○ Taslak'}</span>
+          <button class="bsm ${p.yayinda ? 'bred' : 'bonay'}" onclick="portToggleYayin('${p.id}')">${p.yayinda ? 'Taslağa Al' : 'Yayınla'}</button>
+        </div>
+        <div style="display:flex;gap:4px">
+          <button class="bsm bdet" style="flex:1" onclick="portDuzenle('${p.id}')">Düzenle</button>
+          <button class="bsm bsil" style="flex:1" onclick="portSil('${p.id}')">🗑 Sil</button>
         </div>
       </div>
     </div>
@@ -2017,9 +2019,18 @@ function portDuzenle(id) {
 
 // Sil
 async function portSil(id) {
-  if (!confirm('Bu fotoğrafı silmek istediğinizden emin misiniz?')) return;
+  if (!confirm('Bu fotoğrafı kalıcı olarak silmek istediğinizden emin misiniz?')) return;
   try {
-    await sRest(`portfolio?id=eq.${id}`, { method: 'DELETE', headers: { 'Prefer': 'return=minimal' } });
+    const res = await fetch(`${SUPA_URL}/rest/v1/portfolio?id=eq.${id}`, {
+      method: 'DELETE',
+      headers: {
+        'apikey': SUPA_KEY,
+        'Authorization': 'Bearer ' + SUPA_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      }
+    });
+    if (!res.ok) { const t = await res.text(); throw new Error(t); }
     portFotolar = portFotolar.filter(x => x.id !== id);
     portRender();
     toast('Fotoğraf silindi.', 'ok');
