@@ -65,6 +65,10 @@ app.get('/fiyatlar', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'fiyatlar.html'));
 });
 
+app.get('/urun', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'urun.html'));
+});
+
 // ─── PAYTR ÖDEME SONUÇ SAYFALARI ──────────────────────────────────────────────
 app.get('/odeme-basarili', (req, res) => {
   const html = sayfaHTML(
