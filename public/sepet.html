@@ -96,6 +96,22 @@ body{overflow-x:hidden}
 .paytr-modal-kapat:hover{background:rgba(0,0,0,.3)}
 #paytrFrame{width:100%;height:560px;border:none;display:block}
 
+/* ── SÖZLEŞME MODAL ── */
+.sozlesme-ov{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9100;display:none;align-items:center;justify-content:center;padding:20px}
+.sozlesme-ov.ac{display:flex}
+.sozlesme-modal{background:#fff;width:100%;max-width:600px;max-height:80vh;display:flex;flex-direction:column;border-radius:4px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.35)}
+.sozlesme-modal-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(8,8,8,.1);flex-shrink:0}
+.sozlesme-modal-baslik{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--black)}
+.sozlesme-modal-kapat{background:rgba(8,8,8,.08);border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center;transition:background .2s;flex-shrink:0}
+.sozlesme-modal-kapat:hover{background:rgba(8,8,8,.18)}
+.sozlesme-modal-icerik{flex:1;overflow-y:auto;padding:20px;font-size:.75rem;line-height:1.9;color:#4a4540}
+.sozlesme-modal-icerik h3{font-family:'Playfair Display',serif;font-size:.95rem;font-weight:700;color:var(--black);margin:18px 0 8px}
+.sozlesme-modal-icerik h3:first-child{margin-top:0}
+.sozlesme-modal-icerik p{margin-bottom:10px}
+.sozlesme-modal-footer{padding:12px 20px;border-top:1px solid rgba(8,8,8,.1);display:flex;justify-content:flex-end;flex-shrink:0}
+.sozlesme-kapat-btn{background:var(--black);color:var(--off);border:none;padding:9px 20px;font-size:.55rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;font-family:'Montserrat',sans-serif;transition:opacity .2s}
+.sozlesme-kapat-btn:hover{opacity:.8}
+
 /* ── TOAST ── */
 .toast-sp{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--black);color:var(--off);padding:12px 20px;font-size:.68rem;letter-spacing:.06em;z-index:9999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;border-radius:2px}
 .toast-sp.goster{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -158,6 +174,20 @@ body{overflow-x:hidden}
   <div class="paytr-modal">
     <button class="paytr-modal-kapat" onclick="paytrKapat()">✕</button>
     <iframe id="paytrFrame" src="" allowfullscreen></iframe>
+  </div>
+</div>
+
+<!-- Mesafeli Satış Sözleşmesi Modal -->
+<div class="sozlesme-ov" id="sozlesmeOv" onclick="sozlesmeKapat(event)">
+  <div class="sozlesme-modal">
+    <div class="sozlesme-modal-header">
+      <span class="sozlesme-modal-baslik" id="sozlesmeBaslik">Sözleşme</span>
+      <button class="sozlesme-modal-kapat" onclick="sozlesmeKapat()">✕</button>
+    </div>
+    <div class="sozlesme-modal-icerik" id="sozlesmeIcerik"></div>
+    <div class="sozlesme-modal-footer">
+      <button class="sozlesme-kapat-btn" onclick="sozlesmeKapat()">Okudum, Kapat</button>
+    </div>
   </div>
 </div>
 
@@ -243,8 +273,8 @@ body{overflow-x:hidden}
       <div style="display:flex;align-items:flex-start;gap:9px;margin-bottom:14px;margin-top:8px">
         <input type="checkbox" id="sozlesmeOnay" style="margin-top:2px;width:14px;height:14px;flex-shrink:0;cursor:pointer;accent-color:var(--black)">
         <label for="sozlesmeOnay" style="font-size:.58rem;color:var(--dim);line-height:1.6;cursor:pointer">
-          <a href="/mesafeli-satis-sozlesmesi" target="_blank" style="color:var(--black);text-decoration:underline;text-underline-offset:2px">Mesafeli Satış Sözleşmesi</a>'ni ve
-          <a href="/on-bilgilendirme-formu" target="_blank" style="color:var(--black);text-decoration:underline;text-underline-offset:2px">Ön Bilgilendirme Formu</a>'nu okudum, onaylıyorum.
+          <a href="#" onclick="sozlesmeAc('mesafeli');return false;" style="color:var(--black);text-decoration:underline;text-underline-offset:2px">Mesafeli Satış Sözleşmesi</a>'ni ve
+          <a href="#" onclick="sozlesmeAc('onbilgi');return false;" style="color:var(--black);text-decoration:underline;text-underline-offset:2px">Ön Bilgilendirme Formu</a>'nu okudum, onaylıyorum.
         </label>
       </div>
 
@@ -257,7 +287,7 @@ body{overflow-x:hidden}
         256-bit SSL ile güvenli ödeme
       </div>
       <div style="display:flex;justify-content:center;margin-top:14px">
-        <img src="images/paytr-logo.png" alt="PayTR Güvenli Ödeme" style="height:28px;opacity:.55;object-fit:contain" onerror="this.style.display='none'">
+        <img src="images/paytr-logo.png" alt="PayTR Güvenli Ödeme" style="height:22px;width:auto;opacity:.6;object-fit:contain">
       </div>
     </div>
   </div>
@@ -501,6 +531,62 @@ function paytrKapat(){
   document.getElementById('paytrOv').classList.remove('ac');
   document.getElementById('paytrFrame').src='';
   document.body.style.overflow='';
+}
+
+// ── SÖZLEŞME MODAL
+const sozlesmeler = {
+  mesafeli: {
+    baslik: 'Mesafeli Satış Sözleşmesi',
+    icerik: `
+      <h3>1. Taraflar</h3>
+      <p><strong>Satıcı:</strong> Hair Artist — Tekirdağ</p>
+      <p><strong>Alıcı:</strong> Sipariş formunu dolduran kişi</p>
+      <h3>2. Konu</h3>
+      <p>Bu sözleşme, alıcının web sitesi üzerinden satın aldığı ürünlere ilişkin hak ve yükümlülükleri düzenlemektedir.</p>
+      <h3>3. Ürün Bilgileri</h3>
+      <p>Ürünlere ait nitelik, miktar, renk, adet ve fiyat bilgileri sipariş özeti ekranında gösterilmektedir. Gösterilen fiyatlar KDV dahil Türk Lirası cinsindendir.</p>
+      <h3>4. Teslimat</h3>
+      <p>Sipariş, ödemenin onaylanmasından itibaren en geç 7 iş günü içinde kargo firmasına teslim edilir. Kargo ücreti 500 ₺ ve üzeri siparişlerde ücretsizdir; altındaki siparişlerde 49,90 ₺ olarak uygulanır.</p>
+      <h3>5. Cayma Hakkı</h3>
+      <p>Alıcı, ürünü teslim aldığı tarihten itibaren 14 gün içinde herhangi bir gerekçe göstermeksizin cayma hakkını kullanabilir. Cayma hakkının kullanılabilmesi için ürünün kullanılmamış ve orijinal ambalajında olması gerekmektedir.</p>
+      <h3>6. Garanti</h3>
+      <p>Satılan ürünler mevzuatta öngörülen garanti sürelerine tabidir. Garanti kapsamındaki sorunlar için iletişim adresinden bizimle iletişime geçebilirsiniz.</p>
+      <h3>7. Uyuşmazlık</h3>
+      <p>Bu sözleşmeden doğan uyuşmazlıklarda Tekirdağ Tüketici Hakem Heyeti veya Tüketici Mahkemeleri yetkilidir.</p>
+    `
+  },
+  onbilgi: {
+    baslik: 'Ön Bilgilendirme Formu',
+    icerik: `
+      <h3>Satıcı Bilgileri</h3>
+      <p><strong>Ticari Unvan:</strong> Hair Artist<br><strong>Adres:</strong> Tekirdağ<br><strong>E-posta:</strong> info@hairartist.com.tr</p>
+      <h3>Ürün Bilgileri</h3>
+      <p>Sipariş ettiğiniz ürünlerin temel nitelikleri, fiyatı ve teslimat bilgileri sipariş tamamlama ekranında detaylı olarak gösterilmektedir.</p>
+      <h3>Ödeme Bilgileri</h3>
+      <p>Ödeme işlemi PayTR altyapısı üzerinden 256-bit SSL şifreleme ile güvenli biçimde gerçekleştirilmektedir. Kart bilgileriniz tarafımızca saklanmamaktadır.</p>
+      <h3>Teslimat</h3>
+      <p>Siparişler ödeme onayından itibaren en geç 7 iş günü içinde kargoya verilir. Kargo ücreti 500 ₺ altı siparişler için 49,90 ₺'dir; 500 ₺ ve üzerinde ücretsizdir.</p>
+      <h3>Cayma Hakkı</h3>
+      <p>Teslim tarihinden itibaren 14 gün içinde iade talebinde bulunabilirsiniz. İade edilecek ürünün kullanılmamış ve orijinal ambalajında olması gerekmektedir.</p>
+      <h3>Şikâyet ve İletişim</h3>
+      <p>Her türlü soru ve şikâyetleriniz için iletişim sayfamızdan veya e-posta yoluyla bize ulaşabilirsiniz.</p>
+    `
+  }
+};
+
+function sozlesmeAc(tip) {
+  const s = sozlesmeler[tip];
+  if (!s) return;
+  document.getElementById('sozlesmeBaslik').textContent = s.baslik;
+  document.getElementById('sozlesmeIcerik').innerHTML = s.icerik;
+  document.getElementById('sozlesmeOv').classList.add('ac');
+  document.body.style.overflow = 'hidden';
+}
+
+function sozlesmeKapat(e) {
+  if (e && e.target !== document.getElementById('sozlesmeOv')) return;
+  document.getElementById('sozlesmeOv').classList.remove('ac');
+  document.body.style.overflow = '';
 }
 
 // PayTR'dan başarı/hata mesajı dinle
