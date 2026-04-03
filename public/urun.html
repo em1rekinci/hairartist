@@ -26,8 +26,7 @@ body{overflow-x:hidden}
 /* ── GALERİ ── */
 .galeri-sol{position:sticky;top:70px;height:calc(100vh - 70px);display:flex;flex-direction:column;background:#f5f1ea;overflow:hidden}
 .galeri-ana{flex:1;position:relative;overflow:hidden;cursor:zoom-in}
-.galeri-ana img{width:100%;height:100%;object-fit:cover;transition:transform .6s cubic-bezier(.4,0,.2,1);display:block}
-.galeri-ana img:hover{transform:scale(1.04)}
+.galeri-ana img{width:100%;height:100%;object-fit:cover;display:block;transition:opacity .25s}
 .galeri-ana-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#ede9e1}
 .galeri-placeholder-ic{display:flex;flex-direction:column;align-items:center;gap:12px;opacity:.2}
 .galeri-placeholder-ic svg{width:48px;height:48px}
@@ -119,7 +118,17 @@ body{overflow-x:hidden}
 .urun-btn{font-size:.55rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(8,8,8,.5);border:1px solid rgba(8,8,8,.2);padding:7px 12px;background:transparent;cursor:pointer;font-family:'Montserrat',sans-serif;transition:all .2s}
 .urun-btn:hover{background:var(--black);color:var(--off);border-color:var(--black)}
 
-/* ── YÜKLEME / HATA ── */
+/* ── LİGHTBOX ── */
+.lb-ov{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9500;display:none;align-items:center;justify-content:center;padding:16px;cursor:zoom-out}
+.lb-ov.ac{display:flex}
+.lb-img{max-width:90vw;max-height:88vh;object-fit:contain;border-radius:2px;user-select:none;pointer-events:none}
+.lb-kapat{position:absolute;top:16px;right:20px;background:rgba(255,255,255,.12);border:none;width:36px;height:36px;border-radius:50%;cursor:pointer;color:#fff;font-size:1.1rem;display:flex;align-items:center;justify-content:center;transition:background .2s;z-index:1}
+.lb-kapat:hover{background:rgba(255,255,255,.25)}
+.lb-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.1);border:none;width:44px;height:64px;cursor:pointer;color:#fff;font-size:1.3rem;display:flex;align-items:center;justify-content:center;transition:background .2s;z-index:1}
+.lb-nav:hover{background:rgba(255,255,255,.2)}
+.lb-prev{left:12px;border-radius:2px}
+.lb-next{right:12px;border-radius:2px}
+.lb-sayac{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.5);font-size:.6rem;letter-spacing:.14em;font-family:'Montserrat',sans-serif}
 .yukle-wrap{display:flex;align-items:center;justify-content:center;min-height:60vh;flex-direction:column;gap:16px}
 .yukle-spin{width:32px;height:32px;border:2px solid rgba(8,8,8,.1);border-top-color:var(--black);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -207,6 +216,15 @@ body{overflow-x:hidden}
 
 <div class="toast-urun" id="toastUrun"></div>
 
+<!-- Lightbox -->
+<div class="lb-ov" id="lbOv" onclick="lbKapat(event)">
+  <button class="lb-kapat" onclick="lbKapat()">✕</button>
+  <button class="lb-nav lb-prev" id="lbPrev" onclick="lbNav(-1,event)">‹</button>
+  <img class="lb-img" id="lbImg" src="" alt="">
+  <button class="lb-nav lb-next" id="lbNext" onclick="lbNav(1,event)">›</button>
+  <span class="lb-sayac" id="lbSayac"></span>
+</div>
+
 <script>
 // ── SUPABASE
 const SUPA_URL = 'https://botxnihztrnwzjnrlwzv.supabase.co';
@@ -256,6 +274,35 @@ function galeriGit(idx) {
   if (sayac) sayac.textContent = `${idx + 1} / ${tumFotolar.length}`;
 }
 
+// ── LİGHTBOX
+function lbAc(idx) {
+  if (!tumFotolar.length) return;
+  aktifFoto = idx;
+  const ov = document.getElementById('lbOv');
+  const img = document.getElementById('lbImg');
+  const sayac = document.getElementById('lbSayac');
+  img.src = tumFotolar[idx];
+  if (sayac) sayac.textContent = tumFotolar.length > 1 ? `${idx + 1} / ${tumFotolar.length}` : '';
+  const prevBtn = document.getElementById('lbPrev');
+  const nextBtn = document.getElementById('lbNext');
+  if (prevBtn) prevBtn.style.display = tumFotolar.length > 1 ? 'flex' : 'none';
+  if (nextBtn) nextBtn.style.display = tumFotolar.length > 1 ? 'flex' : 'none';
+  ov.classList.add('ac');
+  document.body.style.overflow = 'hidden';
+}
+
+function lbKapat(e) {
+  if (e && e.target !== e.currentTarget && !e.target.classList.contains('lb-ov')) return;
+  document.getElementById('lbOv').classList.remove('ac');
+  document.body.style.overflow = '';
+}
+
+function lbNav(delta, e) {
+  if (e) e.stopPropagation();
+  const yeni = (aktifFoto + delta + tumFotolar.length) % tumFotolar.length;
+  lbAc(yeni);
+}
+
 // ── ADET
 let adet = 1;
 function adetDegistir(delta) {
@@ -293,7 +340,7 @@ function urunKartHtml(u) {
   const stokBadge = u.stok === 0
     ? '<span class="yakinda-tag" style="background:#b03020">Tükendi</span>'
     : u.stok <= (u.stok_uyari || 3)
-      ? `<span class="yakinda-tag" style="background:#8a5c00">Son ${u.stok} adet</span>`
+      ? `<span class="yakinda-tag" style="background:#8a5c00">Son Birkaç Adet</span>`
       : '';
   const fotolar = fotoUrlParse(u.foto_url);
   const fotoHtml = fotolar[0]
@@ -333,9 +380,9 @@ function sayfaRender(u, benzerler) {
   if (u.stok === 0) {
     stokClass = 'stok-yok'; stokHtml = '<div class="stok-badge-dot"></div>Tükendi';
   } else if (u.stok <= (u.stok_uyari || 3)) {
-    stokClass = 'stok-az'; stokHtml = `<div class="stok-badge-dot"></div>Son ${u.stok} adet kaldı`;
+    stokClass = 'stok-az'; stokHtml = '<div class="stok-badge-dot"></div>Son birkaç adet kaldı';
   } else {
-    stokClass = 'stok-ok'; stokHtml = `<div class="stok-badge-dot"></div>Stokta var — ${u.stok} adet`;
+    stokClass = 'stok-ok'; stokHtml = '<div class="stok-badge-dot"></div>Stokta Mevcut';
   }
 
   // Galeri thumbler
@@ -346,14 +393,13 @@ function sayfaRender(u, benzerler) {
 
   // Galeri ana foto
   const galeriAnaHtml = fotolar.length > 0
-    ? `<img id="galeriAna" src="${fotolar[0]}" alt="${u.ad}" style="transition:opacity .25s" onerror="this.style.display='none'">
+    ? `<img id="galeriAna" src="${fotolar[0]}" alt="${u.ad}" style="transition:opacity .25s;cursor:zoom-in" onclick="lbAc(aktifFoto)" onerror="this.style.display='none'">
        ${fotolar.length > 1 ? `<div class="galeri-sayac" id="galeriSayac">1 / ${fotolar.length}</div>` : ''}`
     : `<div class="galeri-ana-placeholder"><div class="galeri-placeholder-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><span>Fotoğraf yok</span></div></div>`;
 
   // Özellikler
   const ozellikler = [
     { k: 'Kategori', v: u.kat },
-    { k: 'Stok Adedi', v: u.stok === 0 ? 'Tükendi' : `${u.stok} adet` },
   ].filter(o => o.v);
 
   const ozellikHtml = ozellikler.map(o => `
@@ -386,7 +432,7 @@ function sayfaRender(u, benzerler) {
     <div class="urun-detay">
       <!-- GALERİ -->
       <div class="galeri-sol">
-        <div class="galeri-ana" id="galeriAnaWrap" ${fotolar.length > 1 ? 'onclick="galeriSonraki()"' : ''}>
+        <div class="galeri-ana" id="galeriAnaWrap" onclick="lbAc(aktifFoto)" style="cursor:zoom-in">
           ${galeriAnaHtml}
         </div>
         ${fotolar.length > 1 ? `<div class="galeri-thumbler">${thumblerHtml}</div>` : ''}
@@ -444,8 +490,10 @@ function sayfaRender(u, benzerler) {
 
   // Klavye navigasyonu
   document.onkeydown = (e) => {
-    if (e.key === 'ArrowRight') galeriSonraki();
-    if (e.key === 'ArrowLeft') galeriOnceki();
+    const lbAcik = document.getElementById('lbOv').classList.contains('ac');
+    if (e.key === 'Escape' && lbAcik) { document.getElementById('lbOv').classList.remove('ac'); document.body.style.overflow=''; return; }
+    if (e.key === 'ArrowRight') lbAcik ? lbNav(1,null) : galeriSonraki();
+    if (e.key === 'ArrowLeft') lbAcik ? lbNav(-1,null) : galeriOnceki();
   };
 }
 
@@ -456,6 +504,34 @@ function galeriSonraki() {
 function galeriOnceki() {
   if (tumFotolar.length < 2) return;
   galeriGit((aktifFoto - 1 + tumFotolar.length) % tumFotolar.length);
+}
+
+// ── LİGHTBOX
+function lbAc(idx) {
+  if (!tumFotolar.length) return;
+  aktifFoto = idx;
+  const ov = document.getElementById('lbOv');
+  const img = document.getElementById('lbImg');
+  const sayac = document.getElementById('lbSayac');
+  img.src = tumFotolar[idx];
+  sayac.textContent = tumFotolar.length > 1 ? `${idx + 1} / ${tumFotolar.length}` : '';
+  document.getElementById('lbPrev').style.display = tumFotolar.length > 1 ? 'flex' : 'none';
+  document.getElementById('lbNext').style.display = tumFotolar.length > 1 ? 'flex' : 'none';
+  ov.classList.add('ac');
+  document.body.style.overflow = 'hidden';
+}
+function lbKapat(e) {
+  if (e && e.target !== document.getElementById('lbOv') && !e.currentTarget.classList.contains('lb-kapat')) return;
+  document.getElementById('lbOv').classList.remove('ac');
+  document.body.style.overflow = '';
+}
+function lbNav(delta, e) {
+  if (e) e.stopPropagation();
+  const yeni = (aktifFoto + delta + tumFotolar.length) % tumFotolar.length;
+  galeriGit(yeni);
+  document.getElementById('lbImg').src = tumFotolar[yeni];
+  const sayac = document.getElementById('lbSayac');
+  sayac.textContent = tumFotolar.length > 1 ? `${yeni + 1} / ${tumFotolar.length}` : '';
 }
 
 // ── SEPET (localStorage)

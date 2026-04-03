@@ -240,6 +240,14 @@ body{overflow-x:hidden}
 
       <div class="hata-mesaj" id="hataMesaj"></div>
 
+      <div style="display:flex;align-items:flex-start;gap:9px;margin-bottom:14px;margin-top:8px">
+        <input type="checkbox" id="sozlesmeOnay" style="margin-top:2px;width:14px;height:14px;flex-shrink:0;cursor:pointer;accent-color:var(--black)">
+        <label for="sozlesmeOnay" style="font-size:.58rem;color:var(--dim);line-height:1.6;cursor:pointer">
+          <a href="/mesafeli-satis-sozlesmesi" target="_blank" style="color:var(--black);text-decoration:underline;text-underline-offset:2px">Mesafeli Satış Sözleşmesi</a>'ni ve
+          <a href="/on-bilgilendirme-formu" target="_blank" style="color:var(--black);text-decoration:underline;text-underline-offset:2px">Ön Bilgilendirme Formu</a>'nu okudum, onaylıyorum.
+        </label>
+      </div>
+
       <button class="odeme-btn" id="odemeBtn" onclick="odemeBaslat()">
         <div class="spin"></div>
         <span class="btn-txt">Ödemeye Geç</span>
@@ -247,6 +255,9 @@ body{overflow-x:hidden}
       <div class="guvenli-bilgi">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         256-bit SSL ile güvenli ödeme
+      </div>
+      <div style="display:flex;justify-content:center;margin-top:14px">
+        <img src="images/paytr-logo.png" alt="PayTR Güvenli Ödeme" style="height:28px;opacity:.55;object-fit:contain" onerror="this.style.display='none'">
       </div>
     </div>
   </div>
@@ -422,6 +433,12 @@ async function odemeBaslat(){
 
   if(hatalar.length){
     hataMesaj.textContent=`Lütfen doldurun: ${hatalar.join(', ')}.`;
+    hataMesaj.style.display='block';
+    return;
+  }
+
+  if(!document.getElementById('sozlesmeOnay').checked){
+    hataMesaj.textContent='Devam etmek için Mesafeli Satış Sözleşmesi\'ni onaylamanız gerekiyor.';
     hataMesaj.style.display='block';
     return;
   }
