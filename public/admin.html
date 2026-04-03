@@ -323,11 +323,12 @@ tbody td{padding:10px 13px;vertical-align:middle}
 .port-kart-info{flex:1;min-width:0}
 .port-kart-ad{font-size:.68rem;font-weight:500;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
 .port-kart-kat{font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.6);display:block;margin-top:1px}
-.port-kart-meta{padding:9px 10px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:6px;background:var(--white)}
-.port-kart-yayinda{font-size:.48rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;padding:2px 7px;border-radius:8px;border:1px solid}
+.port-kart-meta{padding:9px 10px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:6px;background:var(--white)}
+.port-kart-yayinda{font-size:.48rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;padding:2px 7px;border-radius:8px;border:1px solid;align-self:flex-start}
 .port-kart-yayinda.ac{background:var(--gbg);border-color:var(--gbdr);color:var(--green)}
 .port-kart-yayinda.kp{background:var(--ybg);border-color:var(--ybdr);color:var(--yellow)}
-.port-kart-islemler{display:flex;gap:4px}
+.port-kart-islemler{display:flex;gap:4px;width:100%}
+.port-kart-islemler .bsm{flex:1;text-align:center;justify-content:center}
 .port-foto-placeholder{width:100%;aspect-ratio:3/4;background:var(--bg2);border:2px dashed var(--line2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:all .2s;border-radius:3px}
 .port-foto-placeholder:hover{background:var(--bg3);border-color:var(--text3)}
 .port-foto-placeholder span{font-size:.62rem;color:var(--text3);letter-spacing:.08em}
@@ -774,43 +775,7 @@ tbody td{padding:10px 13px;vertical-align:middle}
             </div>
           </div>
 
-          <!-- SQL Kurulum notu -->
-          <div class="card" style="margin-top:12px" id="port-sql-kart">
-            <div class="ch"><h3 style="font-size:.85rem">⚙️ Supabase Kurulum</h3><button class="tbtn" onclick="document.getElementById('port-sql-kart').style.display='none'">Kapat</button></div>
-            <div class="cb">
-              <p style="font-size:.68rem;color:var(--text3);margin-bottom:10px;line-height:1.7">Aşağıdaki SQL'i Supabase → SQL Editor'e yapıştırın. Bir kez çalıştırmanız yeterli.</p>
-              <pre id="port-sql-text" style="background:var(--sb);color:#c8ff00;padding:13px;border-radius:4px;font-size:.62rem;line-height:1.7;overflow-x:auto;white-space:pre-wrap;cursor:pointer" title="Kopyalamak için tıkla" onclick="portSqlKopyala()">-- 1. Tablo oluştur
-CREATE TABLE IF NOT EXISTS portfolio (
-  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  ad text NOT NULL,
-  kategori text NOT NULL DEFAULT 'balyaj',
-  foto_url text NOT NULL,
-  yayinda boolean NOT NULL DEFAULT true,
-  sira integer NOT NULL DEFAULT 0,
-  created_at timestamptz DEFAULT now()
-);
 
--- 2. Sıralama için index
-CREATE INDEX IF NOT EXISTS portfolio_sira_idx ON portfolio(sira);
-
--- 3. RLS aç + politikalar
-ALTER TABLE portfolio ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "anon_read" ON portfolio FOR SELECT USING (true);
-CREATE POLICY "anon_write" ON portfolio FOR ALL USING (true);
-
--- 4. Storage bucket (varsa atla)
-INSERT INTO storage.buckets (id, name, public)
-VALUES ('portfolio-fotolar', 'portfolio-fotolar', true)
-ON CONFLICT (id) DO NOTHING;
-
--- 5. Storage politikası
-CREATE POLICY "public_portfolio_storage"
-ON storage.objects FOR ALL
-USING (bucket_id = 'portfolio-fotolar')
-WITH CHECK (bucket_id = 'portfolio-fotolar');</pre>
-              <button class="sbtn" onclick="portSqlKopyala()" style="margin-top:8px">📋 SQL'i Kopyala</button>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -1927,9 +1892,9 @@ function portRender() {
       <div class="port-kart-meta">
         <span class="port-kart-yayinda ${p.yayinda ? 'ac' : 'kp'}">${p.yayinda ? '● Yayında' : '○ Taslak'}</span>
         <div class="port-kart-islemler">
-          <button class="bsm bblue" onclick="portToggleYayin('${p.id}')" title="${p.yayinda ? 'Yayından kaldır' : 'Yayınla'}">${p.yayinda ? '↓' : '↑'}</button>
+          <button class="bsm ${p.yayinda ? 'bred' : 'bonay'}" onclick="portToggleYayin('${p.id}')">${p.yayinda ? 'Kaldır' : 'Yayınla'}</button>
           <button class="bsm bdet" onclick="portDuzenle('${p.id}')">Düzenle</button>
-          <button class="bsm bsil" onclick="portSil('${p.id}')">✕</button>
+          <button class="bsm bsil" onclick="portSil('${p.id}')">Sil</button>
         </div>
       </div>
     </div>
