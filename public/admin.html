@@ -1063,7 +1063,7 @@ function statsGuncelle(){
   const t=TRZ.length,bek=TRZ.filter(r=>r.durum==='bekliyor').length;
   const onay=TRZ.filter(r=>r.durum==='onaylandi'&&r.odemeAlindi);
   const n=new Date();
-  const buay=onay.filter(r=>{const d=new Date(r.tarih+'T12:00');return d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear();});
+  const buay=onay.filter(r=>{const d=new Date((r.tarih||'').substring(0,10)+'T12:00');return d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear();});
   const tc=onay.reduce((s,r)=>s+fHesapla(r),0);
   const ac=buay.reduce((s,r)=>s+fHesapla(r),0);
   const AY=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
@@ -1983,7 +1983,7 @@ function ciroRender(){
   const {bas,bit}=ciroPeriyotAralik(CIRO_PERIYOT);
   let odemeler=TRZ.filter(r=>{
     if(!r.odemeAlindi||r.durum!=='onaylandi')return false;
-    const t=new Date(r.tarih+'T12:00');
+    const t=new Date((r.tarih||'').substring(0,10)+'T12:00');
     return t>=bas&&t<=bit;
   });
   if(CIRO_YONTEM!=='hepsi')odemeler=odemeler.filter(r=>(r.odemeYontemi||'nakit')===CIRO_YONTEM);
@@ -2041,16 +2041,16 @@ function ciroGrafik(bas,bit,odemeler){
     for(let h=8;h<=20;h++) noktalar.push({lbl:`${h}:00`,val:odemeler.filter(r=>{const [sh]=r.saat?r.saat.split(':'):['0'];return parseInt(sh)===h;}).reduce((s,r)=>s+fHesapla(r),0)});
   } else if(p==='hafta'){
     const GA=['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
-    for(let i=0;i<7;i++){const d=new Date(bas);d.setDate(bas.getDate()+i);const ts=d.toISOString().split('T')[0];noktalar.push({lbl:GA[i],val:odemeler.filter(r=>r.tarih===ts).reduce((s,r)=>s+fHesapla(r),0)});}
+    for(let i=0;i<7;i++){const d=new Date(bas);d.setDate(bas.getDate()+i);const ts=d.toISOString().split('T')[0];noktalar.push({lbl:GA[i],val:odemeler.filter(r=>(r.tarih||'').substring(0,10)===ts).reduce((s,r)=>s+fHesapla(r),0)});}
   } else if(p==='ay'){
     const sonGun=new Date(n.getFullYear(),n.getMonth()+1,0).getDate();
-    for(let g=1;g<=sonGun;g++){const ts=`${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(g).padStart(2,'0')}`;noktalar.push({lbl:String(g),val:odemeler.filter(r=>r.tarih===ts).reduce((s,r)=>s+fHesapla(r),0)});}
+    for(let g=1;g<=sonGun;g++){const ts=`${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(g).padStart(2,'0')}`;noktalar.push({lbl:String(g),val:odemeler.filter(r=>(r.tarih||'').substring(0,10)===ts).reduce((s,r)=>s+fHesapla(r),0)});}
   } else if(p==='yil'){
     const AYK=['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'];
-    for(let m=0;m<12;m++){noktalar.push({lbl:AYK[m],val:odemeler.filter(r=>{const d=new Date(r.tarih+'T12:00');return d.getMonth()===m&&d.getFullYear()===n.getFullYear();}).reduce((s,r)=>s+fHesapla(r),0)});}
+    for(let m=0;m<12;m++){noktalar.push({lbl:AYK[m],val:odemeler.filter(r=>{const d=new Date((r.tarih||'').substring(0,10)+'T12:00');return d.getMonth()===m&&d.getFullYear()===n.getFullYear();}).reduce((s,r)=>s+fHesapla(r),0)});}
   } else {
     const AYK=['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'];
-    for(let m=0;m<12;m++){noktalar.push({lbl:AYK[m],val:odemeler.filter(r=>{const d=new Date(r.tarih+'T12:00');return d.getMonth()===m&&d.getFullYear()===n.getFullYear();}).reduce((s,r)=>s+fHesapla(r),0)});}
+    for(let m=0;m<12;m++){noktalar.push({lbl:AYK[m],val:odemeler.filter(r=>{const d=new Date((r.tarih||'').substring(0,10)+'T12:00');return d.getMonth()===m&&d.getFullYear()===n.getFullYear();}).reduce((s,r)=>s+fHesapla(r),0)});}
   }
 
   const mx=Math.max(...noktalar.map(x=>x.val),1);
