@@ -543,15 +543,9 @@ tbody td{padding:10px 13px;vertical-align:middle}
 
     <!-- ══ MÜŞTERİLER ══ -->
     <div class="page" id="page-musteriler">
-      <div style="margin-bottom:16px"><h2 style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700">Müşteriler</h2><p style="font-size:.7rem;color:var(--text3);margin-top:3px">Tüm müşteri kayıtları — Birden fazla rezervasyonu olan müşteriler</p></div>
+      <div style="margin-bottom:16px"><h2 style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700">Müşteriler</h2><p style="font-size:.7rem;color:var(--text3);margin-top:3px">Tüm müşteri kayıtları</p></div>
       <div class="card">
         <div class="ch" style="gap:8px;flex-wrap:wrap">
-          <div style="display:flex;align-items:center;gap:8px">
-            <div class="fbar">
-              <button class="fbtn ak" id="must-filtre-cok" onclick="mustFiltrele('cok',this)">🔁 2+ Rezervasyon</button>
-              <button class="fbtn" id="must-filtre-hepsi" onclick="mustFiltrele('hepsi',this)">Tümü</button>
-            </div>
-          </div>
           <div class="sw2">
             <svg class="sico" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <input class="sinp" type="text" placeholder="Müşteri ara..." id="mustarama" oninput="mustAra(this.value)" style="width:170px">
@@ -1437,7 +1431,6 @@ async function personelAta(rezId, personelId){
 function mKapat(){document.getElementById('mov').classList.remove('open');}
 
 // ─── MÜŞTERİLER ───
-let MUST_FILTRE = 'cok'; // 'cok' = 2+ rezervasyon, 'hepsi' = hepsi
 let MUST_ARAMA = '';
 
 function mustGrupla(){
@@ -1450,24 +1443,16 @@ function mustGrupla(){
   return Object.values(gruplar);
 }
 
-function mustFiltrele(tip, btn){
-  MUST_FILTRE = tip;
-  document.querySelectorAll('#must-filtre-cok,#must-filtre-hepsi').forEach(b=>b.classList.remove('ak'));
-  if(btn) btn.classList.add('ak');
-  mustRender();
-}
-
 function mustAra(val){ MUST_ARAMA = val.toLowerCase(); mustRender(); }
 
 function mustRender(){
   const e=document.getElementById('mustbody');
   let liste = mustGrupla().sort((a,b)=>b.rezervasyonlar.length-a.rezervasyonlar.length);
-  if(MUST_FILTRE === 'cok') liste = liste.filter(m => m.rezervasyonlar.length >= 2);
   if(MUST_ARAMA) liste = liste.filter(m => m.ad.toLowerCase().includes(MUST_ARAMA) || m.telefon.includes(MUST_ARAMA));
   const lbl = document.getElementById('must-sayi-lbl');
   if(lbl) lbl.textContent = liste.length + ' müşteri';
   if(!liste.length){
-    e.innerHTML=`<tr><td colspan="7" class="bos">${MUST_FILTRE==='cok'?'2+ rezervasyonu olan müşteri bulunamadı.':'Müşteri yok.'}</td></tr>`;
+    e.innerHTML=`<tr><td colspan="7" class="bos">Müşteri yok.</td></tr>`;
     return;
   }
   e.innerHTML=liste.map(m=>{
@@ -1524,7 +1509,7 @@ function mustDetay(telEnc){
   document.getElementById('must-mlist').innerHTML = sorted.map(r => {
     const p = personel.find(x=>x.id===r.personelId)||personel.find(x=>x.ad===r.personelId);
     const h = FYT[r.hizmet];
-    const fiyatStr = r.odemeAlindi && r.fiyat ? r.fiyat.toLocaleString('tr-TR')+'₺' : (h ? Math.round((h.min+h.max)/2).toLocaleString('tr-TR')+'₺ (tah.)' : '—');
+    const fiyatStr = r.odemeAlindi && r.fiyat ? r.fiyat.toLocaleString('tr-TR')+'₺' : (h ? Math.round((h.min+h.max)/2).toLocaleString('tr-TR')+'₺' : '—');
     const durumBadge = bH(r.durum);
     const odemeBadge = r.odemeAlindi ? '<span class="badge bo" style="font-size:.42rem;margin-left:5px">Ödendi</span>' : '';
     return `<div style="padding:13px 18px;border-bottom:1px solid var(--line);display:flex;align-items:flex-start;gap:12px">
