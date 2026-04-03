@@ -309,6 +309,31 @@ tbody td{padding:10px 13px;vertical-align:middle}
 .ustk{font-size:.64rem;color:var(--text3);text-align:right;white-space:nowrap}
 .stokaz{color:var(--red)}
 
+/* ─── PORTFOLİO ─── */
+.portgrid{display:grid;grid-template-columns:1fr 285px;gap:14px;align-items:start}
+.port-stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+.port-stat{background:var(--white);border:1px solid var(--line);border-radius:var(--r);padding:13px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.port-foto-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;padding:16px}
+.port-kart{background:var(--bg);border:1px solid var(--line);border-radius:4px;overflow:hidden;position:relative;transition:box-shadow .2s}
+.port-kart:hover{box-shadow:0 3px 12px rgba(0,0,0,.1)}
+.port-kart-img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;background:var(--bg3)}
+.port-kart-img-wrap{position:relative;width:100%;aspect-ratio:3/4;background:var(--bg3);overflow:hidden}
+.port-kart-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,8,.8) 0%,transparent 55%);display:flex;align-items:flex-end;padding:10px 9px;opacity:0;transition:opacity .25s}
+.port-kart:hover .port-kart-overlay{opacity:1}
+.port-kart-info{flex:1;min-width:0}
+.port-kart-ad{font-size:.68rem;font-weight:500;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.port-kart-kat{font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.6);display:block;margin-top:1px}
+.port-kart-meta{padding:9px 10px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:6px;background:var(--white)}
+.port-kart-yayinda{font-size:.48rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;padding:2px 7px;border-radius:8px;border:1px solid}
+.port-kart-yayinda.ac{background:var(--gbg);border-color:var(--gbdr);color:var(--green)}
+.port-kart-yayinda.kp{background:var(--ybg);border-color:var(--ybdr);color:var(--yellow)}
+.port-kart-islemler{display:flex;gap:4px}
+.port-foto-placeholder{width:100%;aspect-ratio:3/4;background:var(--bg2);border:2px dashed var(--line2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:all .2s;border-radius:3px}
+.port-foto-placeholder:hover{background:var(--bg3);border-color:var(--text3)}
+.port-foto-placeholder span{font-size:.62rem;color:var(--text3);letter-spacing:.08em}
+.port-onizleme{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;border-radius:3px;margin-bottom:8px}
+.port-bos{text-align:center;padding:44px 20px;color:var(--text3);font-size:.78rem}
+
 /* ─── AYARLAR ─── */
 .agrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .trow{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line);gap:12px}
@@ -412,6 +437,9 @@ tbody td{padding:10px 13px;vertical-align:middle}
       <div class="slbl" style="margin-top:6px">Yönetim</div>
       <div class="ni" onclick="sayfaGec('personel',this)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="5"/><path d="M3 21v-1a9 9 0 0 1 18 0v1"/></svg>Personel
+      </div>
+      <div class="ni" onclick="sayfaGec('portfolio',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Portfolyo
       </div>
       <div class="ni" onclick="sayfaGec('ciro',this)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Ciro & Raporlar
@@ -660,6 +688,133 @@ tbody td{padding:10px 13px;vertical-align:middle}
       </div>
     </div>
 
+    <!-- ══ PORTFOLİO ══ -->
+    <div class="page" id="page-portfolio">
+      <div style="margin-bottom:16px">
+        <h2 style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700">Portfolyo <em style="font-style:italic;font-weight:400;color:var(--text3)">Yönetimi</em></h2>
+        <p style="font-size:.7rem;color:var(--text3);margin-top:3px">Fotoğraf ekle, düzenle ve yayın durumunu kontrol et</p>
+      </div>
+
+      <!-- Stat satırı -->
+      <div class="port-stat-row">
+        <div class="port-stat"><span class="slbl2">Toplam Fotoğraf</span><div class="sval" id="port-toplam" style="font-size:1.55rem">—</div></div>
+        <div class="port-stat"><span class="slbl2">Yayında</span><div class="sval g" id="port-yayinda" style="font-size:1.55rem">—</div></div>
+        <div class="port-stat"><span class="slbl2">Taslak</span><div class="sval y" id="port-taslak" style="font-size:1.55rem">—</div></div>
+      </div>
+
+      <div class="portgrid">
+
+        <!-- Sol: Liste -->
+        <div>
+          <div class="card">
+            <div class="ch">
+              <h3>Çalışmalar</h3>
+              <div style="display:flex;align-items:center;gap:7px">
+                <div class="fbar" id="port-filtre-bar">
+                  <button class="fbtn ak" onclick="portFiltrele('hepsi',this)">Hepsi</button>
+                  <button class="fbtn" onclick="portFiltrele('yayinda',this)">Yayında</button>
+                  <button class="fbtn" onclick="portFiltrele('taslak',this)">Taslak</button>
+                </div>
+              </div>
+            </div>
+            <div id="port-foto-grid" class="port-foto-grid">
+              <div class="port-bos">Yükleniyor...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sağ: Form -->
+        <div>
+          <div class="card">
+            <div class="ch"><h3 id="port-form-baslik">Fotoğraf Ekle</h3></div>
+            <div class="cb">
+              <div style="display:flex;flex-direction:column;gap:11px">
+                <input type="hidden" id="port-fid">
+
+                <!-- Fotoğraf yükleme alanı -->
+                <div class="ff">
+                  <label class="fl">Fotoğraf</label>
+                  <input type="file" id="port-foto-input" accept="image/*" style="display:none" onchange="portFotoSecildi(this)">
+                  <div id="port-foto-wrap" onclick="document.getElementById('port-foto-input').click()">
+                    <div class="port-foto-placeholder" id="port-placeholder">
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--text3)"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                      <span>Fotoğraf seç veya sürükle</span>
+                      <span style="font-size:.55rem;color:var(--text3)">JPG, PNG, WEBP</span>
+                    </div>
+                    <img id="port-onizleme" class="port-onizleme" style="display:none" src="" alt="">
+                  </div>
+                  <input type="hidden" id="port-foto-url">
+                </div>
+
+                <div class="ff"><label class="fl">Çalışma Adı</label><input class="fi" type="text" id="port-ad" placeholder="ör. Freelight Balyaj"></div>
+
+                <div class="ff">
+                  <label class="fl">Kategori</label>
+                  <select class="fsel" id="port-kat">
+                    <option value="balyaj">Balyaj</option>
+                    <option value="boya">Saç Boyama</option>
+                    <option value="kesim">Saç Kesimi</option>
+                    <option value="sac-bakimi">Saç Bakımı</option>
+                    <option value="sekillendirme">Şekillendirme</option>
+                    <option value="ozel">Özel</option>
+                  </select>
+                </div>
+
+                <div class="ff">
+                  <label class="fl">Yayın Durumu</label>
+                  <div style="display:flex;align-items:center;gap:10px;padding:9px 0">
+                    <label class="tgl"><input type="checkbox" id="port-yayinda-chk" checked><span class="tsl"></span></label>
+                    <span id="port-durum-lbl" style="font-size:.72rem;color:var(--text2)">Yayında — sitede görünür</span>
+                  </div>
+                </div>
+
+                <button class="sbtn" onclick="portKaydet()">Kaydet</button>
+                <button class="sbtn sec" id="port-iptal" onclick="portSifirla()" style="display:none">İptal / Yeni</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- SQL Kurulum notu -->
+          <div class="card" style="margin-top:12px" id="port-sql-kart">
+            <div class="ch"><h3 style="font-size:.85rem">⚙️ Supabase Kurulum</h3><button class="tbtn" onclick="document.getElementById('port-sql-kart').style.display='none'">Kapat</button></div>
+            <div class="cb">
+              <p style="font-size:.68rem;color:var(--text3);margin-bottom:10px;line-height:1.7">Aşağıdaki SQL'i Supabase → SQL Editor'e yapıştırın. Bir kez çalıştırmanız yeterli.</p>
+              <pre id="port-sql-text" style="background:var(--sb);color:#c8ff00;padding:13px;border-radius:4px;font-size:.62rem;line-height:1.7;overflow-x:auto;white-space:pre-wrap;cursor:pointer" title="Kopyalamak için tıkla" onclick="portSqlKopyala()">-- 1. Tablo oluştur
+CREATE TABLE IF NOT EXISTS portfolio (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  ad text NOT NULL,
+  kategori text NOT NULL DEFAULT 'balyaj',
+  foto_url text NOT NULL,
+  yayinda boolean NOT NULL DEFAULT true,
+  sira integer NOT NULL DEFAULT 0,
+  created_at timestamptz DEFAULT now()
+);
+
+-- 2. Sıralama için index
+CREATE INDEX IF NOT EXISTS portfolio_sira_idx ON portfolio(sira);
+
+-- 3. RLS aç + politikalar
+ALTER TABLE portfolio ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "anon_read" ON portfolio FOR SELECT USING (true);
+CREATE POLICY "anon_write" ON portfolio FOR ALL USING (true);
+
+-- 4. Storage bucket (varsa atla)
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('portfolio-fotolar', 'portfolio-fotolar', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- 5. Storage politikası
+CREATE POLICY "public_portfolio_storage"
+ON storage.objects FOR ALL
+USING (bucket_id = 'portfolio-fotolar')
+WITH CHECK (bucket_id = 'portfolio-fotolar');</pre>
+              <button class="sbtn" onclick="portSqlKopyala()" style="margin-top:8px">📋 SQL'i Kopyala</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- ══ AYARLAR ══ -->
     <div class="page" id="page-ayarlar">
       <div style="margin-bottom:16px"><h2 style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700">Ayarlar</h2><p style="font-size:.7rem;color:var(--text3);margin-top:3px">Panel ve salon ayarlarını yönetin</p></div>
@@ -878,6 +1033,8 @@ async function verileriYukle(showToast=true){
     if(showToast)toast('Veri yüklenemedi: '+e.message,'hata');
   }
   verileriRender();
+  // Portfolio ayrıca yükle (tablo yoksa hata vermesin)
+  portYukle();
 }
 function verileriRender(){statsGuncelle();tabloRender(AKT_FILTRE);bugRandevu();sonRez();hDagitim();mustRender();aktRender();nbGuncelle();pStatRender();tkRender();}
 
@@ -1695,6 +1852,7 @@ const BASLIKLAR={
   rezervasyonlar:'Rezervasyonlar',musteriler:'Müşteriler',
   personel:'Personel',hizmetler:'Hizmetler & Fiyatlar',
   shop:'Shop',ayarlar:'Ayarlar',ciro:'Ciro & Raporlar',
+  portfolio:'Portfolyo Yönetimi',
 };
 function sayfaGec(sayfa,navEl){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('ak'));
@@ -1711,7 +1869,233 @@ function sayfaGec(sayfa,navEl){
   if(sayfa==='shop')shopRender();
   if(sayfa==='personel'){pListRender();pStatRender();}
   if(sayfa==='ciro')ciroRender();
+  if(sayfa==='portfolio')portRender();
 }
+
+// ─── PORTFOLİO ───
+let portFotolar = [];
+let PORT_FILTRE = 'hepsi';
+let _pendingPortFoto = null;
+
+// Supabase'den yükle
+async function portYukle() {
+  try {
+    const res = await sRest('portfolio?order=sira.asc,created_at.desc');
+    portFotolar = res;
+    portRender();
+  } catch(e) {
+    console.warn('Portfolio tablosu henüz yok veya hata:', e.message);
+    portFotolar = [];
+    portRender();
+  }
+}
+
+// Render
+function portRender() {
+  // Stat güncelle
+  document.getElementById('port-toplam').textContent = portFotolar.length;
+  document.getElementById('port-yayinda').textContent = portFotolar.filter(p => p.yayinda).length;
+  document.getElementById('port-taslak').textContent = portFotolar.filter(p => !p.yayinda).length;
+
+  // Filtre
+  let liste = portFotolar;
+  if (PORT_FILTRE === 'yayinda') liste = portFotolar.filter(p => p.yayinda);
+  else if (PORT_FILTRE === 'taslak') liste = portFotolar.filter(p => !p.yayinda);
+
+  const grid = document.getElementById('port-foto-grid');
+  if (!liste.length) {
+    grid.innerHTML = '<div class="port-bos">Henüz fotoğraf yok. Sağdaki formdan ekleyin.</div>';
+    return;
+  }
+
+  const KAT_LABEL = {
+    balyaj:'Balyaj', boya:'Saç Boyama', kesim:'Saç Kesimi',
+    'sac-bakimi':'Saç Bakımı', sekillendirme:'Şekillendirme', ozel:'Özel'
+  };
+
+  grid.innerHTML = liste.map(p => `
+    <div class="port-kart" id="pkart-${p.id}">
+      <div class="port-kart-img-wrap">
+        <img class="port-kart-img" src="${p.foto_url}" alt="${p.ad}" loading="lazy" onerror="this.style.opacity='.3'">
+        <div class="port-kart-overlay">
+          <div class="port-kart-info">
+            <span class="port-kart-kat">${KAT_LABEL[p.kategori] || p.kategori}</span>
+            <span class="port-kart-ad">${p.ad}</span>
+          </div>
+        </div>
+      </div>
+      <div class="port-kart-meta">
+        <span class="port-kart-yayinda ${p.yayinda ? 'ac' : 'kp'}">${p.yayinda ? '● Yayında' : '○ Taslak'}</span>
+        <div class="port-kart-islemler">
+          <button class="bsm bblue" onclick="portToggleYayin('${p.id}')" title="${p.yayinda ? 'Yayından kaldır' : 'Yayınla'}">${p.yayinda ? '↓' : '↑'}</button>
+          <button class="bsm bdet" onclick="portDuzenle('${p.id}')">Düzenle</button>
+          <button class="bsm bsil" onclick="portSil('${p.id}')">✕</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function portFiltrele(filtre, btn) {
+  PORT_FILTRE = filtre;
+  document.querySelectorAll('#port-filtre-bar .fbtn').forEach(b => b.classList.remove('ak'));
+  btn.classList.add('ak');
+  portRender();
+}
+
+// Fotoğraf seçilince önizle
+function portFotoSecildi(input) {
+  const file = input.files[0];
+  if (!file) return;
+  _pendingPortFoto = file;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    document.getElementById('port-onizleme').src = ev.target.result;
+    document.getElementById('port-onizleme').style.display = 'block';
+    document.getElementById('port-placeholder').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+// Supabase Storage'a yükle
+async function portFotoYukle(file) {
+  const ext = file.name.split('.').pop() || 'jpg';
+  const dosyaAdi = `portfolio_${Date.now()}.${ext}`;
+  const res = await fetch(`${SUPA_URL}/storage/v1/object/portfolio-fotolar/${dosyaAdi}`, {
+    method: 'POST',
+    headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY, 'Content-Type': file.type, 'x-upsert': 'true' },
+    body: file
+  });
+  if (!res.ok) { const t = await res.text(); throw new Error('Fotoğraf yüklenemedi: ' + t); }
+  return `${SUPA_URL}/storage/v1/object/public/portfolio-fotolar/${dosyaAdi}`;
+}
+
+// Kaydet (ekle veya güncelle)
+async function portKaydet() {
+  const editId = document.getElementById('port-fid').value;
+  const ad = document.getElementById('port-ad').value.trim();
+  const kat = document.getElementById('port-kat').value;
+  const yayinda = document.getElementById('port-yayinda-chk').checked;
+  let fotoUrl = document.getElementById('port-foto-url').value || '';
+
+  if (!ad) { toast('Çalışma adı giriniz.', 'hata'); return; }
+
+  if (_pendingPortFoto) {
+    try {
+      toast('Fotoğraf yükleniyor...', 'bilgi');
+      fotoUrl = await portFotoYukle(_pendingPortFoto);
+      _pendingPortFoto = null;
+    } catch(e) { toast(e.message, 'hata'); return; }
+  }
+
+  if (!fotoUrl) { toast('Lütfen fotoğraf seçiniz.', 'hata'); return; }
+
+  try {
+    if (editId) {
+      await sRest(`portfolio?id=eq.${editId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ ad, kategori: kat, yayinda, foto_url: fotoUrl })
+      });
+      const p = portFotolar.find(x => x.id === editId);
+      if (p) Object.assign(p, { ad, kategori: kat, yayinda, foto_url: fotoUrl });
+      toast('Portfolyo güncellendi.', 'ok');
+    } else {
+      const sira = portFotolar.length;
+      const res = await sRest('portfolio', {
+        method: 'POST',
+        body: JSON.stringify({ ad, kategori: kat, yayinda, foto_url: fotoUrl, sira })
+      });
+      const yeni = Array.isArray(res) ? res[0] : res;
+      portFotolar.unshift({ id: yeni.id, ad, kategori: kat, yayinda, foto_url: fotoUrl, sira });
+      toast('Fotoğraf eklendi.', 'ok');
+    }
+    portSifirla();
+    portRender();
+  } catch(e) {
+    toast('Hata: ' + e.message, 'hata');
+  }
+}
+
+// Yayın durumunu hızlı değiştir
+async function portToggleYayin(id) {
+  const p = portFotolar.find(x => x.id === id);
+  if (!p) return;
+  const yeni = !p.yayinda;
+  try {
+    await sRest(`portfolio?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ yayinda: yeni }) });
+    p.yayinda = yeni;
+    portRender();
+    toast(yeni ? 'Yayınlandı ✓' : 'Yayından kaldırıldı.', yeni ? 'ok' : 'bilgi');
+  } catch(e) { toast('Hata: ' + e.message, 'hata'); }
+}
+
+// Düzenle
+function portDuzenle(id) {
+  const p = portFotolar.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('port-fid').value = p.id;
+  document.getElementById('port-ad').value = p.ad;
+  document.getElementById('port-kat').value = p.kategori;
+  document.getElementById('port-yayinda-chk').checked = p.yayinda;
+  portDurumLblGuncelle();
+  document.getElementById('port-foto-url').value = p.foto_url;
+  if (p.foto_url) {
+    document.getElementById('port-onizleme').src = p.foto_url;
+    document.getElementById('port-onizleme').style.display = 'block';
+    document.getElementById('port-placeholder').style.display = 'none';
+  }
+  document.getElementById('port-form-baslik').textContent = 'Fotoğraf Düzenle';
+  document.getElementById('port-iptal').style.display = '';
+  // Forma scroll
+  document.getElementById('port-form-baslik').closest('.card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Sil
+async function portSil(id) {
+  if (!confirm('Bu fotoğrafı silmek istediğinizden emin misiniz?')) return;
+  try {
+    await sRest(`portfolio?id=eq.${id}`, { method: 'DELETE', headers: { 'Prefer': 'return=minimal' } });
+    portFotolar = portFotolar.filter(x => x.id !== id);
+    portRender();
+    toast('Fotoğraf silindi.', 'ok');
+  } catch(e) { toast('Hata: ' + e.message, 'hata'); }
+}
+
+// Formu sıfırla
+function portSifirla() {
+  document.getElementById('port-fid').value = '';
+  document.getElementById('port-ad').value = '';
+  document.getElementById('port-kat').value = 'balyaj';
+  document.getElementById('port-yayinda-chk').checked = true;
+  document.getElementById('port-foto-input').value = '';
+  document.getElementById('port-foto-url').value = '';
+  document.getElementById('port-onizleme').style.display = 'none';
+  document.getElementById('port-placeholder').style.display = 'flex';
+  document.getElementById('port-form-baslik').textContent = 'Fotoğraf Ekle';
+  document.getElementById('port-iptal').style.display = 'none';
+  portDurumLblGuncelle();
+  _pendingPortFoto = null;
+}
+
+// Toggle label güncelle
+function portDurumLblGuncelle() {
+  const chk = document.getElementById('port-yayinda-chk');
+  const lbl = document.getElementById('port-durum-lbl');
+  lbl.textContent = chk.checked ? 'Yayında — sitede görünür' : 'Taslak — sitede gizli';
+  lbl.style.color = chk.checked ? 'var(--green)' : 'var(--yellow)';
+}
+
+// SQL kopyala
+function portSqlKopyala() {
+  const sql = document.getElementById('port-sql-text').textContent;
+  navigator.clipboard.writeText(sql).then(() => toast('SQL kopyalandı! Supabase → SQL Editor\'e yapıştırın.', 'ok'));
+}
+
+// Toggle event
+document.addEventListener('DOMContentLoaded', () => {
+  const chk = document.getElementById('port-yayinda-chk');
+  if (chk) chk.addEventListener('change', portDurumLblGuncelle);
+});
 
 // ─── TOAST ───
 let toastTimer=null;
