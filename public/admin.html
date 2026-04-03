@@ -543,8 +543,23 @@ tbody td{padding:10px 13px;vertical-align:middle}
 
     <!-- ══ MÜŞTERİLER ══ -->
     <div class="page" id="page-musteriler">
-      <div style="margin-bottom:16px"><h2 style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700">Müşteriler</h2><p style="font-size:.7rem;color:var(--text3);margin-top:3px">Tüm müşteri kayıtları</p></div>
-      <div class="card"><div class="cb0 tw"><table><thead><tr><th>Müşteri</th><th>Telefon</th><th>Rezervasyon</th><th>Harcama</th><th>Son Ziyaret</th><th>Favori Hizmet</th></tr></thead><tbody id="mustbody"></tbody></table></div></div>
+      <div style="margin-bottom:16px"><h2 style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700">Müşteriler</h2><p style="font-size:.7rem;color:var(--text3);margin-top:3px">Tüm müşteri kayıtları — Birden fazla rezervasyonu olan müşteriler</p></div>
+      <div class="card">
+        <div class="ch" style="gap:8px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="fbar">
+              <button class="fbtn ak" id="must-filtre-cok" onclick="mustFiltrele('cok',this)">🔁 2+ Rezervasyon</button>
+              <button class="fbtn" id="must-filtre-hepsi" onclick="mustFiltrele('hepsi',this)">Tümü</button>
+            </div>
+          </div>
+          <div class="sw2">
+            <svg class="sico" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input class="sinp" type="text" placeholder="Müşteri ara..." id="mustarama" oninput="mustAra(this.value)" style="width:170px">
+          </div>
+          <span id="must-sayi-lbl" style="font-size:.62rem;color:var(--text3);margin-left:4px"></span>
+        </div>
+        <div class="cb0 tw"><table><thead><tr><th>Müşteri</th><th>Telefon</th><th>Rezervasyon</th><th>Harcama</th><th>Son Ziyaret</th><th>Favori Hizmet</th><th>Detay</th></tr></thead><tbody id="mustbody"></tbody></table></div>
+      </div>
     </div>
 
     <!-- ══ PERSONEL ══ -->
@@ -865,6 +880,23 @@ tbody td{padding:10px 13px;vertical-align:middle}
     </div>
 
   </main>
+</div>
+
+<!-- MÜŞTERİ GEÇMİŞİ MODAL -->
+<div class="mov" id="must-mov" onclick="if(event.target===this)mustMKapat()" style="z-index:5100">
+  <div class="modal" style="max-width:620px">
+    <div class="mh">
+      <div>
+        <h3 id="must-mbaslik">Müşteri Geçmişi</h3>
+        <div id="must-malt" style="font-size:.62rem;color:var(--text3);margin-top:2px"></div>
+      </div>
+      <button class="mclose" onclick="mustMKapat()">✕</button>
+    </div>
+    <!-- Özet satırı -->
+    <div id="must-mozet" style="display:flex;gap:0;border-bottom:1px solid var(--line);background:var(--bg)"></div>
+    <!-- Rezervasyon listesi -->
+    <div id="must-mlist" style="overflow-y:auto;max-height:440px"></div>
+  </div>
 </div>
 
 <!-- DETAY MODAL -->
@@ -1405,18 +1437,120 @@ async function personelAta(rezId, personelId){
 function mKapat(){document.getElementById('mov').classList.remove('open');}
 
 // ─── MÜŞTERİLER ───
+let MUST_FILTRE = 'cok'; // 'cok' = 2+ rezervasyon, 'hepsi' = hepsi
+let MUST_ARAMA = '';
+
+function mustGrupla(){
+  const gruplar={};
+  TRZ.forEach(r=>{
+    if(!gruplar[r.telefon]){gruplar[r.telefon]={ad:r.ad,telefon:r.telefon,rezervasyonlar:[],toplam:0};}
+    gruplar[r.telefon].rezervasyonlar.push(r);
+    if(r.odemeAlindi)gruplar[r.telefon].toplam+=fHesapla(r);
+  });
+  return Object.values(gruplar);
+}
+
+function mustFiltrele(tip, btn){
+  MUST_FILTRE = tip;
+  document.querySelectorAll('#must-filtre-cok,#must-filtre-hepsi').forEach(b=>b.classList.remove('ak'));
+  if(btn) btn.classList.add('ak');
+  mustRender();
+}
+
+function mustAra(val){ MUST_ARAMA = val.toLowerCase(); mustRender(); }
+
 function mustRender(){
   const e=document.getElementById('mustbody');
-  const gruplar={};
-  TRZ.forEach(r=>{if(!gruplar[r.telefon]){gruplar[r.telefon]={ad:r.ad,telefon:r.telefon,rezervasyonlar:[],toplam:0};}gruplar[r.telefon].rezervasyonlar.push(r);if(r.odemeAlindi)gruplar[r.telefon].toplam+=fHesapla(r);});
-  const liste=Object.values(gruplar).sort((a,b)=>b.rezervasyonlar.length-a.rezervasyonlar.length);
-  if(!liste.length){e.innerHTML='<tr><td colspan="6" class="bos">Müşteri yok.</td></tr>';return;}
+  let liste = mustGrupla().sort((a,b)=>b.rezervasyonlar.length-a.rezervasyonlar.length);
+  if(MUST_FILTRE === 'cok') liste = liste.filter(m => m.rezervasyonlar.length >= 2);
+  if(MUST_ARAMA) liste = liste.filter(m => m.ad.toLowerCase().includes(MUST_ARAMA) || m.telefon.includes(MUST_ARAMA));
+  const lbl = document.getElementById('must-sayi-lbl');
+  if(lbl) lbl.textContent = liste.length + ' müşteri';
+  if(!liste.length){
+    e.innerHTML=`<tr><td colspan="7" class="bos">${MUST_FILTRE==='cok'?'2+ rezervasyonu olan müşteri bulunamadı.':'Müşteri yok.'}</td></tr>`;
+    return;
+  }
   e.innerHTML=liste.map(m=>{
     const son=[...m.rezervasyonlar].sort((a,b)=>new Date(b.tarih)-new Date(a.tarih))[0];
     const fav={};m.rezervasyonlar.forEach(r=>{fav[r.hizmet]=(fav[r.hizmet]||0)+1;});
     const favH=Object.entries(fav).sort((a,b)=>b[1]-a[1])[0]?.[0]||'—';
-    return`<tr><td><div class="tad">${m.ad}</div></td><td class="ttel">${m.telefon}</td><td>${m.rezervasyonlar.length}</td><td class="tfyt">${m.toplam?m.toplam.toLocaleString('tr-TR')+'₺':'—'}</td><td class="ttar">${son?son.tarih:'—'}</td><td class="thiz">${favH}</td></tr>`;
+    return`<tr style="cursor:pointer" onclick="mustDetay('${encodeURIComponent(m.telefon)}')" title="Geçmişi görüntüle">
+      <td><div class="tad">${m.ad}</div></td>
+      <td class="ttel">${m.telefon}</td>
+      <td><span style="font-weight:600;color:${m.rezervasyonlar.length>=3?'var(--blue)':m.rezervasyonlar.length>=2?'var(--green)':'var(--text)'}">${m.rezervasyonlar.length}</span></td>
+      <td class="tfyt">${m.toplam?m.toplam.toLocaleString('tr-TR')+'₺':'—'}</td>
+      <td class="ttar">${son?son.tarih:'—'}</td>
+      <td class="thiz">${favH}</td>
+      <td><button class="bsm bblue" onclick="event.stopPropagation();mustDetay('${encodeURIComponent(m.telefon)}')">Geçmiş</button></td>
+    </tr>`;
   }).join('');
+}
+
+function mustDetay(telEnc){
+  const tel = decodeURIComponent(telEnc);
+  const gruplar = mustGrupla();
+  const m = gruplar.find(x => x.telefon === tel);
+  if(!m) return;
+
+  // Başlık
+  document.getElementById('must-mbaslik').textContent = m.ad;
+  document.getElementById('must-malt').textContent = m.telefon + ' · ' + m.rezervasyonlar.length + ' rezervasyon';
+
+  // Özet bar
+  const onaylandi = m.rezervasyonlar.filter(r=>r.durum==='onaylandi').length;
+  const bekliyor  = m.rezervasyonlar.filter(r=>r.durum==='bekliyor').length;
+  const reddedildi= m.rezervasyonlar.filter(r=>r.durum==='reddedildi').length;
+  document.getElementById('must-mozet').innerHTML = `
+    <div style="flex:1;text-align:center;padding:12px 8px;border-right:1px solid var(--line)">
+      <div style="font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--text)">${m.rezervasyonlar.length}</div>
+      <div style="font-size:.5rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin-top:2px">Toplam Rez.</div>
+    </div>
+    <div style="flex:1;text-align:center;padding:12px 8px;border-right:1px solid var(--line)">
+      <div style="font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--green)">${onaylandi}</div>
+      <div style="font-size:.5rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin-top:2px">Onaylı</div>
+    </div>
+    <div style="flex:1;text-align:center;padding:12px 8px;border-right:1px solid var(--line)">
+      <div style="font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--green)">${m.toplam?m.toplam.toLocaleString('tr-TR')+'₺':'—'}</div>
+      <div style="font-size:.5rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin-top:2px">Toplam Harcama</div>
+    </div>
+    <div style="flex:1;text-align:center;padding:12px 8px">
+      <div style="font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--yellow)">${bekliyor}</div>
+      <div style="font-size:.5rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin-top:2px">Bekliyor</div>
+    </div>
+  `;
+
+  // Rezervasyon listesi (en yeni önce)
+  const sorted = [...m.rezervasyonlar].sort((a,b)=>new Date(b.tarih)-new Date(a.tarih));
+  document.getElementById('must-mlist').innerHTML = sorted.map(r => {
+    const p = personel.find(x=>x.id===r.personelId)||personel.find(x=>x.ad===r.personelId);
+    const h = FYT[r.hizmet];
+    const fiyatStr = r.odemeAlindi && r.fiyat ? r.fiyat.toLocaleString('tr-TR')+'₺' : (h ? Math.round((h.min+h.max)/2).toLocaleString('tr-TR')+'₺ (tah.)' : '—');
+    const durumBadge = bH(r.durum);
+    const odemeBadge = r.odemeAlindi ? '<span class="badge bo" style="font-size:.42rem;margin-left:5px">Ödendi</span>' : '';
+    return `<div style="padding:13px 18px;border-bottom:1px solid var(--line);display:flex;align-items:flex-start;gap:12px">
+      <div style="min-width:70px;text-align:center;padding:7px 6px;background:var(--bg);border:1px solid var(--line);border-radius:4px">
+        <div style="font-family:'Playfair Display',serif;font-size:.98rem;font-weight:700;color:var(--text)">${r.tarih.substring(8)}</div>
+        <div style="font-size:.48rem;color:var(--text3);margin-top:1px">${['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'][parseInt(r.tarih.substring(5,7))-1]} ${r.tarih.substring(0,4)}</div>
+        ${r.saat?`<div style="font-size:.56rem;color:var(--text2);margin-top:3px">${r.saat}</div>`:''}
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:.8rem;font-weight:500;color:var(--text)">${r.hizmet}</div>
+        ${p?`<div style="font-size:.65rem;color:var(--text3);margin-top:2px">👤 ${p.ad}</div>`:''}
+        ${r.not&&r.not!=='—'?`<div style="font-size:.63rem;color:var(--text3);margin-top:3px;font-style:italic">"${r.not}"</div>`:''}
+        <div style="margin-top:6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">${durumBadge}${odemeBadge}</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <div style="font-size:.84rem;font-weight:600;color:var(--green)">${fiyatStr}</div>
+        ${r.odemeAlindi&&r.odemeYontemi?`<div style="font-size:.58rem;color:var(--text3);margin-top:2px">${r.odemeYontemi==='kart'?'💳 Kart':'💵 Nakit'}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('must-mov').classList.add('open');
+}
+
+function mustMKapat(){
+  document.getElementById('must-mov').classList.remove('open');
 }
 
 // ─── PERSONEL ───
