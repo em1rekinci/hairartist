@@ -223,7 +223,7 @@ body{overflow-x:hidden}
         <div class="ozet-satir toplam"><span>Toplam</span><span id="genelToplam">—</span></div>
       </div>
       <div class="kargo-bilgi" id="kargoBilgi">
-        <strong>Ücretsiz kargo!</strong> 500₺ ve üzeri siparişlerde geçerlidir.
+        <strong>Ücretsiz kargo!</strong> 1500₺ ve üzeri siparişlerde geçerlidir.
       </div>
 
       <div class="form-baslik">Teslimat Bilgileri</div>
@@ -301,7 +301,7 @@ body{overflow-x:hidden}
 <script>
 const SUPA_URL = 'https://botxnihztrnwzjnrlwzv.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvdHhuaWh6dHJud3pqbnJsd3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MTg4MTAsImV4cCI6MjA5MDA5NDgxMH0.AcX4_2Aykf8J1jln9fvODh2rRffymfEJCAekzmN1ALg';
-const KARGO_SINIR = 500;
+const KARGO_SINIR = 1500;
 const KARGO_UCRET = 49.90;
 
 // ── NAV
@@ -539,14 +539,14 @@ const sozlesmeler = {
     baslik: 'Mesafeli Satış Sözleşmesi',
     icerik: `
       <h3>1. Taraflar</h3>
-      <p><strong>Satıcı:</strong> Hair Artist — Tekirdağ</p>
+      <p><strong>Satıcı:</strong>Fatih Kurt Hair Artist</p>
       <p><strong>Alıcı:</strong> Sipariş formunu dolduran kişi</p>
       <h3>2. Konu</h3>
       <p>Bu sözleşme, alıcının web sitesi üzerinden satın aldığı ürünlere ilişkin hak ve yükümlülükleri düzenlemektedir.</p>
       <h3>3. Ürün Bilgileri</h3>
       <p>Ürünlere ait nitelik, miktar, renk, adet ve fiyat bilgileri sipariş özeti ekranında gösterilmektedir. Gösterilen fiyatlar KDV dahil Türk Lirası cinsindendir.</p>
       <h3>4. Teslimat</h3>
-      <p>Sipariş, ödemenin onaylanmasından itibaren en geç 7 iş günü içinde kargo firmasına teslim edilir. Kargo ücreti 500 ₺ ve üzeri siparişlerde ücretsizdir; altındaki siparişlerde 49,90 ₺ olarak uygulanır.</p>
+      <p>Sipariş, ödemenin onaylanmasından itibaren en geç 7 iş günü içinde kargo firmasına teslim edilir. Kargo ücreti 1500 ₺ ve üzeri siparişlerde ücretsizdir; altındaki siparişlerde 49,90 ₺ olarak uygulanır.</p>
       <h3>5. Cayma Hakkı</h3>
       <p>Alıcı, ürünü teslim aldığı tarihten itibaren 14 gün içinde herhangi bir gerekçe göstermeksizin cayma hakkını kullanabilir. Cayma hakkının kullanılabilmesi için ürünün kullanılmamış ve orijinal ambalajında olması gerekmektedir.</p>
       <h3>6. Garanti</h3>
@@ -559,13 +559,15 @@ const sozlesmeler = {
     baslik: 'Ön Bilgilendirme Formu',
     icerik: `
       <h3>Satıcı Bilgileri</h3>
-      <p><strong>Ticari Unvan:</strong> Hair Artist<br><strong>Adres:</strong> Tekirdağ<br><strong>E-posta:</strong> info@hairartist.com.tr</p>
+      <p><strong>Ticari Unvan:</strong>Fatih Kurt Hair Artist<br><strong>Adres:Esentepe, Yıldıztabya
+Alibeyköy Cd No:5
+34065 Eyüpsultan / İstanbul</strong><br><strong>E-posta:</strong> info@hairartist.com.tr</p>
       <h3>Ürün Bilgileri</h3>
       <p>Sipariş ettiğiniz ürünlerin temel nitelikleri, fiyatı ve teslimat bilgileri sipariş tamamlama ekranında detaylı olarak gösterilmektedir.</p>
       <h3>Ödeme Bilgileri</h3>
       <p>Ödeme işlemi PayTR altyapısı üzerinden 256-bit SSL şifreleme ile güvenli biçimde gerçekleştirilmektedir. Kart bilgileriniz tarafımızca saklanmamaktadır.</p>
       <h3>Teslimat</h3>
-      <p>Siparişler ödeme onayından itibaren en geç 7 iş günü içinde kargoya verilir. Kargo ücreti 500 ₺ altı siparişler için 49,90 ₺'dir; 500 ₺ ve üzerinde ücretsizdir.</p>
+      <p>Siparişler ödeme onayından itibaren en geç 7 iş günü içinde kargoya verilir. Kargo ücreti 1500 ₺ altı siparişler için 49,90 ₺'dir; 1500 ₺ ve üzerinde ücretsizdir.</p>
       <h3>Cayma Hakkı</h3>
       <p>Teslim tarihinden itibaren 14 gün içinde iade talebinde bulunabilirsiniz. İade edilecek ürünün kullanılmamış ve orijinal ambalajında olması gerekmektedir.</p>
       <h3>Şikâyet ve İletişim</h3>
