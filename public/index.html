@@ -199,9 +199,172 @@
   .oneri-section{padding:48px 16px}
   .oneri-section .oneri-row{grid-template-columns:1fr}
 }
+
+/* ── GİRİŞ EKRANI (SPLASH) ── */
+#intro-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #080808;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.8s ease, visibility 0.8s ease;
+}
+#intro-splash.fade-out {
+  opacity: 0;
+  visibility: hidden;
+}
+.splash-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  animation: splashPop 0.7s cubic-bezier(.22,1,.36,1) both;
+}
+.splash-logo-text {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(3.5rem, 10vw, 7rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: #f7f4ef;
+  line-height: 1;
+  position: relative;
+}
+.splash-logo-text::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  top: 50%;
+  height: 3px;
+  background: #f7f4ef;
+  transform: scaleX(0);
+  animation: splashLine 0.5s 0.5s cubic-bezier(.22,1,.36,1) forwards;
+}
+.splash-sub {
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(0.5rem, 1.5vw, 0.7rem);
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: rgba(247,244,239,0.5);
+  font-weight: 500;
+}
+@keyframes splashPop {
+  from { opacity: 0; transform: scale(0.88); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes splashLine {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+/* ── FOTOĞRAF GALERİ BANDI ── */
+.foto-galeri-section {
+  background: #080808;
+  padding: 80px 0;
+  overflow: hidden;
+  border-top: 1px solid #1a1a1a;
+  border-bottom: 1px solid #1a1a1a;
+}
+.foto-galeri-header {
+  text-align: center;
+  margin-bottom: 48px;
+  padding: 0 40px;
+}
+.foto-galeri-header h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  color: #f7f4ef;
+  line-height: 1.1;
+}
+.foto-galeri-header h2 em {
+  font-style: italic;
+  font-weight: 400;
+  color: rgba(247,244,239,.35);
+}
+.foto-galeri-header p {
+  font-family: 'Montserrat', sans-serif;
+  font-size: .78rem;
+  color: rgba(247,244,239,.45);
+  margin-top: 10px;
+  letter-spacing: .06em;
+}
+.foto-band-wrap {
+  position: relative;
+  overflow: hidden;
+}
+.foto-band-wrap::before,
+.foto-band-wrap::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 120px;
+  z-index: 2;
+  pointer-events: none;
+}
+.foto-band-wrap::before { left: 0; background: linear-gradient(to right, #080808, transparent); }
+.foto-band-wrap::after  { right: 0; background: linear-gradient(to left, #080808, transparent); }
+.foto-band {
+  display: flex;
+  gap: 12px;
+  width: max-content;
+  animation: fotoBand 40s linear infinite;
+}
+.foto-band:hover { animation-play-state: paused; }
+.foto-band-item {
+  width: 280px;
+  height: 380px;
+  border-radius: 4px;
+  overflow: hidden;
+  flex-shrink: 0;
+  position: relative;
+}
+.foto-band-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+  display: block;
+}
+.foto-band-item:hover img { transform: scale(1.05); }
+.foto-band-item .foto-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(8,8,8,.6) 0%, transparent 50%);
+  opacity: 0;
+  transition: opacity .3s;
+}
+.foto-band-item:hover .foto-overlay { opacity: 1; }
+@keyframes fotoBand {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@media (max-width: 768px) {
+  .foto-band-item { width: 200px; height: 270px; }
+  .foto-galeri-section { padding: 60px 0; }
+}
 </style>
 </head>
 <body>
+
+<!-- GİRİŞ EKRANI -->
+<div id="intro-splash">
+  <div class="splash-logo">
+    <div class="splash-logo-text">HAIR ARTIST</div>
+    <div class="splash-sub">Hair Studio</div>
+  </div>
+</div>
+<script>
+  window.addEventListener('load', function() {
+    setTimeout(function() {
+      document.getElementById('intro-splash').classList.add('fade-out');
+      setTimeout(function() {
+        document.getElementById('intro-splash').remove();
+      }, 900);
+    }, 1800);
+  });
+</script>
 
 <nav>
   <a href="#" class="nav-logo">
@@ -352,7 +515,40 @@ Saç sağlığını ön planda tutarak, kişiye özel çözümler üretmek ve he
   </div>
 </section>
 
-<!-- FİYAT LİSTESİ -->
+<!-- FOTOĞRAF GALERİSİ -->
+<section class="foto-galeri-section" id="galeri">
+  <div class="foto-galeri-header" data-anim>
+    <span class="sec-tag">Portfolyo</span>
+    <h2>Çalışma<em>larımız</em></h2>
+    <p>Uzman ellerimizden çıkan bazı dönüşümler</p>
+  </div>
+  <div class="foto-band-wrap">
+    <div class="foto-band" id="foto-band">
+      <div class="foto-band-item"><img src="images/galeri-1.jpg" alt="Saç Tasarımı 1" onerror="this.closest('.foto-band-item').style.background='#1a1a1a'"><div class="foto-overlay"></div></div>
+      <div class="foto-band-item"><img src="images/galeri-2.jpg" alt="Saç Tasarımı 2" onerror="this.closest('.foto-band-item').style.background='#1a1a1a'"><div class="foto-overlay"></div></div>
+      <div class="foto-band-item"><img src="images/galeri-3.jpg" alt="Saç Tasarımı 3" onerror="this.closest('.foto-band-item').style.background='#1a1a1a'"><div class="foto-overlay"></div></div>
+      <div class="foto-band-item"><img src="images/galeri-4.jpg" alt="Saç Tasarımı 4" onerror="this.closest('.foto-band-item').style.background='#1a1a1a'"><div class="foto-overlay"></div></div>
+      <div class="foto-band-item"><img src="images/galeri-5.jpg" alt="Saç Tasarımı 5" onerror="this.closest('.foto-band-item').style.background='#1a1a1a'"><div class="foto-overlay"></div></div>
+      <div class="foto-band-item"><img src="images/galeri-6.jpg" alt="Saç Tasarımı 6" onerror="this.closest('.foto-band-item').style.background='#1a1a1a'"><div class="foto-overlay"></div></div>
+      <div class="foto-band-item"><img src="images/galeri-7.jpg" alt="Saç Tasarımı 7" onerror="this.closest('.foto-band-item').style.background='#1a1a1a'"><div class="foto-overlay"></div></div>
+      <div class="foto-band-item"><img src="images/galeri-8.jpg" alt="Saç Tasarımı 8" onerror="this.closest('.foto-band-item').style.background='#1a1a1a'"><div class="foto-overlay"></div></div>
+      <div class="foto-band-item"><img src="images/galeri-9.jpg" alt="Saç Tasarımı 9" onerror="this.closest('.foto-band-item').style.background='#1a1a1a'"><div class="foto-overlay"></div></div>
+      <div class="foto-band-item"><img src="images/galeri-10.jpg" alt="Saç Tasarımı 10" onerror="this.closest('.foto-band-item').style.background='#1a1a1a'"><div class="foto-overlay"></div></div>
+      <!-- Döngü için klonlar (JS ile de yapılabilir) -->
+      <div class="foto-band-item"><img src="images/galeri-1.jpg" alt="Saç Tasarımı 1" onerror="this.closest('.foto-band-item').style.background='#1a1a1a'"><div class="foto-overlay"></div></div>
+      <div class="foto-band-item"><img src="images/galeri-2.jpg" alt="Saç Tasarımı 2" onerror="this.closest('.foto-band-item').style.background='#1a1a1a'"><div class="foto-overlay"></div></div>
+      <div class="foto-band-item"><img src="images/galeri-3.jpg" alt="Saç Tasarımı 3" onerror="this.closest('.foto-band-item').style.background='#1a1a1a'"><div class="foto-overlay"></div></div>
+      <div class="foto-band-item"><img src="images/galeri-4.jpg" alt="Saç Tasarımı 4" onerror="this.closest('.foto-band-item').style.background='#1a1a1a'"><div class="foto-overlay"></div></div>
+      <div class="foto-band-item"><img src="images/galeri-5.jpg" alt="Saç Tasarımı 5" onerror="this.closest('.foto-band-item').style.background='#1a1a1a'"><div class="foto-overlay"></div></div>
+      <div class="foto-band-item"><img src="images/galeri-6.jpg" alt="Saç Tasarımı 6" onerror="this.closest('.foto-band-item').style.background='#1a1a1a'"><div class="foto-overlay"></div></div>
+      <div class="foto-band-item"><img src="images/galeri-7.jpg" alt="Saç Tasarımı 7" onerror="this.closest('.foto-band-item').style.background='#1a1a1a'"><div class="foto-overlay"></div></div>
+      <div class="foto-band-item"><img src="images/galeri-8.jpg" alt="Saç Tasarımı 8" onerror="this.closest('.foto-band-item').style.background='#1a1a1a'"><div class="foto-overlay"></div></div>
+      <div class="foto-band-item"><img src="images/galeri-9.jpg" alt="Saç Tasarımı 9" onerror="this.closest('.foto-band-item').style.background='#1a1a1a'"><div class="foto-overlay"></div></div>
+      <div class="foto-band-item"><img src="images/galeri-10.jpg" alt="Saç Tasarımı 10" onerror="this.closest('.foto-band-item').style.background='#1a1a1a'"><div class="foto-overlay"></div></div>
+    </div>
+  </div>
+</section>
+
 <!-- GOOGLE YORUMLAR -->
 <section class="yorumlar-section" id="yorumlar">
   <div class="yorumlar-inner">
