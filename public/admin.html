@@ -132,7 +132,7 @@ button,input,select,textarea{font-family:'Montserrat',sans-serif}
 .sc.g .sct{background:var(--green)}.sc.y .sct{background:var(--yellow)}.sc.b .sct{background:var(--blue)}.sc.r .sct{background:var(--red)}
 .slbl2{font-size:.5rem;letter-spacing:.18em;text-transform:uppercase;color:var(--text3);margin-bottom:7px;display:block}
 .sval{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;line-height:1;color:var(--text)}
-.sval.g{color:var(--green)}.sval.y{color:var(--yellow)}.sval.b{color:var(--blue)}
+.sval.g{color:var(--green)}.sval.y{color:var(--yellow)}.sval.b{color:var(--blue)}.sval.r{color:var(--red)}
 .ssub{font-size:.6rem;color:var(--text3);margin-top:5px}
 
 /* ─── BADGE ─── */
@@ -1029,7 +1029,9 @@ function cikisYap(){SFR='';TRZ=[];document.getElementById('panel').style.display
 // ─── PANEL BAŞLAT ───
 async function panelBaslat(){
   saatGuncelle();setInterval(saatGuncelle,1000);
-  cgridOlustur();hizRender();pListRender();shopRender();
+  try{cgridOlustur();}catch(e){}
+  try{hizRender();}catch(e){}
+  try{pListRender();}catch(e){}
   tkBugune();
   document.getElementById('dtarih').textContent=new Date().toLocaleDateString('tr-TR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
   await verileriYukle(false);
