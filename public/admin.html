@@ -948,8 +948,8 @@ function dbToLocal(r){
     saat: r.saat||'',
     not: r.musteri_notu||'',
     durum: r.durum||'bekliyor',
-    odemeAlindi: r.odeme_alindi||false,
-    fiyat: r.fiyat||0,
+    odemeAlindi: r.odeme_alindi===true||r.odeme_alindi===1||r.odeme_alindi==='true'||false,
+    fiyat: parseInt(r.fiyat)||0,
     odemeYontemi: r.odeme_yontemi||'nakit',
     tip: r.tip||'normal',
     tarihOlustur: r.created_at||new Date().toISOString(),
@@ -1058,7 +1058,7 @@ async function verileriYukle(showToast=true){
 function verileriRender(){statsGuncelle();tabloRender(AKT_FILTRE);bugRandevu();sonRez();hDagitim();mustRender();aktRender();nbGuncelle();pStatRender();tkRender();}
 
 // ─── STATS ───
-function fHesapla(r){if(r.odemeAlindi&&r.durum==='onaylandi'){if(r.fiyat)return r.fiyat;const h=FYT[r.hizmet];return h?Math.round((h.min+h.max)/2):0;}return 0;}
+function fHesapla(r){if(r.odemeAlindi&&r.durum==='onaylandi'){if(r.fiyat>0)return r.fiyat;const hz=hizmetler.find(x=>x.ad===r.hizmet);if(hz&&hz.min>0)return Math.round((hz.min+hz.max)/2);const h=FYT[r.hizmet];return h?Math.round((h.min+h.max)/2):0;}return 0;}
 function statsGuncelle(){
   const t=TRZ.length,bek=TRZ.filter(r=>r.durum==='bekliyor').length;
   const onay=TRZ.filter(r=>r.durum==='onaylandi'&&r.odemeAlindi);
