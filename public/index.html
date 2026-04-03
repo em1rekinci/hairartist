@@ -205,7 +205,7 @@
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: #f7f4ef;
+  background: #080808;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -250,12 +250,11 @@
   content: '';
   position: absolute;
   top: 0; bottom: 0;
-  width: 100px;
   z-index: 2;
   pointer-events: none;
 }
-.foto-band-wrap::before { left: 0; background: linear-gradient(to right, #f2ede6, transparent); }
-.foto-band-wrap::after  { right: 0; background: linear-gradient(to left, #f2ede6, transparent); }
+.foto-band-wrap::before { left: 0; background: linear-gradient(to right, #f2ede6 0%, transparent 100%); width: 40px; }
+.foto-band-wrap::after  { right: 0; background: linear-gradient(to left, #f2ede6 0%, transparent 100%); width: 40px; }
 .foto-band {
   display: flex;
   gap: 10px;
