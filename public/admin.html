@@ -1044,7 +1044,9 @@ async function verileriYukle(showToast=true){
       sRest('siparisler?select=*&order=created_at.desc&limit=500').catch(()=>[])
     ]);
     TRZ=rezData.map(dbToLocal);
-    SIPARISLER=(sipData||[]).map(s=>({id:s.id,ad:s.musteri_adi||'Müşteri',telefon:s.telefon||'',hizmet:s.urun_adi||'Shop Ürünü',tarih:(s.tarih||s.created_at||'').substring(0,10),saat:'',durum:'onaylandi',odemeAlindi:true,fiyat:parseInt(s.toplam)||0,odemeYontemi:s.odeme_yontemi||'nakit',tip:'shop',personelId:null}));
+    SIPARISLER=(sipData||[]).map(s=>({id:'shop_'+s.id,ad:s.musteri_adi||'Müşteri',telefon:s.telefon||'',hizmet:s.urun_adi||'Shop Ürünü',tarih:(s.tarih||s.created_at||'').substring(0,10),saat:'',durum:'onaylandi',odemeAlindi:true,fiyat:parseInt(s.toplam)||0,odemeYontemi:s.odeme_yontemi||'nakit',tip:'shop',personelId:null}));
+    // Shop siparişlerini TRZ'ye dahil et (ciro, stats, müşteriler için)
+    TRZ=[...TRZ,...SIPARISLER];
     personel=pData.map(p=>({id:p.id,ad:p.ad,rol:p.rol||'',tel:p.tel||'',durum:p.durum||'aktif',foto:p.foto||'',rezaktif:p.rez_aktif!==false}));
     if(hizData&&hizData.length){
       hizmetler=hizData.map(h=>({id:h.id,ad:h.ad,kat:h.kat||'Diğer',min:h.min_fiyat||0,max:h.max_fiyat||0,sure:h.sure||60,sira:h.sira||0}));
@@ -1066,7 +1068,8 @@ function verileriRender(){statsGuncelle();tabloRender(AKT_FILTRE);bugRandevu();s
 // ─── STATS ───
 function fHesapla(r){if(r.odemeAlindi&&r.durum==='onaylandi'){if(r.fiyat)return r.fiyat;const h=FYT[r.hizmet];return h?Math.round((h.min+h.max)/2):0;}return 0;}
 function statsGuncelle(){
-  const t=TRZ.length,bek=TRZ.filter(r=>r.durum==='bekliyor').length;
+  const rezler=TRZ.filter(r=>r.tip!=='shop');
+  const t=rezler.length,bek=rezler.filter(r=>r.durum==='bekliyor').length;
   const onay=TRZ.filter(r=>r.durum==='onaylandi'&&r.odemeAlindi);
   const n=new Date();
   const buay=onay.filter(r=>{const d=new Date(r.tarih+'T12:00');return d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear();});
@@ -1167,12 +1170,13 @@ function filtrele(d,b){AKT_FILTRE=d;document.querySelectorAll('#page-rezervasyon
 function rezAra(v){AKT_ARAMA=v.toLowerCase();tabloRender(AKT_FILTRE);}
 function globalArama(v){if(!v)return;AKT_ARAMA=v.toLowerCase();sayfaGec('rezervasyonlar',document.querySelectorAll('.ni')[2]);tabloRender('hepsi');}
 function tabloRender(f){
-  let l=f==='hepsi'?TRZ:TRZ.filter(r=>r.durum===f);
+  // Shop siparişlerini rezervasyon tablosunda gösterme
+  let l=(f==='hepsi'?TRZ:TRZ.filter(r=>r.durum===f)).filter(r=>r.tip!=='shop');
   if(AKT_ARAMA)l=l.filter(r=>r.ad.toLowerCase().includes(AKT_ARAMA)||r.telefon.includes(AKT_ARAMA)||r.hizmet.toLowerCase().includes(AKT_ARAMA));
   const e=document.getElementById('reztbody');
   if(!l.length){e.innerHTML=`<tr><td colspan="8" class="bos">Rezervasyon bulunamadı.</td></tr>`;return;}
   e.innerHTML=l.map(r=>{
-    const h=FYT[r.hizmet];const fiyat=h?Math.round((h.min+h.max)/2).toLocaleString('tr-TR')+'₺':'—';
+    const h=FYT[r.hizmet];const fiyat=r.odemeAlindi&&r.fiyat?r.fiyat.toLocaleString('tr-TR')+'₺':(h?Math.round((h.min+h.max)/2).toLocaleString('tr-TR')+'₺':'—');
     const p=personel.find(x=>x.id===r.personelId)||personel.find(x=>x.ad===r.personelId);
     let aks;
     if(r.durum==='bekliyor')aks=`<div style="display:flex;gap:4px;white-space:nowrap"><button class="bsm bonay" onclick="onayEt('${r.id}')">Onayla</button><button class="bsm bred" onclick="reddet('${r.id}')">Reddet</button><button class="bsm bdet" onclick="detay('${r.id}')">···</button></div>`;
