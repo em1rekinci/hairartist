@@ -29,7 +29,14 @@
 }
 
 
-/* WhatsApp butonu */
+/* ── HİZMET KARTLARI MOBİL: her zaman görünür + tıklanabilir ── */
+@media(hover:none),(max-width:768px){
+  .svc-card{ -webkit-tap-highlight-color: transparent; }
+  .svc-card .svc-info p{ opacity:1; transform:translateY(0); }
+  .svc-card .svc-book-link{ opacity:1; }
+  .svc-card .svc-overlay{ background:linear-gradient(to top,rgba(8,8,8,.88) 0%,rgba(8,8,8,.3) 55%,transparent 100%); }
+}
+
 .wa-row { margin: 4px 0 !important; }
 .wa-btn {
   display: inline-flex;
@@ -336,12 +343,12 @@ Saç sağlığını ön planda tutarak, kişiye özel çözümler üretmek ve he
     <a href="/rezervasyon">Online rezervasyon →</a>
   </div>
   <div class="svc-grid">
-    <div class="svc-card" data-anim data-delay="1"><img src="images/sac-kesimi.jpg" alt="Saç Kesimi"><div class="svc-overlay"></div><div class="svc-info"><span class="svc-cat">01 — Hizmet</span><h3>Saç Kesimi</h3><p>Yıkama ve fön dahil, kişiye özel şekillendirme.</p><a href="/rezervasyon" class="svc-book-link">Rezerve Et →</a></div></div>
-    <div class="svc-card" data-anim data-delay="2"><img src="images/sac-bakimi.jpg" alt="Saç Bakımı"><div class="svc-overlay"></div><div class="svc-info"><span class="svc-cat">02 — Hizmet</span><h3>Saç Bakımı</h3><p>Keratin, Brezilya Fönü ve özel bakım uygulamaları.</p><a href="/rezervasyon" class="svc-book-link">Rezerve Et →</a></div></div>
-    <div class="svc-card" data-anim data-delay="3"><img src="images/sac-boyama.jpg" alt="Saç Boyama"><div class="svc-overlay"></div><div class="svc-info"><span class="svc-cat">03 — Hizmet</span><h3>Saç Boyama</h3><p>Temel renklendirme ve saç açma işlemleri.</p><a href="/rezervasyon" class="svc-book-link">Rezerve Et →</a></div></div>
-    <div class="svc-card" data-anim data-delay="4"><img src="images/sac-renklendirme.jpg" alt="Saç Renklendirme"><div class="svc-overlay"></div><div class="svc-info"><span class="svc-cat">04 — Hizmet</span><h3>Saç Renklendirme</h3><p>Ombre, Sombre, Balyaj ve diğer uygulamalar.</p><a href="/rezervasyon" class="svc-book-link">Rezerve Et →</a></div></div>
-    <div class="svc-card" data-anim data-delay="5"><img src="images/sac-sekillendirme.jpg" alt="Saç Şekillendirme"><div class="svc-overlay"></div><div class="svc-info"><span class="svc-cat">05 — Hizmet</span><h3>Saç Şekillendirme</h3><p>Fön, maşa, düzleştirme ve gelin saçı uygulamaları.</p><a href="/rezervasyon" class="svc-book-link">Rezerve Et →</a></div></div>
-    <div class="svc-card" data-anim data-delay="6"><img src="images/ozel-bakim.jpg" alt="Özel Bakım"><div class="svc-overlay"></div><div class="svc-info"><span class="svc-cat">06 — Hizmet</span><h3>Özel Saç Bakımı</h3><p>Maske, ampul ve saç derisi masajı ile onarıcı bakım.</p><a href="/rezervasyon" class="svc-book-link">Rezerve Et →</a></div></div>
+    <div class="svc-card" data-anim data-delay="1" onclick="window.location='/rezervasyon'"><img src="images/sac-kesimi.jpg" alt="Saç Kesimi"><div class="svc-overlay"></div><div class="svc-info"><span class="svc-cat">01 — Hizmet</span><h3>Saç Kesimi</h3><p>Yıkama ve fön dahil, kişiye özel şekillendirme.</p><a href="/rezervasyon" class="svc-book-link">Rezerve Et →</a></div></div>
+    <div class="svc-card" data-anim data-delay="2" onclick="window.location='/rezervasyon'"><img src="images/sac-bakimi.jpg" alt="Saç Bakımı"><div class="svc-overlay"></div><div class="svc-info"><span class="svc-cat">02 — Hizmet</span><h3>Saç Bakımı</h3><p>Keratin, Brezilya Fönü ve özel bakım uygulamaları.</p><a href="/rezervasyon" class="svc-book-link">Rezerve Et →</a></div></div>
+    <div class="svc-card" data-anim data-delay="3" onclick="window.location='/rezervasyon'"><img src="images/sac-boyama.jpg" alt="Saç Boyama"><div class="svc-overlay"></div><div class="svc-info"><span class="svc-cat">03 — Hizmet</span><h3>Saç Boyama</h3><p>Temel renklendirme ve saç açma işlemleri.</p><a href="/rezervasyon" class="svc-book-link">Rezerve Et →</a></div></div>
+    <div class="svc-card" data-anim data-delay="4" onclick="window.location='/rezervasyon'"><img src="images/sac-renklendirme.jpg" alt="Saç Renklendirme"><div class="svc-overlay"></div><div class="svc-info"><span class="svc-cat">04 — Hizmet</span><h3>Saç Renklendirme</h3><p>Ombre, Sombre, Balyaj ve diğer uygulamalar.</p><a href="/rezervasyon" class="svc-book-link">Rezerve Et →</a></div></div>
+    <div class="svc-card" data-anim data-delay="5" onclick="window.location='/rezervasyon'"><img src="images/sac-sekillendirme.jpg" alt="Saç Şekillendirme"><div class="svc-overlay"></div><div class="svc-info"><span class="svc-cat">05 — Hizmet</span><h3>Saç Şekillendirme</h3><p>Fön, maşa, düzleştirme ve gelin saçı uygulamaları.</p><a href="/rezervasyon" class="svc-book-link">Rezerve Et →</a></div></div>
+    <div class="svc-card" data-anim data-delay="6" onclick="window.location='/rezervasyon'"><img src="images/ozel-bakim.jpg" alt="Özel Bakım"><div class="svc-overlay"></div><div class="svc-info"><span class="svc-cat">06 — Hizmet</span><h3>Özel Saç Bakımı</h3><p>Maske, ampul ve saç derisi masajı ile onarıcı bakım.</p><a href="/rezervasyon" class="svc-book-link">Rezerve Et →</a></div></div>
   </div>
 </section>
 
