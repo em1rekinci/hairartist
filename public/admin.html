@@ -401,7 +401,7 @@ tbody td{padding:10px 13px;vertical-align:middle}
     </div>
     <div class="gsub">Admin Paneli</div>
     <label class="glbl">Şifre</label>
-    <input type="password" class="ginp" id="sinp" placeholder="••••••••" onkeydown="if(event.key==='Enter')girisYap()">
+    <input type="password" class="ginp" id="sifre-inp" placeholder="••••••••" onkeydown="if(event.key==='Enter')girisYap()">
     <button class="gbtn" onclick="girisYap()">Panele Gir</button>
     <div class="ghata" id="ghata">Şifre hatalı.</div>
     
@@ -1011,7 +1011,7 @@ function demoData(){
 
 // ─── GİRİŞ ───
 async function girisYap(){
-  const s=document.getElementById('sinp').value.trim();if(!s)return;
+  const s=document.getElementById('sifre-inp').value.trim();if(!s)return;
   if(s===DS){
     SFR=s;
     document.getElementById('ghata').style.display='none';
@@ -1024,7 +1024,7 @@ function panelAc(){
   const ge=document.getElementById('ge');ge.style.opacity='0';
   setTimeout(()=>{ge.style.display='none';document.getElementById('panel').style.display='block';panelBaslat();},400);
 }
-function cikisYap(){SFR='';TRZ=[];document.getElementById('panel').style.display='none';const ge=document.getElementById('ge');ge.style.display='flex';ge.style.opacity='1';document.getElementById('sinp').value='';document.getElementById('ghata').style.display='none';}
+function cikisYap(){SFR='';TRZ=[];document.getElementById('panel').style.display='none';const ge=document.getElementById('ge');ge.style.display='flex';ge.style.opacity='1';document.getElementById('sifre-inp').value='';document.getElementById('ghata').style.display='none';}
 
 // ─── PANEL BAŞLAT ───
 async function panelBaslat(){
