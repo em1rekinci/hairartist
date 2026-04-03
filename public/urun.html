@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ürün — Hair Artist</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{overflow-x:hidden}
+.urun-page{background:var(--off);color:var(--black);padding-top:70px;font-family:'Montserrat',sans-serif;min-height:100vh}
+
+/* ── BREADCRUMB ── */
+.breadcrumb{padding:22px 56px;display:flex;align-items:center;gap:8px;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.breadcrumb a{color:var(--dim);text-decoration:none;transition:color .2s}
+.breadcrumb a:hover{color:var(--black)}
+.breadcrumb-sep{opacity:.4}
+.breadcrumb-aktif{color:var(--black)}
+
+/* ── ANA İÇERİK ── */
+.urun-detay{display:grid;grid-template-columns:1fr 1fr;gap:0;min-height:calc(100vh - 170px)}
+
+/* ── GALERİ ── */
+.galeri-sol{position:sticky;top:70px;height:calc(100vh - 70px);display:flex;flex-direction:column;background:#f5f1ea;overflow:hidden}
+.galeri-ana{flex:1;position:relative;overflow:hidden;cursor:zoom-in}
+.galeri-ana img{width:100%;height:100%;object-fit:cover;transition:transform .6s cubic-bezier(.4,0,.2,1);display:block}
+.galeri-ana img:hover{transform:scale(1.04)}
+.galeri-ana-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#ede9e1}
+.galeri-placeholder-ic{display:flex;flex-direction:column;align-items:center;gap:12px;opacity:.2}
+.galeri-placeholder-ic svg{width:48px;height:48px}
+.galeri-placeholder-ic span{font-size:.55rem;letter-spacing:.2em;text-transform:uppercase}
+.galeri-thumbler{display:flex;gap:0;height:80px;border-top:1px solid rgba(8,8,8,.08);overflow-x:auto;flex-shrink:0}
+.galeri-thumbler::-webkit-scrollbar{display:none}
+.galeri-thumb{flex-shrink:0;width:80px;height:80px;cursor:pointer;overflow:hidden;border-right:1px solid rgba(8,8,8,.08);position:relative;transition:opacity .2s}
+.galeri-thumb img{width:100%;height:100%;object-fit:cover;transition:transform .3s}
+.galeri-thumb:hover img{transform:scale(1.08)}
+.galeri-thumb.aktif::after{content:'';position:absolute;inset:0;border:2px solid var(--black);pointer-events:none}
+.galeri-thumb.aktif{opacity:1}
+.galeri-thumb:not(.aktif){opacity:.55}
+.galeri-no-foto{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#ede9e1;flex-direction:column;gap:16px;opacity:.25}
+.galeri-sayac{position:absolute;bottom:14px;right:14px;background:rgba(8,8,8,.55);color:#fff;font-size:.5rem;letter-spacing:.12em;padding:4px 9px;border-radius:2px}
+
+/* ── BİLGİ ── */
+.urun-bilgi-col{padding:52px 56px 80px;display:flex;flex-direction:column;background:var(--off)}
+.urun-kat-tag{font-size:.52rem;letter-spacing:.24em;text-transform:uppercase;color:var(--dim);margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.urun-kat-tag::after{content:'';flex:1;height:1px;background:rgba(8,8,8,.1)}
+.urun-baslik{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,3.5vw,2.8rem);font-weight:700;color:var(--black);line-height:1.05;margin-bottom:20px}
+.urun-baslik em{font-style:italic;font-weight:400;color:var(--dim)}
+
+/* Stok badge */
+.stok-badge{display:inline-flex;align-items:center;gap:6px;font-size:.54rem;letter-spacing:.14em;text-transform:uppercase;font-weight:600;padding:5px 12px;margin-bottom:24px;border:1px solid}
+.stok-ok{background:rgba(74,122,0,.08);border-color:rgba(74,122,0,.2);color:#3d6600}
+.stok-az{background:rgba(154,104,0,.08);border-color:rgba(154,104,0,.2);color:#7a5200}
+.stok-yok{background:rgba(176,48,32,.08);border-color:rgba(176,48,32,.2);color:#8b2010}
+.stok-badge-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.stok-ok .stok-badge-dot{background:#4a7a00}
+.stok-az .stok-badge-dot{background:#9a6800}
+.stok-yok .stok-badge-dot{background:#b03020}
+
+.urun-fiyat-blok{display:flex;align-items:baseline;gap:12px;margin-bottom:32px;padding-bottom:32px;border-bottom:1px solid rgba(8,8,8,.1)}
+.urun-fiyat-buyuk{font-family:'Playfair Display',serif;font-size:clamp(2rem,4vw,2.8rem);font-weight:700;color:var(--black);line-height:1}
+.urun-fiyat-para{font-size:1.1rem;font-weight:300;color:var(--dim);margin-left:2px}
+
+.urun-aciklama{font-size:.8rem;line-height:1.9;color:#5a5550;margin-bottom:36px;flex:1}
+
+/* ── ADET & BUTON ── */
+.adet-satir{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.adet-ctrl{display:flex;align-items:center;border:1px solid rgba(8,8,8,.2);background:#fff}
+.adet-btn{width:38px;height:42px;background:none;border:none;cursor:pointer;font-size:1rem;color:var(--black);transition:background .15s;display:flex;align-items:center;justify-content:center}
+.adet-btn:hover{background:rgba(8,8,8,.05)}
+.adet-btn:disabled{opacity:.3;cursor:not-allowed}
+.adet-sayi{width:44px;text-align:center;font-size:.8rem;font-weight:500;color:var(--black);border:none;outline:none;background:none;font-family:'Montserrat',sans-serif}
+
+.sepet-btn{flex:1;background:var(--black);color:var(--off);border:none;padding:0 28px;height:42px;font-size:.58rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;transition:opacity .2s;font-family:'Montserrat',sans-serif;white-space:nowrap}
+.sepet-btn:hover{opacity:.85}
+.sepet-btn:disabled{opacity:.35;cursor:not-allowed}
+
+.favori-btn{width:42px;height:42px;background:#fff;border:1px solid rgba(8,8,8,.2);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;color:var(--black)}
+.favori-btn:hover{border-color:var(--black)}
+.favori-btn.aktif{background:var(--black);color:var(--off)}
+.favori-btn.aktif svg path{fill:currentColor}
+
+.ekle-bilgi{font-size:.58rem;color:var(--dim);letter-spacing:.08em;margin-bottom:36px;text-align:center}
+
+/* ── ÖZELLİKLER ── */
+.ozellik-baslik{font-size:.52rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dim);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(8,8,8,.1)}
+.ozellik-satir{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(8,8,8,.06);font-size:.74rem}
+.ozellik-satir:last-child{border-bottom:none}
+.ozellik-key{color:var(--dim);font-weight:300}
+.ozellik-val{color:var(--black);font-weight:500;text-align:right}
+
+/* ── BENZERİ ÜRÜNLER ── */
+.benzer-section{padding:80px 56px}
+.benzer-baslik{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:36px}
+.benzer-baslik h2{font-family:'Playfair Display',serif;font-size:clamp(1.4rem,2.5vw,1.8rem);font-weight:700;color:var(--black)}
+.benzer-baslik h2 em{font-style:italic;font-weight:400;color:var(--dim)}
+.benzer-baslik a{font-size:.56rem;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);text-decoration:none;transition:color .2s}
+.benzer-baslik a:hover{color:var(--black)}
+.benzer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+
+/* ── ÜRÜN KARTI (shop.html'den kopyalandı) ── */
+.urun-kart{background:#fff;border:1px solid #e8e4dc;display:flex;flex-direction:column;overflow:hidden;transition:box-shadow .25s;cursor:pointer;text-decoration:none;color:inherit}
+.urun-kart:hover{box-shadow:0 8px 40px rgba(8,8,8,.1)}
+.urun-resim{aspect-ratio:1/1;background:#f0ece4;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.urun-resim img{width:100%;height:100%;object-fit:cover}
+.urun-placeholder{display:flex;flex-direction:column;align-items:center;gap:10px;opacity:.2}
+.urun-placeholder svg{width:36px;height:36px}
+.urun-placeholder span{font-size:.55rem;letter-spacing:.2em;text-transform:uppercase;color:var(--black)}
+.yakinda-tag{position:absolute;top:12px;left:12px;background:var(--black);color:var(--off);font-size:.52rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;padding:4px 9px}
+.urun-bilgi{padding:18px 16px;flex:1;display:flex;flex-direction:column;gap:6px}
+.urun-kat{font-size:.55rem;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
+.urun-ad{font-family:'Playfair Display',serif;font-size:.98rem;font-weight:700;color:var(--black);line-height:1.3}
+.urun-acik{font-size:.72rem;line-height:1.7;color:#6a6560;margin-top:2px;flex:1}
+.urun-alt{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid #e8e4dc}
+.urun-fiyat{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--black)}
+.urun-btn{font-size:.55rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(8,8,8,.5);border:1px solid rgba(8,8,8,.2);padding:7px 12px;background:transparent;cursor:pointer;font-family:'Montserrat',sans-serif;transition:all .2s}
+.urun-btn:hover{background:var(--black);color:var(--off);border-color:var(--black)}
+
+/* ── YÜKLEME / HATA ── */
+.yukle-wrap{display:flex;align-items:center;justify-content:center;min-height:60vh;flex-direction:column;gap:16px}
+.yukle-spin{width:32px;height:32px;border:2px solid rgba(8,8,8,.1);border-top-color:var(--black);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hata-wrap{text-align:center;padding:80px 24px;color:var(--dim)}
+.hata-wrap h3{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:var(--black);margin-bottom:12px}
+.hata-wrap p{font-size:.78rem;line-height:1.8;margin-bottom:28px}
+.hata-btn{display:inline-block;background:var(--black);color:var(--off);padding:12px 28px;font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;font-family:'Montserrat',sans-serif;font-weight:600;transition:opacity .2s}
+.hata-btn:hover{opacity:.8}
+
+/* ── TOAST ── */
+.toast-urun{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--black);color:var(--off);padding:13px 22px;font-size:.68rem;letter-spacing:.08em;z-index:9999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;border-radius:2px}
+.toast-urun.goster{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── RESPONSİVE ── */
+@media(max-width:900px){
+  .breadcrumb{padding:16px 24px}
+  .urun-detay{grid-template-columns:1fr;min-height:auto}
+  .galeri-sol{position:relative;top:auto;height:auto}
+  .galeri-ana{height:60vw;min-height:280px;max-height:420px}
+  .galeri-thumbler{height:64px}
+  .galeri-thumb{width:64px;height:64px}
+  .urun-bilgi-col{padding:36px 24px 60px}
+  .benzer-section{padding:52px 24px}
+  .benzer-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:540px){
+  .breadcrumb{padding:14px 16px}
+  .galeri-ana{height:72vw}
+  .urun-bilgi-col{padding:28px 16px 48px}
+  .adet-satir{flex-wrap:wrap}
+  .sepet-btn{flex:none;width:100%}
+  .benzer-section{padding:40px 16px}
+  .benzer-grid{grid-template-columns:1fr 1fr;gap:8px}
+  .benzer-grid .urun-acik{display:none}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">
+    <img src="images/logo2.png" alt="Hair Artist" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+    <span class="nav-logo-txt" style="display:none">HAIR ARTIST</span>
+  </a>
+  <ul>
+    <li><a href="/">Anasayfa</a></li>
+    <li><a href="/#about">Hakkımızda</a></li>
+    <li><a href="/#services">Hizmetler</a></li>
+    <li><a href="/fiyatlar">Fiyat Listesi</a></li>
+    <li><a href="/portfolio">Portfolyo</a></li>
+    <li><a href="/shop" class="active">Shop</a></li>
+    <li><a href="/#contact">İletişim</a></li>
+  </ul>
+  <div class="nav-right">
+    <a href="/rezervasyon" class="nav-book">Rezervasyon Yap</a>
+    <button class="hamburger" id="hamburger" aria-label="Menü"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-menu-close" onclick="closeMobileMenu()">✕</button>
+  <ul>
+    <li><a href="/" onclick="closeMobileMenu()">Anasayfa</a></li>
+    <li><a href="/#about" onclick="closeMobileMenu()">Hakkımızda</a></li>
+    <li><a href="/#services" onclick="closeMobileMenu()">Hizmetler</a></li>
+    <li><a href="/fiyatlar">Fiyat Listesi</a></li>
+    <li><a href="/portfolio">Portfolyo</a></li>
+    <li><a href="/shop">Shop</a></li>
+    <li><a href="/#contact" onclick="closeMobileMenu()">İletişim</a></li>
+  </ul>
+  <a href="/rezervasyon" class="m-book">Rezervasyon Yap</a>
+</div>
+
+<div class="urun-page" id="urunPage">
+  <!-- İçerik JS ile doldurulacak -->
+  <div class="yukle-wrap" id="yukleWrap">
+    <div class="yukle-spin"></div>
+    <span style="font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)">Yükleniyor...</span>
+  </div>
+</div>
+
+<div class="toast-urun" id="toastUrun"></div>
+
+<script>
+// ── SUPABASE
+const SUPA_URL = 'https://botxnihztrnwzjnrlwzv.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvdHhuaWh6dHJud3pqbnJsd3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MTg4MTAsImV4cCI6MjA5MDA5NDgxMH0.AcX4_2Aykf8J1jln9fvODh2rRffymfEJCAekzmN1ALg';
+
+// ── NAV
+const hamburger = document.getElementById('hamburger');
+const mobileMenu = document.getElementById('mobileMenu');
+function closeMobileMenu(){
+  hamburger.classList.remove('open');
+  mobileMenu.classList.remove('open');
+  mobileMenu.style.display='none';
+  document.body.style.overflow='';
+}
+hamburger.addEventListener('click',()=>{
+  const isOpen = hamburger.classList.toggle('open');
+  if(isOpen){ mobileMenu.style.display='flex'; setTimeout(()=>mobileMenu.classList.add('open'),10); document.body.style.overflow='hidden'; }
+  else { closeMobileMenu(); }
+});
+window.addEventListener('scroll',()=>{ document.querySelector('nav').classList.toggle('scrolled',window.scrollY>40); },{passive:true});
+
+// ── TOAST
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toastUrun');
+  el.textContent = msg;
+  el.classList.add('goster');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('goster'), 2800);
+}
+
+// ── GALERİ
+let aktifFoto = 0;
+let tumFotolar = [];
+
+function galeriGit(idx) {
+  if (!tumFotolar.length) return;
+  aktifFoto = idx;
+  const ana = document.getElementById('galeriAna');
+  if (ana && tumFotolar[idx]) {
+    ana.src = tumFotolar[idx];
+    ana.style.opacity = '0';
+    setTimeout(() => ana.style.opacity = '1', 30);
+  }
+  document.querySelectorAll('.galeri-thumb').forEach((t, i) => t.classList.toggle('aktif', i === idx));
+  const sayac = document.getElementById('galeriSayac');
+  if (sayac) sayac.textContent = `${idx + 1} / ${tumFotolar.length}`;
+}
+
+// ── ADET
+let adet = 1;
+function adetDegistir(delta) {
+  const max = parseInt(document.getElementById('adetSayi')?.dataset.stok || '99');
+  adet = Math.max(1, Math.min(max, adet + delta));
+  const el = document.getElementById('adetSayi');
+  if (el) el.value = adet;
+  document.getElementById('adetAzalt').disabled = adet <= 1;
+  document.getElementById('adetArtir').disabled = adet >= max;
+}
+
+// ── FAVORİ
+let favori = false;
+function favoriBas() {
+  favori = !favori;
+  const btn = document.getElementById('favoriBtnEl');
+  if (btn) btn.classList.toggle('aktif', favori);
+  toast(favori ? '❤ Favorilere eklendi' : 'Favorilerden çıkarıldı');
+}
+
+// ── FOTO URL PARSE (tek string veya JSON array)
+function fotoUrlParse(foto_url) {
+  if (!foto_url) return [];
+  try {
+    if (foto_url.startsWith('[')) {
+      const arr = JSON.parse(foto_url);
+      return Array.isArray(arr) ? arr.filter(Boolean) : [foto_url];
+    }
+  } catch(e) {}
+  return [foto_url];
+}
+
+// ── ÜRÜN KARTI HTML (benzer ürünler için)
+function urunKartHtml(u) {
+  const stokBadge = u.stok === 0
+    ? '<span class="yakinda-tag" style="background:#b03020">Tükendi</span>'
+    : u.stok <= (u.stok_uyari || 3)
+      ? `<span class="yakinda-tag" style="background:#8a5c00">Son ${u.stok} adet</span>`
+      : '';
+  const fotolar = fotoUrlParse(u.foto_url);
+  const fotoHtml = fotolar[0]
+    ? `<img src="${fotolar[0]}" alt="${u.ad}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+    : '';
+  const placeholder = `<div class="urun-placeholder" ${fotolar[0] ? 'style="display:none"' : ''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg><span>Ürün</span></div>`;
+  return `
+    <a class="urun-kart" href="/urun?id=${u.id}" onclick="urunGit('${u.id}');return false;">
+      <div class="urun-resim">${stokBadge}${fotoHtml}${placeholder}</div>
+      <div class="urun-bilgi">
+        <span class="urun-kat">${u.kat}</span>
+        <div class="urun-ad">${u.ad}</div>
+        <div class="urun-acik">${u.acik || ''}</div>
+      </div>
+      <div class="urun-alt">
+        <span class="urun-fiyat">${u.fiyat ? u.fiyat.toLocaleString('tr-TR') + ' ₺' : '— ₺'}</span>
+        <button class="urun-btn">${u.stok === 0 ? 'Tükendi' : 'İncele →'}</button>
+      </div>
+    </a>`;
+}
+
+function urunGit(id) {
+  const url = new URL(window.location.href);
+  url.searchParams.set('id', id);
+  window.history.pushState({}, '', url);
+  sayfaYukle();
+}
+
+// ── SAYFA RENDER
+function sayfaRender(u, benzerler) {
+  const fotolar = fotoUrlParse(u.foto_url);
+  tumFotolar = fotolar;
+  aktifFoto = 0;
+
+  // Stok badge
+  let stokHtml, stokClass;
+  if (u.stok === 0) {
+    stokClass = 'stok-yok'; stokHtml = '<div class="stok-badge-dot"></div>Tükendi';
+  } else if (u.stok <= (u.stok_uyari || 3)) {
+    stokClass = 'stok-az'; stokHtml = `<div class="stok-badge-dot"></div>Son ${u.stok} adet kaldı`;
+  } else {
+    stokClass = 'stok-ok'; stokHtml = `<div class="stok-badge-dot"></div>Stokta var — ${u.stok} adet`;
+  }
+
+  // Galeri thumbler
+  const thumblerHtml = fotolar.length > 1 ? fotolar.map((f, i) => `
+    <div class="galeri-thumb ${i === 0 ? 'aktif' : ''}" onclick="galeriGit(${i})">
+      <img src="${f}" alt="${u.ad} ${i+1}" loading="lazy" onerror="this.parentElement.style.display='none'">
+    </div>`).join('') : '';
+
+  // Galeri ana foto
+  const galeriAnaHtml = fotolar.length > 0
+    ? `<img id="galeriAna" src="${fotolar[0]}" alt="${u.ad}" style="transition:opacity .25s" onerror="this.style.display='none'">
+       ${fotolar.length > 1 ? `<div class="galeri-sayac" id="galeriSayac">1 / ${fotolar.length}</div>` : ''}`
+    : `<div class="galeri-ana-placeholder"><div class="galeri-placeholder-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><span>Fotoğraf yok</span></div></div>`;
+
+  // Özellikler
+  const ozellikler = [
+    { k: 'Kategori', v: u.kat },
+    { k: 'Stok Adedi', v: u.stok === 0 ? 'Tükendi' : `${u.stok} adet` },
+  ].filter(o => o.v);
+
+  const ozellikHtml = ozellikler.map(o => `
+    <div class="ozellik-satir">
+      <span class="ozellik-key">${o.k}</span>
+      <span class="ozellik-val">${o.v}</span>
+    </div>`).join('');
+
+  // Benzer ürünler
+  const benzerHtml = benzerler.length > 0
+    ? `<section class="benzer-section">
+        <div class="benzer-baslik">
+          <h2>Benzer <em>Ürünler</em></h2>
+          <a href="/shop">Tümünü gör →</a>
+        </div>
+        <div class="benzer-grid">
+          ${benzerler.map(b => urunKartHtml(b)).join('')}
+        </div>
+      </section>` : '';
+
+  document.getElementById('urunPage').innerHTML = `
+    <div class="breadcrumb">
+      <a href="/">Anasayfa</a>
+      <span class="breadcrumb-sep">—</span>
+      <a href="/shop">Shop</a>
+      <span class="breadcrumb-sep">—</span>
+      <span class="breadcrumb-aktif">${u.ad}</span>
+    </div>
+
+    <div class="urun-detay">
+      <!-- GALERİ -->
+      <div class="galeri-sol">
+        <div class="galeri-ana" id="galeriAnaWrap" ${fotolar.length > 1 ? 'onclick="galeriSonraki()"' : ''}>
+          ${galeriAnaHtml}
+        </div>
+        ${fotolar.length > 1 ? `<div class="galeri-thumbler">${thumblerHtml}</div>` : ''}
+      </div>
+
+      <!-- BİLGİ -->
+      <div class="urun-bilgi-col">
+        <div class="urun-kat-tag">${u.kat}</div>
+        <h1 class="urun-baslik">${u.ad}</h1>
+        <div class="stok-badge ${stokClass}">${stokHtml}</div>
+
+        <div class="urun-fiyat-blok">
+          <span class="urun-fiyat-buyuk">${u.fiyat ? u.fiyat.toLocaleString('tr-TR') : '—'}</span>
+          <span class="urun-fiyat-para">₺</span>
+        </div>
+
+        ${u.acik ? `<p class="urun-aciklama">${u.acik}</p>` : ''}
+
+        ${u.stok > 0 ? `
+        <div class="adet-satir">
+          <div class="adet-ctrl">
+            <button class="adet-btn" id="adetAzalt" onclick="adetDegistir(-1)" disabled>−</button>
+            <input class="adet-sayi" id="adetSayi" value="1" data-stok="${u.stok}" readonly>
+            <button class="adet-btn" id="adetArtir" onclick="adetDegistir(1)" ${u.stok <= 1 ? 'disabled' : ''}>+</button>
+          </div>
+          <button class="sepet-btn" onclick="sepeteEkle('${u.id}', '${u.ad.replace(/'/g,"\\'")}')">Sepete Ekle</button>
+          <button class="favori-btn" id="favoriBtnEl" onclick="favoriBas()" title="Favorilere ekle">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+        </div>
+        <div class="ekle-bilgi">Ücretsiz kargo 500₺ ve üzeri siparişlerde</div>
+        ` : `
+        <div style="padding:14px 18px;background:rgba(176,48,32,.06);border:1px solid rgba(176,48,32,.15);font-size:.72rem;color:#8b2010;margin-bottom:32px;letter-spacing:.04em">
+          Bu ürün şu an stokta bulunmamaktadır. Yakında tekrar stoklanacaktır.
+        </div>`}
+
+        ${ozellikler.length > 0 ? `
+        <div style="margin-top:auto">
+          <div class="ozellik-baslik">Ürün Bilgileri</div>
+          ${ozellikHtml}
+        </div>` : ''}
+      </div>
+    </div>
+
+    ${benzerHtml}
+
+    <footer style="background:var(--black);border-top:1px solid rgba(247,244,239,.06);padding:40px 56px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px">
+      <p style="font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(247,244,239,.3)">© 2026 Hair Artist · Branded by Fatih Kurt</p>
+      <a href="https://www.vionasoft.com" style="font-size:.56rem;color:rgba(247,244,239,.2);text-decoration:none;letter-spacing:.1em;text-transform:uppercase;transition:color .2s" target="_blank" rel="noopener">Tasarım: Vionasoft</a>
+    </footer>
+  `;
+
+  // Başlık güncelle
+  document.title = `${u.ad} — Hair Artist`;
+
+  // Klavye navigasyonu
+  document.onkeydown = (e) => {
+    if (e.key === 'ArrowRight') galeriSonraki();
+    if (e.key === 'ArrowLeft') galeriOnceki();
+  };
+}
+
+function galeriSonraki() {
+  if (tumFotolar.length < 2) return;
+  galeriGit((aktifFoto + 1) % tumFotolar.length);
+}
+function galeriOnceki() {
+  if (tumFotolar.length < 2) return;
+  galeriGit((aktifFoto - 1 + tumFotolar.length) % tumFotolar.length);
+}
+
+// ── SEPET (localStorage)
+function sepeteEkle(id, ad) {
+  try {
+    let sepet = JSON.parse(localStorage.getItem('ha_sepet') || '[]');
+    const mevcut = sepet.find(s => s.id === id);
+    if (mevcut) {
+      mevcut.adet += adet;
+    } else {
+      sepet.push({ id, ad, adet });
+    }
+    localStorage.setItem('ha_sepet', JSON.stringify(sepet));
+  } catch(e) {}
+  toast(`✓ ${ad} sepete eklendi (${adet} adet)`);
+}
+
+// ── VERİ YÜKLEME
+async function sayfaYukle() {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+
+  document.getElementById('urunPage').innerHTML = `
+    <div class="yukle-wrap">
+      <div class="yukle-spin"></div>
+      <span style="font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)">Yükleniyor...</span>
+    </div>`;
+
+  if (!id) {
+    hataGoster('Ürün bulunamadı', 'Geçerli bir ürün ID\'si belirtilmedi.', true);
+    return;
+  }
+
+  try {
+    // Ürünü çek
+    const res = await fetch(`${SUPA_URL}/rest/v1/shop?id=eq.${id}&limit=1`, {
+      headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY }
+    });
+    if (!res.ok) throw new Error('Sunucu hatası');
+    const arr = await res.json();
+    if (!arr.length) {
+      hataGoster('Ürün bulunamadı', 'Bu ürün mevcut değil veya kaldırılmış olabilir.', true);
+      return;
+    }
+    const u = arr[0];
+
+    // Benzer ürünleri çek (aynı kategori, farklı ürün, yayında)
+    const benzerRes = await fetch(
+      `${SUPA_URL}/rest/v1/shop?kat=eq.${encodeURIComponent(u.kat)}&id=neq.${id}&yayinda=eq.true&limit=3&order=created_at.desc`,
+      { headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY } }
+    );
+    const benzerler = benzerRes.ok ? await benzerRes.json() : [];
+
+    sayfaRender(u, benzerler);
+
+  } catch(e) {
+    hataGoster('Bir hata oluştu', 'Ürün yüklenirken bir sorun çıktı. Lütfen tekrar deneyin.', false);
+  }
+}
+
+function hataGoster(baslik, mesaj, shopLink) {
+  document.getElementById('urunPage').innerHTML = `
+    <div class="hata-wrap">
+      <h3>${baslik}</h3>
+      <p>${mesaj}</p>
+      <a href="/shop" class="hata-btn">← Shop'a Dön</a>
+    </div>
+    <footer style="background:var(--black);border-top:1px solid rgba(247,244,239,.06);padding:40px 56px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px">
+      <p style="font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(247,244,239,.3)">© 2026 Hair Artist</p>
+    </footer>`;
+}
+
+document.addEventListener('DOMContentLoaded', sayfaYukle);
+</script>
+</body>
+</html>

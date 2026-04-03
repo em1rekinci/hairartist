@@ -310,19 +310,30 @@ hamburger.addEventListener('click',()=>{
 window.addEventListener('scroll',()=>{ document.querySelector('nav').classList.toggle('scrolled',window.scrollY>40); },{passive:true});
 
 // ── ÜRÜN KARTI HTML
+function fotoIlkUrl(foto_url) {
+  if (!foto_url) return '';
+  try {
+    if (foto_url.startsWith('[')) {
+      const arr = JSON.parse(foto_url);
+      return Array.isArray(arr) && arr[0] ? arr[0] : foto_url;
+    }
+  } catch(e) {}
+  return foto_url;
+}
+
 function urunKartHtml(u, buyuk=false) {
   const stokBadge = u.stok === 0
-    ? '<span class="yakinda-tag" style="background:var(--red,#b00)">Tükendi</span>'
+    ? '<span class="yakinda-tag" style="background:#b03020">Tükendi</span>'
     : u.stok <= (u.stok_uyari || 3)
       ? `<span class="yakinda-tag" style="background:#8a5c00">Son ${u.stok} adet</span>`
       : '';
-  const fotoHtml = u.foto_url
-    ? `<img src="${u.foto_url}" alt="${u.ad}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+  const ilkFoto = fotoIlkUrl(u.foto_url);
+  const fotoHtml = ilkFoto
+    ? `<img src="${ilkFoto}" alt="${u.ad}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
     : '';
-  const placeholder = `<div class="urun-placeholder" ${u.foto_url ? 'style="display:none"' : ''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg><span>Ürün</span></div>`;
-  const btnDisabled = u.stok === 0;
+  const placeholder = `<div class="urun-placeholder" ${ilkFoto ? 'style="display:none"' : ''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg><span>Ürün</span></div>`;
   return `
-    <div class="urun-kart">
+    <a class="urun-kart" href="/urun?id=${u.id}" style="text-decoration:none;color:inherit;cursor:pointer;display:flex;flex-direction:column">
       <div class="urun-resim">
         ${stokBadge}
         ${fotoHtml}${placeholder}
@@ -334,9 +345,9 @@ function urunKartHtml(u, buyuk=false) {
       </div>
       <div class="urun-alt">
         <span class="urun-fiyat">${u.fiyat ? u.fiyat.toLocaleString('tr-TR') + ' ₺' : '— ₺'}</span>
-        <button class="urun-btn" ${btnDisabled ? 'disabled' : ''}>${btnDisabled ? 'Tükendi' : 'Sepete Ekle'}</button>
+        <span class="urun-btn" style="pointer-events:none">${u.stok === 0 ? 'Tükendi' : 'İncele →'}</span>
       </div>
-    </div>`;
+    </a>`;
 }
 
 // ── ÇOK SATANLAR SLİDER

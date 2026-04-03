@@ -1730,7 +1730,7 @@ function shopFotoGridGuncelle(previewUrl, url, pendingIdx) {
   grid.innerHTML = mevcutlar + bekleyenler + ekleBtn;
   // pending preview yükle
   _pendingShopFotolar.forEach((file, i) => {
-    const img = grid.querySelector(\`img[data-pending="\${i}"]\`);
+    const img = grid.querySelector(`img[data-pending="${i}"]`);
     if (img && !img.src.startsWith('data')) {
       const r = new FileReader();
       r.onload = ev => { if(img) img.src = ev.target.result; };
