@@ -668,24 +668,86 @@ tbody td{padding:10px 13px;vertical-align:middle}
     <!-- ══ SHOP ══ -->
     <div class="page" id="page-shop">
       <div style="margin-bottom:16px"><h2 style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700">Shop <em style="font-style:italic;font-weight:400;color:var(--text3)">Yönetimi</em></h2><p style="font-size:.7rem;color:var(--text3);margin-top:3px">Ürün kataloğunu ve stoklarını yönetin</p></div>
-      <div class="shopsg">
+
+      <!-- Stats -->
+      <div class="shopsg" style="grid-template-columns:repeat(4,1fr)">
         <div class="shopmc"><span class="slbl2">Toplam Ürün</span><div class="sval" id="shopturun" style="font-size:1.55rem">—</div></div>
+        <div class="shopmc"><span class="slbl2">Yayında</span><div class="sval g" id="shopyayinda" style="font-size:1.55rem">—</div></div>
         <div class="shopmc"><span class="slbl2">Stok Uyarısı</span><div class="sval y" id="shopstok" style="font-size:1.55rem">—</div></div>
+        <div class="shopmc"><span class="slbl2">Tükendi</span><div class="sval r" id="shoptukendi" style="font-size:1.55rem">—</div></div>
       </div>
+
       <div class="shopgrid">
-        <div class="card"><div class="ch"><h3>Ürün Listesi</h3><button class="tbtn pri" onclick="document.getElementById('sfad').focus()">+ Ürün Ekle</button></div><div class="cb0" id="shopurunlist"></div></div>
-        <div class="card"><div class="ch"><h3 id="shopformbaslik">Ürün Ekle</h3></div><div class="cb">
-          <div style="display:flex;flex-direction:column;gap:11px">
-            <input type="hidden" id="sfid">
-            <div class="ff"><label class="fl">Ürün Adı</label><input class="fi" id="sfad" type="text" placeholder="ör. Argan Şampuanı"></div>
-            <div class="ff"><label class="fl">Kategori</label><select class="fsel" id="sfkat"><option>Şampuan</option><option>Saç Bakım</option><option>Stil Ürünleri</option><option>Renk</option><option>Aksesuar</option><option>Diğer</option></select></div>
-            <div class="ff"><label class="fl">Fiyat (₺)</label><input class="fi" id="sffiyat" type="number" placeholder="250"></div>
-            <div class="ff"><label class="fl">Stok</label><input class="fi" id="sfstok" type="number" placeholder="10"></div>
-            <div class="ff"><label class="fl">Açıklama</label><input class="fi" id="sfacik" type="text" placeholder="Kısa açıklama"></div>
-            <button class="sbtn" onclick="shopKaydet()">Kaydet</button>
-            <button class="sbtn sec" id="sfiptal" onclick="shopSifirla()" style="display:none">İptal</button>
+        <!-- Sol: Ürün listesi -->
+        <div class="card">
+          <div class="ch">
+            <h3>Ürün Listesi</h3>
+            <div style="display:flex;gap:6px;align-items:center">
+              <div class="fbar" id="shop-filtre-bar">
+                <button class="fbtn ak" onclick="shopFiltrele('hepsi',this)">Hepsi</button>
+                <button class="fbtn" onclick="shopFiltrele('yayinda',this)">Yayında</button>
+                <button class="fbtn" onclick="shopFiltrele('taslak',this)">Taslak</button>
+                <button class="fbtn" onclick="shopFiltrele('azstok',this)">Az Stok</button>
+              </div>
+            </div>
           </div>
-        </div></div>
+          <div class="cb0" id="shopurunlist"><div class="bos">Yükleniyor...</div></div>
+        </div>
+
+        <!-- Sağ: Form -->
+        <div class="card">
+          <div class="ch"><h3 id="shopformbaslik">Ürün Ekle</h3></div>
+          <div class="cb">
+            <div style="display:flex;flex-direction:column;gap:11px">
+              <input type="hidden" id="sfid">
+
+              <!-- Fotoğraf -->
+              <div class="ff">
+                <label class="fl">Ürün Fotoğrafı</label>
+                <input type="file" id="sf-foto-input" accept="image/*" style="display:none" onchange="shopFotoSecildi(this)">
+                <div onclick="document.getElementById('sf-foto-input').click()" style="cursor:pointer">
+                  <div class="port-foto-placeholder" id="sf-placeholder" style="aspect-ratio:1/1">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--text3)"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    <span>Fotoğraf seç</span>
+                  </div>
+                  <img id="sf-onizleme" style="display:none;width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:3px;margin-bottom:4px" src="" alt="">
+                </div>
+                <input type="hidden" id="sf-foto-url">
+              </div>
+
+              <div class="ff"><label class="fl">Ürün Adı</label><input class="fi" id="sfad" type="text" placeholder="ör. Argan Şampuanı"></div>
+              <div class="ff"><label class="fl">Kategori</label>
+                <select class="fsel" id="sfkat">
+                  <option value="Şampuan">Şampuan</option>
+                  <option value="Saç Bakım">Saç Bakım</option>
+                  <option value="Maske">Maske</option>
+                  <option value="Serum">Serum</option>
+                  <option value="Bakım Yağı">Bakım Yağı</option>
+                  <option value="Renk Bakım">Renk Bakım</option>
+                  <option value="Krem">Krem</option>
+                  <option value="Stil Ürünleri">Stil Ürünleri</option>
+                  <option value="Aksesuar">Aksesuar</option>
+                  <option value="Diğer">Diğer</option>
+                </select>
+              </div>
+              <div class="ff"><label class="fl">Fiyat (₺)</label><input class="fi" id="sffiyat" type="number" placeholder="250" min="0"></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <div class="ff"><label class="fl">Stok Adedi</label><input class="fi" id="sfstok" type="number" placeholder="10" min="0"></div>
+                <div class="ff"><label class="fl">Stok Uyarı Limiti</label><input class="fi" id="sfstokuyari" type="number" placeholder="3" min="0"></div>
+              </div>
+              <div class="ff"><label class="fl">Açıklama</label><textarea class="fi" id="sfacik" placeholder="Ürün açıklaması..." style="resize:vertical;min-height:60px"></textarea></div>
+              <div class="ff">
+                <label class="fl">Yayın Durumu</label>
+                <div style="display:flex;align-items:center;gap:10px;padding:9px 0">
+                  <label class="tgl"><input type="checkbox" id="sf-yayinda" checked><span class="tsl"></span></label>
+                  <span id="sf-durum-lbl" style="font-size:.72rem;color:var(--green)">Yayında — sitede görünür</span>
+                </div>
+              </div>
+              <button class="sbtn" onclick="shopKaydet()">Kaydet</button>
+              <button class="sbtn sec" id="sfiptal" onclick="shopSifirla()" style="display:none">İptal / Yeni</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -909,13 +971,7 @@ let bekleyenOdemeId=null;
 
 let personel=[];
 
-let shop=[
-  {id:'u1',ad:'Argan Yağı Şampuanı',kat:'Şampuan',fiyat:280,stok:15,acik:'Yoğun nemlendirici'},
-  {id:'u2',ad:'Keratin Serumu',kat:'Saç Bakım',fiyat:450,stok:8,acik:'Düzleştirici bakım'},
-  {id:'u3',ad:'Renk Koruyucu Masker',kat:'Saç Bakım',fiyat:320,stok:3,acik:'Renk kalıcılığı'},
-  {id:'u4',ad:'Saç Spreyi Güçlü',kat:'Stil Ürünleri',fiyat:180,stok:22,acik:'Güçlü tutma'},
-  {id:'u5',ad:'Doğal Saç Yağı',kat:'Saç Bakım',fiyat:520,stok:1,acik:'Besleyici karışım'},
-];
+let shop=[];
 
 const FYT={
   'Saç Kesimi':{min:500,max:1500,sure:60,kat:'Kesim'},
@@ -1000,6 +1056,8 @@ async function verileriYukle(showToast=true){
   verileriRender();
   // Portfolio ayrıca yükle (tablo yoksa hata vermesin)
   portYukle();
+  // Shop ayrıca yükle
+  shopYukle();
 }
 function verileriRender(){statsGuncelle();tabloRender(AKT_FILTRE);bugRandevu();sonRez();hDagitim();mustRender();aktRender();nbGuncelle();pStatRender();tkRender();}
 
@@ -1561,72 +1619,225 @@ function hizSifirla(){
 }
 
 // ─── SHOP ───
-function shopRender(){
-  const e=document.getElementById('shopurunlist');
-  document.getElementById('shopturun').textContent=shop.length;
-  const azStok=shop.filter(u=>u.stok<=3).length;
-  document.getElementById('shopstok').textContent=azStok||'Yok';
-  if(!shop.length){e.innerHTML='<div class="bos">Ürün yok.</div>';return;}
-  e.innerHTML=shop.map(u=>`
+let shop = [];
+let SHOP_FILTRE = 'hepsi';
+let _pendingShopFoto = null;
+
+async function shopYukle() {
+  try {
+    const res = await sRest('shop?order=created_at.desc');
+    shop = res.map(u => ({
+      id: u.id, ad: u.ad, kat: u.kat, fiyat: u.fiyat || 0,
+      stok: u.stok ?? 0, stokuyari: u.stok_uyari ?? 3,
+      acik: u.acik || '', foto: u.foto_url || '', yayinda: u.yayinda !== false
+    }));
+  } catch(e) {
+    console.warn('Shop tablosu henüz yok:', e.message);
+    shop = [];
+  }
+  shopRender();
+}
+
+function shopFiltrele(filtre, btn) {
+  SHOP_FILTRE = filtre;
+  document.querySelectorAll('#shop-filtre-bar .fbtn').forEach(b => b.classList.remove('ak'));
+  btn.classList.add('ak');
+  shopRender();
+}
+
+function shopRender() {
+  // Stats
+  document.getElementById('shopturun').textContent = shop.length;
+  document.getElementById('shopyayinda').textContent = shop.filter(u => u.yayinda).length;
+  const azStok = shop.filter(u => u.stok > 0 && u.stok <= (u.stokuyari || 3));
+  const tukendi = shop.filter(u => u.stok === 0);
+  document.getElementById('shopstok').textContent = azStok.length || '—';
+  document.getElementById('shoptukendi').textContent = tukendi.length || '—';
+
+  // Filtrele
+  let liste = shop;
+  if (SHOP_FILTRE === 'yayinda') liste = shop.filter(u => u.yayinda);
+  else if (SHOP_FILTRE === 'taslak') liste = shop.filter(u => !u.yayinda);
+  else if (SHOP_FILTRE === 'azstok') liste = shop.filter(u => u.stok <= (u.stokuyari || 3));
+
+  const e = document.getElementById('shopurunlist');
+  if (!liste.length) { e.innerHTML = '<div class="bos">Ürün bulunamadı.</div>'; return; }
+
+  e.innerHTML = liste.map(u => {
+    const stokRenk = u.stok === 0 ? 'color:var(--red);font-weight:600' : u.stok <= (u.stokuyari || 3) ? 'color:var(--yellow);font-weight:600' : 'color:var(--text3)';
+    const stokYazi = u.stok === 0 ? '⚠ Tükendi' : u.stok <= (u.stokuyari || 3) ? `⚠ ${u.stok} adet` : `${u.stok} adet`;
+    const yayinBadge = u.yayinda
+      ? `<span style="font-size:.46rem;padding:2px 6px;border-radius:6px;background:var(--gbg);border:1px solid var(--gbdr);color:var(--green);font-weight:600">● Yayında</span>`
+      : `<span style="font-size:.46rem;padding:2px 6px;border-radius:6px;background:var(--ybg);border:1px solid var(--ybdr);color:var(--yellow);font-weight:600">○ Taslak</span>`;
+    return `
     <div class="usat">
-      <div class="ures"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 7V5a2 2 0 0 0-4 0v2"/></svg></div>
+      <div class="ures" style="overflow:hidden;border-radius:3px">
+        ${u.foto ? `<img src="${u.foto}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">` : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 7V5a2 2 0 0 0-4 0v2"/></svg>`}
+      </div>
       <div class="ublg">
         <div class="uad">${u.ad}</div>
-        <div class="ukat">${u.kat} · ${u.acik||''}</div>
+        <div class="ukat" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:3px">${u.kat} ${yayinBadge}</div>
+        ${u.acik ? `<div style="font-size:.62rem;color:var(--text3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px">${u.acik}</div>` : ''}
       </div>
       <div style="text-align:right;flex-shrink:0">
-        <div class="ufyt">${u.fiyat.toLocaleString('tr-TR')}₺</div>
-        <div class="ustk${u.stok<=3?' stokaz':''}">${u.stok} adet</div>
+        <div class="ufyt">${u.fiyat ? u.fiyat.toLocaleString('tr-TR') + '₺' : '—'}</div>
+        <div style="font-size:.66rem;margin-top:2px;${stokRenk}">${stokYazi}</div>
       </div>
-      <div style="display:flex;gap:4px;margin-left:8px">
-        <button class="bsm bdet" onclick="shopDuzenle('${u.id}')">Düzenle</button>
-        <button class="bsm bsil" onclick="shopSil('${u.id}')">✕</button>
+      <div style="display:flex;flex-direction:column;gap:4px;margin-left:8px;flex-shrink:0">
+        <button class="bsm ${u.yayinda ? 'bred' : 'bonay'}" onclick="shopToggleYayin('${u.id}')">${u.yayinda ? 'Kaldır' : 'Yayınla'}</button>
+        <div style="display:flex;gap:3px">
+          <button class="bsm bdet" onclick="shopDuzenle('${u.id}')">Düzenle</button>
+          <button class="bsm bsil" onclick="shopSil('${u.id}')">Sil</button>
+        </div>
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 }
-function shopKaydet(){
-  const editId=document.getElementById('sfid').value;
-  const ad=document.getElementById('sfad').value.trim();
-  const kat=document.getElementById('sfkat').value;
-  const fiyat=parseInt(document.getElementById('sffiyat').value)||0;
-  const stok=parseInt(document.getElementById('sfstok').value)||0;
-  const acik=document.getElementById('sfacik').value.trim();
-  if(!ad){toast('Ürün adı giriniz.','hata');return;}
-  if(editId){
-    const u=shop.find(x=>x.id===editId);
-    if(u)Object.assign(u,{ad,kat,fiyat,stok,acik});
-    toast('Ürün güncellendi.','ok');
-  } else {
-    shop.push({id:'u'+Date.now(),ad,kat,fiyat,stok,acik});
-    toast('Ürün eklendi.','ok');
+
+function shopFotoSecildi(input) {
+  const file = input.files[0];
+  if (!file) return;
+  _pendingShopFoto = file;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    document.getElementById('sf-onizleme').src = ev.target.result;
+    document.getElementById('sf-onizleme').style.display = 'block';
+    document.getElementById('sf-placeholder').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function shopFotoYukle(file) {
+  const ext = file.name.split('.').pop() || 'jpg';
+  const dosyaAdi = `shop_${Date.now()}.${ext}`;
+  const res = await fetch(`${SUPA_URL}/storage/v1/object/shop-fotolar/${dosyaAdi}`, {
+    method: 'POST',
+    headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY, 'Content-Type': file.type, 'x-upsert': 'true' },
+    body: file
+  });
+  if (!res.ok) { const t = await res.text(); throw new Error('Fotoğraf yüklenemedi: ' + t); }
+  return `${SUPA_URL}/storage/v1/object/public/shop-fotolar/${dosyaAdi}`;
+}
+
+async function shopKaydet() {
+  const editId = document.getElementById('sfid').value;
+  const ad = document.getElementById('sfad').value.trim();
+  const kat = document.getElementById('sfkat').value;
+  const fiyat = parseInt(document.getElementById('sffiyat').value) || 0;
+  const stok = parseInt(document.getElementById('sfstok').value) || 0;
+  const stokuyari = parseInt(document.getElementById('sfstokuyari').value) || 3;
+  const acik = document.getElementById('sfacik').value.trim();
+  const yayinda = document.getElementById('sf-yayinda').checked;
+  let fotoUrl = document.getElementById('sf-foto-url').value || '';
+
+  if (!ad) { toast('Ürün adı giriniz.', 'hata'); return; }
+
+  if (_pendingShopFoto) {
+    try {
+      toast('Fotoğraf yükleniyor...', 'bilgi');
+      fotoUrl = await shopFotoYukle(_pendingShopFoto);
+      _pendingShopFoto = null;
+    } catch(e) { toast(e.message, 'hata'); return; }
   }
-  shopSifirla();shopRender();
+
+  const payload = { ad, kat, fiyat, stok, stok_uyari: stokuyari, acik, yayinda, foto_url: fotoUrl };
+
+  try {
+    if (editId) {
+      await sRest(`shop?id=eq.${editId}`, { method: 'PATCH', body: JSON.stringify(payload) });
+      const u = shop.find(x => x.id === editId);
+      if (u) Object.assign(u, { ad, kat, fiyat, stok, stokuyari, acik, yayinda, foto: fotoUrl });
+      toast('Ürün güncellendi.', 'ok');
+    } else {
+      const res = await sRest('shop', { method: 'POST', body: JSON.stringify(payload) });
+      const yeni = Array.isArray(res) ? res[0] : res;
+      shop.unshift({ id: yeni.id, ad, kat, fiyat, stok, stokuyari, acik, yayinda, foto: fotoUrl });
+      toast('Ürün eklendi.', 'ok');
+    }
+    shopSifirla();
+    shopRender();
+  } catch(e) { toast('Hata: ' + e.message, 'hata'); }
 }
-function shopDuzenle(id){
-  const u=shop.find(x=>x.id===id);if(!u)return;
-  document.getElementById('sfid').value=u.id;
-  document.getElementById('sfad').value=u.ad;
-  document.getElementById('sfkat').value=u.kat;
-  document.getElementById('sffiyat').value=u.fiyat;
-  document.getElementById('sfstok').value=u.stok;
-  document.getElementById('sfacik').value=u.acik||'';
-  document.getElementById('shopformbaslik').textContent='Ürün Düzenle';
-  document.getElementById('sfiptal').style.display='';
+
+async function shopToggleYayin(id) {
+  const u = shop.find(x => x.id === id);
+  if (!u) return;
+  const yeni = !u.yayinda;
+  try {
+    await sRest(`shop?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ yayinda: yeni }) });
+    u.yayinda = yeni;
+    shopRender();
+    toast(yeni ? 'Ürün yayınlandı ✓' : 'Taslağa alındı.', yeni ? 'ok' : 'bilgi');
+  } catch(e) { toast('Hata: ' + e.message, 'hata'); }
 }
-function shopSil(id){
-  if(!confirm('Bu ürünü silmek istediğinizden emin misiniz?'))return;
-  shop=shop.filter(x=>x.id!==id);shopRender();toast('Ürün silindi.','ok');
+
+function shopDuzenle(id) {
+  const u = shop.find(x => x.id === id);
+  if (!u) return;
+  document.getElementById('sfid').value = u.id;
+  document.getElementById('sfad').value = u.ad;
+  document.getElementById('sfkat').value = u.kat;
+  document.getElementById('sffiyat').value = u.fiyat;
+  document.getElementById('sfstok').value = u.stok;
+  document.getElementById('sfstokuyari').value = u.stokuyari || 3;
+  document.getElementById('sfacik').value = u.acik || '';
+  document.getElementById('sf-yayinda').checked = u.yayinda;
+  document.getElementById('sf-foto-url').value = u.foto || '';
+  shopDurumLblGuncelle();
+  if (u.foto) {
+    document.getElementById('sf-onizleme').src = u.foto;
+    document.getElementById('sf-onizleme').style.display = 'block';
+    document.getElementById('sf-placeholder').style.display = 'none';
+  }
+  document.getElementById('shopformbaslik').textContent = 'Ürün Düzenle';
+  document.getElementById('sfiptal').style.display = '';
 }
-function shopSifirla(){
-  document.getElementById('sfid').value='';
-  document.getElementById('sfad').value='';
-  document.getElementById('sffiyat').value='';
-  document.getElementById('sfstok').value='';
-  document.getElementById('sfacik').value='';
-  document.getElementById('shopformbaslik').textContent='Ürün Ekle';
-  document.getElementById('sfiptal').style.display='none';
+
+async function shopSil(id) {
+  if (!confirm('Bu ürünü kalıcı olarak silmek istediğinizden emin misiniz?')) return;
+  try {
+    const res = await fetch(`${SUPA_URL}/rest/v1/shop?id=eq.${id}`, {
+      method: 'DELETE',
+      headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' }
+    });
+    if (!res.ok) { const t = await res.text(); throw new Error(t); }
+    shop = shop.filter(x => x.id !== id);
+    shopRender();
+    toast('Ürün silindi.', 'ok');
+  } catch(e) { toast('Hata: ' + e.message, 'hata'); }
 }
+
+function shopSifirla() {
+  document.getElementById('sfid').value = '';
+  document.getElementById('sfad').value = '';
+  document.getElementById('sfkat').value = 'Şampuan';
+  document.getElementById('sffiyat').value = '';
+  document.getElementById('sfstok').value = '';
+  document.getElementById('sfstokuyari').value = '3';
+  document.getElementById('sfacik').value = '';
+  document.getElementById('sf-foto-input').value = '';
+  document.getElementById('sf-foto-url').value = '';
+  document.getElementById('sf-onizleme').style.display = 'none';
+  document.getElementById('sf-placeholder').style.display = 'flex';
+  document.getElementById('sf-yayinda').checked = true;
+  document.getElementById('shopformbaslik').textContent = 'Ürün Ekle';
+  document.getElementById('sfiptal').style.display = 'none';
+  shopDurumLblGuncelle();
+  _pendingShopFoto = null;
+}
+
+function shopDurumLblGuncelle() {
+  const chk = document.getElementById('sf-yayinda');
+  const lbl = document.getElementById('sf-durum-lbl');
+  if (!lbl) return;
+  lbl.textContent = chk.checked ? 'Yayında — sitede görünür' : 'Taslak — sitede gizli';
+  lbl.style.color = chk.checked ? 'var(--green)' : 'var(--yellow)';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const chk = document.getElementById('sf-yayinda');
+  if (chk) chk.addEventListener('change', shopDurumLblGuncelle);
+});
 
 // ─── ÇALIŞMA SAATLERİ ───
 function cgridOlustur(){
@@ -1831,7 +2042,7 @@ function sayfaGec(sayfa,navEl){
   if(sayfa==='hizmetler')hizRender();
   if(sayfa==='musteriler')mustRender();
   if(sayfa==='takvim')tkRender();
-  if(sayfa==='shop')shopRender();
+  if(sayfa==='shop'){shopRender();}
   if(sayfa==='personel'){pListRender();pStatRender();}
   if(sayfa==='ciro')ciroRender();
   if(sayfa==='portfolio')portRender();
