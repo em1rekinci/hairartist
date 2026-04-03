@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sepet — Hair Artist</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{overflow-x:hidden}
+.sepet-page{background:var(--off);color:var(--black);padding-top:70px;font-family:'Montserrat',sans-serif;min-height:100vh}
+
+.breadcrumb{padding:22px 56px;display:flex;align-items:center;gap:8px;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.breadcrumb a{color:var(--dim);text-decoration:none;transition:color .2s}
+.breadcrumb a:hover{color:var(--black)}
+.breadcrumb-sep{opacity:.4}
+.breadcrumb-aktif{color:var(--black)}
+
+/* ── LAYOUT ── */
+.sepet-layout{display:grid;grid-template-columns:1fr 380px;gap:0;align-items:start;padding:0 56px 80px;max-width:1200px;margin:0 auto}
+
+/* ── SOL: ÜRÜNLER ── */
+.sepet-sol h2{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,3vw,2rem);font-weight:700;margin-bottom:8px}
+.sepet-sol h2 em{font-style:italic;font-weight:400;color:var(--dim)}
+.sepet-adet-info{font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:28px}
+
+.sepet-liste{display:flex;flex-direction:column;border-top:1px solid rgba(8,8,8,.1)}
+
+.sepet-item{display:grid;grid-template-columns:72px 1fr auto;gap:14px;align-items:center;padding:18px 0;border-bottom:1px solid rgba(8,8,8,.1)}
+.sepet-item-resim{width:72px;height:72px;background:#ede9e1;overflow:hidden;flex-shrink:0;border:1px solid rgba(8,8,8,.08)}
+.sepet-item-resim img{width:100%;height:100%;object-fit:cover}
+.sepet-item-bilgi{min-width:0}
+.sepet-item-kat{font-size:.52rem;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);margin-bottom:4px}
+.sepet-item-ad{font-family:'Playfair Display',serif;font-size:.95rem;font-weight:700;color:var(--black);line-height:1.3;margin-bottom:8px}
+.sepet-item-adet{display:flex;align-items:center;gap:0;border:1px solid rgba(8,8,8,.18);display:inline-flex;background:#fff}
+.sepet-item-adet button{width:30px;height:30px;background:none;border:none;cursor:pointer;font-size:.9rem;color:var(--black);transition:background .15s;display:flex;align-items:center;justify-content:center}
+.sepet-item-adet button:hover{background:rgba(8,8,8,.05)}
+.sepet-item-adet button:disabled{opacity:.3;cursor:not-allowed}
+.sepet-item-adet span{width:34px;text-align:center;font-size:.74rem;font-weight:500;color:var(--black)}
+.sepet-item-sag{display:flex;flex-direction:column;align-items:flex-end;gap:10px;flex-shrink:0}
+.sepet-item-fiyat{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--black);white-space:nowrap}
+.sepet-item-sil{background:none;border:none;cursor:pointer;color:var(--dim);font-size:.52rem;letter-spacing:.12em;text-transform:uppercase;padding:0;transition:color .2s;font-family:'Montserrat',sans-serif}
+.sepet-item-sil:hover{color:#b03020}
+
+.sepet-bos{padding:60px 0;text-align:center;color:var(--dim)}
+.sepet-bos svg{width:40px;height:40px;opacity:.25;margin-bottom:14px}
+.sepet-bos p{font-size:.74rem;letter-spacing:.08em;margin-bottom:20px}
+.sepet-bos a{font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--black);text-decoration:none;border-bottom:1px solid rgba(8,8,8,.3);padding-bottom:2px;transition:border-color .2s}
+.sepet-bos a:hover{border-color:var(--black)}
+
+.alısverişe-devam{display:inline-flex;align-items:center;gap:6px;font-size:.56rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);text-decoration:none;margin-top:24px;transition:color .2s}
+.alısverişe-devam:hover{color:var(--black)}
+
+/* ── SAĞ: ÖZET + FORM ── */
+.sepet-sag{position:sticky;top:90px;background:#fff;border:1px solid rgba(8,8,8,.1);padding:28px;margin-left:40px}
+
+.ozet-baslik{font-size:.54rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dim);margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid rgba(8,8,8,.08)}
+
+.ozet-satir{display:flex;justify-content:space-between;align-items:center;font-size:.76rem;margin-bottom:10px;color:var(--black)}
+.ozet-satir.toplam{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;padding-top:14px;margin-top:6px;border-top:1px solid rgba(8,8,8,.1)}
+.ozet-satir span:last-child{font-weight:500}
+.ozet-satir.toplam span:last-child{font-weight:700}
+
+.kargo-bilgi{font-size:.6rem;color:var(--dim);text-align:center;margin:14px 0 20px;padding:10px;background:rgba(74,122,0,.06);border:1px solid rgba(74,122,0,.15);letter-spacing:.04em}
+.kargo-bilgi strong{color:#3d6600}
+
+/* ── FORM ── */
+.form-baslik{font-size:.54rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dim);margin-bottom:16px;padding-top:20px;border-top:1px solid rgba(8,8,8,.08)}
+.form-grup{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.form-lbl{font-size:.5rem;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
+.form-inp{background:#f5f1eb;border:1px solid rgba(8,8,8,.12);color:var(--black);padding:10px 12px;font-size:.8rem;outline:none;transition:border-color .2s;width:100%;font-family:'Montserrat',sans-serif;border-radius:2px}
+.form-inp:focus{border-color:rgba(8,8,8,.4);background:#fff}
+.form-inp.hata{border-color:#b03020;background:rgba(176,48,32,.04)}
+
+.odeme-btn{width:100%;background:var(--black);color:var(--off);border:none;padding:14px;font-size:.6rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;transition:opacity .2s;font-family:'Montserrat',sans-serif;margin-top:4px;display:flex;align-items:center;justify-content:center;gap:8px}
+.odeme-btn:hover:not(:disabled){opacity:.85}
+.odeme-btn:disabled{opacity:.4;cursor:not-allowed}
+.odeme-btn .spin{width:14px;height:14px;border:2px solid rgba(247,244,239,.3);border-top-color:var(--off);border-radius:50%;animation:spin .7s linear infinite;display:none}
+.odeme-btn.yukleniyor .spin{display:block}
+.odeme-btn.yukleniyor .btn-txt{display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.guvenli-bilgi{display:flex;align-items:center;justify-content:center;gap:6px;font-size:.54rem;color:var(--dim);margin-top:10px;letter-spacing:.06em}
+.guvenli-bilgi svg{flex-shrink:0;opacity:.5}
+
+.hata-mesaj{font-size:.68rem;color:#b03020;background:rgba(176,48,32,.07);border:1px solid rgba(176,48,32,.2);padding:10px 12px;margin-top:8px;display:none;line-height:1.5}
+
+/* ── PAYTR iFrame Modal ── */
+.paytr-ov{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:9000;display:none;align-items:center;justify-content:center;padding:16px}
+.paytr-ov.ac{display:flex}
+.paytr-modal{background:#fff;width:100%;max-width:520px;position:relative;border-radius:4px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.35)}
+.paytr-modal-kapat{position:absolute;top:10px;right:12px;background:rgba(0,0,0,.15);border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;color:#fff;font-size:1rem;display:flex;align-items:center;justify-content:center;z-index:1;transition:background .2s}
+.paytr-modal-kapat:hover{background:rgba(0,0,0,.3)}
+#paytrFrame{width:100%;height:560px;border:none;display:block}
+
+/* ── TOAST ── */
+.toast-sp{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--black);color:var(--off);padding:12px 20px;font-size:.68rem;letter-spacing:.06em;z-index:9999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;border-radius:2px}
+.toast-sp.goster{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media(max-width:900px){
+  .breadcrumb{padding:16px 24px}
+  .sepet-layout{grid-template-columns:1fr;padding:0 24px 60px}
+  .sepet-sag{position:static;margin-left:0;margin-top:32px}
+}
+@media(max-width:540px){
+  .breadcrumb{padding:14px 16px}
+  .sepet-layout{padding:0 16px 48px}
+  .sepet-item{grid-template-columns:60px 1fr auto;gap:10px}
+  .sepet-item-resim{width:60px;height:60px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">
+    <img src="images/logo2.png" alt="Hair Artist" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+    <span class="nav-logo-txt" style="display:none">HAIR ARTIST</span>
+  </a>
+  <ul>
+    <li><a href="/">Anasayfa</a></li>
+    <li><a href="/#about">Hakkımızda</a></li>
+    <li><a href="/#services">Hizmetler</a></li>
+    <li><a href="/fiyatlar">Fiyat Listesi</a></li>
+    <li><a href="/portfolio">Portfolyo</a></li>
+    <li><a href="/shop" class="active">Shop</a></li>
+    <li><a href="/#contact">İletişim</a></li>
+  </ul>
+  <div class="nav-right">
+    <a href="/rezervasyon" class="nav-book">Rezervasyon Yap</a>
+    <button class="hamburger" id="hamburger" aria-label="Menü"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-menu-close" onclick="closeMobileMenu()">✕</button>
+  <ul>
+    <li><a href="/" onclick="closeMobileMenu()">Anasayfa</a></li>
+    <li><a href="/#about" onclick="closeMobileMenu()">Hakkımızda</a></li>
+    <li><a href="/#services" onclick="closeMobileMenu()">Hizmetler</a></li>
+    <li><a href="/fiyatlar">Fiyat Listesi</a></li>
+    <li><a href="/portfolio">Portfolyo</a></li>
+    <li><a href="/shop">Shop</a></li>
+    <li><a href="/#contact" onclick="closeMobileMenu()">İletişim</a></li>
+  </ul>
+  <a href="/rezervasyon" class="m-book">Rezervasyon Yap</a>
+</div>
+
+<!-- PayTR Modal -->
+<div class="paytr-ov" id="paytrOv">
+  <div class="paytr-modal">
+    <button class="paytr-modal-kapat" onclick="paytrKapat()">✕</button>
+    <iframe id="paytrFrame" src="" allowfullscreen></iframe>
+  </div>
+</div>
+
+<div class="toast-sp" id="toastSp"></div>
+
+<div class="sepet-page">
+  <div class="breadcrumb">
+    <a href="/">Anasayfa</a>
+    <span class="breadcrumb-sep">—</span>
+    <a href="/shop">Shop</a>
+    <span class="breadcrumb-sep">—</span>
+    <span class="breadcrumb-aktif">Sepet</span>
+  </div>
+
+  <div class="sepet-layout">
+    <!-- SOL -->
+    <div class="sepet-sol">
+      <h2>Sepetim</h2>
+      <div class="sepet-adet-info" id="sepetAdetInfo">Yükleniyor...</div>
+      <div class="sepet-liste" id="sepetListe"></div>
+      <a href="/shop" class="alısverişe-devam">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Alışverişe Devam Et
+      </a>
+    </div>
+
+    <!-- SAĞ -->
+    <div class="sepet-sag">
+      <div class="ozet-baslik">Sipariş Özeti</div>
+      <div id="ozetIcerik">
+        <div class="ozet-satir"><span>Ara Toplam</span><span id="araToplam">—</span></div>
+        <div class="ozet-satir"><span>Kargo</span><span id="kargoUcret">—</span></div>
+        <div class="ozet-satir toplam"><span>Toplam</span><span id="genelToplam">—</span></div>
+      </div>
+      <div class="kargo-bilgi" id="kargoBilgi">
+        <strong>Ücretsiz kargo!</strong> 500₺ ve üzeri siparişlerde geçerlidir.
+      </div>
+
+      <div class="form-baslik">Teslimat Bilgileri</div>
+      <div class="form-grup">
+        <label class="form-lbl">Ad Soyad</label>
+        <input class="form-inp" id="formAd" type="text" placeholder="Adınız Soyadınız" autocomplete="name">
+      </div>
+      <div class="form-grup">
+        <label class="form-lbl">Telefon</label>
+        <input class="form-inp" id="formTel" type="tel" placeholder="05xx xxx xx xx" autocomplete="tel">
+      </div>
+      <div class="form-grup">
+        <label class="form-lbl">E-posta</label>
+        <input class="form-inp" id="formEmail" type="email" placeholder="ornek@mail.com" autocomplete="email">
+      </div>
+      <div class="form-grup">
+        <label class="form-lbl">Teslimat Adresi</label>
+        <textarea class="form-inp" id="formAdres" rows="3" placeholder="Mahalle, cadde, bina no, daire..." style="resize:vertical"></textarea>
+      </div>
+
+      <div class="hata-mesaj" id="hataMesaj"></div>
+
+      <button class="odeme-btn" id="odemeBtn" onclick="odemeBaslat()">
+        <div class="spin"></div>
+        <span class="btn-txt">Ödemeye Geç</span>
+      </button>
+      <div class="guvenli-bilgi">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        256-bit SSL ile güvenli ödeme
+      </div>
+    </div>
+  </div>
+
+  <footer style="background:var(--black);border-top:1px solid rgba(247,244,239,.06);padding:40px 56px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px">
+    <p style="font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(247,244,239,.3)">© 2026 Hair Artist · Branded by Fatih Kurt</p>
+    <a href="https://www.vionasoft.com" style="font-size:.56rem;color:rgba(247,244,239,.2);text-decoration:none;letter-spacing:.1em;text-transform:uppercase" target="_blank" rel="noopener">Tasarım: Vionasoft</a>
+  </footer>
+</div>
+
+<script>
+const SUPA_URL = 'https://botxnihztrnwzjnrlwzv.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvdHhuaWh6dHJud3pqbnJsd3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MTg4MTAsImV4cCI6MjA5MDA5NDgxMH0.AcX4_2Aykf8J1jln9fvODh2rRffymfEJCAekzmN1ALg';
+const KARGO_SINIR = 500;
+const KARGO_UCRET = 49.90;
+
+// ── NAV
+const hamburger = document.getElementById('hamburger');
+const mobileMenu = document.getElementById('mobileMenu');
+function closeMobileMenu(){hamburger.classList.remove('open');mobileMenu.classList.remove('open');mobileMenu.style.display='none';document.body.style.overflow='';}
+hamburger.addEventListener('click',()=>{const o=hamburger.classList.toggle('open');if(o){mobileMenu.style.display='flex';setTimeout(()=>mobileMenu.classList.add('open'),10);document.body.style.overflow='hidden';}else{closeMobileMenu();}});
+window.addEventListener('scroll',()=>{document.querySelector('nav').classList.toggle('scrolled',window.scrollY>40);},{passive:true});
+
+// ── TOAST
+let toastT;
+function toast(msg){const el=document.getElementById('toastSp');el.textContent=msg;el.classList.add('goster');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('goster'),2800);}
+
+// ── SEPET (localStorage)
+function sepetOku(){try{return JSON.parse(localStorage.getItem('ha_sepet')||'[]');}catch(e){return[];}}
+function sepetYaz(s){localStorage.setItem('ha_sepet',JSON.stringify(s));}
+
+// ── FOTO PARSE
+function ilkFoto(foto_url){
+  if(!foto_url)return'';
+  try{if(foto_url.startsWith('[')){const a=JSON.parse(foto_url);return Array.isArray(a)&&a[0]?a[0]:foto_url;}}catch(e){}
+  return foto_url;
+}
+
+// ── ÜRÜN VERİSİNİ SUPABASE'DEN ÇEK
+async function urunleriCek(ids){
+  if(!ids.length)return{};
+  try{
+    const res=await fetch(`${SUPA_URL}/rest/v1/shop?id=in.(${ids.join(',')})`,{headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
+    const arr=await res.json();
+    const map={};arr.forEach(u=>map[u.id]=u);return map;
+  }catch(e){return{};}
+}
+
+// ── ÖZET GÜNCELLE
+function ozetGuncelle(sepet, urunMap){
+  let araToplam=0;
+  sepet.forEach(item=>{
+    const u=urunMap[item.id];
+    if(u) araToplam += (u.fiyat||0) * item.adet;
+  });
+  const kargo = araToplam>=KARGO_SINIR ? 0 : KARGO_UCRET;
+  const toplam = araToplam + kargo;
+  document.getElementById('araToplam').textContent = araToplam.toLocaleString('tr-TR',{minimumFractionDigits:2}) + ' ₺';
+  document.getElementById('kargoUcret').textContent = kargo===0 ? 'Ücretsiz' : kargo.toLocaleString('tr-TR',{minimumFractionDigits:2}) + ' ₺';
+  document.getElementById('genelToplam').textContent = toplam.toLocaleString('tr-TR',{minimumFractionDigits:2}) + ' ₺';
+  document.getElementById('kargoBilgi').style.display = araToplam>=KARGO_SINIR ? 'none' : 'block';
+  document.getElementById('kargoBilgi').innerHTML = araToplam>=KARGO_SINIR
+    ? '' : `<strong>Ücretsiz kargo için</strong> ${(KARGO_SINIR-araToplam).toLocaleString('tr-TR',{minimumFractionDigits:2})} ₺ daha ekle!`;
+  return toplam;
+}
+
+// ── SEPET RENDER
+let urunMap = {};
+async function sepetRender(){
+  let sepet = sepetOku();
+  const ids = sepet.map(s=>s.id).filter(Boolean);
+  urunMap = ids.length ? await urunleriCek(ids) : {};
+
+  const liste = document.getElementById('sepetListe');
+  const info = document.getElementById('sepetAdetInfo');
+
+  if(!sepet.length){
+    info.textContent = 'Sepetiniz boş';
+    liste.innerHTML = `
+      <div class="sepet-bos">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        <p>Sepetinizde henüz ürün yok.</p>
+        <a href="/shop">Alışverişe Başla →</a>
+      </div>`;
+    document.getElementById('araToplam').textContent='0,00 ₺';
+    document.getElementById('kargoUcret').textContent='—';
+    document.getElementById('genelToplam').textContent='0,00 ₺';
+    document.getElementById('odemeBtn').disabled=true;
+    return;
+  }
+
+  const toplamAdet = sepet.reduce((s,i)=>s+i.adet,0);
+  info.textContent = `${toplamAdet} ürün`;
+  document.getElementById('odemeBtn').disabled=false;
+
+  liste.innerHTML = sepet.map((item,idx)=>{
+    const u = urunMap[item.id] || {};
+    const foto = ilkFoto(u.foto_url||'');
+    const fiyat = (u.fiyat||0) * item.adet;
+    const maxStok = u.stok||99;
+    return `
+    <div class="sepet-item" id="item-${idx}">
+      <div class="sepet-item-resim">
+        ${foto?`<img src="${foto}" alt="${u.ad||item.ad||''}" onerror="this.style.display='none'">`:''}
+      </div>
+      <div class="sepet-item-bilgi">
+        <div class="sepet-item-kat">${u.kat||''}</div>
+        <div class="sepet-item-ad">${u.ad||item.ad||'Ürün'}</div>
+        <div class="sepet-item-adet">
+          <button onclick="adetDegistir(${idx},-1)" ${item.adet<=1?'disabled':''}>−</button>
+          <span>${item.adet}</span>
+          <button onclick="adetDegistir(${idx},1)" ${item.adet>=maxStok?'disabled':''}>+</button>
+        </div>
+      </div>
+      <div class="sepet-item-sag">
+        <div class="sepet-item-fiyat">${fiyat.toLocaleString('tr-TR',{minimumFractionDigits:2})} ₺</div>
+        <button class="sepet-item-sil" onclick="urunSil(${idx})">Kaldır</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  ozetGuncelle(sepet, urunMap);
+}
+
+function adetDegistir(idx, delta){
+  let sepet=sepetOku();
+  const u=urunMap[sepet[idx]?.id]||{};
+  const max=u.stok||99;
+  sepet[idx].adet=Math.max(1,Math.min(max,sepet[idx].adet+delta));
+  sepetYaz(sepet);
+  sepetRender();
+}
+
+function urunSil(idx){
+  let sepet=sepetOku();
+  const ad=urunMap[sepet[idx]?.id]?.ad||'Ürün';
+  sepet.splice(idx,1);
+  sepetYaz(sepet);
+  sepetRender();
+  toast(`${ad} sepetten kaldırıldı.`);
+}
+
+// ── ÖDEME
+async function odemeBaslat(){
+  const ad=document.getElementById('formAd').value.trim();
+  const tel=document.getElementById('formTel').value.trim();
+  const email=document.getElementById('formEmail').value.trim();
+  const adres=document.getElementById('formAdres').value.trim();
+  const hataMesaj=document.getElementById('hataMesaj');
+  hataMesaj.style.display='none';
+
+  // Validasyon
+  [document.getElementById('formAd'),document.getElementById('formTel'),
+   document.getElementById('formEmail'),document.getElementById('formAdres')].forEach(el=>el.classList.remove('hata'));
+
+  let hatalar=[];
+  if(!ad){document.getElementById('formAd').classList.add('hata');hatalar.push('Ad soyad');}
+  if(!tel||tel.replace(/\D/g,'').length<10){document.getElementById('formTel').classList.add('hata');hatalar.push('Geçerli telefon');}
+  if(!email||!email.includes('@')){document.getElementById('formEmail').classList.add('hata');hatalar.push('Geçerli e-posta');}
+  if(!adres){document.getElementById('formAdres').classList.add('hata');hatalar.push('Teslimat adresi');}
+
+  const sepet=sepetOku();
+  if(!sepet.length){hataMesaj.textContent='Sepetiniz boş.';hataMesaj.style.display='block';return;}
+
+  if(hatalar.length){
+    hataMesaj.textContent=`Lütfen doldurun: ${hatalar.join(', ')}.`;
+    hataMesaj.style.display='block';
+    return;
+  }
+
+  // Stok kontrol
+  for(const item of sepet){
+    const u=urunMap[item.id];
+    if(u&&u.stok<item.adet){
+      hataMesaj.textContent=`"${u.ad}" için yeterli stok yok. Mevcut: ${u.stok} adet.`;
+      hataMesaj.style.display='block';
+      return;
+    }
+  }
+
+  // Tutar hesapla
+  let araToplam=0;
+  sepet.forEach(item=>{const u=urunMap[item.id];if(u)araToplam+=(u.fiyat||0)*item.adet;});
+  const kargo=araToplam>=KARGO_SINIR?0:KARGO_UCRET;
+  const toplam=araToplam+kargo;
+
+  // Sepet items (PayTR formatı)
+  const sepetItems=sepet.map(item=>{
+    const u=urunMap[item.id]||{};
+    return [u.ad||item.ad||'Ürün', Number((u.fiyat||0)).toFixed(2), item.adet];
+  });
+  // Kargo varsa sepete ekle
+  if(kargo>0) sepetItems.push(['Kargo', kargo.toFixed(2), 1]);
+
+  const btn=document.getElementById('odemeBtn');
+  btn.classList.add('yukleniyor');
+  btn.disabled=true;
+
+  try{
+    const res=await fetch('/api/paytr-token-shop',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ad,telefon:tel,email,adres,fiyat:toplam,sepetItems})
+    });
+    const data=await res.json();
+
+    if(data.status==='success'&&data.token){
+      // PayTR iFrame aç
+      document.getElementById('paytrFrame').src=`https://www.paytr.com/odeme/guvenli/${data.token}`;
+      document.getElementById('paytrOv').classList.add('ac');
+      document.body.style.overflow='hidden';
+    }else{
+      hataMesaj.textContent=data.reason||'Ödeme başlatılamadı. Lütfen tekrar deneyin.';
+      hataMesaj.style.display='block';
+    }
+  }catch(e){
+    hataMesaj.textContent='Bağlantı hatası. Lütfen tekrar deneyin.';
+    hataMesaj.style.display='block';
+  }finally{
+    btn.classList.remove('yukleniyor');
+    btn.disabled=false;
+  }
+}
+
+function paytrKapat(){
+  document.getElementById('paytrOv').classList.remove('ac');
+  document.getElementById('paytrFrame').src='';
+  document.body.style.overflow='';
+}
+
+// PayTR'dan başarı/hata mesajı dinle
+window.addEventListener('message',function(e){
+  if(e.data==='success'){
+    paytrKapat();
+    localStorage.removeItem('ha_sepet');
+    window.location.href='/odeme-basarili';
+  }else if(e.data==='fail'){
+    paytrKapat();
+    window.location.href='/odeme-basarisiz';
+  }
+});
+
+document.addEventListener('DOMContentLoaded', sepetRender);
+</script>
+</body>
+</html>

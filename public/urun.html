@@ -466,7 +466,11 @@ function sepeteEkle(id, ad) {
     }
     localStorage.setItem('ha_sepet', JSON.stringify(sepet));
   } catch(e) {}
-  toast(`✓ ${ad} sepete eklendi (${adet} adet)`);
+
+  // Kısa toast göster, sonra sepete yönlendir
+  const btn = document.querySelector('.sepet-btn');
+  if (btn) { btn.textContent = '✓ Eklendi, yönlendiriliyor...'; btn.disabled = true; }
+  setTimeout(() => { window.location.href = '/sepet'; }, 800);
 }
 
 // ── VERİ YÜKLEME

@@ -69,6 +69,10 @@ app.get('/urun', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'urun.html'));
 });
 
+app.get('/sepet', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'sepet.html'));
+});
+
 // ─── PAYTR ÖDEME SONUÇ SAYFALARI ──────────────────────────────────────────────
 app.get('/odeme-basarili', (req, res) => {
   const html = sayfaHTML(
@@ -450,6 +454,101 @@ app.get('/api/portfolio', (req, res) => {
   } catch (e) {
     console.error('Portfolyo hatası:', e);
     res.status(500).json({ photos: [] });
+  }
+});
+
+// ════════════════════════════════════════════════════════════════════════════
+// PAYTR TOKEN AL — SHOP (Sepet ödemesi için)
+// ════════════════════════════════════════════════════════════════════════════
+app.post('/api/paytr-token-shop', async (req, res) => {
+  try {
+    const { ad, telefon, email, adres, fiyat, sepetItems } = req.body;
+
+    if (!ad || !telefon || !fiyat || !sepetItems?.length) {
+      return res.status(400).json({ status: 'fail', reason: 'Eksik bilgi' });
+    }
+
+    const adParcalar = ad.trim().split(' ');
+    const isim = adParcalar[0];
+    const soyad = adParcalar.length > 1 ? adParcalar.slice(1).join(' ') : '-';
+
+    let tel = telefon.replace(/\D/g, '');
+    if (tel.startsWith('0')) tel = tel.slice(1);
+    if (!tel.startsWith('90')) tel = '90' + tel;
+
+    const tutar_kurus = Math.round(Number(fiyat) * 100);
+    const merchant_oid = 'HS' + Date.now(); // HS = Hair Shop
+
+    let user_ip =
+      req.headers['x-forwarded-for']?.split(',')[0].trim() ||
+      req.socket.remoteAddress ||
+      '1.2.3.4';
+    if (user_ip === '::1' || user_ip === '127.0.0.1') user_ip = '1.2.3.4';
+
+    // Sepet items: [[ad, fiyat, adet], ...]
+    const user_basket = Buffer.from(JSON.stringify(sepetItems)).toString('base64');
+
+    const no_installment  = '0';
+    const max_installment = '0';
+    const currency        = 'TL';
+    const test_mode       = '0';
+    const userEmail       = email || 'info@hairartist.com.tr';
+
+    const hash_str =
+      MERCHANT_ID +
+      user_ip +
+      merchant_oid +
+      userEmail +
+      String(tutar_kurus) +
+      user_basket +
+      no_installment +
+      max_installment +
+      currency +
+      test_mode +
+      MERCHANT_SALT;
+
+    const paytr_token = crypto
+      .createHmac('sha256', MERCHANT_KEY)
+      .update(hash_str)
+      .digest('base64');
+
+    console.log('[PayTR Shop] merchant_oid:', merchant_oid, 'tutar:', tutar_kurus);
+
+    const params = new URLSearchParams({
+      merchant_id:       MERCHANT_ID,
+      user_ip:           user_ip,
+      merchant_oid:      merchant_oid,
+      email:             userEmail,
+      payment_amount:    String(tutar_kurus),
+      paytr_token:       paytr_token,
+      user_basket:       user_basket,
+      debug_on:          '1',
+      no_installment:    no_installment,
+      max_installment:   max_installment,
+      user_name:         `${isim} ${soyad}`,
+      user_address:      adres ? adres.replace(/[^a-zA-Z0-9\s\.,\/\-]/g, ' ').substring(0, 100) : 'Istanbul',
+      user_phone:        tel,
+      merchant_ok_url:   OK_URL,
+      merchant_fail_url: FAIL_URL,
+      timeout_limit:     '30',
+      currency:          currency,
+      test_mode:         test_mode,
+      lang:              'tr',
+    });
+
+    const response = await fetch('https://www.paytr.com/odeme/api/get-token', {
+      method: 'POST',
+      body: params,
+    });
+
+    const data = await response.json();
+    console.log('[PayTR Shop] Yanıt:', JSON.stringify(data));
+
+    return res.json(data);
+
+  } catch (err) {
+    console.error('[PayTR Shop] Hata:', err);
+    return res.status(500).json({ status: 'fail', reason: 'Sunucu hatası' });
   }
 });
 
