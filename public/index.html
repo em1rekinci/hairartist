@@ -205,36 +205,41 @@
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: #080808;
+  background: #f7f4ef;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: opacity 0.9s ease, visibility 0.9s ease;
+  transition: opacity 0.6s ease, visibility 0.6s ease;
 }
 #intro-splash.fade-out {
   opacity: 0;
   visibility: hidden;
 }
 .splash-logo {
-  animation: splashPop 0.8s cubic-bezier(.22,1,.36,1) both;
+  animation: splashFloat 1.1s cubic-bezier(.22,1,.36,1) both;
 }
 .splash-logo img {
   width: clamp(180px, 30vw, 320px);
   height: auto;
   display: block;
+  animation: splashPulse 1.1s ease-in-out infinite alternate;
 }
-@keyframes splashPop {
-  from { opacity: 0; transform: scale(0.85); }
-  to   { opacity: 1; transform: scale(1); }
+@keyframes splashFloat {
+  from { opacity: 0; transform: translateY(24px) scale(0.9); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+@keyframes splashPulse {
+  from { transform: scale(1);    filter: brightness(1); }
+  to   { transform: scale(1.04); filter: brightness(1.08); }
 }
 
 /* ── FOTOĞRAF GALERİ BANDI ── */
 .foto-galeri-section {
-  background: #080808;
+  background: #f2ede6;
   padding: 60px 0;
   overflow: hidden;
-  border-top: 1px solid #1a1a1a;
-  border-bottom: 1px solid #1a1a1a;
+  border-top: 1px solid #e0d8cd;
+  border-bottom: 1px solid #e0d8cd;
 }
 .foto-band-wrap {
   position: relative;
@@ -249,20 +254,20 @@
   z-index: 2;
   pointer-events: none;
 }
-.foto-band-wrap::before { left: 0; background: linear-gradient(to right, #080808, transparent); }
-.foto-band-wrap::after  { right: 0; background: linear-gradient(to left, #080808, transparent); }
+.foto-band-wrap::before { left: 0; background: linear-gradient(to right, #f2ede6, transparent); }
+.foto-band-wrap::after  { right: 0; background: linear-gradient(to left, #f2ede6, transparent); }
 .foto-band {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   width: max-content;
 }
 .foto-band-left  { animation: fotoBandLeft  35s linear infinite; }
 .foto-band-right { animation: fotoBandRight 35s linear infinite; }
 .foto-band:hover { animation-play-state: paused; }
 .foto-band-item {
-  width: 220px;
-  height: 220px;
-  border-radius: 2px;
+  width: 280px;
+  height: 280px;
+  border-radius: 3px;
   overflow: hidden;
   flex-shrink: 0;
 }
@@ -283,7 +288,7 @@
   100% { transform: translateX(0); }
 }
 @media (max-width: 768px) {
-  .foto-band-item { width: 150px; height: 150px; }
+  .foto-band-item { width: 180px; height: 180px; }
   .foto-galeri-section { padding: 40px 0; }
 }
 </style>
@@ -302,8 +307,8 @@
       document.getElementById('intro-splash').classList.add('fade-out');
       setTimeout(function() {
         document.getElementById('intro-splash').remove();
-      }, 900);
-    }, 1800);
+      }, 600);
+    }, 1100);
   });
 </script>
 
