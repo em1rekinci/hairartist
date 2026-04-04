@@ -758,7 +758,7 @@ async function shopSiparisMail(siparis) {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      from:    'Hair Artist Shop <onboarding@resend.dev>',
+      from:    'Fatih Kurt Hair Artist Shop <siparis@fatihkurthairartist.com>',
       to:      ['info@hairartist.com.tr'],
       subject: `🛍 Yeni Sipariş — ${siparis.musteri_adi || 'Müşteri'} | ${siparis.toplam ? siparis.toplam.toLocaleString('tr-TR') + '₺' : ''}`,
       html:    html
