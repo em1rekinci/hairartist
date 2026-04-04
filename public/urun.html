@@ -422,6 +422,25 @@ function sayfaRender(u, benzerler) {
         </div>
       </section>` : '';
 
+  // Fiyat bloğu HTML (IIFE yerine önceden hesaplanıyor)
+  const indirimYuzde = parseInt(u.indirim) || 0;
+  const asilFiyat = u.fiyat || 0;
+  let fiyatBlokHtml;
+  if (indirimYuzde > 0 && asilFiyat > 0) {
+    const yeniFiyat = Math.round(asilFiyat * (1 - indirimYuzde / 100));
+    fiyatBlokHtml = `
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="urun-fiyat-buyuk">${yeniFiyat.toLocaleString('tr-TR')}</span>
+          <span class="urun-fiyat-para">₺</span>
+          <span class="urun-indirim-badge">%${indirimYuzde}</span>
+        </div>
+        <span class="urun-fiyat-eski-buyuk">${asilFiyat.toLocaleString('tr-TR')} ₺</span>
+      </div>`;
+  } else {
+    fiyatBlokHtml = `<span class="urun-fiyat-buyuk">${asilFiyat ? asilFiyat.toLocaleString('tr-TR') : '—'}</span><span class="urun-fiyat-para">₺</span>`;
+  }
+
   document.getElementById('urunPage').innerHTML = `
     <div class="breadcrumb">
       <a href="/">Anasayfa</a>
@@ -447,23 +466,7 @@ function sayfaRender(u, benzerler) {
         <div class="stok-badge ${stokClass}">${stokHtml}</div>
 
         <div class="urun-fiyat-blok">
-          ${(() => {
-            const indirim = parseInt(u.indirim) || 0;
-            const asil = u.fiyat || 0;
-            if (indirim > 0 && asil > 0) {
-              const yeni = Math.round(asil * (1 - indirim / 100));
-              return `
-                <div style="display:flex;flex-direction:column;gap:4px">
-                  <div style="display:flex;align-items:center;gap:10px">
-                    <span class="urun-fiyat-buyuk">${yeni.toLocaleString('tr-TR')}</span>
-                    <span class="urun-fiyat-para">₺</span>
-                    <span class="urun-indirim-badge">%${indirim}</span>
-                  </div>
-                  <span class="urun-fiyat-eski-buyuk">${asil.toLocaleString('tr-TR')} ₺</span>
-                </div>`;
-            }
-            return `<span class="urun-fiyat-buyuk">${asil ? asil.toLocaleString('tr-TR') : '—'}</span><span class="urun-fiyat-para">₺</span>`;
-          })()}
+          ${fiyatBlokHtml}
         </div>
 
         ${u.acik ? `<p class="urun-aciklama">${u.acik}</p>` : ''}
