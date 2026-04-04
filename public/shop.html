@@ -103,9 +103,9 @@
 .bilgi-dot.aktif{background:var(--off);width:40px}
 
 /* ── FOTO SLİDER OKLARI ── */
-.foto-slider-wrap{position:relative;width:100%;height:100%}
+.foto-slider-wrap{position:absolute;inset:0;width:100%;height:100%;overflow:hidden}
 .foto-slider-track{display:flex;height:100%;transition:transform .35s cubic-bezier(.4,0,.2,1)}
-.foto-slider-track img{width:100%;height:100%;object-fit:contain;flex-shrink:0;background:#f7f4ef;padding:8px}
+.foto-slider-track img{width:100%;height:100%;object-fit:contain;flex-shrink:0;min-width:100%;padding:8px}
 .foto-ok{position:absolute;top:50%;transform:translateY(-50%);width:28px;height:28px;background:rgba(255,255,255,.85);border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:4;transition:background .2s;padding:0}
 .foto-ok:hover{background:#fff}
 .foto-ok svg{width:12px;height:12px;stroke:#080808;stroke-width:2.5;fill:none}
@@ -367,7 +367,8 @@ function kartFotoGit(kartId, delta) {
   if (toplam <= 1) return;
   _kartFotoIdx[kartId] = ((_kartFotoIdx[kartId] || 0) + delta + toplam) % toplam;
   const idx = _kartFotoIdx[kartId];
-  track.style.transform = `translateX(-${idx * 100}%)`;
+  const w = track.parentElement.offsetWidth;
+  track.style.transform = `translateX(-${idx * w}px)`;
   // dots
   const dots = document.querySelectorAll(`#fd-${kartId} .foto-dot`);
   dots.forEach((d, i) => d.classList.toggle('ak', i === idx));
@@ -401,11 +402,11 @@ function urunKartHtml(u, buyuk=false) {
       `<img src="${f}" alt="${u.ad}" style="width:100%;height:100%;object-fit:contain;flex-shrink:0;min-width:100%;padding:8px">`
     ).join('');
     const dots = fotolar.map((_, i) =>
-      `<button class="foto-dot${i===0?' ak':''}" onclick="event.preventDefault();event.stopPropagation();kartFotoGit('${kartId}',0);_kartFotoIdx['${kartId}']=${i};document.getElementById('ft-${kartId}').style.transform='translateX(-${i*100}%)';document.querySelectorAll('#fd-${kartId} .foto-dot').forEach((d,j)=>d.classList.toggle('ak',j===${i}))"></button>`
+      `<button class="foto-dot${i===0?' ak':''}" onclick="event.preventDefault();event.stopPropagation();(function(){_kartFotoIdx['${kartId}']=${i};var t=document.getElementById('ft-${kartId}');t.style.transform='translateX(-'+(${i}*t.parentElement.offsetWidth)+'px)';document.querySelectorAll('#fd-${kartId} .foto-dot').forEach((d,j)=>d.classList.toggle('ak',j===${i}))})()"></button>`
     ).join('');
     resimHtml = `
       <div class="foto-slider-wrap">
-        <div class="foto-slider-track" id="ft-${kartId}" style="width:${fotolar.length*100}%">${trackImgs}</div>
+        <div class="foto-slider-track" id="ft-${kartId}">${trackImgs}</div>
         <button class="foto-ok prev" onclick="event.preventDefault();event.stopPropagation();kartFotoGit('${kartId}',-1)"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
         <button class="foto-ok next" onclick="event.preventDefault();event.stopPropagation();kartFotoGit('${kartId}',1)"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>
         <div class="foto-dots-wrap" id="fd-${kartId}">${dots}</div>
