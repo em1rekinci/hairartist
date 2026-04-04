@@ -1377,6 +1377,25 @@ async function supabaseInsert(tablo, veri) {
       'Content-Type': 'application/json',
       'apikey': SUPABASE_KEY,
       'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Prefer': 'return=representation'  // ID geri dönsün
+    },
+    body: JSON.stringify(veri)
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(err);
+  }
+  const data = await res.json();
+  return Array.isArray(data) ? data[0] : data;
+}
+
+async function supabaseUpdate(tablo, id, veri) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${tablo}?id=eq.${id}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
       'Prefer': 'return=minimal'
     },
     body: JSON.stringify(veri)
@@ -1488,8 +1507,8 @@ async function odemeGit() {
   btn.textContent = 'Kaydediliyor…';
 
   try {
-    // 1) Rezervasyonu Supabase'e kaydet
-    await supabaseInsert('rezervasyonlar', {
+    // 1) Rezervasyonu Supabase'e kaydet — ID'yi saklıyoruz
+    const kayit = await supabaseInsert('rezervasyonlar', {
       ad, telefon, hizmet, tarih, saat,
       fiyat: parseInt(fiyat) || 0,
       personel_id: personel,
@@ -1497,6 +1516,7 @@ async function odemeGit() {
       odeme_alindi: false,
       tip: 'odeme_bekleyen'
     });
+    window._bekleyenRezId = kayit?.id || null;
 
     btn.textContent = 'Ödeme açılıyor…';
 
@@ -1593,17 +1613,35 @@ function paytrKapat() {
   if (iframe) iframe.remove();
 }
 
-function paytrMesajDinle(e) {
+async function paytrMesajDinle(e) {
   // PayTR ödeme sonucu bildirimi
-  if (e.data && e.data.status) {
-    if (e.data.status === 'success') {
-      paytrKapat();
-      // Ödeme başarılı sayfasına yönlendir
-      window.location.href = '/odeme-basarili';
-    } else if (e.data.status === 'fail') {
-      paytrKapat();
-      alert('Ödeme başarısız. Lütfen tekrar deneyin.');
+  if (!e.data || !e.data.status) return;
+
+  if (e.data.status === 'success') {
+    paytrKapat();
+
+    // Supabase'deki kaydı "onaylandi + ödeme alındı" olarak güncelle
+    const rezId = window._bekleyenRezId;
+    if (rezId) {
+      try {
+        await supabaseUpdate('rezervasyonlar', rezId, {
+          durum: 'onaylandi',
+          odeme_alindi: true,
+          tip: 'online'
+        });
+        console.log('Rezervasyon ödeme sonrası güncellendi ✓');
+      } catch(err) {
+        console.warn('Rezervasyon güncellenemedi:', err);
+      }
+    } else {
+      console.warn('Bekleyen rezervasyon ID bulunamadı!');
     }
+
+    window.location.href = '/odeme-basarili';
+
+  } else if (e.data.status === 'fail') {
+    paytrKapat();
+    alert('Ödeme başarısız. Lütfen tekrar deneyin.');
   }
 }
 

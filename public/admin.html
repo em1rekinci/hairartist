@@ -529,6 +529,7 @@ tbody td{padding:10px 13px;vertical-align:middle}
           <div class="fbar">
             <button class="fbtn ak" onclick="filtrele('hepsi',this)">Hepsi</button>
             <button class="fbtn" onclick="filtrele('bekliyor',this)">Bekliyor</button>
+            <button class="fbtn" onclick="filtrele('odeme_bekleniyor',this)">💳 Ödeme Bekliyor</button>
             <button class="fbtn" onclick="filtrele('onaylandi',this)">Onaylı</button>
             <button class="fbtn" onclick="filtrele('reddedildi',this)">Reddedildi</button>
           </div>
@@ -1208,15 +1209,22 @@ function filtrele(d,b){AKT_FILTRE=d;document.querySelectorAll('#page-rezervasyon
 function rezAra(v){AKT_ARAMA=v.toLowerCase();tabloRender(AKT_FILTRE);}
 function globalArama(v){if(!v)return;AKT_ARAMA=v.toLowerCase();sayfaGec('rezervasyonlar',document.querySelectorAll('.ni')[2]);tabloRender('hepsi');}
 function tabloRender(f){
-  let l=f==='hepsi'?TRZ:TRZ.filter(r=>r.durum===f);
+  let l;
+  if(f==='hepsi') l=TRZ;
+  else if(f==='bekliyor') l=TRZ.filter(r=>r.durum==='bekliyor');
+  else if(f==='odeme_bekleniyor') l=TRZ.filter(r=>r.durum==='odeme_bekleniyor'||r.durum==='odeme_bekleyen');
+  else l=TRZ.filter(r=>r.durum===f);
   if(AKT_ARAMA)l=l.filter(r=>r.ad.toLowerCase().includes(AKT_ARAMA)||r.telefon.includes(AKT_ARAMA)||r.hizmet.toLowerCase().includes(AKT_ARAMA));
   const e=document.getElementById('reztbody');
   if(!l.length){e.innerHTML=`<tr><td colspan="8" class="bos">Rezervasyon bulunamadı.</td></tr>`;return;}
   e.innerHTML=l.map(r=>{
-    const h=FYT[r.hizmet];const fiyat=h?Math.round((h.min+h.max)/2).toLocaleString('tr-TR')+'₺':'—';
+    const h=FYT[r.hizmet];
+    const fiyatSay=r.fiyat||(h?Math.round((h.min+h.max)/2):0);
+    const fiyat=fiyatSay?fiyatSay.toLocaleString('tr-TR')+'₺':'—';
     const p=personel.find(x=>x.id===r.personelId)||personel.find(x=>x.ad===r.personelId);
     let aks;
     if(r.durum==='bekliyor')aks=`<div style="display:flex;gap:4px;white-space:nowrap"><button class="bsm bonay" onclick="onayEt('${r.id}')">Onayla</button><button class="bsm bred" onclick="reddet('${r.id}')">Reddet</button><button class="bsm bdet" onclick="detay('${r.id}')">···</button></div>`;
+    else if(r.durum==='odeme_bekleniyor'||r.durum==='odeme_bekleyen')aks=`<div style="display:flex;gap:4px;white-space:nowrap"><span style="font-size:.6rem;color:var(--yellow)">⏳ Ödeme bekleniyor</span><button class="bsm bdet" onclick="detay('${r.id}')">···</button><button class="bsm bsil" onclick="sil('${r.id}')">✕</button></div>`;
     else if(r.durum==='onaylandi'&&!r.odemeAlindi)aks=`<div style="display:flex;gap:4px;white-space:nowrap"><button class="bsm bblue" onclick="odemeAl('${r.id}')">Ödeme Al</button><button class="bsm bdet" onclick="detay('${r.id}')">···</button><button class="bsm bsil" onclick="sil('${r.id}')">✕</button></div>`;
     else aks=`<div style="display:flex;gap:4px;white-space:nowrap"><button class="bsm bdet" onclick="detay('${r.id}')">Detay</button><button class="bsm bsil" onclick="sil('${r.id}')">✕</button></div>`;
     const otag=r.odemeAlindi?`<span class="badge bo" style="font-size:.42rem;margin-left:3px">Ödendi</span>`:'';
@@ -1232,7 +1240,7 @@ function tabloRender(f){
     </tr>`;
   }).join('');
 }
-function bH(d){const m={bekliyor:['bb','Bekliyor'],onaylandi:['bo','Onaylandı'],reddedildi:['br','Reddedildi'],tamamlandi:['bt','Tamamlandı']};const[c,l]=m[d]||['',''+d];return`<span class="badge ${c}">${l}</span>`;}
+function bH(d){const m={bekliyor:['bb','Bekliyor'],odeme_bekleniyor:['bb','💳 Ödeme Bekliyor'],odeme_bekleyen:['bb','💳 Ödeme Bekliyor'],onaylandi:['bo','Onaylandı'],reddedildi:['br','Reddedildi'],tamamlandi:['bt','Tamamlandı']};const[c,l]=m[d]||['bb',''+d];return`<span class="badge ${c}">${l}</span>`;}
 
 // ─── WHATSAPP ONAY MESAJI ───
 const WA_PHONE_ID='1017699208099685';
