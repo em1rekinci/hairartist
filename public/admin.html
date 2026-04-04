@@ -476,9 +476,7 @@ tbody td{padding:10px 13px;vertical-align:middle}
       <div class="ni" onclick="sayfaGec('shop',this)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>Shop
       </div>
-      <div class="ni" onclick="sayfaGec('ayarlar',this)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Ayarlar
-      </div>
+
       <div class="ni" onclick="window.open('/','_blank')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Siteye Git
       </div>
@@ -891,28 +889,6 @@ tbody td{padding:10px 13px;vertical-align:middle}
     </div>
 
     <!-- ══ AYARLAR ══ -->
-    <div class="page" id="page-ayarlar">
-      <div style="margin-bottom:16px"><h2 style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700">Ayarlar</h2><p style="font-size:.7rem;color:var(--text3);margin-top:3px">Panel ve salon ayarlarını yönetin</p></div>
-      <div class="agrid">
-        <div class="card"><div class="ch"><h3>Genel Ayarlar</h3></div><div class="cb">
-          <div class="trow"><div><div class="tlbl">Yeni Rezervasyon Bildirimleri</div><div class="tdsc">Yeni rez. gelince uyar</div></div><label class="tgl"><input type="checkbox" checked><span class="tsl"></span></label></div>
-          <div class="trow"><div><div class="tlbl">Otomatik Onay</div><div class="tdsc">Rezervasyonları otomatik onayla</div></div><label class="tgl"><input type="checkbox"><span class="tsl"></span></label></div>
-          <div class="trow"><div><div class="tlbl">Rezervasyon Kabul</div><div class="tdsc">Siteden rezervasyon alınabilsin</div></div><label class="tgl"><input type="checkbox" checked><span class="tsl"></span></label></div>
-          <div class="trow"><div><div class="tlbl">Online Ödeme</div><div class="tdsc">Ödeme seçeneğini etkinleştir</div></div><label class="tgl"><input type="checkbox" checked><span class="tsl"></span></label></div>
-          <div class="trow"><div><div class="tlbl">Shop Aktif</div><div class="tdsc">Shop sayfasını etkinleştir</div></div><label class="tgl"><input type="checkbox" checked><span class="tsl"></span></label></div>
-        </div></div>
-        <div class="card"><div class="ch"><h3>Salon <em style="font-style:italic;font-weight:400;color:var(--text3)">Bilgileri</em></h3><button class="tbtn pri" onclick="toast('Kaydedildi.','ok')">Kaydet</button></div><div class="cb">
-          <div style="display:flex;flex-direction:column;gap:11px">
-            <div class="ff"><label class="fl">Salon Adı</label><input class="fi" type="text" value="Hair Artist"></div>
-            <div class="ff"><label class="fl">Telefon</label><input class="fi" type="text" placeholder="+90 5xx xxx xx xx"></div>
-            <div class="ff"><label class="fl">E-posta</label><input class="fi" type="email" value="info@hairartist.com.tr"></div>
-            <div class="ff"><label class="fl">Instagram</label><input class="fi" type="text" value="@hairartistcomtr"></div>
-            <div class="ff"><label class="fl">Adres</label><input class="fi" type="text" placeholder="Salon adresi"></div>
-          </div>
-        </div></div>
-        <div class="card" style="grid-column:1/-1"><div class="ch"><h3>Çalışma <em style="font-style:italic;font-weight:400;color:var(--text3)">Saatleri</em></h3><button class="tbtn pri" onclick="saatKaydet()">Kaydet</button></div><div class="cb"><div class="cgrid" id="cgrid"></div></div></div>
-      </div>
-    </div>
 
   </main>
 </div>
@@ -2412,7 +2388,7 @@ const BASLIKLAR={
   dashboard:'Dashboard',takvim:'Takvim',
   rezervasyonlar:'Rezervasyonlar',musteriler:'Müşteriler',
   personel:'Personel',hizmetler:'Hizmetler & Fiyatlar',
-  shop:'Shop',ayarlar:'Ayarlar',ciro:'Ciro & Raporlar',
+  shop:'Shop',ciro:'Ciro & Raporlar',
   portfolio:'Portfolyo Yönetimi',
 };
 function sayfaGec(sayfa,navEl){
