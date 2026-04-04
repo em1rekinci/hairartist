@@ -124,7 +124,7 @@ nav ul li a.active{color:var(--off);border-bottom:2px solid var(--off)}
   .ph-stat{padding:0 28px}
   .gal-grid{columns:2}
   .cta-strip{flex-direction:column;gap:32px;text-align:center}
-  footer{flex-direction:column;gap:10px;text-align:center}
+  footer{padding:28px 24px}
 }
 @media(max-width:540px){
   nav{padding:0 16px}
@@ -135,9 +135,9 @@ nav ul li a.active{color:var(--off);border-bottom:2px solid var(--off)}
 }
 
 /* ── FOOTER ── */
-footer{display:flex;align-items:center;justify-content:space-between;padding:28px 56px;border-top:1px solid rgba(247,244,239,.07);font-size:.6rem;letter-spacing:.12em;color:rgba(247,244,239,.28)}
-.foot-credit{color:rgba(247,244,239,.28);text-decoration:none;transition:color .3s}
-.foot-credit:hover{color:var(--off)}
+footer{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:36px 56px;border-top:1px solid rgba(247,244,239,.07);font-size:.6rem;letter-spacing:.12em;text-align:center;color:var(--off)}
+.foot-credit{color:var(--off);text-decoration:none;transition:opacity .3s}
+.foot-credit:hover{opacity:.6}
 
 /* Fade-in on scroll */
 .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
