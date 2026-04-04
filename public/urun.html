@@ -662,6 +662,8 @@ async function sayfaYukle() {
         else if (dx > 40) galeriOnceki();
       }, { passive: true });
     }
+
+  } catch(e) {
     hataGoster('Bir hata oluştu', 'Ürün yüklenirken bir sorun çıktı. Lütfen tekrar deneyin.', false);
   }
 }
