@@ -336,12 +336,19 @@ async function urunleriCek(ids){
   }catch(e){return{};}
 }
 
+// İndirimli birim fiyat hesapla
+function efektifFiyat(u) {
+  const asil = u.fiyat || 0;
+  const indirim = parseInt(u.indirim) || 0;
+  return indirim > 0 ? Math.round(asil * (1 - indirim / 100)) : asil;
+}
+
 // ── ÖZET GÜNCELLE
 function ozetGuncelle(sepet, urunMap){
   let araToplam=0;
   sepet.forEach(item=>{
     const u=urunMap[item.id];
-    if(u) araToplam += (u.fiyat||0) * item.adet;
+    if(u) araToplam += efektifFiyat(u) * item.adet;
   });
   const kargo = araToplam>=KARGO_SINIR ? 0 : KARGO_UCRET;
   const toplam = araToplam + kargo;
@@ -386,8 +393,16 @@ async function sepetRender(){
   liste.innerHTML = sepet.map((item,idx)=>{
     const u = urunMap[item.id] || {};
     const foto = ilkFoto(u.foto_url||'');
-    const fiyat = (u.fiyat||0) * item.adet;
+    const birimFiyat = efektifFiyat(u);
+    const fiyat = birimFiyat * item.adet;
+    const indirim = parseInt(u.indirim) || 0;
+    const asilFiyat = (u.fiyat||0) * item.adet;
     const maxStok = u.stok||99;
+    const fiyatHtml = indirim > 0
+      ? `<div class="sepet-item-fiyat">${fiyat.toLocaleString('tr-TR',{minimumFractionDigits:2})} ₺</div>
+         <div style="font-size:.72rem;color:#bbb;text-decoration:line-through">${asilFiyat.toLocaleString('tr-TR',{minimumFractionDigits:2})} ₺</div>
+         <div style="font-size:.58rem;font-weight:700;color:#fff;background:#080808;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;margin-top:4px">%${indirim}</div>`
+      : `<div class="sepet-item-fiyat">${fiyat.toLocaleString('tr-TR',{minimumFractionDigits:2})} ₺</div>`;
     return `
     <div class="sepet-item" id="item-${idx}">
       <div class="sepet-item-resim">
@@ -403,7 +418,7 @@ async function sepetRender(){
         </div>
       </div>
       <div class="sepet-item-sag">
-        <div class="sepet-item-fiyat">${fiyat.toLocaleString('tr-TR',{minimumFractionDigits:2})} ₺</div>
+        ${fiyatHtml}
         <button class="sepet-item-sil" onclick="urunSil(${idx})">Kaldır</button>
       </div>
     </div>`;
@@ -485,14 +500,14 @@ async function odemeBaslat(){
 
   // Tutar hesapla
   let araToplam=0;
-  sepet.forEach(item=>{const u=urunMap[item.id];if(u)araToplam+=(u.fiyat||0)*item.adet;});
+  sepet.forEach(item=>{const u=urunMap[item.id];if(u)araToplam+=efektifFiyat(u)*item.adet;});
   const kargo=araToplam>=KARGO_SINIR?0:KARGO_UCRET;
   const toplam=araToplam+kargo;
 
   // Sepet items (PayTR formatı)
   const sepetItems=sepet.map(item=>{
     const u=urunMap[item.id]||{};
-    return [u.ad||item.ad||'Ürün', Number((u.fiyat||0)).toFixed(2), item.adet];
+    return [u.ad||item.ad||'Ürün', Number(efektifFiyat(u)).toFixed(2), item.adet];
   });
   // Kargo varsa sepete ekle
   if(kargo>0) sepetItems.push(['Kargo', kargo.toFixed(2), 1]);
@@ -509,7 +524,7 @@ async function odemeBaslat(){
     adres: adres,
     urunler: JSON.stringify(sepet.map(item => {
       const u = urunMap[item.id] || {};
-      return { id: item.id, ad: u.ad || item.ad || 'Ürün', adet: item.adet, fiyat: u.fiyat || 0 };
+      return { id: item.id, ad: u.ad || item.ad || 'Ürün', adet: item.adet, fiyat: efektifFiyat(u) };
     })),
     urun_adi: sepet.length === 1
       ? (urunMap[sepet[0].id]?.ad || 'Shop Ürünü')
