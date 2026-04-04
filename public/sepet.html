@@ -631,21 +631,14 @@ window.addEventListener('message',async function(e){
             'Prefer': 'return=minimal'
           },
           body: JSON.stringify({
-            musteri_adi: siparis.musteri_adi,
-            musteri_ad:  siparis.musteri_adi,
-            telefon:     siparis.telefon,
-            email:       siparis.email,
-            adres:       siparis.adres,
-            urun_adi:    siparis.urun_adi,
-            urunler:     siparis.urunler,
-            toplam:      siparis.toplam,
-            tutar:       siparis.toplam,
-            fiyat:       siparis.toplam,
-            kargo:       siparis.kargo,
+            musteri_adi:   siparis.musteri_adi,
+            telefon:       siparis.telefon,
+            urun_adi:      siparis.urun_adi,
+            toplam:        siparis.toplam,
             odeme_yontemi: 'kart',
-            durum:       'onaylandi',
-            tarih:       siparis.tarih,
-            created_at:  new Date().toISOString()
+            durum:         'onaylandi',
+            tarih:         siparis.tarih,
+            created_at:    new Date().toISOString()
           })
         });
         sessionStorage.removeItem('bekleyen_siparis');
