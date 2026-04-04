@@ -977,6 +977,32 @@ tbody td{padding:10px 13px;vertical-align:middle}
   </div>
 </div>
 
+<!-- İNDİRİM MODAL -->
+<div class="cmov" id="indirim-mov" onclick="if(event.target===this)shopIndirimKapat()">
+  <div class="cmodal">
+    <div class="cmh">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+      <h3>İndirim Ayarla</h3>
+    </div>
+    <div class="cmb">
+      <div style="font-size:.78rem;color:var(--text2);margin-bottom:14px">Ürün: <strong id="indirim-urun-adi" style="color:var(--text)"></strong></div>
+      <div class="ff" style="margin-bottom:14px">
+        <label class="fl">İndirim Yüzdesi (0 = indirim yok)</label>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:1.1rem;color:var(--text3);font-weight:300">%</span>
+          <input type="number" class="fi" id="indirim-inp" min="0" max="99" placeholder="Örn: 20" oninput="indirimOnizlemeSec()" style="max-width:120px">
+        </div>
+      </div>
+      <div id="indirim-onizleme-sec" style="font-size:.76rem;padding:10px 12px;background:var(--bg);border:1px solid var(--line);border-radius:4px;min-height:44px;display:flex;align-items:center"></div>
+    </div>
+    <div class="cmact">
+      <button class="tbtn" onclick="shopIndirimKapat()">İptal</button>
+      <button class="tbtn" onclick="document.getElementById('indirim-inp').value='';shopIndirimKaydet()" style="background:transparent;border-color:var(--rbdr);color:var(--red)" onmouseover="this.style.background='var(--rbg)'" onmouseout="this.style.background='transparent'">İndirimi Kaldır</button>
+      <button class="tbtn pri" onclick="shopIndirimKaydet()">Kaydet</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1871,7 +1897,8 @@ async function shopYukle() {
     shop = res.map(u => ({
       id: u.id, ad: u.ad, kat: u.kat, fiyat: u.fiyat || 0,
       stok: u.stok ?? 0, stokuyari: u.stok_uyari ?? 3,
-      acik: u.acik || '', foto: u.foto_url || '', fotolar: (() => { try { const v = u.foto_url || ''; if (v.startsWith('[')) return JSON.parse(v); return v ? [v] : []; } catch(e){ return u.foto_url ? [u.foto_url] : []; } })(), yayinda: u.yayinda !== false
+      acik: u.acik || '', foto: u.foto_url || '', fotolar: (() => { try { const v = u.foto_url || ''; if (v.startsWith('[')) return JSON.parse(v); return v ? [v] : []; } catch(e){ return u.foto_url ? [u.foto_url] : []; } })(), yayinda: u.yayinda !== false,
+      indirim: u.indirim || 0
     }));
   } catch(e) {
     console.warn('Shop tablosu henüz yok:', e.message);
@@ -1930,6 +1957,7 @@ function shopRender() {
         <div style="display:flex;gap:3px">
           <button class="bsm bdet" onclick="shopDuzenle('${u.id}')">Düzenle</button>
           <button class="bsm bsil" onclick="shopSil('${u.id}')">Sil</button>
+          <button class="bsm" onclick="shopIndirimAc('${u.id}')" style="background:${u.indirim?'rgba(8,8,8,.08)':'transparent'};border-color:${u.indirim?'rgba(8,8,8,.25)':'var(--line)'};color:${u.indirim?'var(--black)':'var(--text3)'};display:flex;align-items:center;gap:3px">${u.indirim ? `<span style="width:20px;height:20px;background:var(--black);color:#fff;border-radius:50%;font-size:.52rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;line-height:1">%${u.indirim}</span>` : `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>`}İndirim</button>
         </div>
       </div>
     </div>`;
@@ -2093,6 +2121,46 @@ async function shopSil(id) {
     shopRender();
     toast('Ürün silindi.', 'ok');
   } catch(e) { toast('Hata: ' + e.message, 'hata'); }
+}
+
+// ─── İNDİRİM MODAL ───
+let _indirimUrunId = null;
+function shopIndirimAc(id) {
+  const u = shop.find(x => x.id === id);
+  if (!u) return;
+  _indirimUrunId = id;
+  document.getElementById('indirim-urun-adi').textContent = u.ad;
+  document.getElementById('indirim-inp').value = u.indirim || '';
+  indirimOnizlemeSec();
+  document.getElementById('indirim-mov').classList.add('open');
+  setTimeout(() => document.getElementById('indirim-inp').focus(), 80);
+}
+function indirimOnizlemeSec() {
+  const val = parseInt(document.getElementById('indirim-inp').value) || 0;
+  const el = document.getElementById('indirim-onizleme-sec');
+  if (!el) return;
+  if (!val) {
+    el.innerHTML = '<span style="color:var(--text3)">İndirim yüzdesi giriniz.</span>';
+  } else {
+    el.innerHTML = `<span style="display:inline-flex;align-items:center;gap:8px"><span style="width:36px;height:36px;background:#080808;color:#fff;border-radius:50%;font-size:.75rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center">%${val}</span><span style="font-size:.78rem;color:var(--green)">Ürün kartında bu badge görünecek</span></span>`;
+  }
+}
+async function shopIndirimKaydet() {
+  if (!_indirimUrunId) return;
+  const val = parseInt(document.getElementById('indirim-inp').value) || 0;
+  if (val < 0 || val > 99) { toast('0-99 arası bir değer giriniz.', 'hata'); return; }
+  try {
+    await sRest(`shop?id=eq.${_indirimUrunId}`, { method: 'PATCH', body: JSON.stringify({ indirim: val || null }) });
+    const u = shop.find(x => x.id === _indirimUrunId);
+    if (u) u.indirim = val;
+    shopIndirimKapat();
+    shopRender();
+    toast(val ? `%${val} indirim uygulandı ✓` : 'İndirim kaldırıldı.', 'ok');
+  } catch(e) { toast('Hata: ' + e.message, 'hata'); }
+}
+function shopIndirimKapat() {
+  document.getElementById('indirim-mov').classList.remove('open');
+  _indirimUrunId = null;
 }
 
 function shopSifirla() {
