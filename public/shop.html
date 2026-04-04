@@ -39,8 +39,8 @@
 /* ── ÜRÜN KARTI ── */
 .urun-kart{background:#fff;border:1px solid #e8e4dc;display:flex;flex-direction:column;overflow:hidden;transition:box-shadow .3s,transform .3s;position:relative}
 .urun-kart:hover{box-shadow:0 12px 48px rgba(8,8,8,.13);transform:translateY(-2px)}
-.urun-resim{aspect-ratio:1/1;background:#f0ece4;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
-.urun-resim img{width:100%;height:100%;object-fit:contain;transition:transform .4s ease;padding:8px;background:#f7f4ef}
+.urun-resim{aspect-ratio:1/1;background:#f7f4ef;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.urun-resim img{width:100%;height:100%;object-fit:contain;transition:transform .4s ease;padding:8px}
 .urun-kart:hover .urun-resim img{transform:scale(1.04)}
 .urun-placeholder{display:flex;flex-direction:column;align-items:center;gap:10px;opacity:.2}
 .urun-placeholder svg{width:36px;height:36px}
@@ -398,7 +398,7 @@ function urunKartHtml(u, buyuk=false) {
   let resimHtml = '';
   if (fotolar.length > 1) {
     const trackImgs = fotolar.map(f =>
-      `<img src="${f}" alt="${u.ad}" style="width:100%;height:100%;object-fit:contain;flex-shrink:0;min-width:100%;background:#f7f4ef;padding:8px">`
+      `<img src="${f}" alt="${u.ad}" style="width:100%;height:100%;object-fit:contain;flex-shrink:0;min-width:100%;padding:8px">`
     ).join('');
     const dots = fotolar.map((_, i) =>
       `<button class="foto-dot${i===0?' ak':''}" onclick="event.preventDefault();event.stopPropagation();kartFotoGit('${kartId}',0);_kartFotoIdx['${kartId}']=${i};document.getElementById('ft-${kartId}').style.transform='translateX(-${i*100}%)';document.querySelectorAll('#fd-${kartId} .foto-dot').forEach((d,j)=>d.classList.toggle('ak',j===${i}))"></button>`
@@ -411,7 +411,7 @@ function urunKartHtml(u, buyuk=false) {
         <div class="foto-dots-wrap" id="fd-${kartId}">${dots}</div>
       </div>`;
   } else if (fotolar.length === 1) {
-    resimHtml = `<img src="${fotolar[0]}" alt="${u.ad}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`;
+    resimHtml = `<img src="${fotolar[0]}" alt="${u.ad}" style="width:100%;height:100%;object-fit:contain;padding:8px;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`;
   }
   const placeholder = `<div class="urun-placeholder" ${fotolar.length ? 'style="display:none"' : ''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg><span>Ürün</span></div>`;
 
