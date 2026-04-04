@@ -29,7 +29,7 @@
   --purple:#6a3093;
   --sw:224px;--th:52px;--r:6px;
 }
-html{scroll-behavior:smooth;-webkit-tap-highlight-color:transparent}
+html{-webkit-tap-highlight-color:transparent}
 body{background:var(--bg);color:var(--text);font-family:'Montserrat',sans-serif;font-weight:300;min-height:100vh;line-height:1.5;-webkit-font-smoothing:antialiased}
 a{text-decoration:none;color:inherit}
 button,input,select,textarea{font-family:'Montserrat',sans-serif}
@@ -96,7 +96,7 @@ button,input,select,textarea{font-family:'Montserrat',sans-serif}
 .sbov.open{display:block;opacity:1}
 
 /* MAIN */
-.main{margin-left:var(--sw);padding-top:var(--th);min-height:100vh;background:var(--bg)}
+.main{margin-left:var(--sw);padding-top:var(--th);min-height:100vh;background:var(--bg);overflow-y:auto;height:100vh;box-sizing:border-box}
 .page{display:none;padding:22px}
 .page.ak{display:block}
 
@@ -371,7 +371,7 @@ tbody td{padding:10px 13px;vertical-align:middle}
   .sidebar{transform:translateX(-240px);width:240px;--sw:240px}
   .sidebar.open{transform:translateX(0)}
   .topbar{left:0}
-  .main{margin-left:0}
+  .main{margin-left:0;height:100vh;overflow-y:auto}
   .hmb{display:flex}
   .dsag{grid-template-columns:1fr}
   .tkwrap{grid-template-columns:1fr}
@@ -630,7 +630,6 @@ tbody td{padding:10px 13px;vertical-align:middle}
             </div>
           </div></div>
         </div>
-      </div>
       </div>
     </div>
 
@@ -2301,7 +2300,10 @@ function sayfaGec(sayfa,navEl){
   document.querySelectorAll('.ni').forEach(n=>n.classList.remove('ak'));
   if(navEl)navEl.classList.add('ak');
   document.getElementById('tptitle').innerHTML=`<strong>${BASLIKLAR[sayfa]||sayfa}</strong>`;
-  window.scrollTo({top:0,behavior:'smooth'});
+  window.scrollTo({top:0,behavior:'instant'});
+  document.documentElement.scrollTop=0;
+  document.body.scrollTop=0;
+  const mainEl=document.querySelector('.main');if(mainEl)mainEl.scrollTop=0;
   sidebarKapat();
   if(sayfa==='hizmetler')hizRender();
   if(sayfa==='musteriler')mustRender();
