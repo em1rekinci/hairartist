@@ -10,6 +10,7 @@ const PORT = process.env.PORT || 3000;
 
 const SITE_URL         = process.env.SITE_URL || 'https://www.fatihkurthairartist.com';
 const ADMIN_SIFRE      = process.env.ADMIN_SIFRE || 'hairartist2026';
+const RESEND_API_KEY   = process.env.RESEND_API_KEY || '';
 
 // ─── PAYTR AYARLARI ──────────────────────────────────────────────────────────
 const MERCHANT_ID   = "685596";
@@ -436,7 +437,10 @@ app.post('/api/paytr-token-shop', async (req, res) => {
           durum:         'bekleyen',
           tarih:         new Date().toISOString().substring(0, 10),
           created_at:    new Date().toISOString(),
-          merchant_oid:  merchant_oid
+          merchant_oid:  merchant_oid,
+          adres:         adres || '',
+          email:         email || '',
+          sepet_detay:   JSON.stringify(sepetItems)
         })
       });
       console.log('[PayTR Shop] Supabase bekleyen kayıt oluşturuldu:', merchant_oid);
@@ -560,13 +564,21 @@ app.post('/api/paytr-callback', async (req, res) => {
               'Content-Type': 'application/json',
               'apikey': SB_KEY,
               'Authorization': 'Bearer ' + SB_KEY,
-              'Prefer': 'return=minimal'
+              'Prefer': 'return=representation'
             },
             body: JSON.stringify({ durum: 'onaylandi' })
           }
         );
         if (r.ok) {
           console.log(`[PayTR Callback] ✓ Shop siparişi onaylandi: ${merchant_oid}`);
+          // Mail gönder
+          try {
+            const rows = await r.json();
+            const s = Array.isArray(rows) ? rows[0] : rows;
+            if (s) await shopSiparisMail(s);
+          } catch(e) {
+            console.warn('[Mail] Gönderim hatası:', e.message);
+          }
         } else {
           const t = await r.text();
           console.error(`[PayTR Callback] Supabase güncelleme hatası: ${t}`);
@@ -603,6 +615,163 @@ app.post('/api/paytr-callback', async (req, res) => {
     return res.send('OK'); // yine de OK dön, PayTR'ın döngüye girmesini önle
   }
 });
+
+// ════════════════════════════════════════════════════════════════════════════
+// SHOP SİPARİŞ MAİLİ — Resend ile info@hairartist.com.tr'ye gönderilir
+// ════════════════════════════════════════════════════════════════════════════
+async function shopSiparisMail(siparis) {
+  if (!RESEND_API_KEY) {
+    console.warn('[Mail] RESEND_API_KEY tanımlı değil, mail atlanıyor.');
+    return;
+  }
+
+  // Sepet detaylarını parse et
+  let sepetSatirlar = '';
+  try {
+    const items = JSON.parse(siparis.sepet_detay || '[]');
+    sepetSatirlar = items.map(item => {
+      const [ad, fiyat, adet] = item;
+      const toplam = (parseFloat(fiyat) * parseInt(adet)).toLocaleString('tr-TR');
+      return `
+        <tr>
+          <td style="padding:10px 14px;border-bottom:1px solid #e8e4dc;font-size:14px;color:#1a1a1a">${ad}</td>
+          <td style="padding:10px 14px;border-bottom:1px solid #e8e4dc;font-size:14px;color:#1a1a1a;text-align:center">${adet}</td>
+          <td style="padding:10px 14px;border-bottom:1px solid #e8e4dc;font-size:14px;color:#1a1a1a;text-align:right;font-weight:600">${parseFloat(fiyat).toLocaleString('tr-TR')}₺</td>
+          <td style="padding:10px 14px;border-bottom:1px solid #e8e4dc;font-size:14px;color:#4a7a00;text-align:right;font-weight:700">${toplam}₺</td>
+        </tr>`;
+    }).join('');
+  } catch(e) {
+    sepetSatirlar = `<tr><td colspan="4" style="padding:10px 14px;color:#888">${siparis.urun_adi || '—'}</td></tr>`;
+  }
+
+  const tarih = new Date().toLocaleString('tr-TR', {
+    timeZone: 'Europe/Istanbul',
+    day: '2-digit', month: 'long', year: 'numeric',
+    hour: '2-digit', minute: '2-digit'
+  });
+
+  const html = `
+<!DOCTYPE html>
+<html lang="tr">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f4f1ec;font-family:'Helvetica Neue',Arial,sans-serif">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f1ec;padding:40px 0">
+    <tr><td align="center">
+      <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%">
+
+        <!-- HEADER -->
+        <tr><td style="background:#080808;padding:28px 32px;text-align:center">
+          <div style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#f7f4ef;letter-spacing:.02em">Hair Artist</div>
+          <div style="font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:rgba(247,244,239,.35);margin-top:4px">Shop</div>
+        </td></tr>
+
+        <!-- BANNER -->
+        <tr><td style="background:#c8ff00;padding:14px 32px;text-align:center">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#080808">🛍 Yeni Sipariş Alındı</div>
+        </td></tr>
+
+        <!-- BODY -->
+        <tr><td style="background:#ffffff;padding:32px">
+
+          <p style="margin:0 0 24px;font-size:13px;color:#6a6560;line-height:1.7">
+            <strong style="color:#080808">${tarih}</strong> tarihinde yeni bir shop siparişi alındı.
+          </p>
+
+          <!-- MÜŞTERİ BİLGİLERİ -->
+          <div style="background:#f4f1ec;border:1px solid #e8e4dc;padding:18px 20px;margin-bottom:24px">
+            <div style="font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:#9a9490;margin-bottom:12px;font-weight:600">Müşteri Bilgileri</div>
+            <table width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="font-size:12px;color:#9a9490;padding:4px 0;width:100px">Ad Soyad</td>
+                <td style="font-size:13px;color:#080808;font-weight:600;padding:4px 0">${siparis.musteri_adi || '—'}</td>
+              </tr>
+              <tr>
+                <td style="font-size:12px;color:#9a9490;padding:4px 0">Telefon</td>
+                <td style="font-size:13px;color:#080808;padding:4px 0">${siparis.telefon || '—'}</td>
+              </tr>
+              ${siparis.email ? `<tr>
+                <td style="font-size:12px;color:#9a9490;padding:4px 0">E-posta</td>
+                <td style="font-size:13px;color:#080808;padding:4px 0">${siparis.email}</td>
+              </tr>` : ''}
+              ${siparis.adres ? `<tr>
+                <td style="font-size:12px;color:#9a9490;padding:4px 0;vertical-align:top">Adres</td>
+                <td style="font-size:13px;color:#080808;padding:4px 0;line-height:1.6">${siparis.adres}</td>
+              </tr>` : ''}
+            </table>
+          </div>
+
+          <!-- SEPET -->
+          <div style="font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:#9a9490;margin-bottom:10px;font-weight:600">Sipariş İçeriği</div>
+          <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e8e4dc;margin-bottom:16px">
+            <thead>
+              <tr style="background:#f4f1ec">
+                <th style="padding:9px 14px;text-align:left;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:#9a9490;font-weight:600">Ürün</th>
+                <th style="padding:9px 14px;text-align:center;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:#9a9490;font-weight:600">Adet</th>
+                <th style="padding:9px 14px;text-align:right;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:#9a9490;font-weight:600">Birim</th>
+                <th style="padding:9px 14px;text-align:right;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:#9a9490;font-weight:600">Toplam</th>
+              </tr>
+            </thead>
+            <tbody>${sepetSatirlar}</tbody>
+          </table>
+
+          <!-- TOPLAM -->
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px">
+            <tr>
+              <td style="font-size:13px;color:#6a6560;padding:6px 0">Ara Toplam</td>
+              <td style="font-size:13px;color:#080808;text-align:right;padding:6px 0">${siparis.toplam ? siparis.toplam.toLocaleString('tr-TR') : '—'}₺</td>
+            </tr>
+            <tr>
+              <td style="font-size:13px;color:#6a6560;padding:6px 0">Ödeme Yöntemi</td>
+              <td style="font-size:13px;color:#080808;text-align:right;padding:6px 0">💳 Kart</td>
+            </tr>
+            <tr style="border-top:2px solid #080808">
+              <td style="font-size:15px;font-weight:700;color:#080808;padding:10px 0 0">Genel Toplam</td>
+              <td style="font-family:Georgia,serif;font-size:20px;font-weight:700;color:#080808;text-align:right;padding:10px 0 0;font-style:italic">${siparis.toplam ? siparis.toplam.toLocaleString('tr-TR') : '—'}₺</td>
+            </tr>
+          </table>
+
+          <!-- SİPARİŞ NO -->
+          <div style="background:#f4f1ec;border:1px solid #e8e4dc;padding:10px 16px;text-align:center;font-size:11px;color:#9a9490;letter-spacing:.12em;text-transform:uppercase">
+            Sipariş No: <strong style="color:#080808">${siparis.merchant_oid || '—'}</strong>
+          </div>
+
+        </td></tr>
+
+        <!-- FOOTER -->
+        <tr><td style="background:#080808;padding:20px 32px;text-align:center">
+          <div style="font-size:11px;color:rgba(247,244,239,.3);line-height:1.8">
+            Hair Artist — fatihkurthairartist.com<br>
+            Bu mail otomatik olarak gönderilmiştir.
+          </div>
+        </td></tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+
+  const mailRes = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${RESEND_API_KEY}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      from:    'Hair Artist Shop <onboarding@resend.dev>',
+      to:      ['info@hairartist.com.tr'],
+      subject: `🛍 Yeni Sipariş — ${siparis.musteri_adi || 'Müşteri'} | ${siparis.toplam ? siparis.toplam.toLocaleString('tr-TR') + '₺' : ''}`,
+      html:    html
+    })
+  });
+
+  if (mailRes.ok) {
+    console.log('[Mail] ✓ Sipariş maili gönderildi:', siparis.merchant_oid);
+  } else {
+    const t = await mailRes.text();
+    console.error('[Mail] Resend hatası:', t);
+  }
+}
 
 // ── Supabase: merchant_oid'e göre rezervasyonu güncelle
 async function supabaseGuncelle(merchant_oid, guncelleme) {
