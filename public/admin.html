@@ -1011,15 +1011,6 @@ async function fotoYukle(file){
 }
 
 
-
-// UTC tarih string'ini yerel tarihe çevir (Supabase UTC kayıtları için)
-function utcToLocalDateStr(utcStr){
-  if(!utcStr) return '';
-  const d = new Date(utcStr); // JS otomatik UTC parse eder
-  const pad = n => String(n).padStart(2,'0');
-  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-}
-
 function dbToLocal(r){
   return {
     id: r.id,
@@ -1135,7 +1126,7 @@ async function verileriYukle(showToast=true){
       ad:s.musteri_adi||s.musteri_ad||s.ad||'Müşteri',
       telefon:s.telefon||s.musteri_telefon||'',
       hizmet:s.urun_adi||s.urun_ad||s.urun||s.hizmet||'Shop Ürünü',
-      tarih:(s.tarih||s.created_at||'').substring(0,10),
+      tarih:utcToLocalDateStr(s.tarih||s.created_at||''),
       saat:'',
       durum:'onaylandi',
       odemeAlindi:true,
@@ -2293,15 +2284,14 @@ function ciroRender(){
   let hizOdemeler=TRZ.filter(r=>{
     if(r.tip==='shop')return false;
     if(!r.odemeAlindi||r.durum!=='onaylandi')return false;
-    // odemeTarihi UTC olabilir, yerel tarihe çevir
-    const tarihStr=r.odemeTarihi ? utcToLocalDateStr(r.odemeTarihi) : (r.tarih||'').substring(0,10);
+    const tarihStr=(r.odemeTarihi||r.tarih||'').substring(0,10);
     if(!tarihStr)return false;
     const t=new Date(tarihStr+'T12:00');
     return t>=bas&&t<=bit;
   }).map(r=>({...r,tip:'hizmet'}));
   // Shop siparişleri
   let shopOdemeler=SIPARISLER.filter(r=>{
-    const tarihStr=r.tarih ? utcToLocalDateStr(r.tarih) : '';
+    const tarihStr=(r.tarih||'').substring(0,10);
     if(!tarihStr)return false;
     const t=new Date(tarihStr+'T12:00');
     return t>=bas&&t<=bit;
@@ -2334,15 +2324,13 @@ function ciroRender(){
   // Tablo
   const tbody=document.getElementById('c-tbody');
   if(!odemeler.length){tbody.innerHTML='<tr><td colspan="6" class="bos">Bu dönem için ödeme bulunamadı.</td></tr>';return;}
-  const sirali=[...odemeler].sort((a,b)=>new Date(b.odemeTarihi||b.tarih)-new Date(a.odemeTarihi||a.tarih));
+  const sirali=[...odemeler].sort((a,b)=>new Date(b.tarih)-new Date(a.tarih));
   tbody.innerHTML=sirali.map(r=>{
     const p=personel.find(x=>x.id===r.personelId)||personel.find(x=>x.ad===r.personelId);
     const f=fHesapla(r);
     const yont=(r.odemeYontemi||'nakit')==='kart'?'💳 Kart':'💵 Nakit';
     const tipBadge=r.tip==='shop'?'<span style="font-size:.44rem;background:var(--bbg);color:var(--blue);border:1px solid var(--bbdr);padding:2px 6px;border-radius:8px;font-weight:600">🛍 Shop</span>':'<span style="font-size:.44rem;background:var(--gbg);color:var(--green);border:1px solid var(--gbdr);padding:2px 6px;border-radius:8px;font-weight:600">✂️ Hizmet</span>';
-    // Tabloda gösterilecek tarihi yerel saate çevir
-    const gosterTarih = r.odemeTarihi ? utcToLocalDateStr(r.odemeTarihi) : (r.tarih||'').substring(0,10);
-    return`<tr><td><div class="tad">${r.ad}</div></td><td class="thiz">${r.hizmet}</td><td class="tfyt">${f.toLocaleString('tr-TR')}₺</td><td style="font-size:.72rem">${yont}</td><td>${tipBadge}</td><td class="ttar">${gosterTarih}</td><td style="font-size:.7rem;color:var(--text2)">${r.tip==='shop'?'—':p?p.ad:'—'}</td></tr>`;
+    return`<tr><td><div class="tad">${r.ad}</div></td><td class="thiz">${r.hizmet}</td><td class="tfyt">${f.toLocaleString('tr-TR')}₺</td><td style="font-size:.72rem">${yont}</td><td>${tipBadge}</td><td class="ttar">${r.odemeTarihi?r.odemeTarihi.substring(0,10):r.tarih}</td><td style="font-size:.7rem;color:var(--text2)">${r.tip==='shop'?'—':p?p.ad:'—'}</td></tr>`;
   }).join('');
 
   // Hizmet dağılım
