@@ -984,6 +984,7 @@ function dbToLocal(r){
     odemeYontemi: r.odeme_yontemi||'nakit',
     tip: r.tip||'normal',
     tarihOlustur: r.created_at||new Date().toISOString(),
+    odemeTarihi: r.odeme_tarihi||null,
     personelId: r.personel_id||null,
   };
 }
@@ -1379,12 +1380,13 @@ async function odemeOnayla(){
     const manuelUcret=parseInt(document.getElementById('manuelUcret').value)||0;
     const odemeYontemi=document.querySelector('input[name="odemeYontemi"]:checked')?.value||'nakit';
     if(!manuelUcret){toast('Lütfen ücret giriniz.','hata');return;}
-    await sRest(`rezervasyonlar?id=eq.${bekleyenOdemeId}`,{method:'PATCH',body:JSON.stringify({odeme_alindi:true,fiyat:manuelUcret,odeme_yontemi:odemeYontemi})});
+    await sRest(`rezervasyonlar?id=eq.${bekleyenOdemeId}`,{method:'PATCH',body:JSON.stringify({odeme_alindi:true,fiyat:manuelUcret,odeme_yontemi:odemeYontemi,odeme_tarihi:new Date().toISOString()})});
     const r=TRZ.find(x=>x.id===bekleyenOdemeId);
     if(r){
       r.odemeAlindi=true;
       r.fiyat=manuelUcret;
       r.odemeYontemi=odemeYontemi;
+      r.odemeTarihi=new Date().toISOString();
       AKTLOG.unshift({tip:'g',txt:`<strong>${r.ad}</strong> — ${manuelUcret.toLocaleString('tr-TR')}₺ ${odemeYontemi} ödeme alındı`,z:new Date()});
     }
     bekleyenOdemeId=null;
@@ -2143,7 +2145,9 @@ function ciroRender(){
   let hizOdemeler=TRZ.filter(r=>{
     if(r.tip==='shop')return false;
     if(!r.odemeAlindi||r.durum!=='onaylandi')return false;
-    const t=new Date((r.tarih||'').substring(0,10)+'T12:00');
+    const tarihStr=(r.odemeTarihi||r.tarih||'').substring(0,10);
+    if(!tarihStr)return false;
+    const t=new Date(tarihStr+'T12:00');
     return t>=bas&&t<=bit;
   }).map(r=>({...r,tip:'hizmet'}));
   // Shop siparişleri
@@ -2187,7 +2191,7 @@ function ciroRender(){
     const f=fHesapla(r);
     const yont=(r.odemeYontemi||'nakit')==='kart'?'💳 Kart':'💵 Nakit';
     const tipBadge=r.tip==='shop'?'<span style="font-size:.44rem;background:var(--bbg);color:var(--blue);border:1px solid var(--bbdr);padding:2px 6px;border-radius:8px;font-weight:600">🛍 Shop</span>':'<span style="font-size:.44rem;background:var(--gbg);color:var(--green);border:1px solid var(--gbdr);padding:2px 6px;border-radius:8px;font-weight:600">✂️ Hizmet</span>';
-    return`<tr><td><div class="tad">${r.ad}</div></td><td class="thiz">${r.hizmet}</td><td class="tfyt">${f.toLocaleString('tr-TR')}₺</td><td style="font-size:.72rem">${yont}</td><td>${tipBadge}</td><td class="ttar">${r.tarih}</td><td style="font-size:.7rem;color:var(--text2)">${r.tip==='shop'?'—':p?p.ad:'—'}</td></tr>`;
+    return`<tr><td><div class="tad">${r.ad}</div></td><td class="thiz">${r.hizmet}</td><td class="tfyt">${f.toLocaleString('tr-TR')}₺</td><td style="font-size:.72rem">${yont}</td><td>${tipBadge}</td><td class="ttar">${r.odemeTarihi?r.odemeTarihi.substring(0,10):r.tarih}</td><td style="font-size:.7rem;color:var(--text2)">${r.tip==='shop'?'—':p?p.ad:'—'}</td></tr>`;
   }).join('');
 
   // Hizmet dağılım
