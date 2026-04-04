@@ -94,14 +94,43 @@ body{overflow-x:hidden}
 .ozellik-key{color:var(--dim);font-weight:300}
 .ozellik-val{color:var(--black);font-weight:500;text-align:right}
 
-/* ── BENZERİ ÜRÜNLER ── */
-.benzer-section{padding:80px 56px}
-.benzer-baslik{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:36px}
+/* ── ÖNERİLEN ÜRÜNLER SLİDER ── */
+.benzer-section{padding:80px 0;background:var(--off);overflow:hidden}
+.benzer-baslik{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:36px;padding:0 56px}
 .benzer-baslik h2{font-family:'Playfair Display',serif;font-size:clamp(1.4rem,2.5vw,1.8rem);font-weight:700;color:var(--black)}
 .benzer-baslik h2 em{font-style:italic;font-weight:400;color:var(--dim)}
 .benzer-baslik a{font-size:.56rem;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);text-decoration:none;transition:color .2s}
 .benzer-baslik a:hover{color:var(--black)}
-.benzer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+
+.benzer-slider-outer{padding:0 56px;position:relative}
+.benzer-slider-wrap{overflow:hidden;width:100%}
+.benzer-slider-track{display:flex;gap:16px;transition:transform .5s cubic-bezier(.4,0,.2,1)}
+.benzer-slider-track .urun-kart{flex-shrink:0;width:calc(33.333% - 11px)}
+
+.benzer-nav{display:flex;gap:10px;padding:24px 56px 0;justify-content:flex-end}
+.benzer-nav-btn{width:36px;height:36px;border:1px solid rgba(8,8,8,.2);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.benzer-nav-btn:hover{background:var(--black);border-color:var(--black)}
+.benzer-nav-btn:hover svg{stroke:#fff}
+.benzer-nav-btn svg{width:14px;height:14px;stroke:var(--black);stroke-width:2;fill:none}
+.benzer-dots{display:flex;gap:8px;padding:20px 56px 0}
+.benzer-dot{width:24px;height:3px;background:rgba(8,8,8,.15);cursor:pointer;transition:all .2s;border:none;padding:0}
+.benzer-dot.ak{background:var(--black);width:40px}
+
+@media(max-width:900px){
+  .benzer-slider-track .urun-kart{width:calc(50% - 8px)}
+  .benzer-baslik{padding:0 24px}
+  .benzer-slider-outer{padding:0 24px}
+  .benzer-nav{padding:20px 24px 0}
+  .benzer-dots{padding:16px 24px 0}
+}
+@media(max-width:540px){
+  .benzer-slider-track .urun-kart{width:calc(80vw)}
+  .benzer-baslik{padding:0 16px}
+  .benzer-slider-outer{padding:0 16px}
+  .benzer-nav{padding:16px 16px 0}
+  .benzer-dots{padding:12px 16px 0}
+  .benzer-section{padding:52px 0}
+}
 
 /* ── ÜRÜN KARTI (shop.html'den kopyalandı) ── */
 .urun-kart{background:#fff;border:1px solid #e8e4dc;display:flex;flex-direction:column;overflow:hidden;transition:box-shadow .25s;cursor:pointer;text-decoration:none;color:inherit}
@@ -412,15 +441,26 @@ function sayfaRender(u, benzerler) {
       <span class="ozellik-val">${o.v}</span>
     </div>`).join('');
 
-  // Benzer ürünler
+  // Önerilen ürünler slider
   const benzerHtml = benzerler.length > 0
     ? `<section class="benzer-section">
         <div class="benzer-baslik">
-          <h2>Benzer <em>Ürünler</em></h2>
+          <h2>Önerilen <em>Ürünler</em></h2>
           <a href="/shop">Tümünü gör →</a>
         </div>
-        <div class="benzer-grid">
-          ${benzerler.map(b => urunKartHtml(b)).join('')}
+        <div class="benzer-slider-outer">
+          <div class="benzer-slider-wrap" id="benzerWrap">
+            <div class="benzer-slider-track" id="benzerTrack">
+              ${benzerler.map(b => urunKartHtml(b)).join('')}
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 56px 0">
+          <div class="benzer-dots" id="benzerDots" style="padding:0"></div>
+          <div class="benzer-nav">
+            <button class="benzer-nav-btn" id="benzerPrev"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+            <button class="benzer-nav-btn" id="benzerNext"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>
+          </div>
         </div>
       </section>` : '';
 
@@ -631,14 +671,49 @@ async function sayfaYukle() {
     }
     const u = arr[0];
 
-    // Benzer ürünleri çek (aynı kategori, farklı ürün, yayında)
+    // Önerilen ürünleri çek (mevcut ürün hariç tümü, yayında)
     const benzerRes = await fetch(
-      `${SUPA_URL}/rest/v1/shop?kat=eq.${encodeURIComponent(u.kat)}&id=neq.${id}&yayinda=eq.true&limit=3&order=created_at.desc`,
+      `${SUPA_URL}/rest/v1/shop?id=neq.${id}&yayinda=eq.true&order=created_at.desc`,
       { headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY } }
     );
     const benzerler = benzerRes.ok ? await benzerRes.json() : [];
 
     sayfaRender(u, benzerler);
+
+    // ── BENZERİ ÜRÜNLER SLİDER
+    setTimeout(() => {
+      const track = document.getElementById('benzerTrack');
+      const wrap = document.getElementById('benzerWrap');
+      const dotsEl = document.getElementById('benzerDots');
+      if (!track || !wrap || benzerler.length === 0) return;
+
+      const perView = window.innerWidth <= 540 ? 1 : window.innerWidth <= 900 ? 2 : 3;
+      let bPos = 0;
+      const maxPos = Math.max(0, benzerler.length - perView);
+
+      // Dots oluştur
+      const dotSayisi = maxPos + 1;
+      if (dotsEl) {
+        dotsEl.innerHTML = Array.from({length: dotSayisi}, (_, i) =>
+          `<button class="benzer-dot${i===0?' ak':''}" onclick="benzerGit(${i})"></button>`
+        ).join('');
+      }
+
+      window.benzerGit = function(idx) {
+        bPos = Math.max(0, Math.min(maxPos, idx));
+        const kartW = track.children[0] ? track.children[0].offsetWidth + 16 : 0;
+        track.style.transform = `translateX(-${bPos * kartW}px)`;
+        document.querySelectorAll('#benzerDots .benzer-dot').forEach((d,i) => d.classList.toggle('ak', i===bPos));
+      };
+
+      document.getElementById('benzerPrev')?.addEventListener('click', () => benzerGit(bPos - 1));
+      document.getElementById('benzerNext')?.addEventListener('click', () => benzerGit(bPos + 1));
+
+      // Otomatik kaydırma
+      let bTimer = setInterval(() => benzerGit(bPos >= maxPos ? 0 : bPos + 1), 3500);
+      wrap.addEventListener('mouseenter', () => clearInterval(bTimer));
+      wrap.addEventListener('mouseleave', () => { bTimer = setInterval(() => benzerGit(bPos >= maxPos ? 0 : bPos + 1), 3500); });
+    }, 100);
 
     // ── GALERİ SWIPE DESTEĞİ
     const galeriWrap = document.getElementById('galeriAnaWrap');
