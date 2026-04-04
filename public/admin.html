@@ -354,6 +354,14 @@ tbody td{padding:10px 13px;vertical-align:middle}
 .kchk{display:flex;align-items:center;justify-content:center}
 .kchk input{accent-color:var(--red);width:14px;height:14px;cursor:pointer}
 
+/* ─── HİZMETLER GRID ─── */
+.hizgrid{display:grid;grid-template-columns:1fr 285px;gap:14px;align-items:start}
+.hizform-col{display:flex;flex-direction:column;gap:14px}
+@media(max-width:768px){
+  #hiz-desktop-wrap{display:none}
+  #hiz-mobile-list{display:block!important}
+}
+
 /* ─── RESPONSIVE ─── */
 @media(max-width:1100px){
   .sgrid{grid-template-columns:1fr 1fr}
@@ -363,6 +371,7 @@ tbody td{padding:10px 13px;vertical-align:middle}
   .shopgrid{grid-template-columns:1fr}
   .portgrid{grid-template-columns:1fr}
   .agrid{grid-template-columns:1fr}
+  .hizgrid{grid-template-columns:1fr}
   .shopsg{grid-template-columns:repeat(2,1fr)}
   .port-stat-row{grid-template-columns:repeat(3,1fr)}
 }
@@ -378,16 +387,25 @@ tbody td{padding:10px 13px;vertical-align:middle}
   .page{padding:14px}
   .crow{grid-template-columns:68px 1fr 1fr 36px;gap:6px}
   .sinp{width:150px}.sinp:focus{width:170px}
+  /* Genel tablolar: 5. ve 7. sütun gizle */
   thead th:nth-child(5),tbody td:nth-child(5),
   thead th:nth-child(7),tbody td:nth-child(7){display:none}
+  /* Müşteri tablosu: Geçmiş (7. sütun) her zaman görünsün */
+  #musttable thead th:nth-child(7),
+  #musttable tbody td:nth-child(7){display:table-cell!important}
   .shopsg{grid-template-columns:repeat(2,1fr)}
   .port-stat-row{grid-template-columns:repeat(3,1fr)}
+  .hizgrid{grid-template-columns:1fr}
 }
 @media(max-width:480px){
   .sgrid{grid-template-columns:1fr 1fr}
   .sval{font-size:1.5rem}
+  /* Genel tablolar: 3. ve 6. sütun gizle */
   thead th:nth-child(3),tbody td:nth-child(3),
   thead th:nth-child(6),tbody td:nth-child(6){display:none}
+  /* Müşteri tablosu: Geçmiş (7. sütun) her zaman görünsün */
+  #musttable thead th:nth-child(7),
+  #musttable tbody td:nth-child(7){display:table-cell!important}
   .tkg{min-height:38px}.tgn{font-size:.68rem}
   .shopsg{grid-template-columns:1fr 1fr}
   .port-stat-row{grid-template-columns:1fr 1fr}
@@ -560,7 +578,7 @@ tbody td{padding:10px 13px;vertical-align:middle}
           </div>
           <span id="must-sayi-lbl" style="font-size:.62rem;color:var(--text3);margin-left:4px"></span>
         </div>
-        <div class="cb0 tw"><table><thead><tr><th>Müşteri</th><th>Telefon</th><th>Rezervasyon</th><th>Harcama</th><th>Son Ziyaret</th><th>Favori Hizmet</th><th>Detay</th></tr></thead><tbody id="mustbody"></tbody></table></div>
+        <div class="cb0 tw"><table id="musttable"><thead><tr><th>Müşteri</th><th>Telefon</th><th>Rezervasyon</th><th>Harcama</th><th class="must-th-sonziyaret">Son Ziyaret</th><th class="must-th-favori">Favori Hizmet</th><th>Geçmiş</th></tr></thead><tbody id="mustbody"></tbody></table></div>
       </div>
     </div>
 
@@ -604,9 +622,12 @@ tbody td{padding:10px 13px;vertical-align:middle}
     <!-- ══ HİZMETLER ══ -->
     <div class="page" id="page-hizmetler">
       <div style="margin-bottom:16px"><h2 style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700">Hizmetler <em style="font-style:italic;font-weight:400;color:var(--text3)">& Fiyatlar</em></h2><p style="font-size:.7rem;color:var(--text3);margin-top:3px">Hizmetleri ve fiyatları yönetin</p></div>
-      <div style="display:grid;grid-template-columns:1fr 285px;gap:14px;align-items:start">
-        <div class="card"><div class="ch"><h3>Hizmet Listesi</h3><span style="font-size:.6rem;color:var(--text3)" id="hizlbl"></span></div><div class="cb0 tw"><table><thead><tr><th>Sıra</th><th>Hizmet</th><th>Kategori</th><th>Fiyat Aralığı</th><th>Süre</th><th>Rez.</th><th>İşlem</th></tr></thead><tbody id="hizbody"></tbody></table></div></div>
-        <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="hizgrid">
+        <div class="card"><div class="ch"><h3>Hizmet Listesi</h3><span style="font-size:.6rem;color:var(--text3)" id="hizlbl"></span></div>
+          <div class="cb0 tw" id="hiz-desktop-wrap"><table><thead><tr><th>Sıra</th><th>Hizmet</th><th>Kategori</th><th>Fiyat Aralığı</th><th>Süre</th><th>Rez.</th><th>İşlem</th></tr></thead><tbody id="hizbody"></tbody></table></div>
+          <div id="hiz-mobile-list" style="display:none"></div>
+        </div>
+        <div class="hizform-col">
           <div class="card"><div class="ch"><h3 id="hizformbaslik">Yeni Hizmet</h3></div><div class="cb">
             <div style="display:flex;flex-direction:column;gap:11px">
               <input type="hidden" id="hfid">
@@ -1720,6 +1741,39 @@ function personelSifirla(){
 function hizRender(){
   const e=document.getElementById('hizbody');
   document.getElementById('hizlbl').textContent=hizmetler.length+' hizmet';
+  const isMobile=window.innerWidth<=768;
+  if(isMobile){
+    // Mobil: kart görünümü
+    const container=document.getElementById('hiz-mobile-list');
+    if(container){
+      container.innerHTML=hizmetler.map((h,idx)=>{
+        const rezSayi=TRZ.filter(r=>r.hizmet===h.ad).length;
+        const fiyatStr=h.min===h.max?h.min.toLocaleString('tr-TR')+'₺':h.min.toLocaleString('tr-TR')+' – '+h.max.toLocaleString('tr-TR')+'₺';
+        return`<div style="display:flex;align-items:center;gap:10px;padding:11px 15px;border-bottom:1px solid var(--line)">
+          <div style="display:flex;flex-direction:column;gap:2px;flex-shrink:0">
+            <button class="bsm bdet" onclick="hizSirala('${h.id}',-1)" ${idx===0?'disabled style="opacity:.3"':''}>↑</button>
+            <button class="bsm bdet" onclick="hizSirala('${h.id}',1)" ${idx===hizmetler.length-1?'disabled style="opacity:.3"':''}>↓</button>
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:.78rem;font-weight:500;color:var(--text)">${h.ad}</div>
+            <div style="display:flex;align-items:center;gap:6px;margin-top:3px;flex-wrap:wrap">
+              <span class="badge bo" style="font-size:.46rem">${h.kat}</span>
+              <span style="font-size:.66rem;color:var(--green);font-weight:600">${fiyatStr}</span>
+              <span style="font-size:.62rem;color:var(--text3)">${h.sure} dk</span>
+              ${rezSayi?`<span style="font-size:.6rem;color:var(--blue)">${rezSayi} rez.</span>`:''}
+            </div>
+          </div>
+          <div style="display:flex;gap:4px;flex-shrink:0">
+            <button class="bsm bdet" onclick="hizDuzenle('${h.id}')">Düzenle</button>
+            <button class="bsm bsil" onclick="hizSil('${h.id}')">✕</button>
+          </div>
+        </div>`;
+      }).join('');
+    }
+    e.innerHTML='';
+    return;
+  }
+  // Desktop: tablo görünümü
   e.innerHTML=hizmetler.map(h=>{
     const rezSayi=TRZ.filter(r=>r.hizmet===h.ad).length;
     const fiyatStr=h.min===h.max?h.min.toLocaleString('tr-TR')+'₺':h.min.toLocaleString('tr-TR')+' – '+h.max.toLocaleString('tr-TR')+'₺';
@@ -2550,6 +2604,15 @@ document.addEventListener('DOMContentLoaded', () => {
   if (chk) chk.addEventListener('change', portDurumLblGuncelle);
   // Shop foto grid ilk render
   shopFotoGridGuncelle();
+});
+
+// Ekran boyutu değişince hizmetler listesini yeniden render et
+let _hizResizeTimer=null;
+window.addEventListener('resize',()=>{
+  clearTimeout(_hizResizeTimer);
+  _hizResizeTimer=setTimeout(()=>{
+    if(document.getElementById('page-hizmetler').classList.contains('ak'))hizRender();
+  },150);
 });
 
 // ─── TOAST ───
