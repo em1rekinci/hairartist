@@ -1518,7 +1518,8 @@ async function odemeGit() {
       durum: 'odeme_bekleniyor',
       odeme_alindi: false,
       tip: 'odeme_bekleyen',
-      merchant_oid: merchant_oid   // ← direkt kayıtta gönder
+      odeme_yontemi: 'kart',
+      merchant_oid: merchant_oid
     });
     window._bekleyenRezId = kayit?.id || null;
 

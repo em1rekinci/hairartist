@@ -511,6 +511,7 @@ app.post('/api/paytr-callback', async (req, res) => {
         durum: 'onaylandi',
         odeme_alindi: true,
         tip: 'online',
+        odeme_yontemi: 'kart',
         odeme_tarihi: new Date().toISOString(),
         odeme_turu: payment_type || '',
       });
