@@ -1531,7 +1531,8 @@ async function odemeGit() {
         tarih,
         saat,
         fiyat: parseInt(fiyat),
-        personel
+        personel,
+        rezervasyon_id: window._bekleyenRezId || null  // ← ID'yi gönder
       })
     });
 

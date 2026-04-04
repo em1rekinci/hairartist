@@ -142,7 +142,7 @@ app.post('/rezervasyon', async (req, res) => {
 // ════════════════════════════════════════════════════════════════════════════
 app.post('/api/paytr-token', async (req, res) => {
   try {
-    const { ad, telefon, hizmet, tarih, saat, fiyat } = req.body;
+    const { ad, telefon, hizmet, tarih, saat, fiyat, rezervasyon_id } = req.body;
 
     if (!ad || !telefon || !hizmet || !fiyat) {
       return res.status(400).json({ status: 'fail', reason: 'Eksik bilgi' });
@@ -240,9 +240,15 @@ app.post('/api/paytr-token', async (req, res) => {
       try {
         const SB_URL = 'https://botxnihztrnwzjnrlwzv.supabase.co';
         const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvdHhuaWh6dHJud3pqbnJsd3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MTg4MTAsImV4cCI6MjA5MDA5NDgxMH0.AcX4_2Aykf8J1jln9fvODh2rRffymfEJCAekzmN1ALg';
-        const telTemiz = telefon.replace(/\D/g, '').slice(-10);
+
+        // rezervasyon_id varsa direkt ID ile eşleştir (en güvenilir yol)
+        // yoksa telefon fallback
+        const filtre = rezervasyon_id
+          ? `id=eq.${rezervasyon_id}`
+          : `telefon=ilike.*${telefon.replace(/\D/g, '').slice(-10)}*&durum=eq.odeme_bekleniyor&order=created_at.desc&limit=1`;
+
         await fetch(
-          `${SB_URL}/rest/v1/rezervasyonlar?telefon=ilike.*${telTemiz}*&durum=eq.odeme_bekleniyor&order=created_at.desc&limit=1`,
+          `${SB_URL}/rest/v1/rezervasyonlar?${filtre}`,
           {
             method: 'PATCH',
             headers: {
@@ -254,7 +260,7 @@ app.post('/api/paytr-token', async (req, res) => {
             body: JSON.stringify({ merchant_oid }),
           }
         );
-        console.log('[PayTR] merchant_oid Supabase\'e yazıldı:', merchant_oid);
+        console.log('[PayTR] merchant_oid Supabase\'e yazıldı:', merchant_oid, 'rez_id:', rezervasyon_id || 'telefon ile');
       } catch (e) {
         console.warn('[PayTR] merchant_oid Supabase\'e yazılamadı:', e.message);
       }
@@ -583,18 +589,19 @@ app.post('/api/paytr-callback', async (req, res) => {
     console.log(`[PayTR Callback] merchant_oid=${merchant_oid} status=${status} tutar=${total_amount}`);
 
     if (status === 'success') {
-      // Supabase'de ödeme durumunu güncelle
+      // Supabase'de ödeme durumunu güncelle — admin 'onaylandi' + odeme_alindi:true bekliyor
       await supabaseGuncelle(merchant_oid, {
-        durum: 'odeme_alindi',
+        durum: 'onaylandi',
         odeme_alindi: true,
+        tip: 'online',
         odeme_tarihi: new Date().toISOString(),
         odeme_turu: payment_type || '',
       });
       console.log(`[PayTR Callback] ✓ Ödeme başarılı: ${merchant_oid}`);
     } else {
-      // Ödeme başarısız
+      // Ödeme başarısız — odeme_bekleniyor'a geri al
       await supabaseGuncelle(merchant_oid, {
-        durum: 'odeme_basarisiz',
+        durum: 'odeme_bekleniyor',
         odeme_alindi: false,
         odeme_hata_kodu: failed_reason_code || '',
         odeme_hata_mesaj: failed_reason_msg || '',
@@ -616,7 +623,6 @@ async function supabaseGuncelle(merchant_oid, guncelleme) {
   const SUPABASE_URL = 'https://botxnihztrnwzjnrlwzv.supabase.co';
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvdHhuaWh6dHJud3pqbnJsd3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MTg4MTAsImV4cCI6MjA5MDA5NDgxMH0.AcX4_2Aykf8J1jln9fvODh2rRffymfEJCAekzmN1ALg';
 
-  // merchant_oid'i rezervasyonlar tablosunda eşleştiriyoruz
   const res = await fetch(
     `${SUPABASE_URL}/rest/v1/rezervasyonlar?merchant_oid=eq.${encodeURIComponent(merchant_oid)}`,
     {
@@ -625,15 +631,23 @@ async function supabaseGuncelle(merchant_oid, guncelleme) {
         'Content-Type': 'application/json',
         'apikey': SUPABASE_KEY,
         'Authorization': 'Bearer ' + SUPABASE_KEY,
-        'Prefer': 'return=minimal',
+        'Prefer': 'return=representation',
       },
       body: JSON.stringify(guncelleme),
     }
   );
 
+  const txt = await res.text();
   if (!res.ok) {
-    const hata = await res.text();
-    console.error('[Supabase Güncelle] Hata:', hata);
+    console.error('[Supabase Güncelle] Hata:', txt);
+    return;
+  }
+
+  const rows = txt ? JSON.parse(txt) : [];
+  if (!rows.length) {
+    console.warn(`[Supabase Güncelle] merchant_oid ile kayıt bulunamadı: ${merchant_oid}`);
+  } else {
+    console.log(`[Supabase Güncelle] ✓ ${rows.length} kayıt güncellendi`);
   }
 }
 
