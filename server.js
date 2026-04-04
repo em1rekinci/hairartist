@@ -661,7 +661,7 @@ async function shopSiparisMail(siparis) {
 
         <!-- HEADER -->
         <tr><td style="background:#080808;padding:28px 32px;text-align:center">
-          <div style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#f7f4ef;letter-spacing:.02em">Hair Artist</div>
+          <div style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#f7f4ef;letter-spacing:.02em">Fatih Kurt Hair Artist</div>
           <div style="font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:rgba(247,244,239,.35);margin-top:4px">Shop</div>
         </td></tr>
 
