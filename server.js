@@ -25,6 +25,9 @@ const SHOP_FAIL_URL = `${SITE_URL}/odeme-basarisiz`;
 // ─── GEÇİCİ REZERVASYON DEPOSU ───────────────────────────────────────────────
 const rezervasyonlar = new Map();
 
+// ─── GEÇİCİ SHOP SİPARİŞ DEPOSU (callback gelene kadar) ─────────────────────
+const bekleyenShopSiparisler = new Map();
+
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -408,6 +411,39 @@ app.post('/api/paytr-token-shop', async (req, res) => {
     const tutar_kurus = Math.round(Number(fiyat) * 100);
     const merchant_oid = 'HS' + Date.now(); // HS = Hair Shop
 
+    const urunAdi = sepetItems.length === 1
+      ? sepetItems[0][0]
+      : sepetItems.length + ' ürün';
+
+    // Supabase'e bekleyen olarak yaz — callback gelince onaylandi'ya güncellenir
+    const SB_URL = 'https://botxnihztrnwzjnrlwzv.supabase.co';
+    const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvdHhuaWh6dHJud3pqbnJsd3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MTg4MTAsImV4cCI6MjA5MDA5NDgxMH0.AcX4_2Aykf8J1jln9fvODh2rRffymfEJCAekzmN1ALg';
+    try {
+      await fetch(`${SB_URL}/rest/v1/siparisler`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SB_KEY,
+          'Authorization': 'Bearer ' + SB_KEY,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({
+          musteri_adi:   ad,
+          telefon:       telefon,
+          urun_adi:      urunAdi,
+          toplam:        Number(fiyat),
+          odeme_yontemi: 'kart',
+          durum:         'bekleyen',
+          tarih:         new Date().toISOString().substring(0, 10),
+          created_at:    new Date().toISOString(),
+          merchant_oid:  merchant_oid
+        })
+      });
+      console.log('[PayTR Shop] Supabase bekleyen kayıt oluşturuldu:', merchant_oid);
+    } catch(e) {
+      console.warn('[PayTR Shop] Supabase ön kayıt hatası:', e.message);
+    }
+
     let user_ip =
       req.headers['x-forwarded-for']?.split(',')[0].trim() ||
       req.socket.remoteAddress ||
@@ -512,15 +548,40 @@ app.post('/api/paytr-callback', async (req, res) => {
     console.log(`[PayTR Callback] merchant_oid=${merchant_oid} status=${status} tutar=${total_amount}`);
 
     if (status === 'success') {
-      // Supabase'de ödeme durumunu güncelle
-      await supabaseGuncelle(merchant_oid, {
-        durum: 'onaylandi',
-        odeme_alindi: true,
-        tip: 'online',
-        odeme_yontemi: 'kart',
-        odeme_tarihi: new Date().toISOString(),
-        odeme_turu: payment_type || '',
-      });
+      // Shop siparişi mi? (HS prefix)
+      if (merchant_oid.startsWith('HS')) {
+        const SB_URL = 'https://botxnihztrnwzjnrlwzv.supabase.co';
+        const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvdHhuaWh6dHJud3pqbnJsd3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MTg4MTAsImV4cCI6MjA5MDA5NDgxMH0.AcX4_2Aykf8J1jln9fvODh2rRffymfEJCAekzmN1ALg';
+        const r = await fetch(
+          `${SB_URL}/rest/v1/siparisler?merchant_oid=eq.${encodeURIComponent(merchant_oid)}`,
+          {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              'apikey': SB_KEY,
+              'Authorization': 'Bearer ' + SB_KEY,
+              'Prefer': 'return=minimal'
+            },
+            body: JSON.stringify({ durum: 'onaylandi' })
+          }
+        );
+        if (r.ok) {
+          console.log(`[PayTR Callback] ✓ Shop siparişi onaylandi: ${merchant_oid}`);
+        } else {
+          const t = await r.text();
+          console.error(`[PayTR Callback] Supabase güncelleme hatası: ${t}`);
+        }
+      } else {
+        // Rezervasyon ödemesi
+        await supabaseGuncelle(merchant_oid, {
+          durum: 'onaylandi',
+          odeme_alindi: true,
+          tip: 'online',
+          odeme_yontemi: 'kart',
+          odeme_tarihi: new Date().toISOString(),
+          odeme_turu: payment_type || '',
+        });
+      }
       console.log(`[PayTR Callback] ✓ Ödeme başarılı: ${merchant_oid}`);
     } else {
       // Ödeme başarısız — odeme_basarisiz olarak işaretle (odeme_bekleniyor değil!)
