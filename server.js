@@ -241,26 +241,31 @@ app.post('/api/paytr-token', async (req, res) => {
         const SB_URL = 'https://botxnihztrnwzjnrlwzv.supabase.co';
         const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvdHhuaWh6dHJud3pqbnJsd3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MTg4MTAsImV4cCI6MjA5MDA5NDgxMH0.AcX4_2Aykf8J1jln9fvODh2rRffymfEJCAekzmN1ALg';
 
-        // rezervasyon_id varsa direkt ID ile eşleştir (en güvenilir yol)
-        // yoksa telefon fallback
-        const filtre = rezervasyon_id
-          ? `id=eq.${rezervasyon_id}`
-          : `telefon=ilike.*${telefon.replace(/\D/g, '').slice(-10)}*&durum=eq.odeme_bekleniyor&order=created_at.desc&limit=1`;
-
-        await fetch(
-          `${SB_URL}/rest/v1/rezervasyonlar?${filtre}`,
-          {
-            method: 'PATCH',
-            headers: {
-              'Content-Type': 'application/json',
-              'apikey': SB_KEY,
-              'Authorization': 'Bearer ' + SB_KEY,
-              'Prefer': 'return=minimal',
-            },
-            body: JSON.stringify({ merchant_oid }),
+        // rezervasyon_id ZORUNLU — yoksa callback merchant_oid'i eşleştiremez
+        if (!rezervasyon_id) {
+          console.error('[PayTR] KRİTİK: rezervasyon_id gelmedi! merchant_oid Supabase\'e yazılamadı.');
+        } else {
+          const patchRes = await fetch(
+            `${SB_URL}/rest/v1/rezervasyonlar?id=eq.${rezervasyon_id}`,
+            {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json',
+                'apikey': SB_KEY,
+                'Authorization': 'Bearer ' + SB_KEY,
+                'Prefer': 'return=representation',
+              },
+              body: JSON.stringify({ merchant_oid }),
+            }
+          );
+          const patchTxt = await patchRes.text();
+          const patchRows = patchTxt ? JSON.parse(patchTxt) : [];
+          if (!patchRows.length) {
+            console.error('[PayTR] merchant_oid yazılmak istendi ama eşleşen kayıt YOK! ID:', rezervasyon_id);
+          } else {
+            console.log('[PayTR] merchant_oid Supabase\'e yazıldı ✓', merchant_oid, '→ rez_id:', rezervasyon_id);
           }
-        );
-        console.log('[PayTR] merchant_oid Supabase\'e yazıldı:', merchant_oid, 'rez_id:', rezervasyon_id || 'telefon ile');
+        }
       } catch (e) {
         console.warn('[PayTR] merchant_oid Supabase\'e yazılamadı:', e.message);
       }
@@ -589,7 +594,7 @@ app.post('/api/paytr-callback', async (req, res) => {
     console.log(`[PayTR Callback] merchant_oid=${merchant_oid} status=${status} tutar=${total_amount}`);
 
     if (status === 'success') {
-      // Supabase'de ödeme durumunu güncelle — admin 'onaylandi' + odeme_alindi:true bekliyor
+      // Supabase'de ödeme durumunu güncelle
       await supabaseGuncelle(merchant_oid, {
         durum: 'onaylandi',
         odeme_alindi: true,
@@ -598,10 +603,20 @@ app.post('/api/paytr-callback', async (req, res) => {
         odeme_turu: payment_type || '',
       });
       console.log(`[PayTR Callback] ✓ Ödeme başarılı: ${merchant_oid}`);
+
+      // Admin'e SMS gönder
+      try {
+        await smsSend(ALICI_TELEFON,
+          `ÖDEME ALINDI ✓\nPayTR: ${merchant_oid}\nTutar: ${(Number(total_amount)/100).toFixed(2)} TL\nRezervasyona git → admin paneli`
+        );
+      } catch(smsErr) {
+        console.warn('[PayTR Callback] Admin SMS gönderilemedi:', smsErr.message);
+      }
     } else {
-      // Ödeme başarısız — odeme_bekleniyor'a geri al
+      // Ödeme başarısız — odeme_basarisiz olarak işaretle (odeme_bekleniyor değil!)
+      // Müşteri yeni ödeme yaparsa frontend yeni kayıt oluşturur
       await supabaseGuncelle(merchant_oid, {
-        durum: 'odeme_bekleniyor',
+        durum: 'odeme_basarisiz',
         odeme_alindi: false,
         odeme_hata_kodu: failed_reason_code || '',
         odeme_hata_mesaj: failed_reason_msg || '',
