@@ -102,7 +102,18 @@
 .bilgi-dot{width:24px;height:3px;background:rgba(247,244,239,.15);cursor:pointer;transition:all .2s}
 .bilgi-dot.aktif{background:var(--off);width:40px}
 
-/* ── FOOTER ALANINDA BOŞLUK ── */
+/* ── FOTO SLİDER OKLARI ── */
+.foto-slider-wrap{position:relative;width:100%;height:100%}
+.foto-slider-track{display:flex;height:100%;transition:transform .35s cubic-bezier(.4,0,.2,1)}
+.foto-slider-track img{width:100%;height:100%;object-fit:cover;flex-shrink:0}
+.foto-ok{position:absolute;top:50%;transform:translateY(-50%);width:28px;height:28px;background:rgba(255,255,255,.85);border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:4;transition:background .2s;padding:0}
+.foto-ok:hover{background:#fff}
+.foto-ok svg{width:12px;height:12px;stroke:#080808;stroke-width:2.5;fill:none}
+.foto-ok.prev{left:7px}
+.foto-ok.next{right:7px}
+.foto-dots-wrap{position:absolute;bottom:7px;left:50%;transform:translateX(-50%);display:flex;gap:4px;z-index:4}
+.foto-dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.5);border:none;padding:0;cursor:pointer;transition:background .2s}
+.foto-dot.ak{background:#fff}
 
 
 /* ── WEB: ÇOK SATANLAR KART YÜKSEKLİĞİ ── */
@@ -330,23 +341,45 @@ hamburger.addEventListener('click',()=>{
 window.addEventListener('scroll',()=>{ document.querySelector('nav').classList.toggle('scrolled',window.scrollY>40); },{passive:true});
 
 // ── ÜRÜN KARTI HTML
-function fotoIlkUrl(foto_url) {
-  if (!foto_url) return '';
+function fotoListesi(foto_url) {
+  if (!foto_url) return [];
   try {
     if (foto_url.startsWith('[')) {
       const arr = JSON.parse(foto_url);
-      return Array.isArray(arr) && arr[0] ? arr[0] : foto_url;
+      return Array.isArray(arr) ? arr.filter(Boolean) : [];
     }
   } catch(e) {}
-  return foto_url;
+  return foto_url ? [foto_url] : [];
+}
+
+function fotoIlkUrl(foto_url) {
+  const list = fotoListesi(foto_url);
+  return list[0] || '';
+}
+
+// Her kart için foto indexini sakla
+const _kartFotoIdx = {};
+
+function kartFotoGit(kartId, delta) {
+  const track = document.getElementById('ft-' + kartId);
+  if (!track) return;
+  const toplam = track.children.length;
+  if (toplam <= 1) return;
+  _kartFotoIdx[kartId] = ((_kartFotoIdx[kartId] || 0) + delta + toplam) % toplam;
+  const idx = _kartFotoIdx[kartId];
+  track.style.transform = `translateX(-${idx * 100}%)`;
+  // dots
+  const dots = document.querySelectorAll(`#fd-${kartId} .foto-dot`);
+  dots.forEach((d, i) => d.classList.toggle('ak', i === idx));
 }
 
 function urunKartHtml(u, buyuk=false) {
-  // İndirim badge — sadece indirim alanı dolu ve > 0 ise göster
-  let indirimBadge = '';
-  if (u.indirim && u.indirim > 0) {
-    indirimBadge = `<div class="indirim-badge">%${u.indirim}</div>`;
-  }
+  // İndirim hesapla
+  const indirimYuzde = u.indirim && u.indirim > 0 ? parseInt(u.indirim) : 0;
+  const asılFiyat = u.fiyat || 0;
+  const indirimFiyat = indirimYuzde > 0 ? Math.round(asılFiyat * (1 - indirimYuzde / 100)) : asılFiyat;
+
+  let indirimBadge = indirimYuzde > 0 ? `<div class="indirim-badge">%${indirimYuzde}</div>` : '';
 
   // Stok badge
   let stokBadge = '';
@@ -357,14 +390,35 @@ function urunKartHtml(u, buyuk=false) {
     stokBadge = `<span class="stok-az-badge">Son ${u.stok} adet</span>`;
   }
 
-  const ilkFoto = fotoIlkUrl(u.foto_url);
-  const fotoHtml = ilkFoto
-    ? `<img src="${ilkFoto}" alt="${u.ad}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
-    : '';
-  const placeholder = `<div class="urun-placeholder" ${ilkFoto ? 'style="display:none"' : ''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg><span>Ürün</span></div>`;
+  // Fotoğraf listesi
+  const fotolar = fotoListesi(u.foto_url);
+  const kartId = u.id;
+  _kartFotoIdx[kartId] = 0;
 
-  const fiyatYeni = u.fiyat ? u.fiyat.toLocaleString('tr-TR') + ' ₺' : '— ₺';
-  const fiyatEski = u.fiyat_eski ? `<span class="urun-fiyat-eski">${u.fiyat_eski.toLocaleString('tr-TR')} ₺</span>` : '';
+  let resimHtml = '';
+  if (fotolar.length > 1) {
+    const trackImgs = fotolar.map(f =>
+      `<img src="${f}" alt="${u.ad}" style="width:100%;height:100%;object-fit:cover;flex-shrink:0;min-width:100%">`
+    ).join('');
+    const dots = fotolar.map((_, i) =>
+      `<button class="foto-dot${i===0?' ak':''}" onclick="event.preventDefault();event.stopPropagation();kartFotoGit('${kartId}',0);_kartFotoIdx['${kartId}']=${i};document.getElementById('ft-${kartId}').style.transform='translateX(-${i*100}%)';document.querySelectorAll('#fd-${kartId} .foto-dot').forEach((d,j)=>d.classList.toggle('ak',j===${i}))"></button>`
+    ).join('');
+    resimHtml = `
+      <div class="foto-slider-wrap">
+        <div class="foto-slider-track" id="ft-${kartId}" style="width:${fotolar.length*100}%">${trackImgs}</div>
+        <button class="foto-ok prev" onclick="event.preventDefault();event.stopPropagation();kartFotoGit('${kartId}',-1)"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <button class="foto-ok next" onclick="event.preventDefault();event.stopPropagation();kartFotoGit('${kartId}',1)"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>
+        <div class="foto-dots-wrap" id="fd-${kartId}">${dots}</div>
+      </div>`;
+  } else if (fotolar.length === 1) {
+    resimHtml = `<img src="${fotolar[0]}" alt="${u.ad}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`;
+  }
+  const placeholder = `<div class="urun-placeholder" ${fotolar.length ? 'style="display:none"' : ''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg><span>Ürün</span></div>`;
+
+  // Fiyat gösterimi
+  const fiyatYeniStr = indirimFiyat ? indirimFiyat.toLocaleString('tr-TR') + ' ₺' : '— ₺';
+  const fiyatEskiHtml = indirimYuzde > 0 && asılFiyat
+    ? `<span class="urun-fiyat-eski">${asılFiyat.toLocaleString('tr-TR')} ₺</span>` : '';
 
   const btnHtml = u.stok === 0
     ? `<span class="urun-btn tukendi">Tükendi</span>`
@@ -374,8 +428,7 @@ function urunKartHtml(u, buyuk=false) {
     <a class="urun-kart" href="/urun?id=${u.id}" style="text-decoration:none;color:inherit;cursor:pointer;display:flex;flex-direction:column">
       <div class="urun-resim">
         ${indirimBadge || stokBadge}
-        ${fotoHtml}${placeholder}
-
+        ${resimHtml}${placeholder}
       </div>
       <div class="urun-bilgi">
         <div class="urun-ad">${u.ad}</div>
@@ -383,8 +436,8 @@ function urunKartHtml(u, buyuk=false) {
       </div>
       <div class="urun-alt">
         <div class="urun-fiyat-grup">
-          <span class="urun-fiyat-yeni">${fiyatYeni}</span>
-          ${fiyatEski}
+          <span class="urun-fiyat-yeni">${fiyatYeniStr}</span>
+          ${fiyatEskiHtml}
         </div>
         ${btnHtml}
       </div>
