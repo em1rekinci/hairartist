@@ -126,12 +126,12 @@ button,input,select,textarea{font-family:'Montserrat',sans-serif}
 .cb0{padding:0}
 
 /* ─── STAT ─── */
-.sgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:14px}
+.sgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:14px;align-items:start}
 .sc{background:var(--white);border:1px solid var(--line);border-radius:var(--r);padding:16px 14px;position:relative;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04)}
 .sct{height:3px;position:absolute;top:0;left:0;right:0;border-radius:var(--r) var(--r) 0 0}
 .sc.g .sct{background:var(--green)}.sc.y .sct{background:var(--yellow)}.sc.b .sct{background:var(--blue)}.sc.r .sct{background:var(--red)}
 .slbl2{font-size:.5rem;letter-spacing:.18em;text-transform:uppercase;color:var(--text3);margin-bottom:7px;display:block}
-.sval{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;line-height:1;color:var(--text)}
+.sval{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;line-height:1;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sval.g{color:var(--green)}.sval.y{color:var(--yellow)}.sval.b{color:var(--blue)}.sval.r{color:var(--red)}
 .ssub{font-size:.6rem;color:var(--text3);margin-top:5px}
 
@@ -295,8 +295,8 @@ tbody td{padding:10px 13px;vertical-align:middle}
 .pdk.aktif{background:var(--green)}.pdk.pasif{background:var(--text3)}
 
 /* ─── SHOP ─── */
-.shopsg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
-.shopmc{background:var(--white);border:1px solid var(--line);border-radius:var(--r);padding:13px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.shopsg{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px;align-items:start}
+.shopmc{background:var(--white);border:1px solid var(--line);border-radius:var(--r);padding:13px;box-shadow:0 1px 3px rgba(0,0,0,.04);overflow:hidden}
 .shopgrid{display:grid;grid-template-columns:1fr 285px;gap:14px;align-items:start}
 .usat{display:flex;align-items:center;gap:10px;padding:11px 15px;border-bottom:1px solid var(--line);transition:background .1s}
 .usat:hover{background:var(--bg)}.usat:last-child{border-bottom:none}
@@ -311,7 +311,7 @@ tbody td{padding:10px 13px;vertical-align:middle}
 
 /* ─── PORTFOLİO ─── */
 .portgrid{display:grid;grid-template-columns:1fr 285px;gap:14px;align-items:start}
-.port-stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+.port-stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px;align-items:start}
 .port-stat{background:var(--white);border:1px solid var(--line);border-radius:var(--r);padding:13px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
 .port-foto-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;padding:16px}
 .port-kart{background:var(--bg);border:1px solid var(--line);border-radius:4px;overflow:hidden;position:relative;transition:box-shadow .2s}
@@ -384,7 +384,7 @@ tbody td{padding:10px 13px;vertical-align:middle}
   thead th:nth-child(3),tbody td:nth-child(3),
   thead th:nth-child(6),tbody td:nth-child(6){display:none}
   .tkg{min-height:38px}.tgn{font-size:.68rem}
-  .shopsg{grid-template-columns:1fr}
+  .shopsg{grid-template-columns:1fr 1fr}
 }
 </style>
 </head>
@@ -697,7 +697,7 @@ tbody td{padding:10px 13px;vertical-align:middle}
       <div style="margin-bottom:16px"><h2 style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700">Shop <em style="font-style:italic;font-weight:400;color:var(--text3)">Yönetimi</em></h2><p style="font-size:.7rem;color:var(--text3);margin-top:3px">Ürün kataloğunu ve stoklarını yönetin</p></div>
 
       <!-- Stats -->
-      <div class="shopsg" style="grid-template-columns:repeat(4,1fr)">
+      <div class="shopsg">
         <div class="shopmc"><span class="slbl2">Toplam Ürün</span><div class="sval" id="shopturun" style="font-size:1.55rem">—</div></div>
         <div class="shopmc"><span class="slbl2">Yayında</span><div class="sval g" id="shopyayinda" style="font-size:1.55rem">—</div></div>
         <div class="shopmc"><span class="slbl2">Stok Uyarısı</span><div class="sval y" id="shopstok" style="font-size:1.55rem">—</div></div>
