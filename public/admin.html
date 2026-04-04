@@ -2284,7 +2284,8 @@ function ciroRender(){
   let hizOdemeler=TRZ.filter(r=>{
     if(r.tip==='shop')return false;
     if(!r.odemeAlindi||r.durum!=='onaylandi')return false;
-    const tarihStr=(r.odemeTarihi||r.tarih||'').substring(0,10);
+    // Sadece odemeTarihi kullan — randevu tarihi değil ödeme tarihi önemli
+    const tarihStr=(r.odemeTarihi||'').substring(0,10);
     if(!tarihStr)return false;
     const t=new Date(tarihStr+'T12:00');
     return t>=bas&&t<=bit;
@@ -2324,7 +2325,7 @@ function ciroRender(){
   // Tablo
   const tbody=document.getElementById('c-tbody');
   if(!odemeler.length){tbody.innerHTML='<tr><td colspan="6" class="bos">Bu dönem için ödeme bulunamadı.</td></tr>';return;}
-  const sirali=[...odemeler].sort((a,b)=>new Date(b.tarih)-new Date(a.tarih));
+  const sirali=[...odemeler].sort((a,b)=>new Date(b.odemeTarihi||b.tarih)-new Date(a.odemeTarihi||a.tarih));
   tbody.innerHTML=sirali.map(r=>{
     const p=personel.find(x=>x.id===r.personelId)||personel.find(x=>x.ad===r.personelId);
     const f=fHesapla(r);
