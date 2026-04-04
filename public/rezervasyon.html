@@ -1860,13 +1860,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
 async function hizmetleriYukle() {
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/hizmetler?select=*&order=sira.asc,created_at.asc`, {
-      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
-    });
-    if (!res.ok) return;
-    const liste = await res.json();
+    const [hizRes, ayarRes] = await Promise.all([
+      fetch(`${SUPABASE_URL}/rest/v1/hizmetler?select=*&order=sira.asc,created_at.asc`, {
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+      }),
+      fetch(`${SUPABASE_URL}/rest/v1/ayarlar?key=eq.indirim_yuzde&select=value`, {
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+      })
+    ]);
+    if (!hizRes.ok) return;
+    const liste = await hizRes.json();
     if (!liste.length) return;
-    ['n', 'o'].forEach(prefix => hizmetDropdownOlustur(prefix, liste));
+
+    // İndirim oranını al
+    let indirimYuzde = 0;
+    if (ayarRes.ok) {
+      const ayarlar = await ayarRes.json();
+      indirimYuzde = ayarlar.length ? parseInt(ayarlar[0].value) || 0 : 0;
+    }
+    window._indirimYuzde = indirimYuzde;
+
+    ['n', 'o'].forEach(prefix => hizmetDropdownOlustur(prefix, liste, indirimYuzde));
   } catch(e) {
     console.warn('Hizmetler yüklenemedi:', e);
   }
@@ -1877,24 +1891,43 @@ function hizmetFiyatStr(min, max) {
   return min.toLocaleString('tr-TR') + ' – ' + max.toLocaleString('tr-TR') + '₺';
 }
 
-function hizmetDropdownOlustur(prefix, liste) {
+function hizmetDropdownOlustur(prefix, liste, indirimYuzde = 0) {
   const dd = document.getElementById(prefix + '-cs-dropdown');
   if (!dd) return;
   const fn = prefix === 'n' ? 'hizmetSecN' : 'hizmetSecO';
   dd.innerHTML = liste.map(h => {
-    const fiyatStr = hizmetFiyatStr(h.min_fiyat || 0, h.max_fiyat || 0);
     const adSafe = h.ad.replace(/'/g, "\\'").replace(/"/g, '&quot;');
     const sure = h.sure || 60;
     const minFiyat = h.min_fiyat || 0;
     const maxFiyat = h.max_fiyat || 0;
-    
+
+    if (indirimYuzde > 0) {
+      const indMin = Math.round(minFiyat * (1 - indirimYuzde / 100));
+      const indMax = Math.round(maxFiyat * (1 - indirimYuzde / 100));
+      const eskiStr = hizmetFiyatStr(minFiyat, maxFiyat);
+      const yeniStr = hizmetFiyatStr(indMin, indMax);
+
+      if (prefix === 'n') {
+        return `<div class="cs-option" onclick="${fn}(this,'${adSafe}',${indMin},${indMax},${sure})">
+          <span class="cs-ad">${h.ad} <span style="font-size:.6rem;background:#c8a96e22;color:#c8a96e;border:1px solid #c8a96e44;border-radius:8px;padding:1px 7px;font-weight:600">%${indirimYuzde} İndirim</span></span>
+          <span class="cs-fiyatlar"><s style="color:var(--text3,#888);font-size:.72rem;font-weight:400">${eskiStr}</s> <span class="cs-indirimli">${yeniStr}</span></span>
+        </div>`;
+      } else {
+        return `<div class="cs-option" onclick="${fn}(this,'${adSafe}',${indMax},${sure})">
+          <span class="cs-ad">${h.ad} <span style="font-size:.6rem;background:#c8a96e22;color:#c8a96e;border:1px solid #c8a96e44;border-radius:8px;padding:1px 7px;font-weight:600">%${indirimYuzde} İndirim</span></span>
+          <span class="cs-fiyatlar"><s style="color:var(--text3,#888);font-size:.72rem;font-weight:400">${eskiStr}</s> <span class="cs-indirimli">${yeniStr}</span></span>
+        </div>`;
+      }
+    }
+
+    // İndirim yok — normal gösterim
+    const fiyatStr = hizmetFiyatStr(minFiyat, maxFiyat);
     if (prefix === 'n') {
       return `<div class="cs-option" onclick="${fn}(this,'${adSafe}',${minFiyat},${maxFiyat},${sure})">
         <span class="cs-ad">${h.ad}</span>
         <span class="cs-fiyatlar"><span class="cs-indirimli">${fiyatStr}</span></span>
       </div>`;
     } else {
-      // Ödeme formu için fiyat tek bir değer (max_fiyat kullan)
       return `<div class="cs-option" onclick="${fn}(this,'${adSafe}',${maxFiyat},${sure})">
         <span class="cs-ad">${h.ad}</span>
         <span class="cs-fiyatlar"><span class="cs-indirimli">${fiyatStr}</span></span>
