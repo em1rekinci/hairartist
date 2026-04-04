@@ -501,6 +501,28 @@ async function odemeBaslat(){
   btn.classList.add('yukleniyor');
   btn.disabled=true;
 
+  // Sipariş verilerini sessionStorage'a kaydet (PayTR success sonrası Supabase'e yazılacak)
+  const siparisVerisi = {
+    musteri_adi: ad,
+    telefon: tel,
+    email: email,
+    adres: adres,
+    urunler: JSON.stringify(sepet.map(item => {
+      const u = urunMap[item.id] || {};
+      return { id: item.id, ad: u.ad || item.ad || 'Ürün', adet: item.adet, fiyat: u.fiyat || 0 };
+    })),
+    urun_adi: sepet.length === 1
+      ? (urunMap[sepet[0].id]?.ad || 'Shop Ürünü')
+      : sepet.length + ' ürün',
+    toplam: toplam,
+    kargo: kargo,
+    ara_toplam: araToplam,
+    odeme_yontemi: 'kart',
+    durum: 'onaylandi',
+    tarih: new Date().toISOString().substring(0, 10)
+  };
+  sessionStorage.setItem('bekleyen_siparis', JSON.stringify(siparisVerisi));
+
   try{
     const res=await fetch('/api/paytr-token-shop',{
       method:'POST',
@@ -592,12 +614,49 @@ function sozlesmeKapat(e) {
 }
 
 // PayTR'dan başarı/hata mesajı dinle
-window.addEventListener('message',function(e){
+window.addEventListener('message',async function(e){
   if(e.data==='success'){
     paytrKapat();
+    // Supabase'e sipariş kaydet
+    try{
+      const sv = sessionStorage.getItem('bekleyen_siparis');
+      if(sv){
+        const siparis = JSON.parse(sv);
+        await fetch(`${SUPA_URL}/rest/v1/siparisler`,{
+          method:'POST',
+          headers:{
+            'apikey': SUPA_KEY,
+            'Authorization': 'Bearer ' + SUPA_KEY,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify({
+            musteri_adi: siparis.musteri_adi,
+            musteri_ad:  siparis.musteri_adi,
+            telefon:     siparis.telefon,
+            email:       siparis.email,
+            adres:       siparis.adres,
+            urun_adi:    siparis.urun_adi,
+            urunler:     siparis.urunler,
+            toplam:      siparis.toplam,
+            tutar:       siparis.toplam,
+            fiyat:       siparis.toplam,
+            kargo:       siparis.kargo,
+            odeme_yontemi: 'kart',
+            durum:       'onaylandi',
+            tarih:       siparis.tarih,
+            created_at:  new Date().toISOString()
+          })
+        });
+        sessionStorage.removeItem('bekleyen_siparis');
+      }
+    }catch(err){
+      console.warn('Sipariş kaydedilemedi:', err);
+    }
     localStorage.removeItem('ha_sepet');
-    window.location.href='/odeme-basarili';
+    window.location.href='/odeme-basarili-shop';
   }else if(e.data==='fail'){
+    sessionStorage.removeItem('bekleyen_siparis');
     paytrKapat();
     window.location.href='/odeme-basarisiz';
   }

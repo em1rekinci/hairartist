@@ -17,8 +17,10 @@ const MERCHANT_KEY  = "aPqa74hp7yn9uXHg";
 const MERCHANT_SALT = "Z7uQTT2ZTeYFxbsN";
 
 // OK_URL ve FAIL_URL doğrudan SITE_URL'den türetiliyor — Railway'de ayrı env gerekmez
-const OK_URL   = `${SITE_URL}/odeme-basarili`;
-const FAIL_URL = `${SITE_URL}/odeme-basarisiz`;
+const OK_URL        = `${SITE_URL}/odeme-basarili`;
+const FAIL_URL      = `${SITE_URL}/odeme-basarisiz`;
+const SHOP_OK_URL   = `${SITE_URL}/odeme-basarili-shop`;
+const SHOP_FAIL_URL = `${SITE_URL}/odeme-basarisiz`;
 
 // ─── GEÇİCİ REZERVASYON DEPOSU ───────────────────────────────────────────────
 const rezervasyonlar = new Map();
@@ -76,6 +78,10 @@ app.get('/odeme-basarili', (req, res) => {
     '#10b981' // yeşil
   );
   res.send(html);
+});
+
+app.get('/odeme-basarili-shop', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'odeme-basarili-shop.html'));
 });
 
 app.get('/odeme-basarisiz', (req, res) => {
@@ -451,8 +457,8 @@ app.post('/api/paytr-token-shop', async (req, res) => {
       user_name:         `${isim} ${soyad}`,
       user_address:      adres ? adres.replace(/[^a-zA-Z0-9\s\.,\/\-]/g, ' ').substring(0, 100) : 'Istanbul',
       user_phone:        tel,
-      merchant_ok_url:   OK_URL,
-      merchant_fail_url: FAIL_URL,
+      merchant_ok_url:   SHOP_OK_URL,
+      merchant_fail_url: SHOP_FAIL_URL,
       timeout_limit:     '30',
       currency:          currency,
       test_mode:         test_mode,

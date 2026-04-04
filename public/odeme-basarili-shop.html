@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Siparişiniz Alındı — Hair Artist</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+body{
+  background:#f4f1ec;
+  color:#080808;
+  font-family:'Montserrat',sans-serif;
+  font-weight:300;
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ── NAV BOŞLUK ── */
+.nav-spacer{height:70px}
+
+/* ── SAYFA ── */
+.basarili-page{
+  min-height:calc(100vh - 70px);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:60px 24px;
+}
+
+/* ── KART ── */
+.basarili-kart{
+  background:#fff;
+  border:1px solid #e8e4dc;
+  width:100%;
+  max-width:520px;
+  overflow:hidden;
+}
+
+/* ── ÜSTTÜK ── */
+.kart-ust{
+  background:#080808;
+  padding:44px 40px 40px;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+.kart-ust::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:radial-gradient(ellipse at 50% 120%, rgba(200,255,0,.08) 0%, transparent 65%);
+  pointer-events:none;
+}
+.check-circle{
+  width:64px;
+  height:64px;
+  border:1.5px solid rgba(200,255,0,.35);
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin:0 auto 22px;
+  position:relative;
+}
+.check-circle svg{
+  width:26px;
+  height:26px;
+  color:#c8ff00;
+}
+.check-ping{
+  position:absolute;
+  inset:-6px;
+  border-radius:50%;
+  border:1px solid rgba(200,255,0,.15);
+  animation:ping 2.4s ease-out infinite;
+}
+@keyframes ping{
+  0%{transform:scale(1);opacity:.6}
+  100%{transform:scale(1.35);opacity:0}
+}
+.kart-ust h1{
+  font-family:'Playfair Display',serif;
+  font-size:1.65rem;
+  font-weight:700;
+  color:#f7f4ef;
+  line-height:1.15;
+  margin-bottom:8px;
+}
+.kart-ust h1 em{
+  font-style:italic;
+  font-weight:400;
+  color:rgba(247,244,239,.4);
+}
+.kart-ust p{
+  font-size:.72rem;
+  color:rgba(247,244,239,.4);
+  line-height:1.7;
+  letter-spacing:.03em;
+}
+
+/* ── DETAY SATIRLARI ── */
+.kart-detay{padding:28px 32px}
+
+.detay-satir{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:16px;
+  padding:10px 0;
+  border-bottom:1px solid #ede9e2;
+}
+.detay-satir:last-child{border-bottom:none}
+.detay-key{
+  font-size:.52rem;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:#9a9490;
+  padding-top:2px;
+  flex-shrink:0;
+}
+.detay-val{
+  font-size:.78rem;
+  color:#080808;
+  text-align:right;
+  font-weight:400;
+  line-height:1.5;
+}
+.detay-val strong{
+  font-weight:600;
+}
+.detay-val.fiyat{
+  font-family:'Playfair Display',serif;
+  font-size:1.05rem;
+  font-weight:700;
+  font-style:italic;
+  color:#080808;
+}
+
+/* ── AYIRICI ── */
+.kart-ayirici{height:1px;background:#ede9e2;margin:0 32px}
+
+/* ── BİLGİ BLOĞU ── */
+.kart-bilgi{
+  padding:20px 32px 24px;
+  background:#faf8f4;
+  border-top:1px solid #ede9e2;
+}
+.bilgi-item{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  padding:8px 0;
+}
+.bilgi-item:not(:last-child){border-bottom:1px solid #ede9e2}
+.bilgi-ikon{
+  width:28px;
+  height:28px;
+  background:#fff;
+  border:1px solid #e8e4dc;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+  margin-top:1px;
+}
+.bilgi-ikon svg{width:13px;height:13px;color:#9a9490}
+.bilgi-metin{
+  font-size:.68rem;
+  color:#6a6560;
+  line-height:1.65;
+}
+.bilgi-metin strong{
+  color:#080808;
+  font-weight:500;
+  display:block;
+  margin-bottom:1px;
+  font-size:.7rem;
+}
+
+/* ── BUTONLAR ── */
+.kart-butonlar{
+  padding:20px 32px 28px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.btn-ana{
+  display:block;
+  width:100%;
+  background:#080808;
+  color:#f7f4ef;
+  border:none;
+  padding:13px;
+  font-size:.58rem;
+  font-weight:600;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  text-align:center;
+  text-decoration:none;
+  cursor:pointer;
+  transition:opacity .2s;
+  font-family:'Montserrat',sans-serif;
+}
+.btn-ana:hover{opacity:.85}
+.btn-ik{
+  display:block;
+  width:100%;
+  background:transparent;
+  color:#9a9490;
+  border:1px solid #e8e4dc;
+  padding:11px;
+  font-size:.56rem;
+  font-weight:500;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  text-align:center;
+  text-decoration:none;
+  cursor:pointer;
+  transition:all .2s;
+  font-family:'Montserrat',sans-serif;
+}
+.btn-ik:hover{border-color:#9a9490;color:#080808}
+
+/* ── SİPARİŞ NO ── */
+.siparis-no-wrap{
+  text-align:center;
+  padding:18px 32px 0;
+}
+.siparis-no{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  background:#f4f1ec;
+  border:1px solid #e8e4dc;
+  padding:7px 14px;
+  font-size:.58rem;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:#9a9490;
+}
+.siparis-no strong{
+  font-weight:600;
+  color:#080808;
+  letter-spacing:.08em;
+}
+
+/* ── ALT LOG ── */
+.alt-logo{
+  margin-top:32px;
+  text-align:center;
+}
+.alt-logo a{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  text-decoration:none;
+  opacity:.4;
+  transition:opacity .2s;
+}
+.alt-logo a:hover{opacity:.7}
+.alt-logo img{height:18px;width:auto;object-fit:contain}
+.alt-logo span{
+  font-family:'Playfair Display',serif;
+  font-size:.82rem;
+  color:#080808;
+}
+
+/* ── MOBILE ── */
+@media(max-width:600px){
+  .basarili-page{padding:40px 16px}
+  .kart-ust{padding:36px 24px 32px}
+  .kart-detay{padding:22px 20px}
+  .kart-bilgi{padding:16px 20px 20px}
+  .kart-butonlar{padding:16px 20px 22px}
+  .siparis-no-wrap{padding:14px 20px 0}
+  .kart-ust h1{font-size:1.4rem}
+}
+</style>
+</head>
+<body>
+
+<div class="nav-spacer"></div>
+
+<div class="basarili-page">
+  <div class="basarili-kart">
+
+    <!-- Üst koyu alan -->
+    <div class="kart-ust">
+      <div class="check-circle">
+        <div class="check-ping"></div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+      <h1>Siparişiniz <em>Alındı</em></h1>
+      <p>Ödemeniz başarıyla tamamlandı.<br>Sipariş detayları e-posta adresinize gönderilecektir.</p>
+    </div>
+
+    <!-- Sipariş no -->
+    <div class="siparis-no-wrap">
+      <div class="siparis-no" id="siparisNoWrap" style="display:none">
+        Sipariş No &nbsp;<strong id="siparisNo">—</strong>
+      </div>
+    </div>
+
+    <!-- Detaylar -->
+    <div class="kart-detay" id="siparisDetay" style="display:none">
+      <div class="detay-satir">
+        <span class="detay-key">Müşteri</span>
+        <span class="detay-val" id="detayMusteri">—</span>
+      </div>
+      <div class="detay-satir">
+        <span class="detay-key">Ürün</span>
+        <span class="detay-val" id="detayUrun">—</span>
+      </div>
+      <div class="detay-satir">
+        <span class="detay-key">Teslimat Adresi</span>
+        <span class="detay-val" id="detayAdres">—</span>
+      </div>
+      <div class="detay-satir">
+        <span class="detay-key">Toplam</span>
+        <span class="detay-val fiyat" id="detayToplam">—</span>
+      </div>
+    </div>
+
+    <!-- Bilgi bloğu -->
+    <div class="kart-bilgi">
+      <div class="bilgi-item">
+        <div class="bilgi-ikon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+        <div class="bilgi-metin">
+          <strong>Kargo Süresi</strong>
+          Ödeme onayından itibaren en geç <strong>7 iş günü</strong> içinde kargoya verilir.
+        </div>
+      </div>
+      <div class="bilgi-item">
+        <div class="bilgi-ikon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+        </div>
+        <div class="bilgi-metin">
+          <strong>Ücretsiz Kargo</strong>
+          1500₺ ve üzeri siparişlerde kargo ücretsizdir.
+        </div>
+      </div>
+      <div class="bilgi-item">
+        <div class="bilgi-ikon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.35 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.63a16 16 0 0 0 5.35 5.35l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        </div>
+        <div class="bilgi-metin">
+          <strong>Sorularınız için</strong>
+          Instagram üzerinden veya telefon ile bize ulaşabilirsiniz.
+        </div>
+      </div>
+    </div>
+
+    <!-- Butonlar -->
+    <div class="kart-butonlar">
+      <a href="/shop" class="btn-ana">Alışverişe Devam Et</a>
+      <a href="/" class="btn-ik">Ana Sayfaya Dön</a>
+    </div>
+
+  </div>
+
+  <!-- Alt logo -->
+  <div class="alt-logo">
+    <a href="/">
+      <img src="images/logo.png" alt="Hair Artist"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='inline'">
+      <span style="display:none;font-family:'Playfair Display',serif;font-size:.88rem;color:#080808">Hair Artist</span>
+    </a>
+  </div>
+</div>
+
+<script>
+// sessionStorage'dan sipariş bilgilerini oku ve göster
+(function(){
+  try{
+    const sv = sessionStorage.getItem('bekleyen_siparis');
+    // Eğer bilgi yoksa URL'den order_no parametresine bak
+    const urlParams = new URLSearchParams(window.location.search);
+    const orderNo = urlParams.get('order_no') || urlParams.get('siparis_no');
+
+    if(orderNo){
+      document.getElementById('siparisNoWrap').style.display = 'inline-flex';
+      document.getElementById('siparisNo').textContent = orderNo;
+    }
+
+    if(sv){
+      const s = JSON.parse(sv);
+      document.getElementById('siparisDetay').style.display = 'block';
+      document.getElementById('detayMusteri').textContent = s.musteri_adi || '—';
+      document.getElementById('detayUrun').textContent = s.urun_adi || '—';
+      document.getElementById('detayAdres').textContent = s.adres || '—';
+      const toplam = s.toplam ? s.toplam.toLocaleString('tr-TR') + ' ₺' : '—';
+      document.getElementById('detayToplam').textContent = toplam;
+      // Gösterdikten sonra temizle
+      sessionStorage.removeItem('bekleyen_siparis');
+    }
+  }catch(e){}
+})();
+</script>
+</body>
+</html>
