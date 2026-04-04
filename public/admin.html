@@ -600,17 +600,6 @@ tbody td{padding:10px 13px;vertical-align:middle}
       <div style="display:grid;grid-template-columns:1fr 285px;gap:14px;align-items:start">
         <div class="card"><div class="ch"><h3>Hizmet Listesi</h3><span style="font-size:.6rem;color:var(--text3)" id="hizlbl"></span></div><div class="cb0 tw"><table><thead><tr><th>Sıra</th><th>Hizmet</th><th>Kategori</th><th>Fiyat Aralığı</th><th>Süre</th><th>Rez.</th><th>İşlem</th></tr></thead><tbody id="hizbody"></tbody></table></div></div>
         <div style="display:flex;flex-direction:column;gap:14px">
-          <div class="card"><div class="ch"><h3>🏷️ Kampanya İndirimi</h3></div><div class="cb">
-            <div style="display:flex;flex-direction:column;gap:10px">
-              <p style="font-size:.7rem;color:var(--text3);margin:0">Rezervasyon sayfasındaki tüm hizmetlere uygulanır. 0 girilirse indirim kaldırılır.</p>
-              <div class="ff" style="margin:0">
-                <label class="fl">İndirim Oranı (%)</label>
-                <input class="fi" id="indirim-input" type="number" min="0" max="100" placeholder="ör. 25" style="font-size:1.1rem;font-weight:600" oninput="indirimOnizlemeGuncelle(parseInt(this.value)||0)">
-              </div>
-              <div id="indirim-onizleme" style="font-size:.7rem;color:var(--text3);min-height:18px"></div>
-              <button class="sbtn" onclick="indirimKaydet()">Kaydet</button>
-            </div>
-          </div></div>
           <div class="card"><div class="ch"><h3 id="hizformbaslik">Yeni Hizmet</h3></div><div class="cb">
             <div style="display:flex;flex-direction:column;gap:11px">
               <input type="hidden" id="hfid">
@@ -623,7 +612,18 @@ tbody td{padding:10px 13px;vertical-align:middle}
               <button class="sbtn sec" id="hfiptal" onclick="hizSifirla()" style="display:none">İptal</button>
             </div>
           </div></div>
+          <div class="card"><div class="ch" style="padding:10px 14px"><h3 style="font-size:.8rem">🏷️ Kampanya İndirimi</h3></div><div class="cb" style="padding:10px 14px">
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <p style="font-size:.65rem;color:var(--text3);margin:0">Sadece <strong>Hizmet Satın Al</strong> bölümüne uygulanır. 0 = indirim yok.</p>
+              <div style="display:flex;gap:8px;align-items:center">
+                <input class="fi" id="indirim-input" type="number" min="0" max="100" placeholder="%" style="width:72px;text-align:center;font-size:1rem;font-weight:700;padding:6px 8px" oninput="indirimOnizlemeGuncelle(parseInt(this.value)||0)">
+                <button class="sbtn" style="flex:1;padding:8px" onclick="indirimKaydet()">Kaydet</button>
+              </div>
+              <div id="indirim-onizleme" style="font-size:.65rem;color:var(--text3);min-height:16px"></div>
+            </div>
+          </div></div>
         </div>
+      </div>
       </div>
     </div>
 

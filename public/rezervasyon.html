@@ -1301,14 +1301,26 @@ function hizmetSecO(el, ad, fiyat, sure) {
   document.querySelectorAll('#o-cs-dropdown .cs-option').forEach(i => i.classList.remove('secili'));
   el.classList.add('secili');
   document.getElementById('o-hizmet').value = ad;
-  document.getElementById('o-fiyat').value = fiyat;
   var lbl = document.getElementById('o-cs-label');
   lbl.style.color = '';
   lbl.textContent = ad;
   document.getElementById('o-cs-dropdown').classList.remove('open');
   document.getElementById('o-cs-arrow').style.transform = '';
-  document.getElementById('o-fiyat-indirimli').textContent = fiyat.toLocaleString('tr-TR') + '₺';
-  document.getElementById('o-fiyat-normal').textContent = '';
+
+  // fiyat zaten indirimli geldi (dropdown'da indMax gönderildi)
+  // orijinal fiyatı bulmak için indirimYuzde'den tersine hesapla
+  var ind = window._indirimYuzde || 0;
+  document.getElementById('o-fiyat').value = fiyat;
+
+  if (ind > 0) {
+    var orijinal = Math.round(fiyat / (1 - ind / 100));
+    document.getElementById('o-fiyat-indirimli').textContent = fiyat.toLocaleString('tr-TR') + '₺';
+    document.getElementById('o-fiyat-normal').innerHTML = '<s style="color:var(--text3);font-size:.78rem;font-weight:400">' + orijinal.toLocaleString('tr-TR') + '₺</s>';
+  } else {
+    document.getElementById('o-fiyat-indirimli').textContent = fiyat.toLocaleString('tr-TR') + '₺';
+    document.getElementById('o-fiyat-normal').textContent = '';
+  }
+
   var sureBadge = document.getElementById('o-sure-badge');
   if (sure && sure > 0) { 
     sureBadge.textContent = 'İşlem süresi: ' + sure + ' dk'; 
@@ -1880,7 +1892,10 @@ async function hizmetleriYukle() {
     }
     window._indirimYuzde = indirimYuzde;
 
-    ['n', 'o'].forEach(prefix => hizmetDropdownOlustur(prefix, liste, indirimYuzde));
+    // n- prefix: indirim YOK (normal rezervasyon sabit fiyat)
+    hizmetDropdownOlustur('n', liste, 0);
+    // o- prefix: indirim VAR (hizmet satın al bölümü)
+    hizmetDropdownOlustur('o', liste, indirimYuzde);
   } catch(e) {
     console.warn('Hizmetler yüklenemedi:', e);
   }
