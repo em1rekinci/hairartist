@@ -1012,16 +1012,11 @@ async function fotoYukle(file){
 
 
 
-
-// Yerel saat ile ISO string döndür (UTC değil) — Türkiye +3 için kritik
-function localISOString(d){
-  d=d||new Date();
-  const pad=n=>String(n).padStart(2,'0');
-  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
-}
-function localDateStr(d){
-  d=d||new Date();
-  const pad=n=>String(n).padStart(2,'0');
+// UTC tarih string'ini yerel tarihe çevir (Supabase UTC kayıtları için)
+function utcToLocalDateStr(utcStr){
+  if(!utcStr) return '';
+  const d = new Date(utcStr); // JS otomatik UTC parse eder
+  const pad = n => String(n).padStart(2,'0');
   return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 }
 
@@ -1187,7 +1182,7 @@ function statsGuncelle(){
   chartRender();
 }
 function chartRender(){
-  const b=new Date();const s7=[];for(let i=6;i>=0;i--){const d=new Date(b);d.setDate(d.getDate()-i);s7.push(localDateStr(d));}
+  const b=new Date();const s7=[];for(let i=6;i>=0;i--){const d=new Date(b);d.setDate(d.getDate()-i);s7.push(d.toISOString().split('T')[0]);}
   const say=s7.map(t=>TRZ.filter(r=>r.tarih===t).length);
   const mx=Math.max(...say,1);
   const GA=['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
@@ -1198,7 +1193,7 @@ function nbGuncelle(){const n=TRZ.filter(r=>r.durum==='bekliyor').length;const e
 
 // ─── BUGÜN RANDEVULAR ───
 function bugRandevu(){
-  const b=localDateStr();
+  const b=new Date().toISOString().split('T')[0];
   const l=TRZ.filter(r=>r.tarih===b&&r.durum==='onaylandi').sort((a,c)=>(a.saat||'').localeCompare(c.saat||''));
   document.getElementById('bugsayi').textContent=l.length+' randevu';
   const e=document.getElementById('bugliste');
@@ -1229,7 +1224,7 @@ function tkRender(){
   const ilk=new Date(tkYil,tkAy,1);const son=new Date(tkYil,tkAy+1,0).getDate();
   let bas=ilk.getDay()-1;if(bas<0)bas=6;
   const onceki=new Date(tkYil,tkAy,0).getDate();
-  const bugun=localDateStr();
+  const bugun=new Date().toISOString().split('T')[0];
   let h='';
   for(let i=0;i<bas;i++)h+=`<div class="tkg ba"><div class="tgn">${onceki-bas+i+1}</div></div>`;
   for(let g=1;g<=son;g++){
@@ -1266,7 +1261,7 @@ function tkDetay(t){
 }
 function tkGeri(){tkAy--;if(tkAy<0){tkAy=11;tkYil--;}tkRender();}
 function tkIleri(){tkAy++;if(tkAy>11){tkAy=0;tkYil++;}tkRender();}
-function tkBugune(){const n=new Date();tkYil=n.getFullYear();tkAy=n.getMonth();tkSec=localDateStr(n);tkRender();}
+function tkBugune(){const n=new Date();tkYil=n.getFullYear();tkAy=n.getMonth();tkSec=n.toISOString().split('T')[0];tkRender();}
 
 // ─── REZERVASYON TABLO ───
 function filtrele(d,b){AKT_FILTRE=d;document.querySelectorAll('#page-rezervasyonlar .fbtn').forEach(x=>x.classList.remove('ak'));b.classList.add('ak');tabloRender(d);}
@@ -1443,13 +1438,13 @@ async function odemeOnayla(){
     const manuelUcret=parseInt(document.getElementById('manuelUcret').value)||0;
     const odemeYontemi=document.querySelector('input[name="odemeYontemi"]:checked')?.value||'nakit';
     if(!manuelUcret){toast('Lütfen ücret giriniz.','hata');return;}
-    await sRest(`rezervasyonlar?id=eq.${bekleyenOdemeId}`,{method:'PATCH',body:JSON.stringify({odeme_alindi:true,fiyat:manuelUcret,odeme_yontemi:odemeYontemi,odeme_tarihi:localISOString()})});
+    await sRest(`rezervasyonlar?id=eq.${bekleyenOdemeId}`,{method:'PATCH',body:JSON.stringify({odeme_alindi:true,fiyat:manuelUcret,odeme_yontemi:odemeYontemi,odeme_tarihi:new Date().toISOString()})});
     const r=TRZ.find(x=>x.id===bekleyenOdemeId);
     if(r){
       r.odemeAlindi=true;
       r.fiyat=manuelUcret;
       r.odemeYontemi=odemeYontemi;
-      r.odemeTarihi=localISOString();
+      r.odemeTarihi=new Date().toISOString();
       AKTLOG.unshift({tip:'g',txt:`<strong>${r.ad}</strong> — ${manuelUcret.toLocaleString('tr-TR')}₺ ${odemeYontemi} ödeme alındı`,z:new Date()});
     }
     bekleyenOdemeId=null;
@@ -2250,7 +2245,7 @@ function ciroFiltrele(p,btn){
   if(p==='aralik'){
     arl.style.display='flex';
     // Bugünü varsayılan olarak doldur
-    const bugun=localDateStr();
+    const bugun=new Date().toISOString().split('T')[0];
     if(!document.getElementById('ciro-bas-inp').value) document.getElementById('ciro-bas-inp').value=bugun;
     if(!document.getElementById('ciro-bit-inp').value) document.getElementById('ciro-bit-inp').value=bugun;
     ciroAralikUygula();
@@ -2298,14 +2293,15 @@ function ciroRender(){
   let hizOdemeler=TRZ.filter(r=>{
     if(r.tip==='shop')return false;
     if(!r.odemeAlindi||r.durum!=='onaylandi')return false;
-    const tarihStr=(r.odemeTarihi||r.tarih||'').substring(0,10);
+    // odemeTarihi UTC olabilir, yerel tarihe çevir
+    const tarihStr=r.odemeTarihi ? utcToLocalDateStr(r.odemeTarihi) : (r.tarih||'').substring(0,10);
     if(!tarihStr)return false;
     const t=new Date(tarihStr+'T12:00');
     return t>=bas&&t<=bit;
   }).map(r=>({...r,tip:'hizmet'}));
   // Shop siparişleri
   let shopOdemeler=SIPARISLER.filter(r=>{
-    const tarihStr=(r.tarih||'').substring(0,10);
+    const tarihStr=r.tarih ? utcToLocalDateStr(r.tarih) : '';
     if(!tarihStr)return false;
     const t=new Date(tarihStr+'T12:00');
     return t>=bas&&t<=bit;
@@ -2338,13 +2334,15 @@ function ciroRender(){
   // Tablo
   const tbody=document.getElementById('c-tbody');
   if(!odemeler.length){tbody.innerHTML='<tr><td colspan="6" class="bos">Bu dönem için ödeme bulunamadı.</td></tr>';return;}
-  const sirali=[...odemeler].sort((a,b)=>new Date(b.tarih)-new Date(a.tarih));
+  const sirali=[...odemeler].sort((a,b)=>new Date(b.odemeTarihi||b.tarih)-new Date(a.odemeTarihi||a.tarih));
   tbody.innerHTML=sirali.map(r=>{
     const p=personel.find(x=>x.id===r.personelId)||personel.find(x=>x.ad===r.personelId);
     const f=fHesapla(r);
     const yont=(r.odemeYontemi||'nakit')==='kart'?'💳 Kart':'💵 Nakit';
     const tipBadge=r.tip==='shop'?'<span style="font-size:.44rem;background:var(--bbg);color:var(--blue);border:1px solid var(--bbdr);padding:2px 6px;border-radius:8px;font-weight:600">🛍 Shop</span>':'<span style="font-size:.44rem;background:var(--gbg);color:var(--green);border:1px solid var(--gbdr);padding:2px 6px;border-radius:8px;font-weight:600">✂️ Hizmet</span>';
-    return`<tr><td><div class="tad">${r.ad}</div></td><td class="thiz">${r.hizmet}</td><td class="tfyt">${f.toLocaleString('tr-TR')}₺</td><td style="font-size:.72rem">${yont}</td><td>${tipBadge}</td><td class="ttar">${r.odemeTarihi?r.odemeTarihi.substring(0,10):r.tarih}</td><td style="font-size:.7rem;color:var(--text2)">${r.tip==='shop'?'—':p?p.ad:'—'}</td></tr>`;
+    // Tabloda gösterilecek tarihi yerel saate çevir
+    const gosterTarih = r.odemeTarihi ? utcToLocalDateStr(r.odemeTarihi) : (r.tarih||'').substring(0,10);
+    return`<tr><td><div class="tad">${r.ad}</div></td><td class="thiz">${r.hizmet}</td><td class="tfyt">${f.toLocaleString('tr-TR')}₺</td><td style="font-size:.72rem">${yont}</td><td>${tipBadge}</td><td class="ttar">${gosterTarih}</td><td style="font-size:.7rem;color:var(--text2)">${r.tip==='shop'?'—':p?p.ad:'—'}</td></tr>`;
   }).join('');
 
   // Hizmet dağılım
@@ -2371,7 +2369,7 @@ function ciroGrafik(bas,bit,odemeler){
     for(let h=8;h<=20;h++) noktalar.push({lbl:`${h}:00`,val:odemeler.filter(r=>{const [sh]=r.saat?r.saat.split(':'):['0'];return parseInt(sh)===h;}).reduce((s,r)=>s+fHesapla(r),0)});
   } else if(p==='hafta'){
     const GA=['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
-    for(let i=0;i<7;i++){const d=new Date(bas);d.setDate(bas.getDate()+i);const ts=localDateStr(d);noktalar.push({lbl:GA[i],val:odemeler.filter(r=>r.tarih===ts).reduce((s,r)=>s+fHesapla(r),0)});}
+    for(let i=0;i<7;i++){const d=new Date(bas);d.setDate(bas.getDate()+i);const ts=d.toISOString().split('T')[0];noktalar.push({lbl:GA[i],val:odemeler.filter(r=>r.tarih===ts).reduce((s,r)=>s+fHesapla(r),0)});}
   } else if(p==='ay'){
     const sonGun=new Date(n.getFullYear(),n.getMonth()+1,0).getDate();
     for(let g=1;g<=sonGun;g++){const ts=`${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(g).padStart(2,'0')}`;noktalar.push({lbl:String(g),val:odemeler.filter(r=>r.tarih===ts).reduce((s,r)=>s+fHesapla(r),0)});}
