@@ -987,6 +987,15 @@ const SUPA_URL='https://botxnihztrnwzjnrlwzv.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvdHhuaWh6dHJud3pqbnJsd3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MTg4MTAsImV4cCI6MjA5MDA5NDgxMH0.AcX4_2Aykf8J1jln9fvODh2rRffymfEJCAekzmN1ALg';
 const ADMIN_SIFRE='fatihkurt341905.';
 
+// UTC string'i yerel tarihe çevir (Türkiye +3 için)
+function utcToLocalDateStr(str){
+  if(!str) return '';
+  const d=new Date(str);
+  if(isNaN(d)) return (str||'').substring(0,10);
+  const pad=n=>String(n).padStart(2,'0');
+  return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+}
+
 async function sRest(path,opts={}){
   const {headers:extraHeaders,...restOpts}=opts;
   const res=await fetch(SUPA_URL+'/rest/v1/'+path,{
@@ -2284,7 +2293,7 @@ function ciroRender(){
   let hizOdemeler=TRZ.filter(r=>{
     if(r.tip==='shop')return false;
     if(!r.odemeAlindi||r.durum!=='onaylandi')return false;
-    const tarihStr=(r.odemeTarihi||r.tarih||'').substring(0,10);
+    const tarihStr=r.odemeTarihi ? utcToLocalDateStr(r.odemeTarihi) : (r.tarih||'').substring(0,10);
     if(!tarihStr)return false;
     const t=new Date(tarihStr+'T12:00');
     return t>=bas&&t<=bit;
@@ -2324,13 +2333,14 @@ function ciroRender(){
   // Tablo
   const tbody=document.getElementById('c-tbody');
   if(!odemeler.length){tbody.innerHTML='<tr><td colspan="6" class="bos">Bu dönem için ödeme bulunamadı.</td></tr>';return;}
-  const sirali=[...odemeler].sort((a,b)=>new Date(b.tarih)-new Date(a.tarih));
+  const sirali=[...odemeler].sort((a,b)=>new Date(b.odemeTarihi||b.tarih)-new Date(a.odemeTarihi||a.tarih));
   tbody.innerHTML=sirali.map(r=>{
     const p=personel.find(x=>x.id===r.personelId)||personel.find(x=>x.ad===r.personelId);
     const f=fHesapla(r);
     const yont=(r.odemeYontemi||'nakit')==='kart'?'💳 Kart':'💵 Nakit';
     const tipBadge=r.tip==='shop'?'<span style="font-size:.44rem;background:var(--bbg);color:var(--blue);border:1px solid var(--bbdr);padding:2px 6px;border-radius:8px;font-weight:600">🛍 Shop</span>':'<span style="font-size:.44rem;background:var(--gbg);color:var(--green);border:1px solid var(--gbdr);padding:2px 6px;border-radius:8px;font-weight:600">✂️ Hizmet</span>';
-    return`<tr><td><div class="tad">${r.ad}</div></td><td class="thiz">${r.hizmet}</td><td class="tfyt">${f.toLocaleString('tr-TR')}₺</td><td style="font-size:.72rem">${yont}</td><td>${tipBadge}</td><td class="ttar">${r.odemeTarihi?r.odemeTarihi.substring(0,10):r.tarih}</td><td style="font-size:.7rem;color:var(--text2)">${r.tip==='shop'?'—':p?p.ad:'—'}</td></tr>`;
+    const gosterTarih=r.odemeTarihi ? utcToLocalDateStr(r.odemeTarihi) : r.tarih;
+    return`<tr><td><div class="tad">${r.ad}</div></td><td class="thiz">${r.hizmet}</td><td class="tfyt">${f.toLocaleString('tr-TR')}₺</td><td style="font-size:.72rem">${yont}</td><td>${tipBadge}</td><td class="ttar">${gosterTarih}</td><td style="font-size:.7rem;color:var(--text2)">${r.tip==='shop'?'—':p?p.ad:'—'}</td></tr>`;
   }).join('');
 
   // Hizmet dağılım
