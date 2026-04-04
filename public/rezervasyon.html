@@ -1507,20 +1507,24 @@ async function odemeGit() {
   btn.textContent = 'Kaydediliyor…';
 
   try {
-    // 1) Rezervasyonu Supabase'e kaydet — ID'yi saklıyoruz
+    // merchant_oid'i frontend'de üret — backend'e ve Supabase'e aynı değeri gönder
+    const merchant_oid = 'HA' + Date.now();
+
+    // 1) Rezervasyonu Supabase'e kaydet — merchant_oid'i de dahil et
     const kayit = await supabaseInsert('rezervasyonlar', {
       ad, telefon, hizmet, tarih, saat,
       fiyat: parseInt(fiyat) || 0,
       personel_id: personel,
       durum: 'odeme_bekleniyor',
       odeme_alindi: false,
-      tip: 'odeme_bekleyen'
+      tip: 'odeme_bekleyen',
+      merchant_oid: merchant_oid   // ← direkt kayıtta gönder
     });
     window._bekleyenRezId = kayit?.id || null;
 
     btn.textContent = 'Ödeme açılıyor…';
 
-    // 2) Backend'den PayTR iframe_token al
+    // 2) Backend'den PayTR iframe_token al — merchant_oid'i de gönder
     const tokenRes = await fetch(PAYTR_TOKEN_ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1532,7 +1536,8 @@ async function odemeGit() {
         saat,
         fiyat: parseInt(fiyat),
         personel,
-        rezervasyon_id: window._bekleyenRezId || null  // ← ID'yi gönder
+        rezervasyon_id: window._bekleyenRezId || null,
+        merchant_oid: merchant_oid   // ← backend bu değeri kullansın
       })
     });
 

@@ -8,11 +8,6 @@ const fs      = require('fs');
 const app  = express();
 const PORT = process.env.PORT || 3000;
 
-// ─── NETGSM AYARLARI (Railway Environment Variables) ─────────────────────────
-const NETGSM_USERCODE  = process.env.NETGSM_USERCODE;
-const NETGSM_PASSWORD  = process.env.NETGSM_PASSWORD;
-const NETGSM_MSGHEADER = process.env.NETGSM_MSGHEADER;
-const ALICI_TELEFON    = process.env.ALICI_TELEFON;
 const SITE_URL         = process.env.SITE_URL || 'https://www.fatihkurthairartist.com';
 const ADMIN_SIFRE      = process.env.ADMIN_SIFRE || 'hairartist2026';
 
@@ -117,24 +112,8 @@ app.post('/rezervasyon', async (req, res) => {
   const onayLink = `${SITE_URL}/onay/${id}`;
   const redLink  = `${SITE_URL}/red/${id}`;
 
-  const fatihSms =
-    `YENİ REZERVASYON\n` +
-    `Ad: ${ad}\n` +
-    `Tel: ${telefon}\n` +
-    `Hizmet: ${hizmet}\n` +
-    `${tarih} - ${saat}\n` +
-    (musteri_notu ? `Not: ${musteri_notu}\n` : '') +
-    `\nONAY: ${onayLink}\n` +
-    `RED: ${redLink}`;
-
-  try {
-    await smsSend(ALICI_TELEFON, fatihSms);
-    console.log(`[${id}] Rezervasyon alındı, SMS gönderildi.`);
-    return res.json({ ok: true, mesaj: "Rezervasyon talebiniz alındı! Onay SMS'i kısa sürede gelecek." });
-  } catch (err) {
-    console.error('SMS hatası:', err);
-    return res.status(500).json({ ok: false, mesaj: 'Sistem hatası. Lütfen telefonla ulaşın: 0531 777 02 03' });
-  }
+  console.log(`[${id}] Rezervasyon alındı. ONAY: ${onayLink} | RED: ${redLink}`);
+  return res.json({ ok: true, mesaj: 'Rezervasyon talebiniz alındı!' });
 });
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -142,7 +121,7 @@ app.post('/rezervasyon', async (req, res) => {
 // ════════════════════════════════════════════════════════════════════════════
 app.post('/api/paytr-token', async (req, res) => {
   try {
-    const { ad, telefon, hizmet, tarih, saat, fiyat, rezervasyon_id } = req.body;
+    const { ad, telefon, hizmet, tarih, saat, fiyat, rezervasyon_id, merchant_oid: frontend_oid } = req.body;
 
     if (!ad || !telefon || !hizmet || !fiyat) {
       return res.status(400).json({ status: 'fail', reason: 'Eksik bilgi' });
@@ -158,7 +137,8 @@ app.post('/api/paytr-token', async (req, res) => {
 
     // tutar_kurus tam sayı olmalı (kuruş cinsinden)
     const tutar_kurus = Math.round(Number(fiyat) * 100);
-    const merchant_oid = 'HA' + Date.now();
+    // Frontend'den gelen merchant_oid'i kullan — Supabase'e zaten yazıldı
+    const merchant_oid = frontend_oid || ('HA' + Date.now());
 
     // Railway'de genellikle x-forwarded-for gelir; IPv6 loopback'i engelle
     let user_ip =
@@ -241,30 +221,12 @@ app.post('/api/paytr-token', async (req, res) => {
         const SB_URL = 'https://botxnihztrnwzjnrlwzv.supabase.co';
         const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvdHhuaWh6dHJud3pqbnJsd3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MTg4MTAsImV4cCI6MjA5MDA5NDgxMH0.AcX4_2Aykf8J1jln9fvODh2rRffymfEJCAekzmN1ALg';
 
-        // rezervasyon_id ZORUNLU — yoksa callback merchant_oid'i eşleştiremez
-        if (!rezervasyon_id) {
-          console.error('[PayTR] KRİTİK: rezervasyon_id gelmedi! merchant_oid Supabase\'e yazılamadı.');
+        // Frontend merchant_oid'i zaten Supabase'e INSERT sırasında yazdı.
+        // rezervasyon_id varsa doğrulama logu yaz.
+        if (frontend_oid) {
+          console.log('[PayTR] merchant_oid frontend tarafından Supabase\'e yazıldı ✓', merchant_oid);
         } else {
-          const patchRes = await fetch(
-            `${SB_URL}/rest/v1/rezervasyonlar?id=eq.${rezervasyon_id}`,
-            {
-              method: 'PATCH',
-              headers: {
-                'Content-Type': 'application/json',
-                'apikey': SB_KEY,
-                'Authorization': 'Bearer ' + SB_KEY,
-                'Prefer': 'return=representation',
-              },
-              body: JSON.stringify({ merchant_oid }),
-            }
-          );
-          const patchTxt = await patchRes.text();
-          const patchRows = patchTxt ? JSON.parse(patchTxt) : [];
-          if (!patchRows.length) {
-            console.error('[PayTR] merchant_oid yazılmak istendi ama eşleşen kayıt YOK! ID:', rezervasyon_id);
-          } else {
-            console.log('[PayTR] merchant_oid Supabase\'e yazıldı ✓', merchant_oid, '→ rez_id:', rezervasyon_id);
-          }
+          console.warn('[PayTR] frontend_oid gelmedi, merchant_oid Supabase\'de eksik kalabilir!');
         }
       } catch (e) {
         console.warn('[PayTR] merchant_oid Supabase\'e yazılamadı:', e.message);
@@ -293,26 +255,12 @@ app.get('/onay/:id', async (req, res) => {
     return res.send(sayfaHTML('⚠️ Zaten İşlendi', `Bu rezervasyon daha önce <b>${rez.durum}</b> olarak işlendi.`, '#f39c12'));
 
   rez.durum = 'onaylandi';
-
-  const musteriSms =
-    `Merhaba ${rez.ad}!\n` +
-    `Randevunuz ONAYLANDI ✓\n` +
-    `${rez.tarih} - ${rez.saat}\n` +
-    `Hizmet: ${rez.hizmet}\n` +
-    `Adres: Alibeyköy Cd No:5, Eyüpsultan\n` +
-    `İptal: 0531 777 02 03`;
-
-  try {
-    await smsSend(telefonFormat(rez.telefon), musteriSms);
-    console.log(`[${rez.id}] ONAYLANDI`);
-    return res.send(sayfaHTML(
-      '✅ Onaylandı',
-      `<b>${rez.ad}</b> — ${rez.tarih} ${rez.saat} randevusu onaylandı.<br>Müşteriye onay SMS'i gönderildi.`,
-      '#27ae60'
-    ));
-  } catch (err) {
-    return res.send(sayfaHTML('⚠️ Hata', 'Onaylandı fakat müşteriye SMS gönderilemedi.', '#f39c12'));
-  }
+  console.log(`[${rez.id}] ONAYLANDI`);
+  return res.send(sayfaHTML(
+    '✅ Onaylandı',
+    `<b>${rez.ad}</b> — ${rez.tarih} ${rez.saat} randevusu onaylandı.`,
+    '#27ae60'
+  ));
 });
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -327,24 +275,12 @@ app.get('/red/:id', async (req, res) => {
     return res.send(sayfaHTML('⚠️ Zaten İşlendi', `Bu rezervasyon daha önce <b>${rez.durum}</b> olarak işlendi.`, '#f39c12'));
 
   rez.durum = 'reddedildi';
-
-  const musteriSms =
-    `Merhaba ${rez.ad},\n` +
-    `${rez.tarih} ${rez.saat} randevusu uygun değil.\n` +
-    `Yeni tarih için: 0531 777 02 03\n` +
-    `Hair Artist`;
-
-  try {
-    await smsSend(telefonFormat(rez.telefon), musteriSms);
-    console.log(`[${rez.id}] REDDEDİLDİ`);
-    return res.send(sayfaHTML(
-      '❌ Reddedildi',
-      `<b>${rez.ad}</b> — ${rez.tarih} ${rez.saat} randevusu reddedildi.<br>Müşteriye bilgi SMS'i gönderildi.`,
-      '#e74c3c'
-    ));
-  } catch (err) {
-    return res.send(sayfaHTML('⚠️ Hata', 'Reddedildi fakat müşteriye SMS gönderilemedi.', '#f39c12'));
-  }
+  console.log(`[${rez.id}] REDDEDİLDİ`);
+  return res.send(sayfaHTML(
+    '❌ Reddedildi',
+    `<b>${rez.ad}</b> — ${rez.tarih} ${rez.saat} randevusu reddedildi.`,
+    '#e74c3c'
+  ));
 });
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -375,21 +311,8 @@ app.post('/admin/onay/:id', async (req, res) => {
   if (rez.durum !== 'bekliyor') return res.status(400).json({ ok: false, mesaj: 'Zaten işlendi.' });
 
   rez.durum = 'onaylandi';
-
-  const musteriSms =
-    `Merhaba ${rez.ad}!\n` +
-    `Randevunuz ONAYLANDI ✓\n` +
-    `${rez.tarih} - ${rez.saat}\n` +
-    `Hizmet: ${rez.hizmet}\n` +
-    `Adres: Alibeyköy Cd No:5, Eyüpsultan\n` +
-    `İptal: 0531 777 02 03`;
-
-  try {
-    await smsSend(telefonFormat(rez.telefon), musteriSms);
-    return res.json({ ok: true, mesaj: 'Onaylandı, SMS gönderildi.' });
-  } catch (err) {
-    return res.json({ ok: true, mesaj: 'Onaylandı fakat SMS gönderilemedi.' });
-  }
+  console.log(`[admin] ${rez.id} ONAYLANDI`);
+  return res.json({ ok: true, mesaj: 'Onaylandı.' });
 });
 
 app.post('/admin/red/:id', async (req, res) => {
@@ -401,19 +324,8 @@ app.post('/admin/red/:id', async (req, res) => {
   if (rez.durum !== 'bekliyor') return res.status(400).json({ ok: false, mesaj: 'Zaten işlendi.' });
 
   rez.durum = 'reddedildi';
-
-  const musteriSms =
-    `Merhaba ${rez.ad},\n` +
-    `${rez.tarih} ${rez.saat} randevusu uygun değil.\n` +
-    `Yeni tarih için: 0531 777 02 03\n` +
-    `Hair Artist`;
-
-  try {
-    await smsSend(telefonFormat(rez.telefon), musteriSms);
-    return res.json({ ok: true, mesaj: 'Reddedildi, SMS gönderildi.' });
-  } catch (err) {
-    return res.json({ ok: true, mesaj: 'Reddedildi fakat SMS gönderilemedi.' });
-  }
+  console.log(`[admin] ${rez.id} REDDEDİLDİ`);
+  return res.json({ ok: true, mesaj: 'Reddedildi.' });
 });
 
 app.delete('/admin/sil/:id', (req, res) => {
@@ -603,15 +515,6 @@ app.post('/api/paytr-callback', async (req, res) => {
         odeme_turu: payment_type || '',
       });
       console.log(`[PayTR Callback] ✓ Ödeme başarılı: ${merchant_oid}`);
-
-      // Admin'e SMS gönder
-      try {
-        await smsSend(ALICI_TELEFON,
-          `ÖDEME ALINDI ✓\nPayTR: ${merchant_oid}\nTutar: ${(Number(total_amount)/100).toFixed(2)} TL\nRezervasyona git → admin paneli`
-        );
-      } catch(smsErr) {
-        console.warn('[PayTR Callback] Admin SMS gönderilemedi:', smsErr.message);
-      }
     } else {
       // Ödeme başarısız — odeme_basarisiz olarak işaretle (odeme_bekleniyor değil!)
       // Müşteri yeni ödeme yaparsa frontend yeni kayıt oluşturur
@@ -666,37 +569,6 @@ async function supabaseGuncelle(merchant_oid, guncelleme) {
   }
 }
 
-// ════════════════════════════════════════════════════════════════════════════
-// YARDIMCI FONKSİYONLAR
-// ════════════════════════════════════════════════════════════════════════════
-async function smsSend(numara, mesaj) {
-  const xml =
-    `<?xml version="1.0" encoding="UTF-8"?>` +
-    `<mainbody><header>` +
-      `<usercode>${NETGSM_USERCODE}</usercode>` +
-      `<password>${NETGSM_PASSWORD}</password>` +
-      `<msgheader>${NETGSM_MSGHEADER}</msgheader>` +
-    `</header><body>` +
-      `<msg><![CDATA[${mesaj}]]></msg>` +
-      `<no>${numara}</no>` +
-    `</body></mainbody>`;
-
-  const res  = await fetch('https://api.netgsm.com.tr/sms/send/xml', {
-    method:  'POST',
-    headers: { 'Content-Type': 'text/xml; charset=UTF-8' },
-    body:    xml
-  });
-  const text = await res.text();
-  console.log('Netgsm:', text.trim());
-  if (!['00', '01', '02'].some(k => text.trim().startsWith(k)))
-    throw new Error('Netgsm hata: ' + text.trim());
-}
-
-function telefonFormat(tel) {
-  let t = tel.replace(/[\s\-\(\)]/g, '').replace(/^\+/, '');
-  if (t.startsWith('0')) t = '9' + t;
-  return t;
-}
 
 function sayfaHTML(baslik, icerik, renk) {
   return `<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8">
