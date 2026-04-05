@@ -511,7 +511,6 @@ function sayfaRender(u, benzerler) {
           ${fiyatBlokHtml}
         </div>
 
-        ${u.acik ? `<p class="urun-aciklama">${u.acik}</p>` : ''}
 
         ${u.stok > 0 ? `
         <div class="adet-satir">
@@ -530,6 +529,8 @@ function sayfaRender(u, benzerler) {
         <div style="padding:14px 18px;background:rgba(176,48,32,.06);border:1px solid rgba(176,48,32,.15);font-size:.72rem;color:#8b2010;margin-bottom:32px;letter-spacing:.04em">
           Bu ürün şu an stokta bulunmamaktadır. Yakında tekrar stoklanacaktır.
         </div>`}
+
+        ${u.acik ? `<p class="urun-aciklama">${u.acik}</p>` : ''}
 
         ${ozellikler.length > 0 ? `
         <div style="margin-top:auto">

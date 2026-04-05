@@ -39,8 +39,8 @@
 /* ── ÜRÜN KARTI ── */
 .urun-kart{background:#fff;border:1px solid #e8e4dc;display:flex;flex-direction:column;overflow:hidden;transition:box-shadow .3s,transform .3s;position:relative}
 .urun-kart:hover{box-shadow:0 12px 48px rgba(8,8,8,.13);transform:translateY(-2px)}
-.urun-resim{aspect-ratio:1/1;background:#fff;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
-.urun-resim img{width:100%;height:100%;object-fit:contain;transition:transform .4s ease;padding:0}
+.urun-resim{aspect-ratio:1/1;background:#f7f4ef;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.urun-resim img{width:100%;height:100%;object-fit:contain;transition:transform .4s ease;padding:8px}
 .urun-kart:hover .urun-resim img{transform:scale(1.04)}
 .urun-placeholder{display:flex;flex-direction:column;align-items:center;gap:10px;opacity:.2}
 .urun-placeholder svg{width:36px;height:36px}
@@ -105,7 +105,7 @@
 /* ── FOTO SLİDER OKLARI ── */
 .foto-slider-wrap{position:absolute;inset:0;width:100%;height:100%;overflow:hidden}
 .foto-slider-track{display:flex;height:100%;transition:transform .35s cubic-bezier(.4,0,.2,1)}
-.foto-slider-track img{width:100%;height:100%;object-fit:contain;flex-shrink:0;min-width:100%;padding:0}
+.foto-slider-track img{width:100%;height:100%;object-fit:contain;flex-shrink:0;min-width:100%;padding:8px}
 .foto-ok{position:absolute;top:50%;transform:translateY(-50%);width:28px;height:28px;background:rgba(255,255,255,.85);border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:4;transition:background .2s;padding:0}
 .foto-ok:hover{background:#fff}
 .foto-ok svg{width:12px;height:12px;stroke:#080808;stroke-width:2.5;fill:none}
@@ -196,11 +196,10 @@ body{overflow-x:hidden}
   <!-- HERO -->
   <div class="shop-hero">
     <div class="shop-hero-sol">
-      <div class="yakinda-pill"><div class="yakinda-pill-dot"></div><span>Çok yakında</span></div>
       <h1>Saç Bakım<br><em>Ürünleri</em></h1>
     </div>
     <div class="shop-hero-sag">
-      <p>Profesyonel saç bakımını eve taşıyın. Fatih Kurt tarafından özenle seçilmiş ürünler çok yakında sizlerle.</p>
+      <p>Profesyonel saç bakımını eve taşıyın. Fatih Kurt tarafından özenle seçilmiş ürünler.</p>
     </div>
   </div>
 
