@@ -13,11 +13,24 @@ const ADMIN_SIFRE      = process.env.ADMIN_SIFRE || 'hairartist2026';
 const RESEND_API_KEY   = process.env.RESEND_API_KEY || '';
 const CLAUDE_KEY       = process.env.CLAUDE_KEY || '';
 
-// ─── CLAUDE KEY ENDPOINT ────────────────────────────────────────────────────
-app.get('/api/claude-key', (req, res) => {
-  const { sifre } = req.query;
-  if (sifre !== ADMIN_SIFRE) return res.status(401).json({ ok: false });
-  return res.json({ ok: true, key: CLAUDE_KEY });
+// ─── CLAUDE PROXY ────────────────────────────────────────────────────────────
+app.post('/api/claude-format', async (req, res) => {
+  if (!CLAUDE_KEY) return res.status(500).json({ error: 'Claude key tanımlı değil' });
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': CLAUDE_KEY,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify(req.body)
+    });
+    const data = await response.json();
+    res.json(data);
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 // ─── PAYTR AYARLARI ──────────────────────────────────────────────────────────
