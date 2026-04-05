@@ -346,7 +346,11 @@ function lbAc(idx) {
 }
 
 function lbKapat(e) {
-  if (e && e.target && !e.target.classList.contains('lb-track-wrap') && !e.target.classList.contains('lb-slide') && e.target.id !== 'lbOv') return;
+  if (e) {
+    // Sadece arka plana (slide veya track-wrap) tıklandığında kapat, img veya butonlara değil
+    const t = e.target;
+    if (!t.classList.contains('lb-slide') && !t.classList.contains('lb-track-wrap') && t.id !== 'lbOv') return;
+  }
   document.getElementById('lbOv').classList.remove('ac');
   document.body.style.overflow = '';
 }
@@ -633,33 +637,7 @@ function galeriOnceki() {
   galeriGit((aktifFoto - 1 + tumFotolar.length) % tumFotolar.length);
 }
 
-// ── LİGHTBOX
-function lbAc(idx) {
-  if (!tumFotolar.length) return;
-  aktifFoto = idx;
-  const ov = document.getElementById('lbOv');
-  const img = document.getElementById('lbImg');
-  const sayac = document.getElementById('lbSayac');
-  img.src = tumFotolar[idx];
-  sayac.textContent = tumFotolar.length > 1 ? `${idx + 1} / ${tumFotolar.length}` : '';
-  document.getElementById('lbPrev').style.display = tumFotolar.length > 1 ? 'flex' : 'none';
-  document.getElementById('lbNext').style.display = tumFotolar.length > 1 ? 'flex' : 'none';
-  ov.classList.add('ac');
-  document.body.style.overflow = 'hidden';
-}
-function lbKapat(e) {
-  if (e && e.target !== document.getElementById('lbOv') && !e.currentTarget.classList.contains('lb-kapat')) return;
-  document.getElementById('lbOv').classList.remove('ac');
-  document.body.style.overflow = '';
-}
-function lbNav(delta, e) {
-  if (e) e.stopPropagation();
-  const yeni = (aktifFoto + delta + tumFotolar.length) % tumFotolar.length;
-  galeriGit(yeni);
-  document.getElementById('lbImg').src = tumFotolar[yeni];
-  const sayac = document.getElementById('lbSayac');
-  sayac.textContent = tumFotolar.length > 1 ? `${yeni + 1} / ${tumFotolar.length}` : '';
-}
+// ── LİGHTBOX (yukarıda tanımlı)
 
 // ── SEPET (localStorage)
 function sepeteEkle(id, ad) {
