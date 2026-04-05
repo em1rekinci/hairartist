@@ -11,6 +11,14 @@ const PORT = process.env.PORT || 3000;
 const SITE_URL         = process.env.SITE_URL || 'https://www.fatihkurthairartist.com';
 const ADMIN_SIFRE      = process.env.ADMIN_SIFRE || 'hairartist2026';
 const RESEND_API_KEY   = process.env.RESEND_API_KEY || '';
+const CLAUDE_KEY       = process.env.CLAUDE_KEY || '';
+
+// ─── CLAUDE KEY ENDPOINT ────────────────────────────────────────────────────
+app.get('/api/claude-key', (req, res) => {
+  const { sifre } = req.query;
+  if (sifre !== ADMIN_SIFRE) return res.status(401).json({ ok: false });
+  return res.json({ ok: true, key: CLAUDE_KEY });
+});
 
 // ─── PAYTR AYARLARI ──────────────────────────────────────────────────────────
 const MERCHANT_ID   = "685596";

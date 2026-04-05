@@ -995,7 +995,10 @@ tbody td{padding:10px 13px;vertical-align:middle}
 // ─── SUPABASE ───
 const SUPA_URL='https://botxnihztrnwzjnrlwzv.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvdHhuaWh6dHJud3pqbnJsd3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MTg4MTAsImV4cCI6MjA5MDA5NDgxMH0.AcX4_2Aykf8J1jln9fvODh2rRffymfEJCAekzmN1ALg';
-const CLAUDE_KEY = 'BURAYA_API_KEY_GIRIN';
+let CLAUDE_KEY = '';
+fetch('/api/claude-key?sifre=' + (localStorage.getItem('ha_sifre') || ''))
+  .then(r => r.json()).then(d => { if (d.ok) CLAUDE_KEY = d.key; })
+  .catch(() => {});
 const ADMIN_SIFRE='fatihkurt341905.';
 
 // UTC string'i yerel tarihe çevir (Türkiye +3 için)
