@@ -827,6 +827,7 @@ a[href^="tel"] {
       <!-- Hizmet Al -->
       <div class="rez-kart odeme" onclick="goster('odeme-form')">
         
+        <div class="indirim-badge" id="odeme-indirim-badge" style="display:none"></div>
         <div class="rez-kart-no">02 — Online Ödeme</div>
         <h2>Hizmet Al <em>Online ödeme</em></h2>
         <p>Hizmetinizi şimdi satın alın, online güvenli ödeme yapın. Randevu tarihinizi belirleyin.</p>
@@ -1891,6 +1892,17 @@ async function hizmetleriYukle() {
       indirimYuzde = ayarlar.length ? parseInt(ayarlar[0].value) || 0 : 0;
     }
     window._indirimYuzde = indirimYuzde;
+
+    // Online ödeme kartındaki indirim badge'ini güncelle
+    const badge = document.getElementById('odeme-indirim-badge');
+    if (badge) {
+      if (indirimYuzde > 0) {
+        badge.textContent = '%' + indirimYuzde + ' İndirim';
+        badge.style.display = '';
+      } else {
+        badge.style.display = 'none';
+      }
+    }
 
     // n- prefix: indirim YOK (normal rezervasyon sabit fiyat)
     hizmetDropdownOlustur('n', liste, 0);
