@@ -990,6 +990,9 @@ const ADMIN_SIFRE='fatihkurt341905.';
 // UTC string'i yerel tarihe çevir (Türkiye +3 için)
 function utcToLocalDateStr(str){
   if(!str) return '';
+  // Salt tarih formatı (YYYY-MM-DD) ise olduğu gibi döndür.
+  // new Date("YYYY-MM-DD") UTC gece yarısı parse edilir; Türkiye +3'te dünün tarihi üretir.
+  if(/^\d{4}-\d{2}-\d{2}$/.test(str)) return str;
   const d=new Date(str);
   if(isNaN(d)) return (str||'').substring(0,10);
   const pad=n=>String(n).padStart(2,'0');
@@ -1135,7 +1138,7 @@ async function verileriYukle(showToast=true){
       ad:s.musteri_adi||s.musteri_ad||s.ad||'Müşteri',
       telefon:s.telefon||s.musteri_telefon||'',
       hizmet:s.urun_adi||s.urun_ad||s.urun||s.hizmet||'Shop Ürünü',
-      tarih:utcToLocalDateStr(s.tarih||s.created_at||''),
+      tarih:utcToLocalDateStr(s.created_at||s.tarih||''), // created_at timestamp'i yerel tarihe çevir (tarih kolonu UTC tarih içeriyor)
       saat:'',
       durum:'onaylandi',
       odemeAlindi:true,
@@ -2364,7 +2367,8 @@ function ciroGrafik(bas,bit,odemeler){
   const n=new Date();
 
   if(p==='gun'){
-    for(let h=8;h<=20;h++) noktalar.push({lbl:`${h}:00`,val:odemeler.filter(r=>{const [sh]=r.saat?r.saat.split(':'):['0'];return parseInt(sh)===h;}).reduce((s,r)=>s+fHesapla(r),0)});
+    for(let h=8;h<=20;h++) noktalar.push({lbl:`${h}:00`,val:odemeler.filter(r=>{if(!r.saat){// Shop siparişleri: saat bilgisi yok, şu anki saate göre dahil et
+const simdi=new Date().getHours();return simdi===h;}const [sh]=r.saat.split(':');return parseInt(sh)===h;}).reduce((s,r)=>s+fHesapla(r),0)});
   } else if(p==='hafta'){
     const GA=['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
     for(let i=0;i<7;i++){const d=new Date(bas);d.setDate(bas.getDate()+i);const ts=d.toISOString().split('T')[0];noktalar.push({lbl:GA[i],val:odemeler.filter(r=>r.tarih===ts).reduce((s,r)=>s+fHesapla(r),0)});}
