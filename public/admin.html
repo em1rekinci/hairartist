@@ -995,10 +995,7 @@ tbody td{padding:10px 13px;vertical-align:middle}
 // ─── SUPABASE ───
 const SUPA_URL='https://botxnihztrnwzjnrlwzv.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvdHhuaWh6dHJud3pqbnJsd3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MTg4MTAsImV4cCI6MjA5MDA5NDgxMH0.AcX4_2Aykf8J1jln9fvODh2rRffymfEJCAekzmN1ALg';
-let CLAUDE_KEY = '';
-fetch('/api/claude-key?sifre=' + (localStorage.getItem('ha_sifre') || ''))
-  .then(r => r.json()).then(d => { if (d.ok) CLAUDE_KEY = d.key; })
-  .catch(() => {});
+const CLAUDE_KEY = 'BURAYA_API_KEY_GIRIN';
 const ADMIN_SIFRE='fatihkurt341905.';
 
 // UTC string'i yerel tarihe çevir (Türkiye +3 için)
@@ -2040,6 +2037,16 @@ async function aiFormatla() {
 
   if (!metin) { toast('Önce açıklama yaz!', 'hata'); return; }
   if (metin.length < 10) { toast('Açıklama çok kısa.', 'hata'); return; }
+
+  // Key yoksa tekrar çek
+  if (!CLAUDE_KEY) {
+    try {
+      const kr = await fetch('/api/claude-key?sifre=' + (localStorage.getItem('ha_sifre') || ''));
+      const kd = await kr.json();
+      if (kd.ok) CLAUDE_KEY = kd.key;
+    } catch(e) {}
+  }
+  if (!CLAUDE_KEY) { toast('Claude API key bulunamadı!', 'hata'); return; }
 
   btn.disabled = true;
   btn.style.opacity = '0.5';
