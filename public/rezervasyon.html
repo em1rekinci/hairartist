@@ -2010,9 +2010,11 @@ async function hizmetleriYukle() {
     window._kampanyaBit   = kampanyaBit;
     window._kampanyaHedef = kampanyaHedef;
 
-    // Tarih yoksa indirim her zaman aktif; tarih varsa sayfa yüklenirken 0 göster,
-    // müşteri tarih seçince kampanyaKontrol() tekrar hesaplayacak
-    const indirimAktif = !kampanyaBas && !kampanyaBit;
+    // Tarih yoksa indirim her zaman aktif; tarih varsa bugünün tarihi kampanya aralığında mı kontrol et
+    const bugunStr = new Date().toISOString().split('T')[0];
+    const indirimAktif = !kampanyaBas && !kampanyaBit
+      ? true
+      : (bugunStr >= kampanyaBas && bugunStr <= kampanyaBit);
     const efektifIndirim = indirimAktif ? indirimYuzde : 0;
 
     // Tarih badge metni  (ör. "10 Mar – 20 Mar")
