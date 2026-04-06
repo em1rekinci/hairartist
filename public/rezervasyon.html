@@ -1967,6 +1967,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var el = document.getElementById(prefix + '-tarih');
     if (!el) return;
     el.min = bugun;
+    el.addEventListener('click', function() { try { el.showPicker(); } catch(e) {} });
     el.addEventListener('change', function() {
       if (el.value < bugun) { el.value = bugun; }
       saatleriGuncelle(prefix);
