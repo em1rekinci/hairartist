@@ -253,7 +253,7 @@ body{overflow-x:hidden}
 <div class="toast-urun" id="toastUrun"></div>
 
 <!-- Lightbox -->
-<div class="lb-ov" id="lbOv">
+<div class="lb-ov" id="lbOv" onclick="lbKapat(event)">
   <button class="lb-kapat" onclick="lbKapat()">✕</button>
   <button class="lb-nav lb-prev" id="lbPrev" onclick="lbNav(-1,event)">‹</button>
   <div class="lb-track-wrap" id="lbTrackWrap">
@@ -348,9 +348,9 @@ function lbAc(idx) {
 
 function lbKapat(e) {
   if (e) {
-    // Sadece arka plana (slide veya track-wrap) tıklandığında kapat, img veya butonlara değil
     const t = e.target;
-    if (!t.classList.contains('lb-slide') && !t.classList.contains('lb-track-wrap') && t.id !== 'lbOv') return;
+    // Nav butonları, kapat butonu ve resmin kendisine tıklanınca kapanmasın
+    if (t.closest('.lb-kapat') || t.closest('.lb-nav') || t.tagName === 'IMG') return;
   }
   document.getElementById('lbOv').classList.remove('ac');
   document.body.style.overflow = '';
