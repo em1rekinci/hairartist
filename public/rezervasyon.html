@@ -1284,11 +1284,12 @@ function hizmetSecN(el, ad, min, max, sure) {
   // Seçili tarihe göre gerçek indirimi kontrol et
   var secilenTarih = document.getElementById('n-tarih').value || '';
   var gercekInd = kampanyaKontrol(secilenTarih, 'n');
-  var tumInd = window._indirimYuzde || 0;
 
-  // min/max dropdown'dan indirimli gelebilir; orijinale döndür
-  var orijMin = tumInd > 0 ? Math.round(min / (1 - tumInd / 100)) : min;
-  var orijMax = tumInd > 0 ? Math.round(max / (1 - tumInd / 100)) : max;
+  // Orijinal fiyatları doğrudan hizmet listesinden al
+  var liste = window._hizmetListesi || [];
+  var hizmetObj = liste.find(function(x){ return x.ad === ad; });
+  var orijMin = hizmetObj ? (hizmetObj.min_fiyat || 0) : min;
+  var orijMax = hizmetObj ? (hizmetObj.max_fiyat || 0) : max;
   var gercekMin = gercekInd > 0 ? Math.round(orijMin * (1 - gercekInd / 100)) : orijMin;
   var gercekMax = gercekInd > 0 ? Math.round(orijMax * (1 - gercekInd / 100)) : orijMax;
 
@@ -1336,14 +1337,14 @@ function hizmetSecO(el, ad, fiyat, sure) {
   document.getElementById('o-cs-arrow').style.transform = '';
 
   // Seçili tarihe göre gerçek indirim oranını hesapla
-  // (tarih aralığı varsa ve seçilen tarih dışındaysa indirim = 0)
   var secilenTarih = document.getElementById('o-tarih').value || '';
   var gercekInd = kampanyaKontrol(secilenTarih, 'o');
 
-  // fiyat dropdown'dan indirimli geldi; eğer gerçek indirim 0 ise orijinale döndür
-  var tumInd = window._indirimYuzde || 0;
-  var orijinalFiyat = tumInd > 0 ? Math.round(fiyat / (1 - tumInd / 100)) : fiyat;
-  var gercekFiyat  = gercekInd > 0 ? Math.round(orijinalFiyat * (1 - gercekInd / 100)) : orijinalFiyat;
+  // Orijinal fiyatı doğrudan hizmet listesinden al
+  var liste = window._hizmetListesi || [];
+  var hizmetObj = liste.find(function(x){ return x.ad === ad; });
+  var orijinalFiyat = hizmetObj ? (hizmetObj.max_fiyat || 0) : fiyat;
+  var gercekFiyat = gercekInd > 0 ? Math.round(orijinalFiyat * (1 - gercekInd / 100)) : orijinalFiyat;
 
   document.getElementById('o-fiyat').value = gercekFiyat;
 
