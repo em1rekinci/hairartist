@@ -1116,7 +1116,7 @@ function demoData(){
   const ISIM=['Ayşe Kaya','Fatma Demir','Zeynep Yıldız','Elif Çelik','Hatice Şahin','Meryem Özkan','Büşra Aslan','Selin Arslan','Neslihan Doğan','Gül Aydın','Derya Bulut','Leyla Korkmaz','Sibel Yılmaz','Hande Kurt','Özge Polat','Ceren Yılmaz','Merve Kaya'];
   const NOTLAR=['—','Alerjim var','Saçlarım hassas','Özel gün','Kısa istiyor','Rötuş olacak','—','—'];
   const DUR=['bekliyor','onaylandi','onaylandi','reddedildi','onaylandi','onaylandi'];
-  const SAAT=['09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00'];
+  const SAAT=['09:00','09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00'];
   const pids=personel.map(p=>p.id);
   const b=new Date();const d=[];
   for(let i=0;i<55;i++){
@@ -1305,11 +1305,13 @@ function tkDetay(t){
   const sbdg=document.getElementById('tkdetsayi');sbdg.textContent=gr.length+' randevu';sbdg.style.display=gr.length?'':'none';
   const e=document.getElementById('tkdetice');
   if(!gr.length){e.innerHTML='<div class="bos">Bu gün için randevu yok.</div>';return;}
-  const saatler=['09','10','11','12','13','14','15','16','17','18','19'];
+  const saatler=['09:00','09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30','19:00'];
   let h='<div class="ssw">';
   saatler.forEach(sa=>{
-    const rb=gr.filter(r=>(r.saat||'').startsWith(sa+':'));
-    h+=`<div class="ss"><div class="ssl">${sa}:00</div><div class="ssb">`;
+    const rb=gr.filter(r=>(r.saat||'')===sa);
+    if(!rb.length) return; // boş saatleri gösterme
+    const [saatNo, dakNo] = sa.split(':');
+    h+=`<div class="ss"><div class="ssl">${saatNo}<span style="font-size:.55rem;display:block;color:var(--text3)">${dakNo}</span></div><div class="ssb">`;
     rb.forEach(r=>{const p=personel.find(x=>x.id===r.personelId)||personel.find(x=>x.ad===r.personelId);h+=`<div class="ssr${r.durum==='bekliyor'?' br2':''}" onclick="detay('${r.id}')"><div class="ssrad">${r.ad}</div><div class="ssrb">${r.hizmet}${p?' · '+p.ad:''} · ${bH(r.durum)}</div></div>`;});
     h+='</div></div>';
   });

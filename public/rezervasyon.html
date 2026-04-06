@@ -1969,6 +1969,13 @@ async function saatleriGuncelle(prefix) {
   var suAnSaat = simdi.getHours();
   var personelId = document.getElementById(prefix + '-personel').value;
 
+  // Salı günü kontrolü (0=Pazar, 1=Pazartesi, 2=Salı, ...)
+  var saliMi = false;
+  if (tarih) {
+    var secilenGun = new Date(tarih + 'T00:00:00').getDay();
+    saliMi = (secilenGun === 2);
+  }
+
   // Supabase'den dolu saatleri çek
   var doluSaatler = tarih ? await doluSaatleriCek(personelId, tarih) : [];
 
@@ -1979,13 +1986,13 @@ async function saatleriGuncelle(prefix) {
     var gecmisMi = bugunMu && saatInt <= suAnSaat;
     var doluMu = doluSaatler.includes(saatStr);
 
-    if (gecmisMi || doluMu) {
+    if (gecmisMi || doluMu || saliMi) {
       btn.disabled = true;
       btn.classList.remove('selected');
-      btn.style.opacity = doluMu ? '.35' : '.2';
+      btn.style.opacity = saliMi ? '.2' : (doluMu ? '.35' : '.2');
       btn.style.cursor = 'not-allowed';
       btn.style.textDecoration = 'line-through';
-      btn.title = doluMu ? 'Bu saat dolu' : 'Geçmiş saat';
+      btn.title = saliMi ? 'Salı günleri kapalıyız' : (doluMu ? 'Bu saat dolu' : 'Geçmiş saat');
     } else {
       btn.disabled = false;
       btn.style.opacity = '';
@@ -1994,6 +2001,21 @@ async function saatleriGuncelle(prefix) {
       btn.title = '';
     }
   });
+
+  // Salı ise tarih alanının altında uyarı göster
+  var formEl = document.getElementById(formId);
+  var mevcutUyari = formEl ? formEl.querySelector('.sali-uyari') : null;
+  if (saliMi) {
+    if (!mevcutUyari) {
+      var uyari = document.createElement('p');
+      uyari.className = 'sali-uyari';
+      uyari.style.cssText = 'color:#e57373;font-size:.75rem;letter-spacing:.05em;margin-top:6px;';
+      uyari.textContent = '⚠ Salı günleri dükkanımız kapalıdır. Lütfen farklı bir gün seçin.';
+      tarihEl.parentElement.appendChild(uyari);
+    }
+  } else {
+    if (mevcutUyari) mevcutUyari.remove();
+  }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
