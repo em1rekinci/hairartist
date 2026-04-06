@@ -759,53 +759,6 @@ a[href^="tel"] {
 .foot-credit { color: #fff !important; }
 
 </style>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<style>
-.flatpickr-day.flatpickr-disabled,
-.flatpickr-day.flatpickr-disabled:hover {
-  color: rgba(247,244,239,.18) !important;
-  background: transparent !important;
-  cursor: not-allowed !important;
-  text-decoration: line-through;
-}
-.flatpickr-calendar {
-  background: #111 !important;
-  border: 1px solid #222 !important;
-  box-shadow: 0 8px 40px rgba(0,0,0,.6) !important;
-  border-radius: 0 !important;
-  font-family: 'Montserrat', sans-serif !important;
-}
-.flatpickr-day {
-  color: #f7f4ef !important;
-  border-radius: 0 !important;
-}
-.flatpickr-day:hover:not(.flatpickr-disabled) {
-  background: #222 !important;
-  border-color: #333 !important;
-}
-.flatpickr-day.selected, .flatpickr-day.selected:hover {
-  background: #f7f4ef !important;
-  color: #080808 !important;
-  border-color: #f7f4ef !important;
-}
-.flatpickr-day.today:not(.selected) {
-  border-color: rgba(247,244,239,.3) !important;
-}
-.flatpickr-months .flatpickr-month,
-.flatpickr-weekdays,
-span.flatpickr-weekday {
-  background: #080808 !important;
-  color: rgba(247,244,239,.5) !important;
-  fill: rgba(247,244,239,.5) !important;
-}
-.flatpickr-current-month .flatpickr-monthDropdown-months,
-.flatpickr-current-month input.cur-year {
-  color: #f7f4ef !important;
-}
-.flatpickr-prev-month svg, .flatpickr-next-month svg {
-  fill: #f7f4ef !important;
-}
-</style>
 </head>
 <body>
 
@@ -975,20 +928,29 @@ span.flatpickr-weekday {
       </div>
       <div class="fg">
         <label class="fl">Tarih</label>
-        <input id="n-tarih" class="fi" type="text" placeholder="Tarih seçin" readonly required>
+        <input id="n-tarih" class="fi" type="date" required>
       </div>
       <div class="fg">
         <label class="fl">Saat</label>
         <div class="time-grid">
           <button type="button" class="time-btn" onclick="selectTime(this,'09:00','n')">09:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'09:30','n')">09:30</button>
           <button type="button" class="time-btn" onclick="selectTime(this,'10:00','n')">10:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'10:30','n')">10:30</button>
           <button type="button" class="time-btn" onclick="selectTime(this,'11:00','n')">11:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'11:30','n')">11:30</button>
           <button type="button" class="time-btn" onclick="selectTime(this,'12:00','n')">12:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'12:30','n')">12:30</button>
           <button type="button" class="time-btn" onclick="selectTime(this,'13:00','n')">13:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'13:30','n')">13:30</button>
           <button type="button" class="time-btn" onclick="selectTime(this,'14:00','n')">14:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'14:30','n')">14:30</button>
           <button type="button" class="time-btn" onclick="selectTime(this,'15:00','n')">15:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'15:30','n')">15:30</button>
           <button type="button" class="time-btn" onclick="selectTime(this,'16:00','n')">16:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'16:30','n')">16:30</button>
           <button type="button" class="time-btn" onclick="selectTime(this,'17:00','n')">17:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'17:30','n')">17:30</button>
           <button type="button" class="time-btn" onclick="selectTime(this,'18:00','n')">18:00</button>
         </div>
         <input type="hidden" id="n-saat" value="">
@@ -1101,20 +1063,29 @@ span.flatpickr-weekday {
       </div>
       <div class="fg">
         <label class="fl">Tarih</label>
-        <input id="o-tarih" class="fi" type="text" placeholder="Tarih seçin" readonly required>
+        <input id="o-tarih" class="fi" type="date" required>
       </div>
       <div class="fg">
         <label class="fl">Saat</label>
         <div class="time-grid">
           <button type="button" class="time-btn" onclick="selectTime(this,'09:00','o')">09:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'09:30','o')">09:30</button>
           <button type="button" class="time-btn" onclick="selectTime(this,'10:00','o')">10:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'10:30','o')">10:30</button>
           <button type="button" class="time-btn" onclick="selectTime(this,'11:00','o')">11:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'11:30','o')">11:30</button>
           <button type="button" class="time-btn" onclick="selectTime(this,'12:00','o')">12:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'12:30','o')">12:30</button>
           <button type="button" class="time-btn" onclick="selectTime(this,'13:00','o')">13:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'13:30','o')">13:30</button>
           <button type="button" class="time-btn" onclick="selectTime(this,'14:00','o')">14:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'14:30','o')">14:30</button>
           <button type="button" class="time-btn" onclick="selectTime(this,'15:00','o')">15:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'15:30','o')">15:30</button>
           <button type="button" class="time-btn" onclick="selectTime(this,'16:00','o')">16:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'16:30','o')">16:30</button>
           <button type="button" class="time-btn" onclick="selectTime(this,'17:00','o')">17:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'17:30','o')">17:30</button>
           <button type="button" class="time-btn" onclick="selectTime(this,'18:00','o')">18:00</button>
         </div>
         <input type="hidden" id="o-saat" value="">
@@ -1539,7 +1510,6 @@ async function normalGonder() {
     mesaj(mesajDiv, 'Lütfen tüm zorunlu alanları doldurun.', 'hata');
     return;
   }
-
   
   if (!kvkkCheck.checked || !gizlilikCheck.checked) {
     mesaj(mesajDiv, 'Lütfen sözleşmeleri okuyup onaylayın.', 'hata');
@@ -1605,7 +1575,6 @@ async function odemeGit() {
     mesaj(mesajDiv, 'Lütfen tüm zorunlu alanları doldurun.', 'hata');
     return;
   }
-
   
   if (!kvkkCheck.checked || !gizlilikCheck.checked || !mesafeliCheck.checked || !teslimatCheck.checked) {
     mesaj(mesajDiv, 'Lütfen tüm sözleşmeleri okuyup onaylayın.', 'hata');
@@ -2254,38 +2223,6 @@ function personelDropdownOlustur(prefix, liste) {
   }).join('');
 }
 
-</script>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/tr.js"></script>
-<script>
-(function() {
-  var bugun = new Date();
-  bugun.setHours(0,0,0,0);
-
-  var fpConfig = {
-    locale: 'tr',
-    minDate: 'today',
-    disableMobile: true, // mobilde de flatpickr kullan
-    disable: [
-      function(date) {
-        return date.getDay() === 2; // Salı
-      }
-    ],
-    dateFormat: 'Y-m-d',
-    onChange: function(selectedDates, dateStr, instance) {
-      // Hangi input olduğunu bul ve change event'ini tetikle
-      var el = instance.input;
-      var event = new Event('change', { bubbles: true });
-      el.dispatchEvent(event);
-    }
-  };
-
-  var nTarihEl = document.getElementById('n-tarih');
-  var oTarihEl = document.getElementById('o-tarih');
-
-  if (nTarihEl) flatpickr(nTarihEl, fpConfig);
-  if (oTarihEl) flatpickr(oTarihEl, fpConfig);
-})();
 </script>
 </body>
 </html>
