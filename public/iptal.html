@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rezervasyon İptal — Hair Artist</title>
+<link rel="icon" href="favicondark.png" media="(prefers-color-scheme: light)">
+<link rel="icon" href="favicon.png" media="(prefers-color-scheme: dark)">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{
+  background:#080808;
+  color:#f7f4ef;
+  font-family:'Montserrat',sans-serif;
+  font-weight:300;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  -webkit-font-smoothing:antialiased;
+}
+.kart{
+  background:#111;
+  border:1px solid #1e1e1e;
+  width:100%;
+  max-width:480px;
+  overflow:hidden;
+}
+.kart-ust{
+  background:#080808;
+  padding:40px 36px 36px;
+  text-align:center;
+  border-bottom:1px solid #1e1e1e;
+}
+.ikon{
+  width:56px;height:56px;
+  border:1.5px solid rgba(255,85,85,.3);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 20px;
+}
+.ikon svg{width:22px;height:22px;color:#ff6b6b}
+.kart-ust h1{
+  font-family:'Playfair Display',serif;
+  font-size:1.5rem;
+  font-weight:700;
+  color:#f7f4ef;
+  margin-bottom:8px;
+  line-height:1.2;
+}
+.kart-ust p{
+  font-size:.72rem;
+  color:rgba(247,244,239,.45);
+  line-height:1.7;
+  letter-spacing:.02em;
+}
+
+/* Rezervasyon detay kutusu */
+.rez-detay{
+  padding:24px 32px;
+  border-bottom:1px solid #1e1e1e;
+  display:none;
+}
+.rez-detay.show{display:block}
+.detay-satir{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:12px;
+  padding:8px 0;
+  border-bottom:1px solid #1a1a1a;
+}
+.detay-satir:last-child{border-bottom:none}
+.detay-key{
+  font-size:.52rem;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:rgba(247,244,239,.35);
+  flex-shrink:0;
+  padding-top:1px;
+}
+.detay-val{
+  font-size:.78rem;
+  color:#f7f4ef;
+  text-align:right;
+  font-weight:400;
+}
+
+/* Butonlar */
+.kart-alt{padding:24px 32px 28px}
+.btn-iptal{
+  display:block;width:100%;
+  background:#ff3b3b;
+  color:#fff;
+  border:none;
+  padding:14px;
+  font-family:'Montserrat',sans-serif;
+  font-size:.58rem;
+  font-weight:600;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:opacity .2s;
+  margin-bottom:8px;
+}
+.btn-iptal:hover{opacity:.85}
+.btn-iptal:disabled{opacity:.45;cursor:not-allowed}
+.btn-geri{
+  display:block;width:100%;
+  background:transparent;
+  color:rgba(247,244,239,.5);
+  border:1px solid #1e1e1e;
+  padding:12px;
+  font-family:'Montserrat',sans-serif;
+  font-size:.56rem;
+  font-weight:500;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  text-align:center;
+  text-decoration:none;
+  cursor:pointer;
+  transition:all .2s;
+}
+.btn-geri:hover{border-color:#333;color:#f7f4ef}
+
+/* Mesaj */
+.mesaj{
+  display:none;
+  font-size:.75rem;
+  padding:12px 16px;
+  margin-bottom:12px;
+  line-height:1.5;
+}
+.mesaj.basari{
+  background:rgba(0,200,100,.08);
+  border:1px solid rgba(0,200,100,.25);
+  color:#00c864;
+}
+.mesaj.hata{
+  background:rgba(255,85,85,.08);
+  border:1px solid rgba(255,85,85,.25);
+  color:#ff6b6b;
+}
+
+/* Yükleniyor */
+.yukleniyor{
+  padding:40px 32px;
+  text-align:center;
+  font-size:.72rem;
+  color:rgba(247,244,239,.35);
+  letter-spacing:.1em;
+}
+.yukleniyor-dot{
+  width:8px;height:8px;
+  background:rgba(247,244,239,.2);
+  border-radius:50%;
+  margin:0 auto 16px;
+  animation:pulse 1.2s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:.2}50%{opacity:1}}
+
+/* Hata/bulunamadı */
+.bulunamadi{
+  padding:32px;
+  text-align:center;
+  display:none;
+}
+.bulunamadi p{
+  font-size:.75rem;
+  color:rgba(247,244,239,.4);
+  line-height:1.7;
+}
+
+/* Alt logo */
+.alt-logo{
+  text-align:center;
+  margin-top:28px;
+  opacity:.3;
+}
+.alt-logo a{
+  text-decoration:none;
+  font-family:'Playfair Display',serif;
+  font-size:.85rem;
+  color:#f7f4ef;
+  font-style:italic;
+}
+
+@media(max-width:520px){
+  .kart-ust{padding:32px 20px 28px}
+  .rez-detay{padding:20px}
+  .kart-alt{padding:20px}
+}
+</style>
+</head>
+<body>
+
+<div>
+  <div class="kart">
+    <div class="kart-ust">
+      <div class="ikon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </div>
+      <h1>Rezervasyon İptali</h1>
+      <p>Rezervasyonunuzu iptal etmek üzeresiniz.<br>Bu işlem geri alınamaz.</p>
+    </div>
+
+    <!-- Yükleniyor -->
+    <div class="yukleniyor" id="yukleniyor">
+      <div class="yukleniyor-dot"></div>
+      Rezervasyon bilgileri yükleniyor…
+    </div>
+
+    <!-- Bulunamadı -->
+    <div class="bulunamadi" id="bulunamadi">
+      <p>Rezervasyon bulunamadı veya<br>bu link geçersiz.</p>
+    </div>
+
+    <!-- Detaylar -->
+    <div class="rez-detay" id="rez-detay">
+      <div class="detay-satir">
+        <span class="detay-key">Ad Soyad</span>
+        <span class="detay-val" id="d-ad">—</span>
+      </div>
+      <div class="detay-satir">
+        <span class="detay-key">Hizmet</span>
+        <span class="detay-val" id="d-hizmet">—</span>
+      </div>
+      <div class="detay-satir">
+        <span class="detay-key">Tarih</span>
+        <span class="detay-val" id="d-tarih">—</span>
+      </div>
+      <div class="detay-satir">
+        <span class="detay-key">Saat</span>
+        <span class="detay-val" id="d-saat">—</span>
+      </div>
+      <div class="detay-satir">
+        <span class="detay-key">Durum</span>
+        <span class="detay-val" id="d-durum">—</span>
+      </div>
+    </div>
+
+    <!-- Butonlar -->
+    <div class="kart-alt" id="kart-alt" style="display:none">
+      <div class="mesaj" id="mesaj"></div>
+      <button class="btn-iptal" id="btn-iptal" onclick="iptalEt()">Rezervasyonu İptal Et</button>
+      <a href="/" class="btn-geri">Ana Sayfaya Dön</a>
+    </div>
+  </div>
+
+  <div class="alt-logo">
+    <a href="/">Hair Artist</a>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://botxnihztrnwzjnrlwzv.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvdHhuaWh6dHJud3pqbnJsd3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MTg4MTAsImV4cCI6MjA5MDA5NDgxMH0.AcX4_2Aykf8J1jln9fvODh2rRffymfEJCAekzmN1ALg';
+
+const params = new URLSearchParams(window.location.search);
+const REZ_ID = params.get('id');
+
+function tarihFormatla(tarihStr) {
+  if (!tarihStr) return '—';
+  const d = new Date(tarihStr + 'T00:00:00');
+  const aylar = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+  return d.getDate() + ' ' + aylar[d.getMonth()] + ' ' + d.getFullYear();
+}
+
+async function rezervasyonYukle() {
+  if (!REZ_ID) {
+    document.getElementById('yukleniyor').style.display = 'none';
+    document.getElementById('bulunamadi').style.display = 'block';
+    return;
+  }
+
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/rezervasyonlar?id=eq.${REZ_ID}&select=*`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+    });
+    const data = await res.json();
+
+    document.getElementById('yukleniyor').style.display = 'none';
+
+    if (!data || !data.length) {
+      document.getElementById('bulunamadi').style.display = 'block';
+      return;
+    }
+
+    const r = data[0];
+
+    document.getElementById('d-ad').textContent = r.ad || '—';
+    document.getElementById('d-hizmet').textContent = r.hizmet || '—';
+    document.getElementById('d-tarih').textContent = tarihFormatla(r.tarih);
+    document.getElementById('d-saat').textContent = r.saat || '—';
+
+    const durumEl = document.getElementById('d-durum');
+    if (r.durum === 'iptal_edildi') {
+      durumEl.textContent = 'Zaten iptal edildi';
+      durumEl.style.color = '#ff6b6b';
+      document.getElementById('btn-iptal').disabled = true;
+      document.getElementById('btn-iptal').textContent = 'Bu rezervasyon zaten iptal edildi';
+    } else {
+      durumEl.textContent = r.durum === 'onaylandi' ? 'Onaylandı' : 'Bekliyor';
+      durumEl.style.color = r.durum === 'onaylandi' ? '#00c864' : '#ffdf00';
+    }
+
+    document.getElementById('rez-detay').classList.add('show');
+    document.getElementById('kart-alt').style.display = 'block';
+  } catch(e) {
+    document.getElementById('yukleniyor').style.display = 'none';
+    document.getElementById('bulunamadi').style.display = 'block';
+  }
+}
+
+async function iptalEt() {
+  const btn = document.getElementById('btn-iptal');
+  const mesajEl = document.getElementById('mesaj');
+
+  btn.disabled = true;
+  btn.textContent = 'İptal ediliyor…';
+  mesajEl.style.display = 'none';
+
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/rezervasyonlar?id=eq.${REZ_ID}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({ durum: 'iptal_edildi' })
+    });
+
+    if (!res.ok) throw new Error();
+
+    mesajEl.className = 'mesaj basari';
+    mesajEl.textContent = '✓ Rezervasyonunuz başarıyla iptal edildi.';
+    mesajEl.style.display = 'block';
+    btn.textContent = 'İptal Edildi ✓';
+    document.getElementById('d-durum').textContent = 'İptal edildi';
+    document.getElementById('d-durum').style.color = '#ff6b6b';
+  } catch(e) {
+    mesajEl.className = 'mesaj hata';
+    mesajEl.textContent = '✗ Bir hata oluştu, lütfen tekrar deneyin.';
+    mesajEl.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Rezervasyonu İptal Et';
+  }
+}
+
+rezervasyonYukle();
+</script>
+</body>
+</html>
