@@ -656,6 +656,32 @@ window.addEventListener('message',async function(e){
             created_at:    new Date().toISOString()
           })
         });
+        // Stok düş
+        const urunler = JSON.parse(siparis.urunler || '[]');
+        for(const item of urunler){
+          if(!item.id) continue;
+          try{
+            // Önce güncel stoğu oku
+            const stokRes = await fetch(`${SUPA_URL}/rest/v1/shop?id=eq.${item.id}&select=stok`,{
+              headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
+            });
+            const stokData = await stokRes.json();
+            const mevcutStok = stokData[0]?.stok ?? 0;
+            const yeniStok = Math.max(0, mevcutStok - item.adet);
+            await fetch(`${SUPA_URL}/rest/v1/shop?id=eq.${item.id}`,{
+              method:'PATCH',
+              headers:{
+                'apikey':SUPA_KEY,
+                'Authorization':'Bearer '+SUPA_KEY,
+                'Content-Type':'application/json',
+                'Prefer':'return=minimal'
+              },
+              body: JSON.stringify({ stok: yeniStok })
+            });
+          }catch(stokErr){
+            console.warn('Stok düşülemedi (id:'+item.id+'):', stokErr);
+          }
+        }
         sessionStorage.removeItem('bekleyen_siparis');
       }
     }catch(err){
