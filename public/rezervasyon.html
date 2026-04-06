@@ -1399,16 +1399,16 @@ async function whatsappGonder(telefon, ad, hizmet, tarih, saat, personel, rezerv
     : '';
 
   const metin =
-    `✅ *Rezervasyon Onayı — Hair Artist*\n\n` +
+    `📋 *Rezervasyon Bilgilendirme — Fatih Kurt Hair Artist*\n\n` +
     `Merhaba ${ad},\n\n` +
-    `Rezervasyonunuz başarıyla alındı!\n\n` +
+    `Rezervasyon talebiniz alındı. En kısa sürede size geri dönüş sağlayacağız.\n\n` +
     `📋 *Detaylar:*\n` +
     `• Hizmet: ${hizmet}\n` +
     `• Tarih: ${tarih}\n` +
     `• Saat: ${saat || 'Belirtilmedi'}\n` +
     `• Personel: ${personel}\n\n` +
     (iptalLink ? `❌ Rezervasyonunuzu iptal etmek için:\n${iptalLink}\n\n` : '') +
-    `_Hair Artist — fatihkurthairartist.com_`;
+    `_Fatih Kurt Hair Artist — www.fatihkurthairartist.com_`;
 
   try {
     const res = await fetch(

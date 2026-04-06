@@ -79,6 +79,10 @@ app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
+app.get('/iptal', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'iptal.html'));
+});
+
 app.get('/portfolio', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'portfolio.html'));
 });
@@ -592,13 +596,49 @@ app.post('/api/paytr-callback', async (req, res) => {
         );
         if (r.ok) {
           console.log(`[PayTR Callback] ✓ Shop siparişi onaylandi: ${merchant_oid}`);
-          // Mail gönder
+          // Mail gönder + stok düş
           try {
             const rows = await r.json();
             const s = Array.isArray(rows) ? rows[0] : rows;
-            if (s) await shopSiparisMail(s);
+            if (s) {
+              await shopSiparisMail(s);
+              // Stok düş — sepet_detay formatı: [[ad, fiyat, adet], ...]
+              const urunler = JSON.parse(s.sepet_detay || '[]');
+              for (const item of urunler) {
+                const urunAd = Array.isArray(item) ? item[0] : item.ad;
+                const adet   = Array.isArray(item) ? (item[2] || 1) : (item.adet || 1);
+                if (!urunAd) continue;
+                try {
+                  const stokRes = await fetch(
+                    `${SB_URL}/rest/v1/shop?ad=eq.${encodeURIComponent(urunAd)}&select=id,stok`,
+                    { headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY } }
+                  );
+                  const stokData = await stokRes.json();
+                  if (!stokData || !stokData.length) {
+                    console.warn(`[Stok] Ürün bulunamadı: ${urunAd}`);
+                    continue;
+                  }
+                  const mevcutStok = stokData[0].stok ?? 0;
+                  const urunId     = stokData[0].id;
+                  const yeniStok   = Math.max(0, mevcutStok - adet);
+                  await fetch(`${SB_URL}/rest/v1/shop?id=eq.${urunId}`, {
+                    method: 'PATCH',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'apikey': SB_KEY,
+                      'Authorization': 'Bearer ' + SB_KEY,
+                      'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify({ stok: yeniStok })
+                  });
+                  console.log(`[Stok] ✓ ${urunAd}: ${mevcutStok} → ${yeniStok}`);
+                } catch(stokErr) {
+                  console.warn(`[Stok] Düşülemedi (${urunAd}):`, stokErr.message);
+                }
+              }
+            }
           } catch(e) {
-            console.warn('[Mail] Gönderim hatası:', e.message);
+            console.warn('[Mail/Stok] Hata:', e.message);
           }
         } else {
           const t = await r.text();
