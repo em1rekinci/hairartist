@@ -812,6 +812,8 @@ a[href^="tel"] {
 
       <!-- Rezervasyon Yap -->
       <div class="rez-kart" onclick="goster('normal-form')">
+        <div class="indirim-badge" id="normal-indirim-badge" style="display:none;background:#f7f4ef;color:#080808"></div>
+        <div id="normal-tarih-badge" style="display:none;position:absolute;bottom:20px;right:20px;background:rgba(247,244,239,.12);border:1px solid rgba(247,244,239,.25);color:#f7f4ef;font-size:.48rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:4px 9px;pointer-events:none"></div>
         <div class="rez-kart-no">01 — Ücretsiz</div>
         <h2>Rezervasyon Yap <em>Ödeme yok</em></h2>
         <p>Rezervasyonunuzu yapın, En kısa sürede rezervasyonunuz onaylansın. Salona geldiğinizde ödeme yaparsınız.</p>
@@ -828,6 +830,7 @@ a[href^="tel"] {
       <div class="rez-kart odeme" onclick="goster('odeme-form')">
         
         <div class="indirim-badge" id="odeme-indirim-badge" style="display:none"></div>
+        <div id="odeme-tarih-badge" style="display:none;position:absolute;bottom:20px;right:20px;background:rgba(255,223,0,.12);border:1px solid rgba(255,223,0,.3);color:#ffdf00;font-size:.48rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:4px 9px;pointer-events:none"></div>
         <div class="rez-kart-no">02 — Online Ödeme</div>
         <h2>Hizmet Al <em>Online ödeme</em></h2>
         <p>Hizmetinizi şimdi satın alın, online güvenli ödeme yapın. Randevu tarihinizi belirleyin.</p>
@@ -1793,6 +1796,43 @@ function selectTime(btn, time, prefix) {
   document.getElementById(prefix + '-saat').value = time;
 }
 
+// Kampanya tarih kontrolü — tarih değişince indirim güncelle
+document.addEventListener('DOMContentLoaded', function() {
+  var oTarih = document.getElementById('o-tarih');
+  if (oTarih) {
+    oTarih.addEventListener('change', function() {
+      var ind = kampanyaKontrol(this.value, 'o');
+      var liste = window._hizmetListesi || [];
+      if (liste.length) hizmetDropdownOlustur('o', liste, ind);
+      var badge = document.getElementById('odeme-indirim-badge');
+      var tbadge = document.getElementById('odeme-tarih-badge');
+      var yuzde = window._indirimYuzde || 0;
+      var hedef = window._kampanyaHedef || 'ikisi';
+      var goster = yuzde > 0 && (hedef === 'hizmet' || hedef === 'ikisi');
+      if (badge) {
+        if (goster && ind > 0) { badge.textContent = '%' + yuzde + ' İndirim'; badge.style.display = ''; }
+        else { badge.style.display = 'none'; }
+      }
+    });
+  }
+  var nTarih = document.getElementById('n-tarih');
+  if (nTarih) {
+    nTarih.addEventListener('change', function() {
+      var ind = kampanyaKontrol(this.value, 'n');
+      var liste = window._hizmetListesi || [];
+      if (liste.length) hizmetDropdownOlustur('n', liste, ind);
+      var badge = document.getElementById('normal-indirim-badge');
+      var yuzde = window._indirimYuzde || 0;
+      var hedef = window._kampanyaHedef || 'ikisi';
+      var goster = yuzde > 0 && (hedef === 'rezervasyon' || hedef === 'ikisi');
+      if (badge) {
+        if (goster && ind > 0) { badge.textContent = '%' + yuzde + ' İndirim'; badge.style.display = ''; }
+        else { badge.style.display = 'none'; }
+      }
+    });
+  }
+});
+
 // Personelin seçili tarihte dolu saatlerini Supabase'den çek
 async function doluSaatleriCek(personelId, tarih) {
   if (!personelId || !tarih) return [];
@@ -1877,7 +1917,7 @@ async function hizmetleriYukle() {
       fetch(`${SUPABASE_URL}/rest/v1/hizmetler?select=*&order=sira.asc,created_at.asc`, {
         headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
       }),
-      fetch(`${SUPABASE_URL}/rest/v1/ayarlar?key=eq.indirim_yuzde&select=value`, {
+      fetch(`${SUPABASE_URL}/rest/v1/ayarlar?key=in.(indirim_yuzde,kampanya_baslangic,kampanya_bitis,kampanya_hedef)&select=key,value`, {
         headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
       })
     ]);
@@ -1885,32 +1925,86 @@ async function hizmetleriYukle() {
     const liste = await hizRes.json();
     if (!liste.length) return;
 
-    // İndirim oranını al
-    let indirimYuzde = 0;
+    let indirimYuzde = 0, kampanyaBas = '', kampanyaBit = '', kampanyaHedef = 'ikisi';
     if (ayarRes.ok) {
       const ayarlar = await ayarRes.json();
-      indirimYuzde = ayarlar.length ? parseInt(ayarlar[0].value) || 0 : 0;
+      indirimYuzde = parseInt((ayarlar.find(a => a.key === 'indirim_yuzde') || {}).value) || 0;
+      kampanyaBas  = (ayarlar.find(a => a.key === 'kampanya_baslangic') || {}).value || '';
+      kampanyaBit  = (ayarlar.find(a => a.key === 'kampanya_bitis')     || {}).value || '';
+      kampanyaHedef= (ayarlar.find(a => a.key === 'kampanya_hedef')     || {}).value || 'ikisi';
     }
-    window._indirimYuzde = indirimYuzde;
+    window._indirimYuzde  = indirimYuzde;
+    window._kampanyaBas   = kampanyaBas;
+    window._kampanyaBit   = kampanyaBit;
+    window._kampanyaHedef = kampanyaHedef;
 
-    // Online ödeme kartındaki indirim badge'ini güncelle
-    const badge = document.getElementById('odeme-indirim-badge');
-    if (badge) {
-      if (indirimYuzde > 0) {
-        badge.textContent = '%' + indirimYuzde + ' İndirim';
-        badge.style.display = '';
-      } else {
-        badge.style.display = 'none';
-      }
+    // Tarih yoksa indirim her zaman aktif; tarih varsa sayfa yüklenirken 0 göster,
+    // müşteri tarih seçince kampanyaKontrol() tekrar hesaplayacak
+    const indirimAktif = !kampanyaBas && !kampanyaBit;
+    const efektifIndirim = indirimAktif ? indirimYuzde : 0;
+
+    // Tarih badge metni  (ör. "10 Mar – 20 Mar")
+    var tarihBadgeTxt = (kampanyaBas && kampanyaBit)
+      ? formatTarihKisa(kampanyaBas) + ' – ' + formatTarihKisa(kampanyaBit)
+      : '';
+
+    // ── Hizmet Al kartı (odeme) ──
+    var hizmetAlAktif = indirimYuzde > 0 && (kampanyaHedef === 'hizmet' || kampanyaHedef === 'ikisi');
+    var odeIBadge = document.getElementById('odeme-indirim-badge');
+    var odeTBadge = document.getElementById('odeme-tarih-badge');
+    if (odeIBadge) {
+      if (hizmetAlAktif) { odeIBadge.textContent = '%' + indirimYuzde + ' İndirim'; odeIBadge.style.display = ''; }
+      else { odeIBadge.style.display = 'none'; }
+    }
+    if (odeTBadge) {
+      if (tarihBadgeTxt && hizmetAlAktif) { odeTBadge.textContent = tarihBadgeTxt; odeTBadge.style.display = ''; }
+      else { odeTBadge.style.display = 'none'; }
     }
 
-    // n- prefix: indirim YOK (normal rezervasyon sabit fiyat)
-    hizmetDropdownOlustur('n', liste, 0);
-    // o- prefix: indirim VAR (hizmet satın al bölümü)
-    hizmetDropdownOlustur('o', liste, indirimYuzde);
+    // ── Rezervasyon Yap kartı (normal) ──
+    var rezAktif = indirimYuzde > 0 && (kampanyaHedef === 'rezervasyon' || kampanyaHedef === 'ikisi');
+    var norIBadge = document.getElementById('normal-indirim-badge');
+    var norTBadge = document.getElementById('normal-tarih-badge');
+    if (norIBadge) {
+      if (rezAktif) { norIBadge.textContent = '%' + indirimYuzde + ' İndirim'; norIBadge.style.display = ''; }
+      else { norIBadge.style.display = 'none'; }
+    }
+    if (norTBadge) {
+      if (tarihBadgeTxt && rezAktif) { norTBadge.textContent = tarihBadgeTxt; norTBadge.style.display = ''; }
+      else { norTBadge.style.display = 'none'; }
+    }
+
+    // ── Hizmet dropdown indirim oranları ──
+    var hizmetAlInd   = (kampanyaHedef === 'hizmet'      || kampanyaHedef === 'ikisi') ? efektifIndirim : 0;
+    var normalRezInd  = (kampanyaHedef === 'rezervasyon' || kampanyaHedef === 'ikisi') ? efektifIndirim : 0;
+
+    window._hizmetListesi = liste;
+    hizmetDropdownOlustur('n', liste, normalRezInd);
+    hizmetDropdownOlustur('o', liste, hizmetAlInd);
   } catch(e) {
     console.warn('Hizmetler yüklenemedi:', e);
   }
+}
+
+function formatTarihKisa(tarihStr) {
+  if (!tarihStr) return '';
+  var d = new Date(tarihStr + 'T00:00:00');
+  var aylar = ['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'];
+  return d.getDate() + ' ' + aylar[d.getMonth()];
+}
+
+function kampanyaKontrol(tarih, prefix) {
+  var bas   = window._kampanyaBas   || '';
+  var bit   = window._kampanyaBit   || '';
+  var yuzde = window._indirimYuzde  || 0;
+  var hedef = window._kampanyaHedef || 'ikisi';
+  if (!yuzde) return 0;
+  // Hedef kontrolü
+  if (prefix === 'o' && hedef === 'rezervasyon') return 0;
+  if (prefix === 'n' && hedef === 'hizmet')      return 0;
+  if (!bas && !bit) return yuzde; // tarih yoksa her zaman aktif
+  if (!tarih) return 0;
+  return tarih >= bas && tarih <= bit ? yuzde : 0;
 }
 
 function hizmetFiyatStr(min, max) {

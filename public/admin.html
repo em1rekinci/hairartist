@@ -639,11 +639,40 @@ tbody td{padding:10px 13px;vertical-align:middle}
             </div>
           </div></div>
           <div class="card"><div class="ch" style="padding:10px 14px"><h3 style="font-size:.8rem">🏷️ Kampanya İndirimi</h3></div><div class="cb" style="padding:10px 14px">
-            <div style="display:flex;flex-direction:column;gap:8px">
-              <p style="font-size:.65rem;color:var(--text3);margin:0">Sadece <strong>Hizmet Satın Al</strong> bölümüne uygulanır. 0 = indirim yok.</p>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <p style="font-size:.65rem;color:var(--text3);margin:0">İndirimin hangi bölüme uygulanacağını seçin. Tarih aralığı seçilirse sadece o tarihlerde geçerli olur.</p>
+              <!-- Hedef seçimi -->
+              <div>
+                <label style="font-size:.5rem;letter-spacing:.17em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px">İndirim Uygulanacak Bölüm</label>
+                <div style="display:flex;flex-direction:column;gap:5px">
+                  <label id="hlbl-ikisi" style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:7px 10px;border:1px solid var(--black);border-radius:3px;background:rgba(0,0,0,.04)">
+                    <input type="radio" name="kampanya-hedef" value="ikisi" id="kh-ikisi" checked style="accent-color:var(--black)" onchange="kampanyaHedefDegisti()">
+                    <span style="font-size:.72rem;color:var(--text)">✦ <strong>Her İkisi</strong></span>
+                  </label>
+                  <label id="hlbl-hizmet" style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:7px 10px;border:1px solid var(--line2);border-radius:3px">
+                    <input type="radio" name="kampanya-hedef" value="hizmet" id="kh-hizmet" style="accent-color:var(--black)" onchange="kampanyaHedefDegisti()">
+                    <span style="font-size:.72rem;color:var(--text2)">💳 Yalnızca <strong>Hizmet Al</strong></span>
+                  </label>
+                  <label id="hlbl-rezervasyon" style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:7px 10px;border:1px solid var(--line2);border-radius:3px">
+                    <input type="radio" name="kampanya-hedef" value="rezervasyon" id="kh-rezervasyon" style="accent-color:var(--black)" onchange="kampanyaHedefDegisti()">
+                    <span style="font-size:.72rem;color:var(--text2)">📅 Yalnızca <strong>Rezervasyon Yap</strong></span>
+                  </label>
+                </div>
+              </div>
               <div style="display:flex;gap:8px;align-items:center">
                 <input class="fi" id="indirim-input" type="number" min="0" max="100" placeholder="%" style="width:72px;text-align:center;font-size:1rem;font-weight:700;padding:6px 8px" oninput="indirimOnizlemeGuncelle(parseInt(this.value)||0)">
+                <span style="font-size:.65rem;color:var(--text3);white-space:nowrap">% indirim</span>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <div><label style="font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:4px">Başlangıç</label>
+                <input class="fi" id="kampanya-baslangic" type="date" style="padding:7px 10px;font-size:.78rem"></div>
+                <div><label style="font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:4px">Bitiş</label>
+                <input class="fi" id="kampanya-bitis" type="date" style="padding:7px 10px;font-size:.78rem"></div>
+              </div>
+              <div id="kampanya-durum" style="font-size:.65rem;min-height:16px"></div>
+              <div style="display:flex;gap:8px">
                 <button class="sbtn" style="flex:1;padding:8px" onclick="indirimKaydet()">Kaydet</button>
+                <button class="sbtn" style="padding:8px 12px;background:transparent;border:1px solid var(--rbdr);color:var(--red)" onclick="kampanyaSil()">Kaldır</button>
               </div>
               <div id="indirim-onizleme" style="font-size:.65rem;color:var(--text3);min-height:16px"></div>
             </div>
@@ -995,7 +1024,7 @@ tbody td{padding:10px 13px;vertical-align:middle}
 // ─── SUPABASE ───
 const SUPA_URL='https://botxnihztrnwzjnrlwzv.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvdHhuaWh6dHJud3pqbnJsd3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MTg4MTAsImV4cCI6MjA5MDA5NDgxMH0.AcX4_2Aykf8J1jln9fvODh2rRffymfEJCAekzmN1ALg';
-// Claude key server proxy üzerinden kullanılıyor
+const CLAUDE_KEY = 'BURAYA_API_KEY_GIRIN';
 const ADMIN_SIFRE='fatihkurt341905.';
 
 // UTC string'i yerel tarihe çevir (Türkiye +3 için)
@@ -1140,6 +1169,18 @@ async function verileriYukle(showToast=true){
     // İndirim ayarını yükle
     const indirimAyar = (ayarData||[]).find(a=>a.key==='indirim_yuzde');
     const indirimYuzde = indirimAyar ? parseInt(indirimAyar.value)||0 : 0;
+    const basAyar = (ayarData||[]).find(a=>a.key==='kampanya_baslangic');
+    const bitAyar = (ayarData||[]).find(a=>a.key==='kampanya_bitis');
+    const hedefAyar = (ayarData||[]).find(a=>a.key==='kampanya_hedef');
+    const bas = basAyar ? basAyar.value : '';
+    const bit = bitAyar ? bitAyar.value : '';
+    const hedef = hedefAyar ? hedefAyar.value : 'ikisi';
+    if(document.getElementById('kampanya-baslangic')) document.getElementById('kampanya-baslangic').value = bas||'';
+    if(document.getElementById('kampanya-bitis')) document.getElementById('kampanya-bitis').value = bit||'';
+    // Hedef radio'yu ayarla
+    const khEl = document.getElementById('kh-'+hedef);
+    if(khEl){ khEl.checked = true; kampanyaHedefDegisti(); }
+    kampanyaDurumGuncelle(indirimYuzde, bas, bit, hedef);
     const inp = document.getElementById('indirim-input');
     if(inp) inp.value = indirimYuzde || '';
     indirimOnizlemeGuncelle(indirimYuzde);
@@ -1817,11 +1858,73 @@ function hizRender(){
 async function indirimKaydet(){
   const yuzde = parseInt(document.getElementById('indirim-input').value)||0;
   if(yuzde<0||yuzde>100){toast('Geçerli bir oran girin (0-100).','hata');return;}
+  const bas = document.getElementById('kampanya-baslangic').value;
+  const bit = document.getElementById('kampanya-bitis').value;
+  if(bas && bit && bas > bit){toast('Başlangıç tarihi bitiş tarihinden büyük olamaz.','hata');return;}
+  const hedefEl = document.querySelector('input[name="kampanya-hedef"]:checked');
+  const hedef = hedefEl ? hedefEl.value : 'ikisi';
   try{
     await sRest('ayarlar?key=eq.indirim_yuzde',{method:'PATCH',body:JSON.stringify({value:String(yuzde)})});
+    const upsert = async (key, val) => {
+      const check = await sRest('ayarlar?key=eq.'+key+'&select=key');
+      const arr = Array.isArray(check) ? check : [];
+      if(arr.length) await sRest('ayarlar?key=eq.'+key,{method:'PATCH',body:JSON.stringify({value:val})});
+      else await sRest('ayarlar',{method:'POST',body:JSON.stringify({key,value:val})});
+    };
+    await upsert('kampanya_baslangic', bas);
+    await upsert('kampanya_bitis', bit);
+    await upsert('kampanya_hedef', hedef);
     indirimOnizlemeGuncelle(yuzde);
-    toast(yuzde===0?'İndirim kaldırıldı.':'%'+yuzde+' indirim aktif edildi.','ok');
+    kampanyaDurumGuncelle(yuzde, bas, bit, hedef);
+    toast(yuzde===0?'İndirim kaldırıldı.':'%'+yuzde+' kampanya kaydedildi.','ok');
   }catch(e){toast('Hata: '+e.message,'hata');}
+}
+
+async function kampanyaSil(){
+  try{
+    await sRest('ayarlar?key=eq.indirim_yuzde',{method:'PATCH',body:JSON.stringify({value:'0'})});
+    await sRest('ayarlar?key=eq.kampanya_baslangic',{method:'PATCH',body:JSON.stringify({value:''})});
+    await sRest('ayarlar?key=eq.kampanya_bitis',{method:'PATCH',body:JSON.stringify({value:''})});
+    await sRest('ayarlar?key=eq.kampanya_hedef',{method:'PATCH',body:JSON.stringify({value:'ikisi'})});
+    document.getElementById('indirim-input').value = '';
+    document.getElementById('kampanya-baslangic').value = '';
+    document.getElementById('kampanya-bitis').value = '';
+    const khIkisi = document.getElementById('kh-ikisi');
+    if(khIkisi){ khIkisi.checked = true; kampanyaHedefDegisti(); }
+    indirimOnizlemeGuncelle(0);
+    kampanyaDurumGuncelle(0,'','','ikisi');
+    toast('Kampanya kaldırıldı.','ok');
+  }catch(e){toast('Hata: '+e.message,'hata');}
+}
+
+function kampanyaHedefDegisti(){
+  const hedefEl = document.querySelector('input[name="kampanya-hedef"]:checked');
+  const hedef = hedefEl ? hedefEl.value : 'ikisi';
+  ['ikisi','hizmet','rezervasyon'].forEach(h=>{
+    const lbl = document.getElementById('hlbl-'+h);
+    if(!lbl) return;
+    if(hedef===h){
+      lbl.style.borderColor='var(--black)';
+      lbl.style.background='rgba(0,0,0,.04)';
+    } else {
+      lbl.style.borderColor='var(--line2)';
+      lbl.style.background='';
+    }
+  });
+}
+
+function kampanyaDurumGuncelle(yuzde, bas, bit, hedef){
+  const el = document.getElementById('kampanya-durum');
+  if(!el) return;
+  if(!yuzde){ el.textContent=''; return; }
+  const hedefMetin = hedef==='hizmet'?'Hizmet Al':hedef==='rezervasyon'?'Rezervasyon Yap':'Her İkisi';
+  if(!bas || !bit){
+    el.innerHTML='<span style="color:var(--green);font-weight:600">✓ Aktif: </span>Süresiz %'+yuzde+' indirim <span style="color:var(--blue);font-size:.6rem">('+hedefMetin+')</span>';
+    return;
+  }
+  const b = new Date(bas).toLocaleDateString('tr-TR');
+  const e = new Date(bit).toLocaleDateString('tr-TR');
+  el.innerHTML='<span style="color:var(--green);font-weight:600">✓ Aktif: </span>'+b+' – '+e+' arası %'+yuzde+' indirim <span style="color:var(--blue);font-size:.6rem">('+hedefMetin+')</span>';
 }
 function indirimOnizlemeGuncelle(yuzde){
   const el=document.getElementById('indirim-onizleme');
@@ -2043,10 +2146,13 @@ async function aiFormatla() {
   if (yukl) { yukl.style.display = 'block'; }
 
   try {
-    const response = await fetch('/api/claude-format', {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'x-api-key': CLAUDE_KEY,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
