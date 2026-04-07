@@ -338,6 +338,12 @@ async function iptalEt() {
 
     if (!res.ok) throw new Error();
 
+    // Kapalı saati geri aç (admin onaylarken kapanmıştı)
+    await fetch(`${SUPABASE_URL}/rest/v1/kapali_saatler?rezervasyon_id=eq.${REZ_ID}`, {
+      method: 'DELETE',
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+    }).catch(() => {}); // hata olsa da iptal işlemini engelleme
+
     mesajEl.className = 'mesaj basari';
     mesajEl.textContent = '✓ Rezervasyonunuz başarıyla iptal edildi.';
     mesajEl.style.display = 'block';
