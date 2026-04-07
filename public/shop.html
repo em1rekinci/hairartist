@@ -40,7 +40,7 @@
 /* ── ÜRÜN KARTI ── */
 .urun-kart{background:#fff;border:1px solid #e8e4dc;display:flex;flex-direction:column;overflow:hidden;transition:box-shadow .3s,transform .3s;position:relative}
 .urun-kart:hover{box-shadow:0 12px 48px rgba(8,8,8,.13);transform:translateY(-2px)}
-.urun-resim{aspect-ratio:1/1;background:#fff;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.urun-resim{aspect-ratio:1/1;background:#fff;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
 .urun-resim img{width:100%;height:100%;object-fit:contain;transition:transform .4s ease;padding:0}
 .urun-kart:hover .urun-resim img{transform:scale(1.04)}
 .urun-placeholder{display:flex;flex-direction:column;align-items:center;gap:10px;opacity:.2}
@@ -106,7 +106,7 @@
 /* ── FOTO SLİDER OKLARI ── */
 .foto-slider-wrap{position:absolute;inset:0;width:100%;height:100%;overflow:hidden;z-index:1}
 .foto-slider-track{display:flex;height:100%;transition:transform .35s cubic-bezier(.4,0,.2,1);will-change:transform}
-.foto-slider-track img{height:100%;object-fit:contain;flex-shrink:0;padding:8px}
+.foto-slider-track img{width:100%;height:100%;object-fit:contain;flex-shrink:0;padding:8px}
 .foto-ok{position:absolute;top:50%;transform:translateY(-50%);width:32px;height:32px;background:rgba(255,255,255,.92);border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;transition:background .2s,opacity .2s;padding:0;pointer-events:auto}
 .foto-ok:hover{background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.15)}
 .foto-ok svg{width:12px;height:12px;stroke:#080808;stroke-width:2.5;fill:none;pointer-events:none}
@@ -364,17 +364,15 @@ const _kartFotoIdx = {};
 function kartFotoGit(kartId, delta) {
   const track = document.getElementById('ft-' + kartId);
   if (!track) return;
-  const toplam = track.children.length;
+  const toplam = parseInt(track.dataset.toplam) || track.children.length;
   if (toplam <= 1) return;
   _kartFotoIdx[kartId] = ((_kartFotoIdx[kartId] || 0) + delta + toplam) % toplam;
   const idx = _kartFotoIdx[kartId];
-  const resimEl = track.closest('.urun-resim');
-  const w = resimEl.getBoundingClientRect().width || resimEl.offsetWidth || track.offsetWidth;
-  // track genişliğini de güncelle
-  track.style.width = (w * toplam) + 'px';
-  Array.from(track.children).forEach(img => { img.style.width = w + 'px'; img.style.minWidth = w + 'px'; });
-  track.style.transform = `translateX(-${idx * w}px)`;
-  // dots
+  // track genişliği = toplam * 100%, her img = 100%/toplam
+  // translateX: -(idx * (100/toplam))% = -(idx * 100)% / toplam
+  // Daha basit: track width = toplam*100%, her img width = 100%/toplam
+  // transform = -idx * (100/toplam) %
+  track.style.transform = `translateX(-${idx * (100 / toplam)}%)`;
   const dots = document.querySelectorAll(`#fd-${kartId} .foto-dot`);
   dots.forEach((d, i) => d.classList.toggle('ak', i === idx));
 }
@@ -403,15 +401,17 @@ function urunKartHtml(u, buyuk=false) {
 
   let resimHtml = '';
   if (fotolar.length > 1) {
+    const n = fotolar.length;
+    const imgW = (100 / n).toFixed(4); // her img'in track içindeki yüzdesi
     const trackImgs = fotolar.map(f =>
-      `<img src="${f}" alt="${u.ad}" style="width:100%;height:100%;object-fit:contain;flex-shrink:0;min-width:100%;padding:8px">`
+      `<img src="${f}" alt="${u.ad}" style="width:${imgW}%;height:100%;object-fit:contain;flex-shrink:0;padding:8px">`
     ).join('');
     const dots = fotolar.map((_, i) =>
-      `<button class="foto-dot${i===0?' ak':''}" onclick="event.preventDefault();event.stopPropagation();(function(){_kartFotoIdx['${kartId}']=${i};var t=document.getElementById('ft-${kartId}');var r=t.closest('.urun-resim');var w=r.getBoundingClientRect().width||r.offsetWidth;t.style.width=(w*${fotolar.length})+'px';Array.from(t.children).forEach(function(img){img.style.width=w+'px';img.style.minWidth=w+'px';});t.style.transform='translateX(-'+(${i}*w)+'px)';document.querySelectorAll('#fd-${kartId} .foto-dot').forEach(function(d,j){d.classList.toggle('ak',j===${i});})})()"></button>`
+      `<button class="foto-dot${i===0?' ak':''}" onclick="event.preventDefault();event.stopPropagation();(function(){_kartFotoIdx['${kartId}']=${i};var t=document.getElementById('ft-${kartId}');var n=${n};t.style.transform='translateX(-'+(${i}*(100/n))+'%)';document.querySelectorAll('#fd-${kartId} .foto-dot').forEach(function(d,j){d.classList.toggle('ak',j===${i});});})()"></button>`
     ).join('');
     resimHtml = `
       <div class="foto-slider-wrap">
-        <div class="foto-slider-track" id="ft-${kartId}">${trackImgs}</div>
+        <div class="foto-slider-track" id="ft-${kartId}" data-toplam="${n}" style="width:${n*100}%">${trackImgs}</div>
       </div>
       <button class="foto-ok prev" onclick="event.preventDefault();event.stopPropagation();kartFotoGit('${kartId}',-1)"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
       <button class="foto-ok next" onclick="event.preventDefault();event.stopPropagation();kartFotoGit('${kartId}',1)"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>
@@ -499,21 +499,6 @@ function csSliderKur(urunler) {
   csOto();
   wrap.addEventListener('mouseenter', csDur);
   wrap.addEventListener('mouseleave', csOto);
-
-  // Track genişliklerini init et
-  requestAnimationFrame(() => {
-    urunler.forEach(u => {
-      const track = document.getElementById('ft-' + u.id);
-      if (!track) return;
-      const resimEl = track.closest('.urun-resim');
-      if (!resimEl) return;
-      const w = resimEl.getBoundingClientRect().width || resimEl.offsetWidth;
-      if (!w) return;
-      const cnt = track.children.length;
-      track.style.width = (w * cnt) + 'px';
-      Array.from(track.children).forEach(img => { img.style.width = w + 'px'; img.style.minWidth = w + 'px'; });
-    });
-  });
 }
 
 // ── TÜM ÜRÜNLER GRİD
@@ -525,20 +510,6 @@ function tumUrunlerRender(urunler) {
     return;
   }
   grid.innerHTML = urunler.map(u => urunKartHtml(u)).join('');
-  // Track genişliklerini DOM'a eklenince init et
-  requestAnimationFrame(() => {
-    urunler.forEach(u => {
-      const track = document.getElementById('ft-' + u.id);
-      if (!track) return;
-      const resimEl = track.closest('.urun-resim');
-      if (!resimEl) return;
-      const w = resimEl.getBoundingClientRect().width || resimEl.offsetWidth;
-      if (!w) return;
-      const cnt = track.children.length;
-      track.style.width = (w * cnt) + 'px';
-      Array.from(track.children).forEach(img => { img.style.width = w + 'px'; img.style.minWidth = w + 'px'; });
-    });
-  });
 }
 
 // ── SEPETE EKLE
