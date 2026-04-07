@@ -40,7 +40,7 @@
 /* ── ÜRÜN KARTI ── */
 .urun-kart{background:#fff;border:1px solid #e8e4dc;display:flex;flex-direction:column;overflow:hidden;transition:box-shadow .3s,transform .3s;position:relative}
 .urun-kart:hover{box-shadow:0 12px 48px rgba(8,8,8,.13);transform:translateY(-2px)}
-.urun-resim{aspect-ratio:1/1;background:#fff;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.urun-resim{aspect-ratio:1/1;background:#fff;position:relative;display:flex;align-items:center;justify-content:center}
 .urun-resim img{width:100%;height:100%;object-fit:contain;transition:transform .4s ease;padding:0}
 .urun-kart:hover .urun-resim img{transform:scale(1.04)}
 .urun-placeholder{display:flex;flex-direction:column;align-items:center;gap:10px;opacity:.2}
@@ -427,7 +427,7 @@ function urunKartHtml(u, buyuk=false) {
     : `<button class="urun-btn" onclick="event.preventDefault();event.stopPropagation();sepeteEkle('${u.id}')">Sepete Ekle</button>`;
 
   return `
-    <a class="urun-kart" href="/urun?id=${u.id}" style="text-decoration:none;color:inherit;cursor:pointer;display:flex;flex-direction:column">
+    <div class="urun-kart" style="text-decoration:none;color:inherit;cursor:pointer;display:flex;flex-direction:column" onclick="window.location='/urun?id=${u.id}'">
       <div class="urun-resim">
         ${indirimBadge || stokBadge}
         ${resimHtml}${placeholder}
@@ -443,7 +443,7 @@ function urunKartHtml(u, buyuk=false) {
         </div>
         ${btnHtml}
       </div>
-    </a>`;
+    </div>`;
 }
 
 // ── ÇOK SATANLAR SLİDER
