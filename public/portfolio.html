@@ -52,8 +52,9 @@ nav ul li a.active{color:var(--off);border-bottom:2px solid var(--off)}
 .gallery-section{background:var(--mid);padding:60px 56px 100px}
 .section-label{font-size:.6rem;letter-spacing:.35em;text-transform:uppercase;color:rgba(247,244,239,.3);display:flex;align-items:center;gap:16px;margin-bottom:40px}
 .section-label::after{content:"";flex:1;height:1px;background:rgba(247,244,239,.08)}
-.gal-grid{columns:3;gap:4px;column-fill:balance}
-.gal-item{break-inside:avoid;margin-bottom:4px;position:relative;overflow:hidden;cursor:pointer}
+.gal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.gal-grid::after{content:"";display:block}
+.gal-item{position:relative;overflow:hidden;cursor:pointer;break-inside:avoid}
 .gal-item img{width:100%;height:auto;display:block;filter:grayscale(10%);transition:transform .6s cubic-bezier(.4,0,.2,1),filter .4s}
 .gal-item:hover img{transform:scale(1.04);filter:grayscale(0%)}
 .gal-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,8,.72) 0%,rgba(8,8,8,.1) 55%,transparent 100%);transition:background .4s;display:flex;align-items:flex-end;padding:18px}
@@ -123,7 +124,7 @@ nav ul li a.active{color:var(--off);border-bottom:2px solid var(--off)}
   .page-header{flex-direction:column;align-items:flex-start;padding-top:86px;gap:24px}
   .ph-right{align-self:stretch;justify-content:flex-start;padding-bottom:32px}
   .ph-stat{padding:0 28px}
-  .gal-grid{columns:2}
+  .gal-grid{display:block;columns:2;gap:4px}
   .cta-strip{flex-direction:column;gap:32px;text-align:center}
   footer{padding:28px 24px}
 }
@@ -331,6 +332,23 @@ async function galeriYukle() {
         </div>
       </div>
     `).join('');
+
+    // Son satır hizalama: kalan fotoğraf sayısına göre grid ayarla
+    const cols = 3;
+    const remainder = fotolar.length % cols;
+    if (remainder === 1) {
+      // Tek fotoğraf kalırsa ortada göster
+      grid.style.justifyItems = 'center';
+      const lastItem = grid.querySelector('.gal-item:last-child');
+      if(lastItem) { lastItem.style.gridColumn = '2'; }
+    } else if (remainder === 2) {
+      // İki fotoğraf kalırsa 1. ve 3. sütuna yerleştir (ortada boşluk bırakma, sola yasla)
+      // Daha iyi görünüm için grid'i 2 kolon gibi davrandır son satırda
+      const items = grid.querySelectorAll('.gal-item');
+      const lastTwo = [items[items.length-2], items[items.length-1]];
+      lastTwo[0].style.gridColumn = '1';
+      lastTwo[1].style.gridColumn = '2';
+    }
 
     // Click → lightbox
     grid.querySelectorAll('.gal-item').forEach((item, i) => {
