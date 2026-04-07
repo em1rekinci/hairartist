@@ -1396,7 +1396,8 @@ const WA_TOKEN    = 'EAAbpYZAirSdQBRI4zue0O1LrIYpb3cAVpEy6Hrq3sGBVptJjlBE4ekryny
 
 function telFormatla(input) {
   let val = input.value.replace(/[^0-9]/g, '');
-  if (!val.startsWith('0') && val.length > 0) val = '0' + val;
+  // Sadece 5 ile başlıyorsa önüne 0 ekle (yabancı numaralara dokunma)
+  if (val.startsWith('5')) val = '0' + val;
   if (val.length > 11) val = val.substring(0, 11);
   // Format: 05xx xxx xx xx
   let fmt = '';
