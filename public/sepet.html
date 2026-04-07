@@ -74,6 +74,7 @@ body{overflow-x:hidden}
 .form-lbl{font-size:.5rem;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
 .form-inp{background:#f5f1eb;border:1px solid rgba(8,8,8,.12);color:var(--black);padding:10px 12px;font-size:.8rem;outline:none;transition:border-color .2s;width:100%;font-family:'Montserrat',sans-serif;border-radius:2px}
 .form-inp:focus{border-color:rgba(8,8,8,.4);background:#fff}
+.form-inp::placeholder{color:rgba(8,8,8,.28);font-style:italic}
 .form-inp.hata{border-color:#b03020;background:rgba(176,48,32,.04)}
 
 .odeme-btn{width:100%;background:var(--black);color:var(--off);border:none;padding:14px;font-size:.6rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;transition:opacity .2s;font-family:'Montserrat',sans-serif;margin-top:4px;display:flex;align-items:center;justify-content:center;gap:8px}
@@ -232,11 +233,11 @@ select.form-inp:disabled{opacity:.45;cursor:not-allowed}
       <div class="form-baslik">Teslimat Bilgileri</div>
       <div class="form-grup">
         <label class="form-lbl">Ad Soyad</label>
-        <input class="form-inp" id="formAd" type="text" autocomplete="name">
+        <input class="form-inp" id="formAd" type="text" autocomplete="name" placeholder="Ad Soyad">
       </div>
       <div class="form-grup">
         <label class="form-lbl">Telefon</label>
-        <input class="form-inp" id="formTel" type="tel" autocomplete="tel" maxlength="11" inputmode="numeric">
+        <input class="form-inp" id="formTel" type="tel" autocomplete="tel" maxlength="11" inputmode="numeric" placeholder="05xxx">
       </div>
       <div class="form-grup">
         <label class="form-lbl">E-posta</label>
@@ -262,7 +263,7 @@ select.form-inp:disabled{opacity:.45;cursor:not-allowed}
       </div>
       <div class="form-grup">
         <label class="form-lbl">Mahalle / Cadde / Sokak</label>
-        <input class="form-inp" id="formSokak" type="text" autocomplete="address-line1">
+        <input class="form-inp" id="formSokak" type="text" autocomplete="address-line1" placeholder="Adres...">
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
         <div class="form-grup">
