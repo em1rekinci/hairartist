@@ -251,41 +251,73 @@
 
 /* ── Mobile Menu Dil Seçici ─────────────────── */
 .lang-switcher-mobile {
+  position: relative;
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  justify-content: center;
   padding: 12px 0 8px;
   width: 100%;
 }
+.lang-current-mobile {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: 1px solid rgba(247,244,239,.22);
+  color: rgba(247,244,239,.75);
+  padding: 5px 10px;
+  border-radius: 3px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: .6rem;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color .2s, color .2s;
+  white-space: nowrap;
+}
+.lang-current-mobile:hover {
+  border-color: rgba(247,244,239,.5);
+  color: #f7f4ef;
+}
+.lang-dropdown-mobile {
+  display: none;
+  position: absolute;
+  bottom: calc(100% - 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #111;
+  border: 1px solid #222;
+  border-radius: 4px;
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+  min-width: 130px;
+  z-index: 9999;
+  box-shadow: 0 8px 24px rgba(0,0,0,.5);
+}
+.lang-dropdown-mobile.open { display: block; }
 .lang-option-mobile {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   width: 100%;
-  background: rgba(247,244,239,.05);
-  border: 1px solid rgba(247,244,239,.1);
-  border-radius: 6px;
-  padding: 10px 16px;
+  background: none;
+  border: none;
+  padding: 7px 14px;
   cursor: pointer;
-  transition: background .15s, border-color .15s;
+  transition: background .15s;
   text-align: left;
 }
-.lang-option-mobile:hover {
-  background: rgba(247,244,239,.1);
-  border-color: rgba(247,244,239,.3);
-}
-.lang-option-mobile.active {
-  background: rgba(247,244,239,.15);
-  border-color: rgba(247,244,239,.45);
-}
+.lang-option-mobile:hover { background: rgba(247,244,239,.06); }
+.lang-option-mobile.active { background: rgba(247,244,239,.1); }
 .lang-code-mobile {
   font-family: 'Montserrat', sans-serif;
-  font-size: .65rem;
+  font-size: .6rem;
   font-weight: 700;
   letter-spacing: .1em;
   color: #f7f4ef;
   text-transform: uppercase;
-  min-width: 24px;
+  min-width: 22px;
 }
 .lang-name-mobile {
   font-family: 'Montserrat', sans-serif;
@@ -319,33 +351,68 @@
   function mountMobileSwitcher() {
     const mobileMenu = document.getElementById('mobileMenu');
     if (!mobileMenu) return;
-    // Zaten eklenmiş mi?
     if (mobileMenu.querySelector('.lang-switcher-mobile')) return;
+
+    const globe = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`;
 
     const wrap = document.createElement('div');
     wrap.className = 'lang-switcher-mobile';
 
+    const currentBtn = document.createElement('button');
+    currentBtn.className = 'lang-current-mobile';
+    currentBtn.setAttribute('aria-haspopup', 'listbox');
+    currentBtn.setAttribute('aria-expanded', 'false');
+    currentBtn.innerHTML = `${globe}<span class="lang-flag">${LANG_FLAGS[currentLang]}</span><span class="lang-label-mobile">${LANG_LABELS[currentLang]}</span>`;
+
+    const dropdown = document.createElement('ul');
+    dropdown.className = 'lang-dropdown-mobile';
+    dropdown.setAttribute('role', 'listbox');
+
     SUPPORTED.forEach(lang => {
+      const li = document.createElement('li');
       const btn = document.createElement('button');
-      btn.className = 'lang-option-mobile' + (lang === currentLang ? ' active' : '');
+      btn.className = 'lang-option-mobile';
       btn.dataset.lang = lang;
+      btn.setAttribute('role', 'option');
       btn.innerHTML = `<span class="lang-flag-opt">${LANG_FLAGS[lang]}</span><span class="lang-code-mobile">${LANG_LABELS[lang]}</span><span class="lang-name-mobile">${LANG_NAMES[lang]}</span>`;
-      btn.addEventListener('click', async () => {
+      if (lang === currentLang) btn.classList.add('active');
+
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
         await setLang(lang);
+        // Bu dropdown'u güncelle
+        currentBtn.querySelector('.lang-label-mobile').textContent = LANG_LABELS[lang];
+        currentBtn.querySelector('.lang-flag').innerHTML = LANG_FLAGS[lang];
+        dropdown.querySelectorAll('.lang-option-mobile').forEach(b => {
+          b.classList.toggle('active', b.dataset.lang === lang);
+        });
         // nav-right'taki switcher'ı da güncelle
         const navLabel = document.querySelector('.lang-current .lang-current-label');
         const navFlag  = document.querySelector('.lang-current .lang-flag');
         if (navLabel) navLabel.textContent = LANG_LABELS[lang];
         if (navFlag)  navFlag.innerHTML  = LANG_FLAGS[lang];
-        // Aktif class güncelle
-        wrap.querySelectorAll('.lang-option-mobile').forEach(b => {
-          b.classList.toggle('active', b.dataset.lang === lang);
-        });
+        dropdown.classList.remove('open');
+        currentBtn.setAttribute('aria-expanded', 'false');
       });
-      wrap.appendChild(btn);
+
+      li.appendChild(btn);
+      dropdown.appendChild(li);
     });
 
-    // Mobile menu'nun m-book butonundan önce ekle
+    currentBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = dropdown.classList.toggle('open');
+      currentBtn.setAttribute('aria-expanded', String(isOpen));
+    });
+
+    document.addEventListener('click', () => {
+      dropdown.classList.remove('open');
+      currentBtn.setAttribute('aria-expanded', 'false');
+    });
+
+    wrap.appendChild(currentBtn);
+    wrap.appendChild(dropdown);
+
     const mBook = mobileMenu.querySelector('.m-book');
     if (mBook) mobileMenu.insertBefore(wrap, mBook);
     else mobileMenu.appendChild(wrap);
