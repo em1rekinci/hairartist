@@ -8,6 +8,7 @@
 <link rel="icon" href="favicon.png" media="(prefers-color-scheme: dark)">
 <link rel="apple-touch-icon" href="favicon.png">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<script src="/i18n.js" defer></script>
 <link rel="stylesheet" href="style.css">
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -210,20 +211,20 @@ body{overflow-x:hidden}
     <span class="nav-logo-txt" style="display:none">HAIR ARTIST</span>
   </a>
   <ul>
-    <li><a href="/">Anasayfa</a></li>
-    <li><a href="/#about">Hakkımızda</a></li>
-    <li><a href="/#services">Hizmetler</a></li>
-    <li><a href="/fiyatlar">Fiyat Listesi</a></li>
-    <li><a href="/portfolio">Portfolyo</a></li>
-    <li><a href="/shop" class="active">Shop</a></li>
-    <li><a href="/#contact">İletişim</a></li>
+    <li><a href="/" data-i18n="nav_home">Anasayfa</a></li>
+    <li><a href="/#about" data-i18n="nav_about">Hakkımızda</a></li>
+    <li><a href="/#services" data-i18n="nav_services">Hizmetler</a></li>
+    <li><a href="/fiyatlar" data-i18n="nav_prices">Fiyat Listesi</a></li>
+    <li><a href="/portfolio" data-i18n="nav_portfolio">Portfolyo</a></li>
+    <li><a href="/shop" class="active" data-i18n="nav_shop">Shop</a></li>
+    <li><a href="/#contact" data-i18n="nav_contact">İletişim</a></li>
   </ul>
   <div class="nav-right">
     <a href="/sepet" class="nav-cart" title="Sepet" style="position:relative;display:flex;align-items:center;justify-content:center;width:36px;height:36px;color:inherit;text-decoration:none">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
       <span class="sepet-badge" style="display:none;position:absolute;top:-4px;right:-4px;background:var(--black);color:var(--off);font-size:.48rem;font-weight:700;width:16px;height:16px;border-radius:50%;align-items:center;justify-content:center;letter-spacing:0;line-height:1">0</span>
     </a>
-    <a href="/rezervasyon" class="nav-book">Rezervasyon Yap</a>
+    <a href="/rezervasyon" class="nav-book" data-i18n="nav_book">Rezervasyon Yap</a>
     <button class="hamburger" id="hamburger" aria-label="Menü"><span></span><span></span><span></span></button>
   </div>
 </nav>
@@ -236,17 +237,17 @@ body{overflow-x:hidden}
     <li><a href="/#services" onclick="closeMobileMenu()">Hizmetler</a></li>
     <li><a href="/fiyatlar">Fiyat Listesi</a></li>
     <li><a href="/portfolio">Portfolyo</a></li>
-    <li><a href="/shop">Shop</a></li>
+    <li><a href="/shop" data-i18n="nav_shop">Shop</a></li>
     <li><a href="/#contact" onclick="closeMobileMenu()">İletişim</a></li>
   </ul>
-  <a href="/rezervasyon" class="m-book">Rezervasyon Yap</a>
+  <a href="/rezervasyon" class="m-book" data-i18n="nav_book">Rezervasyon Yap</a>
 </div>
 
 <div class="urun-page" id="urunPage">
   <!-- İçerik JS ile doldurulacak -->
   <div class="yukle-wrap" id="yukleWrap">
     <div class="yukle-spin"></div>
-    <span style="font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)">Yükleniyor...</span>
+    <span style="font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)" data-i18n="urun_loading">Yükleniyor...</span>
   </div>
 </div>
 

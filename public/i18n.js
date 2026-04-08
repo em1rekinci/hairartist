@@ -5,10 +5,10 @@
  */
 
 (function () {
-  const SUPPORTED = ['tr', 'en', 'de', 'fr', 'ar', 'ru'];
+  const SUPPORTED = ['tr', 'en', 'de', 'fr', 'ru'];
   const RTL_LANGS  = ['ar'];
-  const LANG_LABELS = { tr: 'TR', en: 'EN', de: 'DE', fr: 'FR', ar: 'AR', ru: 'RU' };
-  const LANG_NAMES  = { tr: 'Türkçe', en: 'English', de: 'Deutsch', fr: 'Français', ar: 'العربية', ru: 'Русский' };
+  const LANG_LABELS = { tr: 'TR', en: 'EN', de: 'DE', fr: 'FR', ru: 'RU' };
+  const LANG_NAMES  = { tr: 'Türkçe', en: 'English', de: 'Deutsch', fr: 'Français',  ru: 'Русский' };
 
   let currentLang = 'tr';
   let translations = {};
@@ -23,16 +23,14 @@
 
   // ── JSON yükle ───────────────────────────────────────────────────────────────
   async function loadTranslations(lang) {
-    if (lang === 'tr') {
-      // Türkçe inline — her zaman hazır
-      return null;
-    }
     try {
       const r = await fetch(`/translations/${lang}.json?v=${Date.now()}`);
       if (!r.ok) throw new Error('not found');
       return await r.json();
     } catch {
-      console.warn(`[i18n] ${lang}.json yüklenemedi, Türkçeye dönülüyor.`);
+      if (lang !== 'tr') {
+        console.warn(`[i18n] ${lang}.json yüklenemedi, Türkçeye dönülüyor.`);
+      }
       return null;
     }
   }
@@ -80,20 +78,16 @@
     currentLang = lang;
     localStorage.setItem('ha_lang', lang);
 
-    const loaded = await loadTranslations(lang);
+    // İstenilen dili yükle; başarısız olursa tr'ye fall back et
+    let loaded = await loadTranslations(lang);
 
-    if (loaded) {
-      translations = loaded;
-    } else {
-      // tr.json'dan yükle (her zaman mevcut)
-      try {
-        const r = await fetch('/translations/tr.json');
-        translations = await r.json();
-      } catch {
-        translations = {};
-      }
+    if (!loaded && lang !== 'tr') {
+      currentLang = 'tr';
+      localStorage.setItem('ha_lang', 'tr');
+      loaded = await loadTranslations('tr');
     }
 
+    translations = loaded || {};
     applyTranslations();
   }
 
@@ -256,16 +250,18 @@
     injectStyles();
     currentLang = detectLang();
 
-    // Önce tr.json yükle (fallback olarak her zaman gerekli)
-    try {
-      const r = await fetch('/translations/tr.json');
-      const trData = await r.json();
-      translations = trData; // default Türkçe
-    } catch { translations = {}; }
-
-    if (currentLang !== 'tr') {
-      const loaded = await loadTranslations(currentLang);
-      if (loaded) translations = loaded;
+    // Tespit edilen dili yükle (tr dahil — hepsi aynı path'ten)
+    const loaded = await loadTranslations(currentLang);
+    if (loaded) {
+      translations = loaded;
+    } else if (currentLang !== 'tr') {
+      // Hedef dil yüklenemedi, tr'ye dön
+      currentLang = 'tr';
+      localStorage.setItem('ha_lang', 'tr');
+      const trData = await loadTranslations('tr');
+      translations = trData || {};
+    } else {
+      translations = {};
     }
 
     applyTranslations();

@@ -8,6 +8,7 @@
 <link rel="icon" href="favicon.png" media="(prefers-color-scheme: dark)">
 <link rel="apple-touch-icon" href="favicon.png">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<script src="/i18n.js" defer></script>
 <link rel="stylesheet" href="style.css">
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -141,20 +142,20 @@ select.form-inp:disabled{opacity:.45;cursor:not-allowed}
     <span class="nav-logo-txt" style="display:none">HAIR ARTIST</span>
   </a>
   <ul>
-    <li><a href="/">Anasayfa</a></li>
-    <li><a href="/#about">Hakkımızda</a></li>
-    <li><a href="/#services">Hizmetler</a></li>
-    <li><a href="/fiyatlar">Fiyat Listesi</a></li>
-    <li><a href="/portfolio">Portfolyo</a></li>
+    <li><a href="/" data-i18n="nav_home">Anasayfa</a></li>
+    <li><a href="/#about" data-i18n="nav_about">Hakkımızda</a></li>
+    <li><a href="/#services" data-i18n="nav_services">Hizmetler</a></li>
+    <li><a href="/fiyatlar" data-i18n="nav_prices">Fiyat Listesi</a></li>
+    <li><a href="/portfolio" data-i18n="nav_portfolio">Portfolyo</a></li>
     <li><a href="/shop" class="active">Shop</a></li>
-    <li><a href="/#contact">İletişim</a></li>
+    <li><a href="/#contact" data-i18n="nav_contact">İletişim</a></li>
   </ul>
   <div class="nav-right">
     <a href="/sepet" class="nav-cart" title="Sepet" style="position:relative;display:flex;align-items:center;justify-content:center;width:36px;height:36px;color:inherit;text-decoration:none">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
       <span class="sepet-badge" style="display:none;position:absolute;top:-4px;right:-4px;background:var(--black);color:var(--off);font-size:.48rem;font-weight:700;width:16px;height:16px;border-radius:50%;align-items:center;justify-content:center;letter-spacing:0;line-height:1">0</span>
     </a>
-    <a href="/rezervasyon" class="nav-book">Rezervasyon Yap</a>
+    <a href="/rezervasyon" class="nav-book" data-i18n="nav_book">Rezervasyon Yap</a>
     <button class="hamburger" id="hamburger" aria-label="Menü"><span></span><span></span><span></span></button>
   </div>
 </nav>
@@ -167,10 +168,10 @@ select.form-inp:disabled{opacity:.45;cursor:not-allowed}
     <li><a href="/#services" onclick="closeMobileMenu()">Hizmetler</a></li>
     <li><a href="/fiyatlar">Fiyat Listesi</a></li>
     <li><a href="/portfolio">Portfolyo</a></li>
-    <li><a href="/shop">Shop</a></li>
+    <li><a href="/shop" data-i18n="nav_shop">Shop</a></li>
     <li><a href="/#contact" onclick="closeMobileMenu()">İletişim</a></li>
   </ul>
-  <a href="/rezervasyon" class="m-book">Rezervasyon Yap</a>
+  <a href="/rezervasyon" class="m-book" data-i18n="nav_book">Rezervasyon Yap</a>
 </div>
 
 <!-- PayTR Modal -->
@@ -201,77 +202,77 @@ select.form-inp:disabled{opacity:.45;cursor:not-allowed}
   <div class="breadcrumb">
     <a href="/">Anasayfa</a>
     <span class="breadcrumb-sep">—</span>
-    <a href="/shop">Shop</a>
+    <a href="/shop" data-i18n="nav_shop">Shop</a>
     <span class="breadcrumb-sep">—</span>
-    <span class="breadcrumb-aktif">Sepet</span>
+    <span class="breadcrumb-aktif" data-i18n="cart_title">Sepet</span>
   </div>
 
   <div class="sepet-layout">
     <!-- SOL -->
     <div class="sepet-sol">
-      <h2>Sepetim</h2>
+      <h2 data-i18n="cart_title">Sepetim</h2>
       <div class="sepet-adet-info" id="sepetAdetInfo">Yükleniyor...</div>
       <div class="sepet-liste" id="sepetListe"></div>
       <a href="/shop" class="alısverişe-devam">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-        Alışverişe Devam Et
+        <span data-i18n="cart_continue">Alışverişe Devam Et</span>
       </a>
     </div>
 
     <!-- SAĞ -->
     <div class="sepet-sag">
-      <div class="ozet-baslik">Sipariş Özeti</div>
+      <div class="ozet-baslik" data-i18n="cart_summary">Sipariş Özeti</div>
       <div id="ozetIcerik">
-        <div class="ozet-satir"><span>Ara Toplam</span><span id="araToplam">—</span></div>
-        <div class="ozet-satir"><span>Kargo</span><span id="kargoUcret">—</span></div>
-        <div class="ozet-satir toplam"><span>Toplam</span><span id="genelToplam">—</span></div>
+        <div class="ozet-satir"><span data-i18n="cart_subtotal">Ara Toplam</span><span id="araToplam">—</span></div>
+        <div class="ozet-satir"><span data-i18n="cart_shipping">Kargo</span><span id="kargoUcret">—</span></div>
+        <div class="ozet-satir toplam"><span data-i18n="cart_total">Toplam</span><span id="genelToplam">—</span></div>
       </div>
       <div class="kargo-bilgi" id="kargoBilgi">
         <strong>Ücretsiz kargo!</strong> 1500₺ ve üzeri siparişlerde geçerlidir.
       </div>
 
-      <div class="form-baslik">Teslimat Bilgileri</div>
+      <div class="form-baslik" data-i18n="cart_delivery_title">Teslimat Bilgileri</div>
       <div class="form-grup">
-        <label class="form-lbl">Ad Soyad</label>
-        <input class="form-inp" id="formAd" type="text" autocomplete="name" placeholder="Ad Soyad">
+        <label class="form-lbl" data-i18n="book_name">Ad Soyad</label>
+        <input class="form-inp" id="formAd" type="text" autocomplete="name" data-i18n-placeholder="cart_ad_ph" placeholder="Ad Soyad">
       </div>
       <div class="form-grup">
-        <label class="form-lbl">Telefon</label>
+        <label class="form-lbl" data-i18n="book_phone">Telefon</label>
         <input class="form-inp" id="formTel" type="tel" autocomplete="tel" maxlength="14" inputmode="numeric" placeholder="05xxx" oninput="sepetTelFormatla(this)">
       </div>
       <div class="form-grup">
-        <label class="form-lbl">E-posta</label>
+        <label class="form-lbl" data-i18n="book_email">E-posta</label>
         <input class="form-inp" id="formEmail" type="email" autocomplete="email">
       </div>
       <div class="form-grup">
-        <label class="form-lbl">İl</label>
+        <label class="form-lbl" data-i18n="cart_il">İl</label>
         <select class="form-inp" id="formIl" autocomplete="address-level1" onchange="ilceDoldur(this.value)">
           <option value="">— Seçiniz —</option>
         </select>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
         <div class="form-grup">
-          <label class="form-lbl">İlçe</label>
+          <label class="form-lbl" data-i18n="cart_ilce">İlçe</label>
           <select class="form-inp" id="formIlce" autocomplete="address-level2">
             <option value="">— Önce il seçin —</option>
           </select>
         </div>
         <div class="form-grup">
-          <label class="form-lbl">Posta Kodu</label>
+          <label class="form-lbl" data-i18n="cart_postakodu">Posta Kodu</label>
           <input class="form-inp" id="formPostakodu" type="text" autocomplete="postal-code" maxlength="5" inputmode="numeric">
         </div>
       </div>
       <div class="form-grup">
-        <label class="form-lbl">Mahalle / Cadde / Sokak</label>
-        <input class="form-inp" id="formSokak" type="text" autocomplete="address-line1" placeholder="Adres...">
+        <label class="form-lbl" data-i18n="cart_adres">Mahalle / Cadde / Sokak</label>
+        <input class="form-inp" id="formSokak" type="text" autocomplete="address-line1" data-i18n-placeholder="cart_adres_ph" placeholder="Adres...">
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
         <div class="form-grup">
-          <label class="form-lbl">Bina No</label>
+          <label class="form-lbl" data-i18n="cart_binano">Bina No</label>
           <input class="form-inp" id="formBinaNo" type="text" autocomplete="address-line2" inputmode="numeric" maxlength="6">
         </div>
         <div class="form-grup">
-          <label class="form-lbl">Daire No</label>
+          <label class="form-lbl" data-i18n="cart_daireno">Daire No</label>
           <input class="form-inp" id="formDaireNo" type="text" inputmode="numeric" maxlength="6">
         </div>
       </div>
@@ -288,11 +289,11 @@ select.form-inp:disabled{opacity:.45;cursor:not-allowed}
 
       <button class="odeme-btn" id="odemeBtn" onclick="odemeBaslat()">
         <div class="spin"></div>
-        <span class="btn-txt">Ödemeye Geç</span>
+        <span class="btn-txt" data-i18n="cart_checkout">Ödemeye Geç</span>
       </button>
       <div class="guvenli-bilgi">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        256-bit SSL ile güvenli ödeme
+        <span data-i18n="cart_ssl">256-bit SSL ile güvenli ödeme</span>
       </div>
       <div style="display:flex;justify-content:center;margin-top:14px">
         <img src="images/paytr-logo2.png" alt="PayTR Güvenli Ödeme" style="height:22px;width:auto;opacity:.6;object-fit:contain">
@@ -301,8 +302,8 @@ select.form-inp:disabled{opacity:.45;cursor:not-allowed}
   </div>
 
 <footer>
-  <p>© 2026 Hair Artist · Branded by Fatih Kurt</p>
-  <a href="https://www.vionasoft.com" class="foot-credit" target="_blank" rel="noopener">Tasarım: Vionasoft</a>
+  <p data-i18n="footer_rights_full">© 2026 Hair Artist · Branded by Fatih Kurt</p>
+  <a href="https://www.vionasoft.com" class="foot-credit" target="_blank" rel="noopener"><span data-i18n="footer_design">Tasarım:</span> Vionasoft</a>
 </footer>
 </div>
 

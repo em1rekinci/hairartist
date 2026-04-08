@@ -14,7 +14,6 @@ const TARGET_LANGS = {
   en: 'English',
   de: 'German',
   fr: 'French',
-  ar: 'Arabic',
   ru: 'Russian'
 };
 
