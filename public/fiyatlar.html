@@ -371,9 +371,11 @@ async function fiyatlariYukle() {
       const sag = liste.slice(yari);
 
       const satirHtml = h => {
+        const aktifDil = (window.i18n && window.i18n.lang) || 'tr';
+        const isim = h['ad_' + aktifDil] || h.ad;
         const tutar = fiyatFormatla(h.min_fiyat, h.max_fiyat);
         return '<div class="fiyat-satir' + (isOzel ? ' highlight-row' : '') + '">' +
-          '<div class="fiyat-satir-ad"><strong>' + h.ad + '</strong></div>' +
+          '<div class="fiyat-satir-ad"><strong>' + isim + '</strong></div>' +
           '<div class="fiyat-satir-tutar' + (isOzel ? ' ozel' : '') + '">' + tutar + '</div>' +
           '</div>';
       };
@@ -397,7 +399,18 @@ async function fiyatlariYukle() {
   }
 }
 
-fiyatlariYukle();
+// i18n hazır olunca yükle, dil değişince yeniden render et
+function baslat() {
+  fiyatlariYukle();
+  window.addEventListener('langchange', fiyatlariYukle);
+}
+
+if (window.i18n) {
+  baslat();
+} else {
+  window.addEventListener('i18nready', baslat);
+  setTimeout(baslat, 400); // fallback
+}
 </script>
 </body>
 </html>
