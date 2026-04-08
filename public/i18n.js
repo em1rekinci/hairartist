@@ -8,7 +8,13 @@
   const SUPPORTED = ['tr', 'en', 'de', 'fr', 'ru'];
   const RTL_LANGS  = ['ar'];
   const LANG_LABELS = { tr: 'TR', en: 'EN', de: 'DE', fr: 'FR', ru: 'RU' };
-  const LANG_FLAGS  = { tr: '🇹🇷', en: '🇬🇧', de: '🇩🇪', fr: '🇫🇷', ru: '🇷🇺' };
+  const LANG_FLAGS  = {
+    tr: '<img src="https://flagcdn.com/16x12/tr.png" width="16" height="12" alt="TR" style="display:inline-block;vertical-align:middle;border-radius:1px">',
+    en: '<img src="https://flagcdn.com/16x12/gb.png" width="16" height="12" alt="EN" style="display:inline-block;vertical-align:middle;border-radius:1px">',
+    de: '<img src="https://flagcdn.com/16x12/de.png" width="16" height="12" alt="DE" style="display:inline-block;vertical-align:middle;border-radius:1px">',
+    fr: '<img src="https://flagcdn.com/16x12/fr.png" width="16" height="12" alt="FR" style="display:inline-block;vertical-align:middle;border-radius:1px">',
+    ru: '<img src="https://flagcdn.com/16x12/ru.png" width="16" height="12" alt="RU" style="display:inline-block;vertical-align:middle;border-radius:1px">',
+  };
   const LANG_NAMES  = { tr: 'Türkçe', en: 'English', de: 'Deutsch', fr: 'Français',  ru: 'Русский' };
 
   let currentLang = 'tr';
@@ -128,7 +134,7 @@
         e.stopPropagation();
         await setLang(lang);
         current.querySelector('.lang-current-label').textContent = LANG_LABELS[lang];
-        current.querySelector('.lang-flag').textContent = LANG_FLAGS[lang];
+        current.querySelector('.lang-flag').innerHTML = LANG_FLAGS[lang];
         dropdown.classList.remove('open');
         current.setAttribute('aria-expanded', 'false');
       });
@@ -322,7 +328,7 @@
         const navLabel = document.querySelector('.lang-current .lang-current-label');
         const navFlag  = document.querySelector('.lang-current .lang-flag');
         if (navLabel) navLabel.textContent = LANG_LABELS[lang];
-        if (navFlag)  navFlag.textContent  = LANG_FLAGS[lang];
+        if (navFlag)  navFlag.innerHTML  = LANG_FLAGS[lang];
         // Aktif class güncelle
         wrap.querySelectorAll('.lang-option-mobile').forEach(b => {
           b.classList.toggle('active', b.dataset.lang === lang);
