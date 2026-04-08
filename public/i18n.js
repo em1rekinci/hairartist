@@ -252,37 +252,45 @@
 /* ── Mobile Menu Dil Seçici ─────────────────── */
 .lang-switcher-mobile {
   display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 16px 0 4px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 0 8px;
+  width: 100%;
 }
 .lang-option-mobile {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 5px;
-  background: rgba(247,244,239,.07);
-  border: 1px solid rgba(247,244,239,.15);
-  border-radius: 4px;
-  padding: 7px 12px;
+  gap: 12px;
+  width: 100%;
+  background: rgba(247,244,239,.05);
+  border: 1px solid rgba(247,244,239,.1);
+  border-radius: 6px;
+  padding: 10px 16px;
   cursor: pointer;
   transition: background .15s, border-color .15s;
+  text-align: left;
 }
 .lang-option-mobile:hover {
-  background: rgba(247,244,239,.14);
-  border-color: rgba(247,244,239,.35);
+  background: rgba(247,244,239,.1);
+  border-color: rgba(247,244,239,.3);
 }
 .lang-option-mobile.active {
-  background: rgba(247,244,239,.18);
-  border-color: rgba(247,244,239,.5);
+  background: rgba(247,244,239,.15);
+  border-color: rgba(247,244,239,.45);
 }
 .lang-code-mobile {
   font-family: 'Montserrat', sans-serif;
-  font-size: .6rem;
+  font-size: .65rem;
   font-weight: 700;
-  letter-spacing: .08em;
+  letter-spacing: .1em;
   color: #f7f4ef;
   text-transform: uppercase;
+  min-width: 24px;
+}
+.lang-name-mobile {
+  font-family: 'Montserrat', sans-serif;
+  font-size: .7rem;
+  color: rgba(247,244,239,.55);
 }
 
 @media (max-width: 768px) {
@@ -321,7 +329,7 @@
       const btn = document.createElement('button');
       btn.className = 'lang-option-mobile' + (lang === currentLang ? ' active' : '');
       btn.dataset.lang = lang;
-      btn.innerHTML = `<span class="lang-flag-opt">${LANG_FLAGS[lang]}</span><span class="lang-code-mobile">${LANG_LABELS[lang]}</span>`;
+      btn.innerHTML = `<span class="lang-flag-opt">${LANG_FLAGS[lang]}</span><span class="lang-code-mobile">${LANG_LABELS[lang]}</span><span class="lang-name-mobile">${LANG_NAMES[lang]}</span>`;
       btn.addEventListener('click', async () => {
         await setLang(lang);
         // nav-right'taki switcher'ı da güncelle
