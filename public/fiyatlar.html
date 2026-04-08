@@ -313,14 +313,15 @@ window.addEventListener('scroll',()=>{
 const SUPA_URL = 'https://botxnihztrnwzjnrlwzv.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvdHhuaWh6dHJud3pqbnJsd3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MTg4MTAsImV4cCI6MjA5MDA5NDgxMH0.AcX4_2Aykf8J1jln9fvODh2rRffymfEJCAekzmN1ALg';
 
-// Admindeki kategori değerleri → görünen isim + ikon + sıra
+// SQL'deki kat değerleri → orijinal sayfa görünümü
 const KAT_META = {
-  'Kesim':         { ikon: '✂️',  ad: 'Saç Kesimi & Şekillendirme', sira: 1 },
-  'Şekillendirme': { ikon: '💇',  ad: 'Şekillendirme',               sira: 2 },
-  'Renk':          { ikon: '🎨',  ad: 'Boyama & Renklendirme',       sira: 3 },
-  'Bakım':         { ikon: '🌿',  ad: 'Saç Bakımı & Kaynak',         sira: 4 },
-  'Özel':          { ikon: '👰',  ad: 'Özel Günler',                 sira: 5 },
-  'Diğer':         { ikon: '✨',  ad: 'Diğer',                       sira: 99 },
+  'Kesim':    { ikon: '✂️',  ad: 'Saç Kesimi & Şekillendirme', sira: 1 },
+  'Güzellik': { ikon: '💅',  ad: 'Güzellik & Bakım',            sira: 2 },
+  'Makyaj':   { ikon: '💄',  ad: 'Makyaj',                      sira: 3 },
+  'Özel':     { ikon: '👰',  ad: 'Özel Günler',                 sira: 4 },
+  'Renk':     { ikon: '🎨',  ad: 'Boyama & Renklendirme',       sira: 5 },
+  'Bakım':    { ikon: '🌿',  ad: 'Saç Bakımı & Kaynak',         sira: 6 },
+  'Diğer':    { ikon: '✨',  ad: 'Diğer',                       sira: 99 },
 };
 
 function fiyatFormatla(min, max) {
@@ -343,7 +344,7 @@ async function fiyatlariYukle() {
       return;
     }
 
-    // Kategorilere göre grupla
+    // Kategoriye göre grupla
     const gruplar = {};
     hizmetler.forEach(h => {
       const kat = h.kat || 'Diğer';
