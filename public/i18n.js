@@ -1,50 +1,45 @@
 /**
- * i18n.js — Hair Artist Dil Değiştirici
- * 
- * Kullanım (her HTML sayfasının <head> sonuna ekleyin):
- *   <script src="/i18n.js"></script>
- * 
- * HTML elemanlarına data-i18n="anahtar" ekleyin:
- *   <a href="#">Anasayfa</a>  →  <a href="#" data-i18n="nav_home">Anasayfa</a>
- * 
- * Placeholder için: data-i18n-placeholder="book_name"
- * Title için: data-i18n-title="nav_book"
+ * i18n.js — Hair Artist çok dil desteği
+ * Desteklenen: tr, en, de, fr, ar, ru
+ * Dil dosyaları: /translations/{lang}.json
  */
 
 (function () {
-  'use strict';
+  const SUPPORTED = ['tr', 'en', 'de', 'fr', 'ar', 'ru'];
+  const RTL_LANGS  = ['ar'];
+  const LANG_LABELS = { tr: 'TR', en: 'EN', de: 'DE', fr: 'FR', ar: 'AR', ru: 'RU' };
+  const LANG_NAMES  = { tr: 'Türkçe', en: 'English', de: 'Deutsch', fr: 'Français', ar: 'العربية', ru: 'Русский' };
 
-  const LANGS = {
-    tr: { label: 'TR', flag: '🇹🇷', name: 'Türkçe', dir: 'ltr' },
-    en: { label: 'EN', flag: '🇬🇧', name: 'English', dir: 'ltr' },
-    de: { label: 'DE', flag: '🇩🇪', name: 'Deutsch', dir: 'ltr' },
-    fr: { label: 'FR', flag: '🇫🇷', name: 'Français', dir: 'ltr' },
-    ar: { label: 'AR', flag: '🇸🇦', name: 'العربية', dir: 'rtl' },
-    ru: { label: 'RU', flag: '🇷🇺', name: 'Русский', dir: 'ltr' }
-  };
-
-  let currentLang = localStorage.getItem('ha_lang') || 'tr';
+  let currentLang = 'tr';
   let translations = {};
 
-  // ── Çeviri dosyasını yükle ──────────────────────────────────────────────────
+  // ── Dil tespiti ──────────────────────────────────────────────────────────────
+  function detectLang() {
+    const stored = localStorage.getItem('ha_lang');
+    if (stored && SUPPORTED.includes(stored)) return stored;
+    const browser = (navigator.language || '').slice(0, 2).toLowerCase();
+    return SUPPORTED.includes(browser) ? browser : 'tr';
+  }
+
+  // ── JSON yükle ───────────────────────────────────────────────────────────────
   async function loadTranslations(lang) {
     if (lang === 'tr') {
-      // Türkçe varsayılan, yüklemeye gerek yok — DOM zaten Türkçe
-      return {};
+      // Türkçe inline — her zaman hazır
+      return null;
     }
     try {
-      const res = await fetch(`/translations/${lang}.json?v=${Date.now()}`);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return await res.json();
-    } catch (e) {
-      console.warn(`[i18n] ${lang}.json yüklenemedi, Türkçe kullanılıyor.`);
-      return {};
+      const r = await fetch(`/translations/${lang}.json?v=${Date.now()}`);
+      if (!r.ok) throw new Error('not found');
+      return await r.json();
+    } catch {
+      console.warn(`[i18n] ${lang}.json yüklenemedi, Türkçeye dönülüyor.`);
+      return null;
     }
   }
 
-  // ── DOM'u güncelle ──────────────────────────────────────────────────────────
-  function applyTranslations(t) {
-    if (!t || Object.keys(t).length === 0) return;
+  // ── DOM'u güncelle ───────────────────────────────────────────────────────────
+  function applyTranslations() {
+    const t = translations;
 
     // data-i18n → textContent
     document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -52,7 +47,7 @@
       if (t[key] !== undefined) el.textContent = t[key];
     });
 
-    // data-i18n-html → innerHTML (bold, em gibi işaretlemeler için)
+    // data-i18n-html → innerHTML (br vb. için)
     document.querySelectorAll('[data-i18n-html]').forEach(el => {
       const key = el.getAttribute('data-i18n-html');
       if (t[key] !== undefined) el.innerHTML = t[key];
@@ -64,242 +59,226 @@
       if (t[key] !== undefined) el.placeholder = t[key];
     });
 
-    // data-i18n-title → title attribute
-    document.querySelectorAll('[data-i18n-title]').forEach(el => {
-      const key = el.getAttribute('data-i18n-title');
-      if (t[key] !== undefined) el.title = t[key];
-    });
+    // RTL desteği
+    if (RTL_LANGS.includes(currentLang)) {
+      document.documentElement.setAttribute('dir', 'rtl');
+      document.documentElement.setAttribute('lang', currentLang);
+    } else {
+      document.documentElement.setAttribute('dir', 'ltr');
+      document.documentElement.setAttribute('lang', currentLang);
+    }
 
-    // data-i18n-aria → aria-label
-    document.querySelectorAll('[data-i18n-aria]').forEach(el => {
-      const key = el.getAttribute('data-i18n-aria');
-      if (t[key] !== undefined) el.setAttribute('aria-label', t[key]);
+    // Dil seçici aktif gösterge
+    document.querySelectorAll('.lang-option').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.lang === currentLang);
     });
   }
 
-  // ── Dil değiştir ────────────────────────────────────────────────────────────
+  // ── Dil değiştir ─────────────────────────────────────────────────────────────
   async function setLang(lang) {
-    if (!LANGS[lang]) return;
-
+    if (!SUPPORTED.includes(lang)) return;
     currentLang = lang;
     localStorage.setItem('ha_lang', lang);
 
-    // HTML dir ve lang attribute
-    document.documentElement.lang = lang;
-    document.documentElement.dir = LANGS[lang].dir;
+    const loaded = await loadTranslations(lang);
 
-    // Arapça için özel font ayarı
-    if (lang === 'ar') {
-      document.body.style.fontFamily = "'Noto Sans Arabic', 'Montserrat', sans-serif";
+    if (loaded) {
+      translations = loaded;
     } else {
-      document.body.style.fontFamily = '';
+      // tr.json'dan yükle (her zaman mevcut)
+      try {
+        const r = await fetch('/translations/tr.json');
+        translations = await r.json();
+      } catch {
+        translations = {};
+      }
     }
 
-    translations = await loadTranslations(lang);
-    applyTranslations(translations);
-    updateDropdown();
-    closeDropdown();
+    applyTranslations();
   }
 
-  // ── Dil seçici widget'ı oluştur ─────────────────────────────────────────────
-  function createLangSwitcher() {
+  // ── Dil seçici widget'ı oluştur ───────────────────────────────────────────────
+  function buildLangSwitcher() {
+    const wrap = document.createElement('div');
+    wrap.className = 'lang-switcher';
+    wrap.setAttribute('aria-label', 'Language selector');
+
+    const current = document.createElement('button');
+    current.className = 'lang-current';
+    current.setAttribute('aria-haspopup', 'listbox');
+    current.setAttribute('aria-expanded', 'false');
+
+    const globe = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`;
+    current.innerHTML = `${globe}<span class="lang-current-label">${LANG_LABELS[currentLang]}</span>`;
+
+    const dropdown = document.createElement('ul');
+    dropdown.className = 'lang-dropdown';
+    dropdown.setAttribute('role', 'listbox');
+
+    SUPPORTED.forEach(lang => {
+      const li = document.createElement('li');
+      const btn = document.createElement('button');
+      btn.className = 'lang-option';
+      btn.dataset.lang = lang;
+      btn.setAttribute('role', 'option');
+      btn.innerHTML = `<span class="lang-code">${LANG_LABELS[lang]}</span><span class="lang-name">${LANG_NAMES[lang]}</span>`;
+      if (lang === currentLang) btn.classList.add('active');
+
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        await setLang(lang);
+        current.querySelector('.lang-current-label').textContent = LANG_LABELS[lang];
+        dropdown.classList.remove('open');
+        current.setAttribute('aria-expanded', 'false');
+      });
+
+      li.appendChild(btn);
+      dropdown.appendChild(li);
+    });
+
+    current.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = dropdown.classList.toggle('open');
+      current.setAttribute('aria-expanded', String(isOpen));
+    });
+
+    document.addEventListener('click', () => {
+      dropdown.classList.remove('open');
+      current.setAttribute('aria-expanded', 'false');
+    });
+
+    wrap.appendChild(current);
+    wrap.appendChild(dropdown);
+    return wrap;
+  }
+
+  // ── CSS enjekte et ────────────────────────────────────────────────────────────
+  function injectStyles() {
     const style = document.createElement('style');
     style.textContent = `
-      .ha-lang-switcher {
-        position: relative;
-        display: inline-flex;
-        align-items: center;
-        margin-left: 16px;
-        z-index: 9999;
-      }
-      .ha-lang-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        background: transparent;
-        border: 1px solid rgba(247,244,239,0.2);
-        color: rgba(247,244,239,0.8);
-        padding: 5px 10px;
-        font-family: 'Montserrat', sans-serif;
-        font-size: 0.6rem;
-        font-weight: 500;
-        letter-spacing: 0.1em;
-        cursor: pointer;
-        transition: all 0.2s;
-        white-space: nowrap;
-      }
-      .ha-lang-btn:hover {
-        border-color: rgba(247,244,239,0.5);
-        color: #f7f4ef;
-      }
-      .ha-lang-btn .ha-flag { font-size: 0.85rem; line-height: 1; }
-      .ha-lang-btn .ha-chevron {
-        width: 8px; height: 8px;
-        border-right: 1px solid currentColor;
-        border-bottom: 1px solid currentColor;
-        transform: rotate(45deg);
-        transition: transform 0.2s;
-        margin-top: -2px;
-      }
-      .ha-lang-switcher.open .ha-chevron { transform: rotate(-135deg); margin-top: 2px; }
-
-      .ha-lang-dropdown {
-        position: absolute;
-        top: calc(100% + 8px);
-        right: 0;
-        background: #111;
-        border: 1px solid #2a2a2a;
-        min-width: 140px;
-        opacity: 0;
-        visibility: hidden;
-        transform: translateY(-6px);
-        transition: all 0.18s ease;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-      }
-      .ha-lang-switcher.open .ha-lang-dropdown {
-        opacity: 1;
-        visibility: visible;
-        transform: translateY(0);
-      }
-      .ha-lang-option {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 10px 14px;
-        font-family: 'Montserrat', sans-serif;
-        font-size: 0.65rem;
-        font-weight: 400;
-        color: rgba(247,244,239,0.6);
-        cursor: pointer;
-        transition: all 0.15s;
-        border-bottom: 1px solid #1a1a1a;
-        letter-spacing: 0.05em;
-      }
-      .ha-lang-option:last-child { border-bottom: none; }
-      .ha-lang-option:hover { background: #1a1a1a; color: #f7f4ef; }
-      .ha-lang-option.active { color: #f7f4ef; }
-      .ha-lang-option .ha-opt-flag { font-size: 1rem; }
-      .ha-lang-option .ha-opt-label { font-weight: 600; letter-spacing: 0.12em; font-size: 0.6rem; }
-      .ha-lang-option .ha-opt-name { color: rgba(247,244,239,0.35); font-size: 0.6rem; }
-
-      /* Açık arka plan sayfalar için (fiyatlar, rezervasyon, shop) */
-      .light-nav .ha-lang-btn {
-        border-color: rgba(8,8,8,0.2);
-        color: rgba(8,8,8,0.7);
-      }
-      .light-nav .ha-lang-btn:hover { border-color: rgba(8,8,8,0.5); color: #080808; }
-      .light-nav .ha-lang-dropdown { background: #fff; border-color: #e8e4dc; }
-      .light-nav .ha-lang-option { color: rgba(8,8,8,0.5); border-color: #f0ece4; }
-      .light-nav .ha-lang-option:hover { background: #f9f6f0; color: #080808; }
-      .light-nav .ha-lang-option.active { color: #080808; }
-      .light-nav .ha-lang-option .ha-opt-name { color: rgba(8,8,8,0.3); }
-
-      @media (max-width: 768px) {
-        .ha-lang-switcher { margin-left: 8px; }
-        .ha-lang-btn { padding: 4px 8px; font-size: 0.55rem; }
-        .ha-lang-dropdown { right: 0; min-width: 130px; }
-      }
+/* ── Lang Switcher ──────────────────────────── */
+.lang-switcher {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+.lang-current {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: 1px solid rgba(247,244,239,.22);
+  color: rgba(247,244,239,.75);
+  padding: 5px 10px;
+  border-radius: 3px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: .6rem;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color .2s, color .2s;
+  white-space: nowrap;
+}
+.lang-current:hover {
+  border-color: rgba(247,244,239,.5);
+  color: #f7f4ef;
+}
+.lang-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: #111;
+  border: 1px solid #222;
+  border-radius: 4px;
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+  min-width: 130px;
+  z-index: 9999;
+  box-shadow: 0 8px 24px rgba(0,0,0,.5);
+}
+.lang-dropdown.open { display: block; }
+.lang-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 7px 14px;
+  cursor: pointer;
+  transition: background .15s;
+  text-align: left;
+}
+.lang-option:hover { background: rgba(247,244,239,.06); }
+.lang-option.active { background: rgba(247,244,239,.1); }
+.lang-code {
+  font-family: 'Montserrat', sans-serif;
+  font-size: .6rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  color: #f7f4ef;
+  min-width: 22px;
+}
+.lang-name {
+  font-family: 'Montserrat', sans-serif;
+  font-size: .7rem;
+  color: rgba(247,244,239,.55);
+}
+/* nav-right içinde sıralama */
+.nav-right { display: flex; align-items: center; gap: 10px; }
+@media (max-width: 768px) {
+  .lang-switcher { margin-right: 4px; }
+  .lang-dropdown { right: 0; }
+}
     `;
     document.head.appendChild(style);
+  }
 
-    // Widget HTML
-    const switcher = document.createElement('div');
-    switcher.className = 'ha-lang-switcher';
-    switcher.id = 'ha-lang-switcher';
-
-    const btn = document.createElement('button');
-    btn.className = 'ha-lang-btn';
-    btn.id = 'ha-lang-btn';
-    btn.setAttribute('aria-label', 'Dil seçin');
-    btn.innerHTML = `
-      <span class="ha-flag">${LANGS[currentLang].flag}</span>
-      <span class="ha-lbl">${LANGS[currentLang].label}</span>
-      <span class="ha-chevron"></span>
-    `;
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      switcher.classList.toggle('open');
-    });
-
-    const dropdown = document.createElement('div');
-    dropdown.className = 'ha-lang-dropdown';
-
-    Object.entries(LANGS).forEach(([code, info]) => {
-      const opt = document.createElement('div');
-      opt.className = `ha-lang-option${code === currentLang ? ' active' : ''}`;
-      opt.dataset.lang = code;
-      opt.innerHTML = `
-        <span class="ha-opt-flag">${info.flag}</span>
-        <span class="ha-opt-label">${info.label}</span>
-        <span class="ha-opt-name">${info.name}</span>
-      `;
-      opt.addEventListener('click', () => setLang(code));
-      dropdown.appendChild(opt);
-    });
-
-    switcher.appendChild(btn);
-    switcher.appendChild(dropdown);
-
-    // Navbar'a ekle
-    const navBook = document.querySelector('.nav-book');
-    const navEnd = document.querySelector('.nav-end, .nav-actions, .nav-right');
-
+  // ── Nav'a yerleştir ───────────────────────────────────────────────────────────
+  function mountSwitcher() {
+    const navRight = document.querySelector('.nav-right');
+    if (!navRight) return;
+    const navBook = navRight.querySelector('.nav-book');
+    const switcher = buildLangSwitcher();
+    // Rezervasyon Yap butonunun soluna ekle
     if (navBook) {
-      navBook.parentNode.insertBefore(switcher, navBook.nextSibling);
-    } else if (navEnd) {
-      navEnd.appendChild(switcher);
+      navRight.insertBefore(switcher, navBook);
     } else {
-      // Navbar bulunamazsa sağ alt köşeye sabit yerleştir
-      switcher.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:9999;';
-      document.body.appendChild(switcher);
+      navRight.prepend(switcher);
     }
-
-    // Dışarı tıklayınca kapat
-    document.addEventListener('click', closeDropdown);
   }
 
-  function closeDropdown() {
-    const sw = document.getElementById('ha-lang-switcher');
-    if (sw) sw.classList.remove('open');
-  }
-
-  function updateDropdown() {
-    const btn = document.getElementById('ha-lang-btn');
-    if (btn) {
-      btn.querySelector('.ha-flag').textContent = LANGS[currentLang].flag;
-      btn.querySelector('.ha-lbl').textContent = LANGS[currentLang].label;
-    }
-    document.querySelectorAll('.ha-lang-option').forEach(opt => {
-      opt.classList.toggle('active', opt.dataset.lang === currentLang);
-    });
-  }
-
-  // ── Başlat ──────────────────────────────────────────────────────────────────
+  // ── Başlat ────────────────────────────────────────────────────────────────────
   async function init() {
-    // Arapça font yükle (sadece gerekirse)
-    if (currentLang === 'ar') {
-      const link = document.createElement('link');
-      link.rel = 'stylesheet';
-      link.href = 'https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600&display=swap';
-      document.head.appendChild(link);
-    }
+    injectStyles();
+    currentLang = detectLang();
 
-    createLangSwitcher();
+    // Önce tr.json yükle (fallback olarak her zaman gerekli)
+    try {
+      const r = await fetch('/translations/tr.json');
+      const trData = await r.json();
+      translations = trData; // default Türkçe
+    } catch { translations = {}; }
 
-    // Kaydedilen dil Türkçe değilse uygula
     if (currentLang !== 'tr') {
-      await setLang(currentLang);
+      const loaded = await loadTranslations(currentLang);
+      if (loaded) translations = loaded;
+    }
+
+    applyTranslations();
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', mountSwitcher);
+    } else {
+      mountSwitcher();
     }
   }
 
-  // DOM hazır olduğunda başlat
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
+  // Public API
+  window.i18n = { setLang, detectLang, t: (k) => translations[k] || k };
 
-  // Global erişim (isteğe bağlı kullanım için)
-  window.i18n = { setLang, t: (key) => translations[key] || key };
-
+  init();
 })();
