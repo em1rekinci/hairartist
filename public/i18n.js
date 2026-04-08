@@ -8,6 +8,7 @@
   const SUPPORTED = ['tr', 'en', 'de', 'fr', 'ru'];
   const RTL_LANGS  = ['ar'];
   const LANG_LABELS = { tr: 'TR', en: 'EN', de: 'DE', fr: 'FR', ru: 'RU' };
+  const LANG_FLAGS  = { tr: '🇹🇷', en: '🇬🇧', de: '🇩🇪', fr: '🇫🇷', ru: '🇷🇺' };
   const LANG_NAMES  = { tr: 'Türkçe', en: 'English', de: 'Deutsch', fr: 'Français',  ru: 'Русский' };
 
   let currentLang = 'tr';
@@ -70,6 +71,11 @@
     document.querySelectorAll('.lang-option').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.lang === currentLang);
     });
+
+    // Yorum çeviri notu — TR ise gizle, diğer dillerde göster
+    document.querySelectorAll('[data-review-translated]').forEach(el => {
+      el.style.display = currentLang === 'tr' ? 'none' : 'inline';
+    });
   }
 
   // ── Dil değiştir ─────────────────────────────────────────────────────────────
@@ -103,7 +109,7 @@
     current.setAttribute('aria-expanded', 'false');
 
     const globe = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`;
-    current.innerHTML = `${globe}<span class="lang-current-label">${LANG_LABELS[currentLang]}</span>`;
+    current.innerHTML = `${globe}<span class="lang-flag">${LANG_FLAGS[currentLang]}</span><span class="lang-current-label">${LANG_LABELS[currentLang]}</span>`;
 
     const dropdown = document.createElement('ul');
     dropdown.className = 'lang-dropdown';
@@ -115,13 +121,14 @@
       btn.className = 'lang-option';
       btn.dataset.lang = lang;
       btn.setAttribute('role', 'option');
-      btn.innerHTML = `<span class="lang-code">${LANG_LABELS[lang]}</span><span class="lang-name">${LANG_NAMES[lang]}</span>`;
+      btn.innerHTML = `<span class="lang-flag-opt">${LANG_FLAGS[lang]}</span><span class="lang-code">${LANG_LABELS[lang]}</span><span class="lang-name">${LANG_NAMES[lang]}</span>`;
       if (lang === currentLang) btn.classList.add('active');
 
       btn.addEventListener('click', async (e) => {
         e.stopPropagation();
         await setLang(lang);
         current.querySelector('.lang-current-label').textContent = LANG_LABELS[lang];
+        current.querySelector('.lang-flag').textContent = LANG_FLAGS[lang];
         dropdown.classList.remove('open');
         current.setAttribute('aria-expanded', 'false');
       });
@@ -208,6 +215,17 @@
 }
 .lang-option:hover { background: rgba(247,244,239,.06); }
 .lang-option.active { background: rgba(247,244,239,.1); }
+.lang-flag {
+  font-size: 1rem;
+  line-height: 1;
+  display: inline-block;
+}
+.lang-flag-opt {
+  font-size: 1.05rem;
+  line-height: 1;
+  display: inline-block;
+  min-width: 22px;
+}
 .lang-code {
   font-family: 'Montserrat', sans-serif;
   font-size: .6rem;
@@ -223,6 +241,43 @@
 }
 /* nav-right içinde sıralama */
 .nav-right { display: flex; align-items: center; gap: 10px; }
+
+/* ── Mobile Menu Dil Seçici ─────────────────── */
+.lang-switcher-mobile {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 0 4px;
+  flex-wrap: wrap;
+}
+.lang-option-mobile {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(247,244,239,.07);
+  border: 1px solid rgba(247,244,239,.15);
+  border-radius: 4px;
+  padding: 7px 12px;
+  cursor: pointer;
+  transition: background .15s, border-color .15s;
+}
+.lang-option-mobile:hover {
+  background: rgba(247,244,239,.14);
+  border-color: rgba(247,244,239,.35);
+}
+.lang-option-mobile.active {
+  background: rgba(247,244,239,.18);
+  border-color: rgba(247,244,239,.5);
+}
+.lang-code-mobile {
+  font-family: 'Montserrat', sans-serif;
+  font-size: .6rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  color: #f7f4ef;
+  text-transform: uppercase;
+}
+
 @media (max-width: 768px) {
   .lang-switcher { margin-right: 4px; }
   .lang-dropdown { right: 0; }
@@ -243,6 +298,42 @@
     } else {
       navRight.prepend(switcher);
     }
+  }
+
+  // ── Mobile menu'ya da ekle ────────────────────────────────────────────────────
+  function mountMobileSwitcher() {
+    const mobileMenu = document.getElementById('mobileMenu');
+    if (!mobileMenu) return;
+    // Zaten eklenmiş mi?
+    if (mobileMenu.querySelector('.lang-switcher-mobile')) return;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'lang-switcher-mobile';
+
+    SUPPORTED.forEach(lang => {
+      const btn = document.createElement('button');
+      btn.className = 'lang-option-mobile' + (lang === currentLang ? ' active' : '');
+      btn.dataset.lang = lang;
+      btn.innerHTML = `<span class="lang-flag-opt">${LANG_FLAGS[lang]}</span><span class="lang-code-mobile">${LANG_LABELS[lang]}</span>`;
+      btn.addEventListener('click', async () => {
+        await setLang(lang);
+        // nav-right'taki switcher'ı da güncelle
+        const navLabel = document.querySelector('.lang-current .lang-current-label');
+        const navFlag  = document.querySelector('.lang-current .lang-flag');
+        if (navLabel) navLabel.textContent = LANG_LABELS[lang];
+        if (navFlag)  navFlag.textContent  = LANG_FLAGS[lang];
+        // Aktif class güncelle
+        wrap.querySelectorAll('.lang-option-mobile').forEach(b => {
+          b.classList.toggle('active', b.dataset.lang === lang);
+        });
+      });
+      wrap.appendChild(btn);
+    });
+
+    // Mobile menu'nun m-book butonundan önce ekle
+    const mBook = mobileMenu.querySelector('.m-book');
+    if (mBook) mobileMenu.insertBefore(wrap, mBook);
+    else mobileMenu.appendChild(wrap);
   }
 
   // ── Başlat ────────────────────────────────────────────────────────────────────
@@ -267,9 +358,13 @@
     applyTranslations();
 
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', mountSwitcher);
+      document.addEventListener('DOMContentLoaded', () => {
+        mountSwitcher();
+        mountMobileSwitcher();
+      });
     } else {
       mountSwitcher();
+      mountMobileSwitcher();
     }
   }
 

@@ -200,7 +200,7 @@ select.form-inp:disabled{opacity:.45;cursor:not-allowed}
 
 <div class="sepet-page">
   <div class="breadcrumb">
-    <a href="/">Anasayfa</a>
+    <a href="/" data-i18n="nav_home">Anasayfa</a>
     <span class="breadcrumb-sep">—</span>
     <a href="/shop" data-i18n="nav_shop">Shop</a>
     <span class="breadcrumb-sep">—</span>
@@ -451,7 +451,7 @@ function ozetGuncelle(sepet, urunMap){
   document.getElementById('genelToplam').textContent = toplam.toLocaleString('tr-TR',{minimumFractionDigits:2}) + ' ₺';
   document.getElementById('kargoBilgi').style.display = araToplam>=KARGO_SINIR ? 'none' : 'block';
   document.getElementById('kargoBilgi').innerHTML = araToplam>=KARGO_SINIR
-    ? '' : `<strong>Ücretsiz kargo için</strong> ${(KARGO_SINIR-araToplam).toLocaleString('tr-TR',{minimumFractionDigits:2})} ₺ daha ekle!`;
+    ? '' : `<strong>${(window.i18n && window.i18n.t('cart_free_shipping_cta')) || 'Ücretsiz kargo için'}</strong> ${(KARGO_SINIR-araToplam).toLocaleString('tr-TR',{minimumFractionDigits:2})} ₺ ${(window.i18n && window.i18n.t('cart_free_shipping_add')) || 'daha ekle!'}`;
   return toplam;
 }
 
@@ -466,12 +466,12 @@ async function sepetRender(){
   const info = document.getElementById('sepetAdetInfo');
 
   if(!sepet.length){
-    info.textContent = 'Sepetiniz boş';
+    info.textContent = (window.i18n && window.i18n.t('cart_empty_short')) || 'Sepetiniz boş';
     liste.innerHTML = `
       <div class="sepet-bos">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-        <p>Sepetinizde henüz ürün yok.</p>
-        <a href="/shop">Alışverişe Başla →</a>
+        <p>${(window.i18n && window.i18n.t('cart_empty_desc')) || 'Sepetinizde henüz ürün yok.'}</p>
+        <a href="/shop">${(window.i18n && window.i18n.t('cart_start_shopping')) || 'Alışverişe Başla →'}</a>
       </div>`;
     document.getElementById('araToplam').textContent='0,00 ₺';
     document.getElementById('kargoUcret').textContent='—';

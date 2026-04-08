@@ -255,7 +255,7 @@
   <!-- HERO -->
   <div class="fiyat-hero">
     <span class="sec-tag" data-i18n="prices_tag">Fiyat Listesi</span>
-    <h1>Hizmet <em>fiyatlarımız</em></h1>
+    <h1 data-i18n-html="prices_hero_title">Hizmet <em>fiyatlarımız</em></h1>
     <p class="fiyat-hero-alt" data-i18n="prices_hero_alt">Tüm fiyatlar saç uzunluğu, yoğunluğu ve kullanılan ürüne göre değişiklik gösterebilir. Kesin fiyat için salonumuzu arayabilirsiniz.</p>
   </div>
 
@@ -264,19 +264,19 @@
 
     <!-- Dinamik fiyat kategorileri Supabase'den yüklenir -->
     <div id="fiyat-dinamik-icerik">
-      <div id="fiyat-yukleniyor" style="padding:60px 0;text-align:center;font-family:'Montserrat',sans-serif;font-size:.8rem;color:#888;letter-spacing:.08em">Yükleniyor...</div>
+      <div id="fiyat-yukleniyor" style="padding:60px 0;text-align:center;font-family:'Montserrat',sans-serif;font-size:.8rem;color:#888;letter-spacing:.08em" data-i18n="prices_loading">Yükleniyor...</div>
     </div>
 
     <!-- CTA -->
     <div class="fiyat-cta-bar">
       <div class="fiyat-cta-sol">
-        <h3 data-i18n="prices_cta_title">Hemen rezervasyon yapın.</h3>
+        <h3 data-i18n-html="prices_cta_title">Hemen rezervasyon <em>yapın.</em></h3>
         <p data-i18n="prices_cta_desc">Online rezervasyon veya ödeme ile kolayca rezervasyon oluşturun.</p>
       </div>
       <a href="/rezervasyon" class="fiyat-cta-btn" data-i18n="prices_cta_btn">Rezervasyon Yap →</a>
     </div>
 
-    <p class="fiyat-dipnot"><strong>* Belirtilen fiyatlar ortalama fiyat aralıklarıdır. Saç uzunluğu, yoğunluğu ve kullanılan ürün miktarına göre değişiklik gösterebilir. Kesin fiyat için lütfen salonumuzu arayın: <a href="tel:+905317770203" style="color:#1a1209;text-decoration:underline">   0531 777 02 03</a></strong></p>
+    <p class="fiyat-dipnot" data-i18n-html="prices_note"><strong>* Belirtilen fiyatlar ortalama fiyat aralıklarıdır. Saç uzunluğu, yoğunluğu ve kullanılan ürün miktarına göre değişiklik gösterebilir. Kesin fiyat için lütfen salonumuzu arayın: <a href="tel:+905317770203" style="color:#1a1209;text-decoration:underline">   0531 777 02 03</a></strong></p>
 
   </div>
 </div>
@@ -315,13 +315,13 @@ const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
 
 // SQL'deki kat değerleri → orijinal sayfa görünümü
 const KAT_META = {
-  'Kesim':    { ikon: '✂️',  ad: 'Saç Kesimi & Şekillendirme', sira: 1 },
-  'Güzellik': { ikon: '💅',  ad: 'Güzellik & Bakım',            sira: 2 },
-  'Makyaj':   { ikon: '💄',  ad: 'Makyaj',                      sira: 3 },
-  'Özel':     { ikon: '👰',  ad: 'Özel Günler',                 sira: 4 },
-  'Renk':     { ikon: '🎨',  ad: 'Boyama & Renklendirme',       sira: 5 },
-  'Bakım':    { ikon: '🌿',  ad: 'Saç Bakımı & Kaynak',         sira: 6 },
-  'Diğer':    { ikon: '✨',  ad: 'Diğer',                       sira: 99 },
+  'Kesim':    { ikon: '✂️',  key: 'prices_cat_kesim',    ad: 'Saç Kesimi & Şekillendirme', sira: 1 },
+  'Güzellik': { ikon: '💅',  key: 'prices_cat_guzellik', ad: 'Güzellik & Bakım',            sira: 2 },
+  'Makyaj':   { ikon: '💄',  key: 'prices_cat_makyaj',   ad: 'Makyaj',                      sira: 3 },
+  'Özel':     { ikon: '👰',  key: 'prices_cat_ozel',     ad: 'Özel Günler',                 sira: 4 },
+  'Renk':     { ikon: '🎨',  key: 'prices_cat_boya',     ad: 'Boyama & Renklendirme',       sira: 5 },
+  'Bakım':    { ikon: '🌿',  key: 'prices_cat_bakim',    ad: 'Saç Bakımı & Kaynak',         sira: 6 },
+  'Diğer':    { ikon: '✨',  key: null,                  ad: 'Diğer',                       sira: 99 },
 };
 
 function fiyatFormatla(min, max) {
@@ -340,7 +340,7 @@ async function fiyatlariYukle() {
     const hizmetler = await res.json();
 
     if (!hizmetler || !hizmetler.length) {
-      document.getElementById('fiyat-yukleniyor').textContent = 'Fiyat listesi henüz hazır değil.';
+      document.getElementById('fiyat-yukleniyor').textContent = (window.i18n && window.i18n.t('prices_empty')) || 'Fiyat listesi henüz hazır değil.';
       return;
     }
 
@@ -362,7 +362,8 @@ async function fiyatlariYukle() {
     let html = '';
     siraliKatlar.forEach(kat => {
       const liste = gruplar[kat];
-      const meta = KAT_META[kat] || { ikon: '✦', ad: kat };
+      const meta = KAT_META[kat] || { ikon: '✦', key: null, ad: kat };
+      const katAd = (meta.key && window.i18n) ? window.i18n.t(meta.key) : meta.ad;
       const isOzel = kat === 'Özel';
 
       const yari = Math.ceil(liste.length / 2);
@@ -380,7 +381,7 @@ async function fiyatlariYukle() {
       html += '<div class="fiyat-bolum">' +
         '<div class="fiyat-bolum-baslik">' +
           '<span class="fiyat-bolum-ikon">' + meta.ikon + '</span>' +
-          '<span class="fiyat-bolum-ad">' + meta.ad + '</span>' +
+          '<span class="fiyat-bolum-ad">' + katAd + '</span>' +
         '</div>' +
         '<div class="fiyat-2col">' +
           '<div class="fiyat-tablo">' + sol.map(satirHtml).join('') + '</div>' +
@@ -392,7 +393,7 @@ async function fiyatlariYukle() {
     document.getElementById('fiyat-dinamik-icerik').innerHTML = html;
 
   } catch(e) {
-    document.getElementById('fiyat-yukleniyor').textContent = 'Fiyatlar yüklenirken bir sorun oluştu. Lütfen sayfayı yenileyin.';
+    document.getElementById('fiyat-yukleniyor').textContent = (window.i18n && window.i18n.t('prices_error')) || 'Fiyatlar yüklenirken bir sorun oluştu. Lütfen sayfayı yenileyin.';
   }
 }
 

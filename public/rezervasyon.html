@@ -859,10 +859,10 @@ a[href^="tel"] {
     </div>
 
     <div class="rez-bilgi">
-      <div class="rez-bilgi-item"><strong>Adres</strong>Esentepe, Yıldıztabya Alibeyköy Cd No:5 34065 Eyüpsultan / İstanbul</div>
-      <div class="rez-bilgi-item"><strong>Telefon</strong>0531 777 02 03</div>
-      <div class="rez-bilgi-item"><strong>Mesai</strong>Pzt, Çar–Cmt 08:30–20:00 · Paz 09:00–19:00</div>
-      <div class="rez-bilgi-item"><strong>Kapalı</strong>Salı</div>
+      <div class="rez-bilgi-item"><strong data-i18n="contact_address_title">Adres</strong>Esentepe, Yıldıztabya Alibeyköy Cd No:5 34065 Eyüpsultan / İstanbul</div>
+      <div class="rez-bilgi-item"><strong data-i18n="contact_phone_title">Telefon</strong>0531 777 02 03</div>
+      <div class="rez-bilgi-item"><strong data-i18n="rez_mesai">Mesai</strong>Pzt, Çar–Cmt 08:30–20:00 · Paz 09:00–19:00</div>
+      <div class="rez-bilgi-item"><strong data-i18n="rez_kapali">Kapalı</strong>Salı</div>
     </div>
 
     <div class="form-grid">
@@ -905,7 +905,7 @@ a[href^="tel"] {
         <input id="n-ad" class="fi" type="text" data-i18n-placeholder="rez_name_ph" placeholder="Adınız" required>
       </div>
       <div class="fg">
-        <label class="fl">Telefon <span style="color:#f7f4ef;font-size:.6rem;letter-spacing:.08em;text-transform:none;font-weight:500">— Lütfen numaranızı doğru yazın</span></label>
+        <label class="fl"><span data-i18n="book_phone">Telefon</span> <span style="color:#f7f4ef;font-size:.6rem;letter-spacing:.08em;text-transform:none;font-weight:500" data-i18n="rez_tel_uyari">— Lütfen numaranızı doğru yazın</span></label>
         <input id="n-tel" class="fi" type="tel" placeholder="05xx xxx xx xx" required oninput="telFormatla(this)">
       </div>
       <div class="fg form-grid-full">
@@ -987,16 +987,16 @@ a[href^="tel"] {
     <button class="rez-geri" onclick="geriDon()" data-i18n="rez_geri">← Geri</button>
 
     <div class="rez-form-baslik">
-      <span class="sec-tag" style="color:rgba(212, 175, 55, 1)">Hizmet Al — Online Ödeme</span>
+      <span class="sec-tag" style="color:rgba(212, 175, 55, 1)" data-i18n="rez_form2_tag">Hizmet Al — Online Ödeme</span>
       <h2 data-i18n-html="rez_form2_title">Hizmetinizi seçin,<br><em>online ödeyin.</em></h2>
       <p data-i18n="rez_form2_desc">Aşağıdaki formu doldurun. Bilgilerinizi onayladıktan sonra güvenli ödeme sayfasına yönlendirileceksiniz.</p>
     </div>
 
     <div class="rez-bilgi">
-      <div class="rez-bilgi-item"><strong>Adres</strong>Esentepe, Yıldıztabya Alibeyköy Cd No:5 34065 Eyüpsultan / İstanbul</div>
-      <div class="rez-bilgi-item"><strong>Telefon</strong>0531 777 02 03</div>
+      <div class="rez-bilgi-item"><strong data-i18n="contact_address_title">Adres</strong>Esentepe, Yıldıztabya Alibeyköy Cd No:5 34065 Eyüpsultan / İstanbul</div>
+      <div class="rez-bilgi-item"><strong data-i18n="contact_phone_title">Telefon</strong>0531 777 02 03</div>
       
-      <div class="rez-bilgi-item"><strong>Mesai</strong>Pzt, Çar–Cmt 08:30–20:00 · Paz 09:00–19:00 · Salı Kapalı</div>
+      <div class="rez-bilgi-item"><strong data-i18n="rez_mesai">Mesai</strong>Pzt, Çar–Cmt 08:30–20:00 · Paz 09:00–19:00 · Salı Kapalı</div>
     </div>
 
     <div class="form-grid">
@@ -1035,11 +1035,11 @@ a[href^="tel"] {
         </div>
       </div>
       <div class="fg">
-        <label class="fl">Ad Soyad</label>
+        <label class="fl" data-i18n="book_name">Ad Soyad</label>
         <input id="o-ad" class="fi" type="text" data-i18n-placeholder="rez_name_ph" placeholder="Adınız" required>
       </div>
       <div class="fg">
-        <label class="fl">Telefon <span style="color:#f7f4ef;font-size:.6rem;letter-spacing:.08em;text-transform:none;font-weight:500">— Lütfen numaranızı doğru yazın</span></label>
+        <label class="fl"><span data-i18n="book_phone">Telefon</span> <span style="color:#f7f4ef;font-size:.6rem;letter-spacing:.08em;text-transform:none;font-weight:500" data-i18n="rez_tel_uyari">— Lütfen numaranızı doğru yazın</span></label>
         <input id="o-tel" class="fi" type="tel" placeholder="05xx xxx xx xx" required oninput="telFormatla(this)">
       </div>
       <div class="fg form-grid-full">
