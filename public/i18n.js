@@ -225,6 +225,7 @@
   line-height: 1;
   display: inline-block;
   min-width: 22px;
+  font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
 }
 .lang-code {
   font-family: 'Montserrat', sans-serif;
