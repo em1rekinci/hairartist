@@ -798,24 +798,18 @@ function oneriGonderMobil() {
 <script src="/i18n.js"></script>
 
 <script>
-// Google Places API — Otomatik Puan Güncelleme
+// Google Rating — sunucudan çek (cache: 24 saat)
 (function() {
-  var PLACE_ID = 'ChIJ3XOCRsGwyhQRBDLZurYAP7Y';
-  var API_KEY  = 'AIzaSyBKof_-nuuzsIETGi3gjQcacEZEcLPqpN8';
   var el = document.getElementById('google-rating');
   if (!el) return;
-
-  fetch('https://places.googleapis.com/v1/places/' + PLACE_ID + '?fields=rating&key=' + API_KEY)
+  fetch('/api/google-rating')
     .then(function(r) { return r.json(); })
-    .then(function(data) {
-      if (data && data.rating) {
-        var puan = Math.round(data.rating * 10) / 10; // 4.27 → 4.3
-        el.textContent = puan + '★';
+    .then(function(d) {
+      if (d && d.puan) {
+        el.textContent = d.puan + '★';
       }
     })
-    .catch(function() {
-      // Hata olursa 4.2 olarak kalır, sorun yok
-    });
+    .catch(function() { /* hata olursa 4.2★ kalır */ });
 })();
 </script>
 </body>

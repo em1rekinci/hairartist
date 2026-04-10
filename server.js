@@ -12,6 +12,39 @@ const SITE_URL         = process.env.SITE_URL || 'https://www.fatihkurthairartis
 const ADMIN_SIFRE      = process.env.ADMIN_SIFRE || 'hairartist2026';
 const RESEND_API_KEY   = process.env.RESEND_API_KEY || '';
 const CLAUDE_KEY       = process.env.CLAUDE_KEY || '';
+const SERPAPI_KEY      = process.env.SERPAPI_KEY || '03c94f5f1085187e9222bcb72e2a7dd2999460340ae87181388f4c0d4b69367d';
+const PLACE_ID         = 'ChIJ3XOCRsGwyhQRBDLZurYAP7Y';
+
+// ─── GOOGLE RATING CACHE ──────────────────────────────────────────────────────
+let ratingCache = { puan: null, sonGuncelleme: 0 };
+const CACHE_SURE = 24 * 60 * 60 * 1000; // 24 saat (ms)
+
+async function googlePuanCek() {
+  try {
+    const url = `https://serpapi.com/search.json?engine=google_maps&place_id=${PLACE_ID}&api_key=${SERPAPI_KEY}`;
+    const r = await fetch(url);
+    const d = await r.json();
+    const puan = d?.place_results?.rating || d?.local_results?.[0]?.rating || null;
+    if (puan) {
+      ratingCache = { puan, sonGuncelleme: Date.now() };
+      console.log(`[Rating] ✓ Google puanı güncellendi: ${puan}`);
+    }
+  } catch(e) {
+    console.error('[Rating] Hata:', e.message);
+  }
+}
+
+// Sunucu açılınca bir kez çek
+googlePuanCek();
+
+// ─── GOOGLE RATING API ───────────────────────────────────────────────────────
+app.get('/api/google-rating', async (req, res) => {
+  // Cache süresi dolduysa yenile
+  if (Date.now() - ratingCache.sonGuncelleme > CACHE_SURE) {
+    await googlePuanCek();
+  }
+  res.json({ puan: ratingCache.puan || 4.2 });
+});
 
 // ─── CLAUDE PROXY ────────────────────────────────────────────────────────────
 app.post('/api/claude-format', async (req, res) => {
