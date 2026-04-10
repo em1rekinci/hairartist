@@ -392,7 +392,7 @@
   </div>
   <div class="stat-strip">
     <div class="ss-item"><span class="ss-num">999+</span><span class="ss-lbl" data-i18n="stat_happy_clients">Mutlu Müşteri</span></div>
-    <div class="ss-item"><span class="ss-num">4.2★</span><span class="ss-lbl" data-i18n="stat_rating">Müşteri Puanı</span></div>
+    <div class="ss-item"><span class="ss-num" id="google-rating">4.2★</span><span class="ss-lbl" data-i18n="stat_rating">Müşteri Puanı</span></div>
     <div class="ss-item"><span class="ss-num">15+</span><span class="ss-lbl" data-i18n="stat_experience">Yıllık Deneyim</span></div>
     <div class="ss-item"><span class="ss-num">999+</span><span class="ss-lbl" data-i18n="stat_designs">Eşsiz Tasarım</span></div>
   </div>
@@ -796,5 +796,27 @@ function oneriGonderMobil() {
 </script>
 
 <script src="/i18n.js"></script>
+
+<script>
+// Google Places API — Otomatik Puan Güncelleme
+(function() {
+  var PLACE_ID = 'ChIJ3XOCRsGwyhQRBDLZurYAP7Y';
+  var API_KEY  = 'AIzaSyBKof_-nuuzsIETGi3gjQcacEZEcLPqpN8';
+  var el = document.getElementById('google-rating');
+  if (!el) return;
+
+  fetch('https://places.googleapis.com/v1/places/' + PLACE_ID + '?fields=rating&key=' + API_KEY)
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data && data.rating) {
+        var puan = Math.round(data.rating * 10) / 10; // 4.27 → 4.3
+        el.textContent = puan + '★';
+      }
+    })
+    .catch(function() {
+      // Hata olursa 4.2 olarak kalır, sorun yok
+    });
+})();
+</script>
 </body>
 </html>
