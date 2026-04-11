@@ -1348,15 +1348,8 @@ function hizmetSecN(el, ad, min, max, sure) {
   }
 
   var sureBadge = document.getElementById('n-sure-badge');
-  if (sure && sure > 0) {
-    var _lbl = (window.i18n && window.i18n.t('rez_islem_suresi')) || 'İşlem süresi:';
-    var _unit = (window.i18n && window.i18n.t('rez_dk')) || 'dk';
-    sureBadge.textContent = _lbl + ' ' + sure + ' ' + _unit;
-    sureBadge.style.display = '';
-  } else {
-    sureBadge.textContent = '';
-    sureBadge.style.display = 'none';
-  }
+  sureBadge.dataset.sure = sure || 0;
+  sureBadgeGuncelle(sureBadge);
   document.getElementById('n-fiyat-box').classList.add('show');
 }
 
@@ -1398,15 +1391,8 @@ function hizmetSecO(el, ad, fiyat, sure) {
   }
 
   var sureBadge = document.getElementById('o-sure-badge');
-  if (sure && sure > 0) {
-    var _lbl2 = (window.i18n && window.i18n.t('rez_islem_suresi')) || 'İşlem süresi:';
-    var _unit2 = (window.i18n && window.i18n.t('rez_dk')) || 'dk';
-    sureBadge.textContent = _lbl2 + ' ' + sure + ' ' + _unit2;
-    sureBadge.style.display = '';
-  } else {
-    sureBadge.textContent = '';
-    sureBadge.style.display = 'none';
-  }
+  sureBadge.dataset.sure = sure || 0;
+  sureBadgeGuncelle(sureBadge);
   document.getElementById('o-fiyat-box').classList.add('show');
 }
 
@@ -2306,13 +2292,37 @@ function personelDropdownOlustur(prefix, liste) {
 }
 
 
+// ── Sure badge yardımcı fonksiyon
+function sureBadgeGuncelle(badge) {
+  var sure = parseInt(badge.dataset.sure) || 0;
+  if (sure > 0) {
+    var _lbl  = (window.i18n && window.i18n.t('rez_islem_suresi')) || 'İşlem süresi:';
+    var _unit = (window.i18n && window.i18n.t('rez_dk')) || 'dk';
+    badge.textContent = _lbl + ' ' + sure + ' ' + _unit;
+    badge.style.display = '';
+  } else {
+    badge.textContent = '';
+    badge.style.display = 'none';
+  }
+}
+// Dil değişince tüm sure badge'lerini güncelle
+window.addEventListener('langchange', function() {
+  document.querySelectorAll('#n-sure-badge, #o-sure-badge').forEach(sureBadgeGuncelle);
+});
+
 // ── Mesai metni i18n ile güncelle
 function rezBilgiMesaiGuncelle() {
   var t = window.i18n && window.i18n.t.bind(window.i18n);
-  var pzt  = t ? t('contact_day_0') : 'Pzt';
-  var car  = t ? t('contact_day_2') : 'Çar';
-  var cmt  = t ? t('contact_day_5') : 'Cmt';
-  var paz  = t ? t('contact_day_6') : 'Paz';
+  // i18n henüz yüklenmediyse key'ler ham gelir, o zaman bekle
+  var pzt = t ? t('contact_day_0') : null;
+  if (!pzt || pzt === 'contact_day_0') {
+    // i18n hazır değil, kısa süre sonra tekrar dene
+    setTimeout(rezBilgiMesaiGuncelle, 100);
+    return;
+  }
+  var car  = t('contact_day_2');
+  var cmt  = t('contact_day_5');
+  var paz  = t('contact_day_6');
   var text = pzt + ', ' + car + '–' + cmt + ' 08:30–20:00 · ' + paz + ' 09:00–19:00';
   document.querySelectorAll('.rez-bilgi-mesai-text').forEach(function(el) {
     el.textContent = text;
