@@ -996,7 +996,8 @@ a[href^="tel"] {
       <div class="rez-bilgi-item"><strong data-i18n="contact_address_title">Adres</strong>Esentepe, Yıldıztabya Alibeyköy Cd No:5 34065 Eyüpsultan / İstanbul</div>
       <div class="rez-bilgi-item"><strong data-i18n="contact_phone_title">Telefon</strong>0531 777 02 03</div>
       
-      <div class="rez-bilgi-item"><strong data-i18n="rez_mesai">Mesai</strong>Pzt, Çar–Cmt 08:30–20:00 · Paz 09:00–19:00 · Salı Kapalı</div>
+      <div class="rez-bilgi-item"><strong data-i18n="rez_mesai">Mesai</strong>Pzt, Çar–Cmt 08:30–20:00 · Paz 09:00–19:00</div>
+      <div class="rez-bilgi-item"><strong data-i18n="rez_kapali">Kapalı</strong>Salı</div>
     </div>
 
     <div class="form-grid">
@@ -1268,14 +1269,32 @@ function goster(id) {
   document.getElementById('normal-form').classList.remove('aktif');
   document.getElementById('odeme-form').classList.remove('aktif');
   document.getElementById(id).classList.add('aktif');
+  var hash = id === 'normal-form' ? '#rezervasyon' : '#hizmet-al';
+  history.pushState(null, '', hash);
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 function geriDon() {
   document.getElementById('normal-form').classList.remove('aktif');
   document.getElementById('odeme-form').classList.remove('aktif');
   document.getElementById('secim-ekrani').style.display = 'flex';
+  history.pushState(null, '', window.location.pathname);
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
+// Sayfa yüklenince hash varsa direkt formu aç
+(function() {
+  function hashKontrol() {
+    var hash = window.location.hash;
+    if (hash === '#rezervasyon') goster('normal-form');
+    else if (hash === '#hizmet-al') goster('odeme-form');
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', hashKontrol);
+  } else {
+    hashKontrol();
+  }
+  window.addEventListener('popstate', hashKontrol);
+})();
 
 // ── SAAT SEÇİCİ
 function selectTime(btn, time, prefix) {
