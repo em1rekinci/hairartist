@@ -6,201 +6,222 @@
 <title>Rezervasyon İptal — Fatih Kurt Hair Artist</title>
 <link rel="icon" href="favicondark.png" media="(prefers-color-scheme: light)">
 <link rel="icon" href="favicon.png" media="(prefers-color-scheme: dark)">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
 body{
-  background:#080808;
-  color:#f7f4ef;
+  background:#eeebe5;
+  color:#111111;
   font-family:'Montserrat',sans-serif;
-  font-weight:300;
+  font-weight:400;
   min-height:100vh;
   display:flex;
   align-items:center;
   justify-content:center;
-  padding:24px;
+  padding:16px;
   -webkit-font-smoothing:antialiased;
 }
+
 .kart{
-  background:#111;
-  border:1px solid #1e1e1e;
+  background:#ffffff;
+  border:1px solid #d4cfc7;
   width:100%;
-  max-width:480px;
-  overflow:hidden;
-}
-.kart-ust{
-  background:#080808;
-  padding:40px 36px 36px;
-  text-align:center;
-  border-bottom:1px solid #1e1e1e;
-}
-.ikon{
-  width:56px;height:56px;
-  border:1.5px solid rgba(255,85,85,.3);
-  border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  margin:0 auto 20px;
-}
-.ikon svg{width:22px;height:22px;color:#ff6b6b}
-.kart-ust h1{
-  font-family:'Playfair Display',serif;
-  font-size:1.5rem;
-  font-weight:700;
-  color:#f7f4ef;
-  margin-bottom:8px;
-  line-height:1.2;
-}
-.kart-ust p{
-  font-size:.72rem;
-  color:rgba(247,244,239,.45);
-  line-height:1.7;
-  letter-spacing:.02em;
+  max-width:460px;
+  box-shadow:0 4px 24px rgba(0,0,0,.10);
 }
 
-/* Rezervasyon detay kutusu */
+.kart-ust{
+  background:#f7f4ef;
+  padding:36px 28px 30px;
+  text-align:center;
+  border-bottom:1px solid #d4cfc7;
+}
+
+.ikon{
+  width:60px;height:60px;
+  border:2px solid rgba(180,40,40,.4);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 18px;
+  background:rgba(180,40,40,.07);
+}
+.ikon svg{width:24px;height:24px;color:#b42828}
+
+.kart-ust h1{
+  font-family:'Playfair Display',serif;
+  font-size:1.55rem;
+  font-weight:700;
+  color:#111111;
+  margin-bottom:10px;
+  line-height:1.25;
+}
+.kart-ust p{
+  font-size:.88rem;
+  color:#444444;
+  line-height:1.75;
+  font-weight:400;
+}
+
 .rez-detay{
-  padding:24px 32px;
-  border-bottom:1px solid #1e1e1e;
+  padding:20px 28px;
+  border-bottom:1px solid #d4cfc7;
   display:none;
 }
 .rez-detay.show{display:block}
+
 .detay-satir{
   display:flex;
   justify-content:space-between;
   align-items:flex-start;
   gap:12px;
-  padding:8px 0;
-  border-bottom:1px solid #1a1a1a;
+  padding:13px 0;
+  border-bottom:1px solid #e8e4de;
 }
 .detay-satir:last-child{border-bottom:none}
+
 .detay-key{
-  font-size:.52rem;
-  letter-spacing:.18em;
+  font-size:.75rem;
+  letter-spacing:.1em;
   text-transform:uppercase;
-  color:rgba(247,244,239,.35);
+  color:#666666;
+  font-weight:600;
   flex-shrink:0;
   padding-top:1px;
 }
 .detay-val{
-  font-size:.78rem;
-  color:#f7f4ef;
+  font-size:.95rem;
+  color:#111111;
   text-align:right;
-  font-weight:400;
+  font-weight:500;
+  line-height:1.4;
 }
 
-/* Butonlar */
-.kart-alt{padding:24px 32px 28px}
+.kart-alt{padding:22px 28px 28px}
+
 .btn-iptal{
   display:block;width:100%;
-  background:#ff3b3b;
-  color:#fff;
+  background:#b42828;
+  color:#ffffff;
   border:none;
-  padding:14px;
+  padding:18px;
   font-family:'Montserrat',sans-serif;
-  font-size:.58rem;
+  font-size:.8rem;
   font-weight:600;
-  letter-spacing:.2em;
+  letter-spacing:.16em;
   text-transform:uppercase;
   cursor:pointer;
-  transition:opacity .2s;
-  margin-bottom:8px;
+  transition:background .2s;
+  margin-bottom:10px;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
 }
-.btn-iptal:hover{opacity:.85}
-.btn-iptal:disabled{opacity:.45;cursor:not-allowed}
+.btn-iptal:hover{background:#9a2020}
+.btn-iptal:active{background:#7e1a1a}
+.btn-iptal:disabled{background:#cccccc;color:#888888;cursor:not-allowed}
+
 .btn-geri{
   display:block;width:100%;
-  background:transparent;
-  color:rgba(247,244,239,.5);
-  border:1px solid #1e1e1e;
-  padding:12px;
+  background:#ffffff;
+  color:#333333;
+  border:1.5px solid #bbb8b2;
+  padding:16px;
   font-family:'Montserrat',sans-serif;
-  font-size:.56rem;
+  font-size:.78rem;
   font-weight:500;
-  letter-spacing:.16em;
+  letter-spacing:.13em;
   text-transform:uppercase;
   text-align:center;
   text-decoration:none;
   cursor:pointer;
   transition:all .2s;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
 }
-.btn-geri:hover{border-color:#333;color:#f7f4ef}
+.btn-geri:hover{border-color:#888;color:#111}
+.btn-geri:active{background:#f0ede8}
 
-/* Mesaj */
 .mesaj{
   display:none;
-  font-size:.75rem;
-  padding:12px 16px;
-  margin-bottom:12px;
-  line-height:1.5;
+  font-size:.85rem;
+  font-weight:500;
+  padding:14px 16px;
+  margin-bottom:14px;
+  line-height:1.55;
 }
 .mesaj.basari{
-  background:rgba(0,200,100,.08);
-  border:1px solid rgba(0,200,100,.25);
-  color:#00c864;
+  background:#eaf7f0;
+  border:1.5px solid #2a9e60;
+  color:#1a6e3e;
 }
 .mesaj.hata{
-  background:rgba(255,85,85,.08);
-  border:1px solid rgba(255,85,85,.25);
-  color:#ff6b6b;
+  background:#fbeaea;
+  border:1.5px solid #b42828;
+  color:#8a1e1e;
 }
 
-/* Yükleniyor */
 .yukleniyor{
-  padding:40px 32px;
+  padding:44px 28px;
   text-align:center;
-  font-size:.72rem;
-  color:rgba(247,244,239,.35);
-  letter-spacing:.1em;
+  font-size:.85rem;
+  color:#666666;
+  letter-spacing:.06em;
+  font-weight:400;
 }
 .yukleniyor-dot{
-  width:8px;height:8px;
-  background:rgba(247,244,239,.2);
+  width:10px;height:10px;
+  background:#bbb;
   border-radius:50%;
-  margin:0 auto 16px;
+  margin:0 auto 18px;
   animation:pulse 1.2s ease-in-out infinite;
 }
-@keyframes pulse{0%,100%{opacity:.2}50%{opacity:1}}
+@keyframes pulse{0%,100%{opacity:.25}50%{opacity:1}}
 
-/* Hata/bulunamadı */
 .bulunamadi{
-  padding:32px;
+  padding:36px 28px;
   text-align:center;
   display:none;
 }
 .bulunamadi p{
-  font-size:.75rem;
-  color:rgba(247,244,239,.4);
-  line-height:1.7;
+  font-size:.9rem;
+  color:#444444;
+  line-height:1.8;
+  font-weight:400;
 }
 
-/* Alt logo */
 .alt-logo{
   text-align:center;
-  margin-top:28px;
-  opacity:.3;
+  margin-top:20px;
 }
 .alt-logo a{
   text-decoration:none;
   font-family:'Playfair Display',serif;
-  font-size:.85rem;
-  color:#f7f4ef;
+  font-size:.95rem;
+  color:#555555;
   font-style:italic;
 }
 
-@media(max-width:520px){
-  .kart-ust{padding:32px 20px 28px}
-  .rez-detay{padding:20px}
-  .kart-alt{padding:20px}
+@media(max-width:480px){
+  body{padding:12px;align-items:flex-start;padding-top:20px}
+  .kart-ust{padding:28px 18px 22px}
+  .rez-detay{padding:14px 18px}
+  .kart-alt{padding:16px 18px 22px}
+  .kart-ust h1{font-size:1.3rem}
+  .kart-ust p{font-size:.84rem}
+  .detay-key{font-size:.7rem}
+  .detay-val{font-size:.9rem}
+  .btn-iptal{padding:20px;font-size:.82rem}
+  .btn-geri{padding:17px;font-size:.78rem}
 }
 </style>
 </head>
 <body>
 
-<div>
+<div style="width:100%;max-width:460px;">
   <div class="kart">
     <div class="kart-ust">
       <div class="ikon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
         </svg>
       </div>
@@ -208,18 +229,15 @@ body{
       <p>Rezervasyonunuzu iptal etmek üzeresiniz.<br>Bu işlem geri alınamaz.</p>
     </div>
 
-    <!-- Yükleniyor -->
     <div class="yukleniyor" id="yukleniyor">
       <div class="yukleniyor-dot"></div>
       Rezervasyon bilgileri yükleniyor…
     </div>
 
-    <!-- Bulunamadı -->
     <div class="bulunamadi" id="bulunamadi">
       <p>Rezervasyon bulunamadı veya<br>bu link geçersiz.</p>
     </div>
 
-    <!-- Detaylar -->
     <div class="rez-detay" id="rez-detay">
       <div class="detay-satir">
         <span class="detay-key">Ad Soyad</span>
@@ -243,7 +261,6 @@ body{
       </div>
     </div>
 
-    <!-- Butonlar -->
     <div class="kart-alt" id="kart-alt" style="display:none">
       <div class="mesaj" id="mesaj"></div>
       <button class="btn-iptal" id="btn-iptal" onclick="iptalEt()">Rezervasyonu İptal Et</button>
@@ -276,38 +293,31 @@ async function rezervasyonYukle() {
     document.getElementById('bulunamadi').style.display = 'block';
     return;
   }
-
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/rezervasyonlar?id=eq.${REZ_ID}&select=*`, {
       headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
     });
     const data = await res.json();
-
     document.getElementById('yukleniyor').style.display = 'none';
-
     if (!data || !data.length) {
       document.getElementById('bulunamadi').style.display = 'block';
       return;
     }
-
     const r = data[0];
-
     document.getElementById('d-ad').textContent = r.ad || '—';
     document.getElementById('d-hizmet').textContent = r.hizmet || '—';
     document.getElementById('d-tarih').textContent = tarihFormatla(r.tarih);
     document.getElementById('d-saat').textContent = r.saat || '—';
-
     const durumEl = document.getElementById('d-durum');
     if (r.durum === 'iptal_edildi') {
       durumEl.textContent = 'Zaten iptal edildi';
-      durumEl.style.color = '#ff6b6b';
+      durumEl.style.color = '#b42828';
       document.getElementById('btn-iptal').disabled = true;
       document.getElementById('btn-iptal').textContent = 'Bu rezervasyon zaten iptal edildi';
     } else {
       durumEl.textContent = r.durum === 'onaylandi' ? 'Onaylandı' : 'Bekliyor';
-      durumEl.style.color = r.durum === 'onaylandi' ? '#00c864' : '#ffdf00';
+      durumEl.style.color = r.durum === 'onaylandi' ? '#1a6e3e' : '#8a6500';
     }
-
     document.getElementById('rez-detay').classList.add('show');
     document.getElementById('kart-alt').style.display = 'block';
   } catch(e) {
@@ -319,11 +329,9 @@ async function rezervasyonYukle() {
 async function iptalEt() {
   const btn = document.getElementById('btn-iptal');
   const mesajEl = document.getElementById('mesaj');
-
   btn.disabled = true;
   btn.textContent = 'İptal ediliyor…';
   mesajEl.style.display = 'none';
-
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/rezervasyonlar?id=eq.${REZ_ID}`, {
       method: 'PATCH',
@@ -335,21 +343,17 @@ async function iptalEt() {
       },
       body: JSON.stringify({ durum: 'iptal_edildi' })
     });
-
     if (!res.ok) throw new Error();
-
-    // Kapalı saati geri aç (admin onaylarken kapanmıştı)
     await fetch(`${SUPABASE_URL}/rest/v1/kapali_saatler?rezervasyon_id=eq.${REZ_ID}`, {
       method: 'DELETE',
       headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
-    }).catch(() => {}); // hata olsa da iptal işlemini engelleme
-
+    }).catch(() => {});
     mesajEl.className = 'mesaj basari';
     mesajEl.textContent = '✓ Rezervasyonunuz başarıyla iptal edildi.';
     mesajEl.style.display = 'block';
     btn.textContent = 'İptal Edildi ✓';
     document.getElementById('d-durum').textContent = 'İptal edildi';
-    document.getElementById('d-durum').style.color = '#ff6b6b';
+    document.getElementById('d-durum').style.color = '#b42828';
   } catch(e) {
     mesajEl.className = 'mesaj hata';
     mesajEl.textContent = '✗ Bir hata oluştu, lütfen tekrar deneyin.';
