@@ -264,5 +264,8 @@
   "rez_hizmet_sec": "— Select Service —",
   "rez_hizmet_yukleniyor": "Loading services...",
   "rez_sali_uyari": "⚠ We are closed on Tuesdays. Please select a different day.",
-  "rez_musait_degil": "No available appointments"
+  "rez_musait_degil": "No available appointments",
+  "rez_tahmini_fiyat": "Estimated price",
+  "rez_islem_suresi": "Duration:",
+  "rez_dk": "min"
 }

@@ -861,8 +861,8 @@ a[href^="tel"] {
     <div class="rez-bilgi">
       <div class="rez-bilgi-item"><strong data-i18n="contact_address_title">Adres</strong>Esentepe, Yıldıztabya Alibeyköy Cd No:5 34065 Eyüpsultan / İstanbul</div>
       <div class="rez-bilgi-item"><strong data-i18n="contact_phone_title">Telefon</strong>0531 777 02 03</div>
-      <div class="rez-bilgi-item"><strong data-i18n="rez_mesai">Mesai</strong>Pzt, Çar–Cmt 08:30–20:00 · Paz 09:00–19:00</div>
-      <div class="rez-bilgi-item"><strong data-i18n="rez_kapali">Kapalı</strong>Salı</div>
+      <div class="rez-bilgi-item"><strong data-i18n="rez_mesai">Mesai</strong><span class="rez-bilgi-mesai-text"></span></div>
+      <div class="rez-bilgi-item"><strong data-i18n="rez_kapali">Kapalı</strong><span data-i18n="contact_day_1">Salı</span></div>
     </div>
 
     <div class="form-grid">
@@ -924,7 +924,7 @@ a[href^="tel"] {
           <span id="fiyat-indirimli"></span>
           <span id="fiyat-normal"></span>
           <span id="n-sure-badge" class="fiyat-badge" style="background:rgba(247,244,239,.05);border-color:rgba(247,244,239,.1);color:#f7f4ef"></span>
-          <span class="fiyat-badge">Tahmini fiyat</span>
+          <span class="fiyat-badge" data-i18n="rez_tahmini_fiyat">Tahmini fiyat</span>
         </div>
       </div>
       <div class="fg">
@@ -996,8 +996,8 @@ a[href^="tel"] {
       <div class="rez-bilgi-item"><strong data-i18n="contact_address_title">Adres</strong>Esentepe, Yıldıztabya Alibeyköy Cd No:5 34065 Eyüpsultan / İstanbul</div>
       <div class="rez-bilgi-item"><strong data-i18n="contact_phone_title">Telefon</strong>0531 777 02 03</div>
       
-      <div class="rez-bilgi-item"><strong data-i18n="rez_mesai">Mesai</strong>Pzt, Çar–Cmt 08:30–20:00 · Paz 09:00–19:00</div>
-      <div class="rez-bilgi-item"><strong data-i18n="rez_kapali">Kapalı</strong>Salı</div>
+      <div class="rez-bilgi-item"><strong data-i18n="rez_mesai">Mesai</strong><span class="rez-bilgi-mesai-text"></span></div>
+      <div class="rez-bilgi-item"><strong data-i18n="rez_kapali">Kapalı</strong><span data-i18n="contact_day_1">Salı</span></div>
     </div>
 
     <div class="form-grid">
@@ -2301,6 +2301,21 @@ function personelDropdownOlustur(prefix, liste) {
   }).join('');
 }
 
+
+// ── Mesai metni i18n ile güncelle
+function rezBilgiMesaiGuncelle() {
+  var t = window.i18n && window.i18n.t.bind(window.i18n);
+  var pzt  = t ? t('contact_day_0') : 'Pzt';
+  var car  = t ? t('contact_day_2') : 'Çar';
+  var cmt  = t ? t('contact_day_5') : 'Cmt';
+  var paz  = t ? t('contact_day_6') : 'Paz';
+  var text = pzt + ', ' + car + '–' + cmt + ' 08:30–20:00 · ' + paz + ' 09:00–19:00';
+  document.querySelectorAll('.rez-bilgi-mesai-text').forEach(function(el) {
+    el.textContent = text;
+  });
+}
+document.addEventListener('DOMContentLoaded', rezBilgiMesaiGuncelle);
+window.addEventListener('langchange', rezBilgiMesaiGuncelle);
 </script>
 </body>
 </html>
