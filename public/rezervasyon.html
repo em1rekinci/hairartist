@@ -2059,6 +2059,16 @@ document.addEventListener('DOMContentLoaded', function() {
   personelYukle();
   // ── Hizmetleri Supabase'den yükle
   hizmetleriYukle();
+
+  // ── Dil değişince dropdown'ları yeniden render et
+  window.addEventListener('langchange', () => {
+    if (window._hizmetListesi) {
+      const hizInd = (window._kampanyaHedef === 'hizmet' || window._kampanyaHedef === 'ikisi') ? (window._indirimYuzde || 0) : 0;
+      const rezInd = (window._kampanyaHedef === 'rezervasyon' || window._kampanyaHedef === 'ikisi') ? (window._indirimYuzde || 0) : 0;
+      hizmetDropdownOlustur('n', window._hizmetListesi, rezInd);
+      hizmetDropdownOlustur('o', window._hizmetListesi, hizInd);
+    }
+  });
 });
 
 async function hizmetleriYukle() {
@@ -2168,8 +2178,11 @@ function hizmetDropdownOlustur(prefix, liste, indirimYuzde = 0) {
   const dd = document.getElementById(prefix + '-cs-dropdown');
   if (!dd) return;
   const fn = prefix === 'n' ? 'hizmetSecN' : 'hizmetSecO';
+  const aktifDil = (window.i18n && window.i18n.detectLang()) || 'tr';
+  
   dd.innerHTML = liste.map(h => {
-    const adSafe = h.ad.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    const gorununAd = h["ad_" + aktifDil] || h.ad;
+    const adSafe = gorununAd.replace(/'/g, "\\'").replace(/"/g, '&quot;');
     const sure = h.sure || 60;
     const minFiyat = h.min_fiyat || 0;
     const maxFiyat = h.max_fiyat || 0;
@@ -2182,12 +2195,12 @@ function hizmetDropdownOlustur(prefix, liste, indirimYuzde = 0) {
 
       if (prefix === 'n') {
         return `<div class="cs-option" onclick="${fn}(this,'${adSafe}',${indMin},${indMax},${sure})">
-          <span class="cs-ad">${h.ad} <span style="font-size:.6rem;background:#c8a96e22;color:#c8a96e;border:1px solid #c8a96e44;border-radius:8px;padding:1px 7px;font-weight:600">%${indirimYuzde} İndirim</span></span>
+          <span class="cs-ad">${gorununAd} <span style="font-size:.6rem;background:#c8a96e22;color:#c8a96e;border:1px solid #c8a96e44;border-radius:8px;padding:1px 7px;font-weight:600">%${indirimYuzde} İndirim</span></span>
           <span class="cs-fiyatlar"><s style="color:var(--text3,#888);font-size:.72rem;font-weight:400">${eskiStr}</s> <span class="cs-indirimli">${yeniStr}</span></span>
         </div>`;
       } else {
         return `<div class="cs-option" onclick="${fn}(this,'${adSafe}',${indMax},${sure})">
-          <span class="cs-ad">${h.ad} <span style="font-size:.6rem;background:#c8a96e22;color:#c8a96e;border:1px solid #c8a96e44;border-radius:8px;padding:1px 7px;font-weight:600">%${indirimYuzde} İndirim</span></span>
+          <span class="cs-ad">${gorununAd} <span style="font-size:.6rem;background:#c8a96e22;color:#c8a96e;border:1px solid #c8a96e44;border-radius:8px;padding:1px 7px;font-weight:600">%${indirimYuzde} İndirim</span></span>
           <span class="cs-fiyatlar"><s style="color:var(--text3,#888);font-size:.72rem;font-weight:400">${eskiStr}</s> <span class="cs-indirimli">${yeniStr}</span></span>
         </div>`;
       }
@@ -2197,12 +2210,12 @@ function hizmetDropdownOlustur(prefix, liste, indirimYuzde = 0) {
     const fiyatStr = hizmetFiyatStr(minFiyat, maxFiyat);
     if (prefix === 'n') {
       return `<div class="cs-option" onclick="${fn}(this,'${adSafe}',${minFiyat},${maxFiyat},${sure})">
-        <span class="cs-ad">${h.ad}</span>
+        <span class="cs-ad">${gorununAd}</span>
         <span class="cs-fiyatlar"><span class="cs-indirimli">${fiyatStr}</span></span>
       </div>`;
     } else {
       return `<div class="cs-option" onclick="${fn}(this,'${adSafe}',${maxFiyat},${sure})">
-        <span class="cs-ad">${h.ad}</span>
+        <span class="cs-ad">${gorununAd}</span>
         <span class="cs-fiyatlar"><span class="cs-indirimli">${fiyatStr}</span></span>
       </div>`;
     }
