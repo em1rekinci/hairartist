@@ -2292,44 +2292,59 @@ function personelDropdownOlustur(prefix, liste) {
 }
 
 
-// ── Sure badge yardımcı fonksiyon
+// ── Dinamik i18n güncellemeleri (mesai + sure badge)
+function _t(key) {
+  return (window.i18n && window.i18n.t(key)) || '';
+}
+
+function _i18nHazirMi() {
+  // i18n hazır mı? t() key'i aynen döndürüyorsa henüz yüklenmemiş demek
+  var test = _t('contact_day_0');
+  return test && test !== 'contact_day_0';
+}
+
 function sureBadgeGuncelle(badge) {
   var sure = parseInt(badge.dataset.sure) || 0;
   if (sure > 0) {
-    var _lbl  = (window.i18n && window.i18n.t('rez_islem_suresi')) || 'İşlem süresi:';
-    var _unit = (window.i18n && window.i18n.t('rez_dk')) || 'dk';
-    badge.textContent = _lbl + ' ' + sure + ' ' + _unit;
+    if (!_i18nHazirMi()) {
+      setTimeout(function() { sureBadgeGuncelle(badge); }, 80);
+      return;
+    }
+    var lbl  = _t('rez_islem_suresi') || 'İşlem süresi:';
+    var unit = _t('rez_dk') || 'dk';
+    badge.textContent = lbl + ' ' + sure + ' ' + unit;
     badge.style.display = '';
   } else {
     badge.textContent = '';
     badge.style.display = 'none';
   }
 }
-// Dil değişince tüm sure badge'lerini güncelle
-window.addEventListener('langchange', function() {
-  document.querySelectorAll('#n-sure-badge, #o-sure-badge').forEach(sureBadgeGuncelle);
-});
 
-// ── Mesai metni i18n ile güncelle
-function rezBilgiMesaiGuncelle() {
-  var t = window.i18n && window.i18n.t.bind(window.i18n);
-  // i18n henüz yüklenmediyse key'ler ham gelir, o zaman bekle
-  var pzt = t ? t('contact_day_0') : null;
-  if (!pzt || pzt === 'contact_day_0') {
-    // i18n hazır değil, kısa süre sonra tekrar dene
-    setTimeout(rezBilgiMesaiGuncelle, 100);
+function rezDinamikGuncelle() {
+  if (!_i18nHazirMi()) {
+    setTimeout(rezDinamikGuncelle, 80);
     return;
   }
-  var car  = t('contact_day_2');
-  var cmt  = t('contact_day_5');
-  var paz  = t('contact_day_6');
-  var text = pzt + ', ' + car + '–' + cmt + ' 08:30–20:00 · ' + paz + ' 09:00–19:00';
+
+  // Mesai metni
+  var pzt = _t('contact_day_0');
+  var car = _t('contact_day_2');
+  var cmt = _t('contact_day_5');
+  var paz = _t('contact_day_6');
+  var mesaiText = pzt + ', ' + car + '–' + cmt + ' 08:30–20:00 · ' + paz + ' 09:00–19:00';
   document.querySelectorAll('.rez-bilgi-mesai-text').forEach(function(el) {
-    el.textContent = text;
+    el.textContent = mesaiText;
   });
+
+  // Sure badge'leri
+  document.querySelectorAll('#n-sure-badge, #o-sure-badge').forEach(sureBadgeGuncelle);
 }
-document.addEventListener('DOMContentLoaded', rezBilgiMesaiGuncelle);
-window.addEventListener('langchange', rezBilgiMesaiGuncelle);
+
+// İlk yükleme
+document.addEventListener('DOMContentLoaded', rezDinamikGuncelle);
+
+// Dil değişince
+window.addEventListener('langchange', rezDinamikGuncelle);
 </script>
 </body>
 </html>
