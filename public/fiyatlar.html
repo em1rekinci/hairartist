@@ -371,7 +371,7 @@ async function fiyatlariYukle() {
       const sag = liste.slice(yari);
 
       const satirHtml = h => {
-        const aktifDil = (window.i18n && window.i18n.lang) || 'tr';
+        const aktifDil = (window.i18n && window.i18n.detectLang()) || 'tr';
         const isim = h['ad_' + aktifDil] || h.ad;
         const tutar = fiyatFormatla(h.min_fiyat, h.max_fiyat);
         return '<div class="fiyat-satir' + (isOzel ? ' highlight-row' : '') + '">' +
