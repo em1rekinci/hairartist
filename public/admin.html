@@ -1360,35 +1360,40 @@ function tabloRender(f){
 function bH(d){const m={bekliyor:['bb','Bekliyor'],odeme_bekleniyor:['bb','💳 Ödeme Bekliyor'],odeme_bekleyen:['bb','💳 Ödeme Bekliyor'],onaylandi:['bo','Onaylandı'],reddedildi:['br','Reddedildi'],tamamlandi:['bt','Tamamlandı']};const[c,l]=m[d]||['bb',''+d];return`<span class="badge ${c}">${l}</span>`;}
 
 // ─── WHATSAPP ONAY MESAJI ───
-const WA_PHONE_ID='1072138589312755';
-const WA_TOKEN='EAAbpYZAirSdQBRI4zue0O1LrIYpb3cAVpEy6Hrq3sGBVptJjlBE4ekrynybEcbCB6tvflCcB3C4ElAQbibK4XhNNYca0gXcOnVnlZCtoDG3ba5HDK2OURNcTxvdOK8kBIH3ChgPiAQPjZB9QOp1JoSmZCcbqvQ3ZBfx3bF0I28DIHS0pJ7Dklfo8s9ZAjiKwwnoAZDZD';
+const WA_PHONE_ID='1018603338011115'; // 
+const WA_TOKEN='XXXXXXXXXXXXXXXXX'; // 
+
+async function waMesajGonder(tel, metin){
+  let t=tel.replace(/\s/g,'').replace(/[^0-9]/g,'');
+  if(t.startsWith('0'))t=t.substring(1);
+  if(!t.startsWith('90'))t='90'+t;
+  try{
+    const res=await fetch(`https://graph.facebook.com/v22.0/${WA_PHONE_ID}/messages`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+WA_TOKEN},
+      body:JSON.stringify({messaging_product:'whatsapp',to:t,type:'text',text:{body:metin}})
+    });
+    const data=await res.json();
+    if(!res.ok)console.warn('WhatsApp gönderilemedi:',data);
+    else console.log('WhatsApp mesajı gönderildi ✓');
+  }catch(e){console.warn('WhatsApp hata:',e);}
+}
 
 async function waOnayMesaji(r){
-  let tel=r.telefon.replace(/\s/g,'').replace(/[^0-9]/g,'');
-  if(tel.startsWith('0'))tel=tel.substring(1);
-  if(!tel.startsWith('90'))tel='90'+tel;
   const p=personel.find(x=>x.id===r.personelId)||personel.find(x=>x.ad===r.personelId);
+  const iptalLink=r.id?`https://www.fatihkurthairartist.com/iptal?id=${r.id}`:'';
   const metin=
-    `✅ *Rezervasyon Onaylandı — Hair Artist*\n\n`+
+    `✅ *Rezervasyon Onaylandı — Fatih Kurt Hair Artist*\n\n`+
     `Merhaba ${r.ad},\n\n`+
     `Rezervasyonunuz onaylandı!\n\n`+
     `📋 *Detaylar:*\n`+
     `• Hizmet: ${r.hizmet}\n`+
     `• Tarih: ${r.tarih}\n`+
     `• Saat: ${r.saat||'Belirtilmedi'}\n`+
-    `• Personel: ${p?p.ad:'Baran Kurt'}\n\n`+
-    `Randevunuzu iptal etmek veya değiştirmek için bizi arayın.\n\n`+
-    `_Hair Artist — hairartist.com.tr_`;
-  try{
-    const res=await fetch(`https://graph.facebook.com/v22.0/${WA_PHONE_ID}/messages`,{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+WA_TOKEN},
-      body:JSON.stringify({messaging_product:'whatsapp',to:tel,type:'text',text:{body:metin}})
-    });
-    const data=await res.json();
-    if(!res.ok)console.warn('WhatsApp gönderilemedi:',data);
-    else console.log('WhatsApp onay mesajı gönderildi ✓');
-  }catch(e){console.warn('WhatsApp hata:',e);}
+    `• Personel: ${p?p.ad:'Belirtilmedi'}\n\n`+
+    (iptalLink?`❌ Rezervasyonunuzu iptal etmek için:\n${iptalLink}\n\n`:'')+
+    `_Fatih Kurt Hair Artist — www.fatihkurthairartist.com_`;
+  await waMesajGonder(r.telefon, metin);
 }
 
 // ─── ONAY / RED / SİL ───
@@ -1440,11 +1445,8 @@ async function reddet(id){
 }
 
 async function waRedMesaji(r){
-  let tel=r.telefon.replace(/\s/g,'').replace(/[^0-9]/g,'');
-  if(tel.startsWith('0'))tel=tel.substring(1);
-  if(!tel.startsWith('90'))tel='90'+tel;
   const metin=
-    `❌ *Rezervasyon Talebi — Hair Artist*\n\n`+
+    `❌ *Rezervasyon Talebi — Fatih Kurt Hair Artist*\n\n`+
     `Merhaba ${r.ad},\n\n`+
     `Maalesef rezervasyon talebinizi bu seferlik karşılayamıyoruz.\n\n`+
     `📋 *Talep Detayları:*\n`+
@@ -1452,17 +1454,10 @@ async function waRedMesaji(r){
     `• Tarih: ${r.tarih}\n`+
     `• Saat: ${r.saat||'Belirtilmedi'}\n\n`+
     `Farklı bir tarih veya saat için bizi arayabilirsiniz.\n\n`+
-    `_Hair Artist — hairartist.com.tr_`;
-  try{
-    const res=await fetch(`https://graph.facebook.com/v22.0/${WA_PHONE_ID}/messages`,{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+WA_TOKEN},
-      body:JSON.stringify({messaging_product:'whatsapp',to:tel,type:'text',text:{body:metin}})
-    });
-    const data=await res.json();
-    if(!res.ok)console.warn('WhatsApp gönderilemedi:',data);
-    else console.log('WhatsApp red mesajı gönderildi ✓');
-  }catch(e){console.warn('WhatsApp hata:',e);}
+    `📞 0531 777 02 03\n`+
+    `🌐 www.fatihkurthairartist.com\n\n`+
+    `_Fatih Kurt Hair Artist — www.fatihkurthairartist.com_`;
+  await waMesajGonder(r.telefon, metin);
 }
 async function sil(id){
   if(!confirm('Bu rezervasyonu silmek istediğinizden emin misiniz?'))return;
