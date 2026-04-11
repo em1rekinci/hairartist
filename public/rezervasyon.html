@@ -872,7 +872,7 @@ a[href^="tel"] {
         <div class="personel-dropdown-wrap" id="n-personel-wrap">
           <div class="personel-selected" onclick="personelToggle('n')">
             <div class="personel-selected-inner" id="n-personel-selected-inner">
-              <span class="personel-selected-placeholder">— Personel Seçin —</span>
+              <span class="personel-selected-placeholder" data-i18n="rez_personel_sec">— Personel Seçin —</span>
             </div>
             <svg class="personel-dd-arrow" id="n-personel-arrow" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.2"/></svg>
           </div>
@@ -913,11 +913,11 @@ a[href^="tel"] {
         <input type="hidden" id="n-hizmet" value="">
         <div class="cs-wrap" id="n-cs-wrap">
           <div class="cs-selected" onclick="csToggleN()">
-            <span id="n-cs-label" style="color:#f7f4ef">— Hizmet Seçin —</span>
+            <span id="n-cs-label" style="color:#f7f4ef" data-i18n="rez_hizmet_sec">— Hizmet Seçin —</span>
             <svg class="cs-arrow" id="n-cs-arrow" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.2"/></svg>
           </div>
           <div class="cs-dropdown" id="n-cs-dropdown">
-            <div class="cs-option" style="opacity:.85;pointer-events:none">Hizmetler yükleniyor...</div>
+            <div class="cs-option" style="opacity:.85;pointer-events:none" data-i18n="rez_hizmet_yukleniyor">Hizmetler yükleniyor...</div>
           </div>
         </div>
         <div class="fiyat-box" id="n-fiyat-box">
@@ -1007,7 +1007,7 @@ a[href^="tel"] {
         <div class="personel-dropdown-wrap" id="o-personel-wrap">
           <div class="personel-selected" onclick="personelToggle('o')">
             <div class="personel-selected-inner" id="o-personel-selected-inner">
-              <span class="personel-selected-placeholder">— Personel Seçin —</span>
+              <span class="personel-selected-placeholder" data-i18n="rez_personel_sec">— Personel Seçin —</span>
             </div>
             <svg class="personel-dd-arrow" id="o-personel-arrow" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.2"/></svg>
           </div>
@@ -1049,11 +1049,11 @@ a[href^="tel"] {
         <input type="hidden" id="o-fiyat" value="">
         <div class="cs-wrap" id="o-cs-wrap">
           <div class="cs-selected" onclick="csToggleO()">
-            <span id="o-cs-label" style="color:#f7f4ef">— Hizmet Seçin —</span>
+            <span id="o-cs-label" style="color:#f7f4ef" data-i18n="rez_hizmet_sec">— Hizmet Seçin —</span>
             <svg class="cs-arrow" id="o-cs-arrow" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.2"/></svg>
           </div>
           <div class="cs-dropdown" id="o-cs-dropdown">
-            <div class="cs-option" style="opacity:.85;pointer-events:none">Hizmetler yükleniyor...</div>
+            <div class="cs-option" style="opacity:.85;pointer-events:none" data-i18n="rez_hizmet_yukleniyor">Hizmetler yükleniyor...</div>
           </div>
         </div>
         <div class="fiyat-box" id="o-fiyat-box">
@@ -1563,7 +1563,7 @@ async function normalGonder() {
     document.getElementById('n-hizmet').value = '';
     document.getElementById('n-personel').value = '';
     document.querySelectorAll('#normal-form .personel-row').forEach(k => k.classList.remove('secili'));
-    document.getElementById('n-cs-label').textContent = '— Hizmet Seçin —';
+    document.getElementById('n-cs-label').textContent = (window.i18n && window.i18n.t('rez_hizmet_sec')) || '— Hizmet Seçin —';
     document.getElementById('n-cs-label').style.color = '#f7f4ef';
     document.getElementById('n-fiyat-box').classList.remove('show');
     document.querySelectorAll('#normal-form .time-btn').forEach(b => b.classList.remove('selected'));
@@ -2029,7 +2029,12 @@ async function saatleriGuncelle(prefix) {
       btn.style.opacity = saliMi ? '.2' : (doluMu ? '.35' : '.2');
       btn.style.cursor = 'not-allowed';
       btn.style.textDecoration = 'line-through';
-      btn.title = saliMi ? 'Salı günleri kapalıyız' : (doluMu ? 'Bu saat dolu' : 'Geçmiş saat');
+      var _t = window.i18n && window.i18n.t.bind(window.i18n);
+      btn.title = saliMi
+        ? ((_t && _t('rez_sali_kapali')) || 'Salı günleri kapalıyız')
+        : (doluMu
+          ? ((_t && _t('rez_saat_dolu')) || 'Bu saat dolu')
+          : ((_t && _t('rez_gecmis_saat')) || 'Geçmiş saat'));
     } else {
       btn.disabled = false;
       btn.style.opacity = '';
@@ -2047,7 +2052,8 @@ async function saatleriGuncelle(prefix) {
       var uyari = document.createElement('p');
       uyari.className = 'sali-uyari';
       uyari.style.cssText = 'color:#e57373;font-size:.75rem;letter-spacing:.05em;margin-top:6px;';
-      uyari.textContent = '⚠ Salı günleri salonumuz kapalıdır. Lütfen farklı bir gün seçin.';
+      uyari.setAttribute('data-i18n','rez_sali_uyari');
+      uyari.textContent = (window.i18n && window.i18n.t('rez_sali_uyari')) || '⚠ Salı günleri salonumuz kapalıdır. Lütfen farklı bir gün seçin.';
       tarihEl.parentElement.appendChild(uyari);
     }
   } else {
@@ -2278,7 +2284,7 @@ function personelDropdownOlustur(prefix, liste) {
         <div class="personel-foto" style="filter:grayscale(1)">${fotoHtml}</div>
         <div class="personel-info">
           <div class="personel-ad">${p.ad}</div>
-          <div class="personel-unvan" style="color:#f7f4ef">Uygun rezervasyon bulunamadı</div>
+          <div class="personel-unvan" style="color:#f7f4ef" data-i18n="rez_musait_degil">Uygun rezervasyon bulunamadı</div>
         </div>
         <div style="font-size:.55rem;color:#f7f4ef;white-space:nowrap">🚫</div>
       </div>`;
