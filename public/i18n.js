@@ -101,6 +101,7 @@
 
     translations = loaded || {};
     applyTranslations();
+    window.dispatchEvent(new CustomEvent('langchange', { detail: { lang } }));
   }
 
   // ── Dil seçici widget'ı oluştur ───────────────────────────────────────────────
