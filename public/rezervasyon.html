@@ -1348,12 +1348,14 @@ function hizmetSecN(el, ad, min, max, sure) {
   }
 
   var sureBadge = document.getElementById('n-sure-badge');
-  if (sure && sure > 0) { 
-    sureBadge.textContent = 'İşlem süresi: ' + sure + ' dk'; 
-    sureBadge.style.display = ''; 
-  } else { 
-    sureBadge.textContent = ''; 
-    sureBadge.style.display = 'none'; 
+  if (sure && sure > 0) {
+    var _lbl = (window.i18n && window.i18n.t('rez_islem_suresi')) || 'İşlem süresi:';
+    var _unit = (window.i18n && window.i18n.t('rez_dk')) || 'dk';
+    sureBadge.textContent = _lbl + ' ' + sure + ' ' + _unit;
+    sureBadge.style.display = '';
+  } else {
+    sureBadge.textContent = '';
+    sureBadge.style.display = 'none';
   }
   document.getElementById('n-fiyat-box').classList.add('show');
 }
@@ -1396,12 +1398,14 @@ function hizmetSecO(el, ad, fiyat, sure) {
   }
 
   var sureBadge = document.getElementById('o-sure-badge');
-  if (sure && sure > 0) { 
-    sureBadge.textContent = 'İşlem süresi: ' + sure + ' dk'; 
-    sureBadge.style.display = ''; 
-  } else { 
-    sureBadge.textContent = ''; 
-    sureBadge.style.display = 'none'; 
+  if (sure && sure > 0) {
+    var _lbl2 = (window.i18n && window.i18n.t('rez_islem_suresi')) || 'İşlem süresi:';
+    var _unit2 = (window.i18n && window.i18n.t('rez_dk')) || 'dk';
+    sureBadge.textContent = _lbl2 + ' ' + sure + ' ' + _unit2;
+    sureBadge.style.display = '';
+  } else {
+    sureBadge.textContent = '';
+    sureBadge.style.display = 'none';
   }
   document.getElementById('o-fiyat-box').classList.add('show');
 }
