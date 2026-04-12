@@ -16,7 +16,7 @@ const SERPAPI_KEY      = process.env.SERPAPI_KEY || '03c94f5f1085187e9222bcb72e2
 const PLACE_ID         = 'ChIJ3XOCRsGwyhQRBDLZurYAP7Y';
 
 // ─── GOOGLE RATING CACHE ──────────────────────────────────────────────────────
-let ratingCache = { puan: null, sonGuncelleme: 0 };
+let ratingCache = { puan: null, yorumSayisi: null, sonGuncelleme: 0 };
 const CACHE_SURE = 24 * 60 * 60 * 1000; // 24 saat (ms)
 
 async function googlePuanCek() {
@@ -25,9 +25,10 @@ async function googlePuanCek() {
     const r = await fetch(url);
     const d = await r.json();
     const puan = d?.place_results?.rating || d?.local_results?.[0]?.rating || null;
+    const yorumSayisi = d?.place_results?.reviews || d?.local_results?.[0]?.reviews || null;
     if (puan) {
-      ratingCache = { puan, sonGuncelleme: Date.now() };
-      console.log(`[Rating] ✓ Google puanı güncellendi: ${puan}`);
+      ratingCache = { puan, yorumSayisi, sonGuncelleme: Date.now() };
+      console.log(`[Rating] ✓ Google puanı güncellendi: ${puan} (${yorumSayisi} yorum)`);
     }
   } catch(e) {
     console.error('[Rating] Hata:', e.message);
@@ -43,7 +44,7 @@ app.get('/api/google-rating', async (req, res) => {
   if (Date.now() - ratingCache.sonGuncelleme > CACHE_SURE) {
     await googlePuanCek();
   }
-  res.json({ puan: ratingCache.puan || 4.2 });
+  res.json({ puan: ratingCache.puan || 4.2, yorumSayisi: ratingCache.yorumSayisi || 83 });
 });
 
 // ─── CLAUDE PROXY ────────────────────────────────────────────────────────────

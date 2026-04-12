@@ -601,10 +601,10 @@
         <span class="sec-tag" data-i18n="reviews_tag">Müşteri Yorumları</span>
         <h2><span data-i18n="reviews_title_pre">Onlar</span> <em data-i18n="reviews_title_em">ne dedi?</em></h2>
         <div class="genel-puan">
-          <div class="gp-sayi">4.2</div>
+          <div class="gp-sayi" id="google-rating-2">4.2</div>
           <div class="gp-sag">
             <div class="gp-yildizlar">★★★★<span style="opacity:.35">★</span></div>
-            <div class="gp-alt" data-i18n="reviews_count">83 Google yorumu</div>
+            <div class="gp-alt" data-i18n="reviews_count" id="google-review-count">83 Google yorumu</div>
           </div>
         </div>
       </div>
@@ -865,16 +865,22 @@ function oneriGonderMobil() {
 <script>
 // Google Rating — sunucudan çek (cache: 24 saat)
 (function() {
-  var el = document.getElementById('google-rating');
-  if (!el) return;
+  var el1 = document.getElementById('google-rating');
+  var el2 = document.getElementById('google-rating-2');
+  var el3 = document.getElementById('google-review-count');
+  if (!el1 && !el2 && !el3) return;
   fetch('/api/google-rating')
     .then(function(r) { return r.json(); })
     .then(function(d) {
       if (d && d.puan) {
-        el.textContent = d.puan + '★';
+        if (el1) el1.textContent = d.puan + '★';
+        if (el2) el2.textContent = d.puan;
+      }
+      if (d && d.yorumSayisi) {
+        if (el3) el3.textContent = d.yorumSayisi + ' Google yorumu';
       }
     })
-    .catch(function() { /* hata olursa 4.2★ kalır */ });
+    .catch(function() { /* hata olursa mevcut değer kalır */ });
 })();
 </script>
 </body>
