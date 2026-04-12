@@ -884,7 +884,6 @@ document.addEventListener('DOMContentLoaded', () => {
     sepetRender();
   } else {
     window.addEventListener('langchange', sepetRender, { once: true });
-    setTimeout(sepetRender, 1200); // fallback - i18n gelmezse yine de çalıştır
   }
   // Dil değişince boş sepet metinlerini de güncelle
   window.addEventListener('langchange', sepetRender);

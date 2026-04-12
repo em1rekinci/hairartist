@@ -439,6 +439,7 @@
     }
 
     applyTranslations();
+    window.dispatchEvent(new CustomEvent('langchange', { detail: { lang: currentLang } }));
 
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => {
