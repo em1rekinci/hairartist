@@ -879,7 +879,15 @@ function inputKisitlamalariEkle() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  sepetRender();
+  // i18n hazır olduktan sonra render et
+  if (window.i18n) {
+    sepetRender();
+  } else {
+    window.addEventListener('langchange', sepetRender, { once: true });
+    setTimeout(sepetRender, 1200); // fallback - i18n gelmezse yine de çalıştır
+  }
+  // Dil değişince boş sepet metinlerini de güncelle
+  window.addEventListener('langchange', sepetRender);
   illeriDoldur();
   ilceDoldur('');
   inputKisitlamalariEkle();
