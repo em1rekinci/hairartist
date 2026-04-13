@@ -274,6 +274,7 @@ app.post('/api/paytr-token', async (req, res) => {
       currency:          currency,
       test_mode:         test_mode,
       lang:              'tr',
+      store_card:        '0',  // Kart kaydetme özelliğini kapat
     });
 
     const response = await fetch('https://www.paytr.com/odeme/api/get-token', {
@@ -562,6 +563,7 @@ app.post('/api/paytr-token-shop', async (req, res) => {
       currency:          currency,
       test_mode:         test_mode,
       lang:              'tr',
+      store_card:        '0',  // Kart kaydetme özelliğini kapat
     });
 
     const response = await fetch('https://www.paytr.com/odeme/api/get-token', {

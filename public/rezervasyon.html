@@ -1735,9 +1735,13 @@ function paytrKapat() {
 
 async function paytrMesajDinle(e) {
   // PayTR ödeme sonucu bildirimi
-  if (!e.data || !e.data.status) return;
+  if (!e.data) return;
 
-  if (e.data.status === 'success') {
+  // PayTR hem string hem obje gönderebilir
+  const status = typeof e.data === 'string' ? e.data : e.data.status;
+  if (!status) return;
+
+  if (status === 'success') {
     paytrKapat();
 
     // Supabase'deki kaydı "onaylandi + ödeme alındı" olarak güncelle
@@ -1765,7 +1769,7 @@ async function paytrMesajDinle(e) {
 
     window.location.href = '/odeme-basarili';
 
-  } else if (e.data.status === 'fail') {
+  } else if (status === 'fail') {
     paytrKapat();
     alert('Ödeme başarısız. Lütfen tekrar deneyin.');
   }
