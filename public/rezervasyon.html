@@ -869,6 +869,7 @@ a[href^="tel"] {
       <div class="fg form-grid-full personel-secim-wrap">
         <label class="fl" data-i18n="rez_personel">Personel Seçimi</label>
         <input type="hidden" id="n-personel" value="">
+        <input type="hidden" id="n-personel-isim" value="">
         <div class="personel-dropdown-wrap" id="n-personel-wrap">
           <div class="personel-selected" onclick="personelToggle('n')">
             <div class="personel-selected-inner" id="n-personel-selected-inner">
@@ -1004,6 +1005,7 @@ a[href^="tel"] {
       <div class="fg form-grid-full personel-secim-wrap">
         <label class="fl" data-i18n="rez_personel">Personel Seçimi</label>
         <input type="hidden" id="o-personel" value="">
+        <input type="hidden" id="o-personel-isim" value="">
         <div class="personel-dropdown-wrap" id="o-personel-wrap">
           <div class="personel-selected" onclick="personelToggle('o')">
             <div class="personel-selected-inner" id="o-personel-selected-inner">
@@ -1242,8 +1244,10 @@ document.addEventListener('click', function(e) {
 function personelSec(el, prefix, isim, unvan, foto, emoji, personelId) {
   el.closest('.personel-dropdown').querySelectorAll('.personel-row').forEach(k => k.classList.remove('secili'));
   el.classList.add('secili');
-  // UUID varsa onu kaydet, yoksa isim (geriye uyumluluk)
+  // UUID'yi personel_id'ye, ismi ayrı input'a kaydet
   document.getElementById(prefix + '-personel').value = personelId || isim;
+  var isimInput = document.getElementById(prefix + '-personel-isim');
+  if (isimInput) isimInput.value = isim;
   // Dropdown kapat
   var dd = document.getElementById(prefix + '-personel-dropdown');
   var arrow = document.getElementById(prefix + '-personel-arrow');
@@ -1524,6 +1528,7 @@ async function normalGonder() {
   const saat = document.getElementById('n-saat').value;
   const not = document.getElementById('n-not').value.trim();
   const personel = document.getElementById('n-personel').value || 'Baran Kurt';
+  const personelIsim = document.getElementById('n-personel-isim').value || personel;
   
   // Checkbox kontrolleri
   const kvkkCheck = document.getElementById('n-kvkk');
@@ -1550,7 +1555,7 @@ async function normalGonder() {
       odeme_alindi: false,
       tip: 'normal'
     });
-    whatsappGonder(telefon, ad, hizmet, tarih, saat, personel, rez?.id);
+    whatsappGonder(telefon, ad, hizmet, tarih, saat, personelIsim, rez?.id);
     mesaj(mesajDiv, '✓Rezervasyonunuz alındı. En kısa sürede sizinle iletişime geçeceğiz.', 'basari');
     ['n-ad','n-tel','n-tarih','n-not'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('n-hizmet').value = '';
@@ -1587,6 +1592,7 @@ async function odemeGit() {
   const saat = document.getElementById('o-saat').value;
   const fiyat = document.getElementById('o-fiyat').value;
   const personel = document.getElementById('o-personel').value || 'Baran Kurt';
+  const personelIsim = document.getElementById('o-personel-isim').value || personel;
   
   // Checkbox kontrolleri
   const kvkkCheck = document.getElementById('o-kvkk');
@@ -1628,7 +1634,7 @@ async function odemeGit() {
       merchant_oid: merchant_oid
     });
     window._bekleyenRezId = kayit?.id || null;
-    window._bekleyenRezData = { ad, telefon, hizmet, tarih, saat, personel };
+    window._bekleyenRezData = { ad, telefon, hizmet, tarih, saat, personel: personelIsim };
 
     btn.textContent = 'Ödeme açılıyor…';
 
