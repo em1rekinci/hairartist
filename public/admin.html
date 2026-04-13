@@ -1363,15 +1363,28 @@ function bH(d){const m={bekliyor:['bb','Bekliyor'],odeme_bekleniyor:['bb','💳 
 const WA_PHONE_ID='1018603338011115'; // 
 const WA_TOKEN='EAAbpYZAirSdQBRD9lMpx2ZC4DPUmFoZBsvioyZBZAA7Tn72N51Des58u8SR2pGRJ45jIyDEumIcrqq7XVDlIwtuVbHIrMjKu5NnGblt8Ai9w23PxJiNR0nJbZC4YfbAlH8xebsIEAi7oZBc0ZAA8a9e0W5rRfVQCmoUmZBAPqvZCBssm7s5NlBNZAC4fAS90DVVyTgMXlF6yejrUum32tvu7NYxMmdWOgPIDMrOtBVqSfC7ZBhkzYsEvGuQI5FBni2Ewy7iuM1k2ZBinCO8rawwZAMZBDhQ23NLZAYkWtYTc4UvZBxAZDZD'; // 
 
-async function waMesajGonder(tel, metin){
+async function waTemplatGonder(tel, sablon, parametreler){
   let t=tel.replace(/\s/g,'').replace(/[^0-9]/g,'');
   if(t.startsWith('0'))t=t.substring(1);
   if(!t.startsWith('90'))t='90'+t;
   try{
+    const body={
+      messaging_product:'whatsapp',
+      to:t,
+      type:'template',
+      template:{
+        name:sablon,
+        language:{code:'tr'},
+        components:[{
+          type:'body',
+          parameters:parametreler.map(p=>({type:'text',text:String(p)}))
+        }]
+      }
+    };
     const res=await fetch(`https://graph.facebook.com/v22.0/${WA_PHONE_ID}/messages`,{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+WA_TOKEN},
-      body:JSON.stringify({messaging_product:'whatsapp',to:t,type:'text',text:{body:metin}})
+      body:JSON.stringify(body)
     });
     const data=await res.json();
     if(!res.ok)console.warn('WhatsApp gönderilemedi:',data);
@@ -1381,19 +1394,15 @@ async function waMesajGonder(tel, metin){
 
 async function waOnayMesaji(r){
   const p=personel.find(x=>x.id===r.personelId)||personel.find(x=>x.ad===r.personelId);
-  const iptalLink=r.id?`https://www.fatihkurthairartist.com/iptal?id=${r.id}`:'';
-  const metin=
-    `✅ *Rezervasyon Onaylandı — Fatih Kurt Hair Artist*\n\n`+
-    `Merhaba ${r.ad},\n\n`+
-    `Rezervasyonunuz onaylandı!\n\n`+
-    `📋 *Detaylar:*\n`+
-    `• Hizmet: ${r.hizmet}\n`+
-    `• Tarih: ${r.tarih}\n`+
-    `• Saat: ${r.saat||'Belirtilmedi'}\n`+
-    `• Personel: ${p?p.ad:'Belirtilmedi'}\n\n`+
-    (iptalLink?`❌ Rezervasyonunuzu iptal etmek için:\n${iptalLink}\n\n`:'')+
-    `_Fatih Kurt Hair Artist — www.fatihkurthairartist.com_`;
-  await waMesajGonder(r.telefon, metin);
+  const iptalLink=r.id?`https://www.fatihkurthairartist.com/iptal?id=${r.id}`:'Belirtilmedi';
+  await waTemplatGonder(r.telefon,'rezervasyon_onaylandi',[
+    r.ad,
+    r.hizmet,
+    r.tarih,
+    r.saat||'Belirtilmedi',
+    p?p.ad:'Belirtilmedi',
+    iptalLink
+  ]);
 }
 
 // ─── ONAY / RED / SİL ───
@@ -1445,19 +1454,12 @@ async function reddet(id){
 }
 
 async function waRedMesaji(r){
-  const metin=
-    `❌ *Rezervasyon Talebi — Fatih Kurt Hair Artist*\n\n`+
-    `Merhaba ${r.ad},\n\n`+
-    `Maalesef rezervasyon talebinizi bu seferlik karşılayamıyoruz.\n\n`+
-    `📋 *Talep Detayları:*\n`+
-    `• Hizmet: ${r.hizmet}\n`+
-    `• Tarih: ${r.tarih}\n`+
-    `• Saat: ${r.saat||'Belirtilmedi'}\n\n`+
-    `Farklı bir tarih veya saat için bizi arayabilirsiniz.\n\n`+
-    `📞 0531 777 02 03\n`+
-    `🌐 www.fatihkurthairartist.com\n\n`+
-    `_Fatih Kurt Hair Artist — www.fatihkurthairartist.com_`;
-  await waMesajGonder(r.telefon, metin);
+  await waTemplatGonder(r.telefon,'rezervasyon_reddedildi',[
+    r.ad,
+    r.hizmet,
+    r.tarih,
+    r.saat||'Belirtilmedi'
+  ]);
 }
 async function sil(id){
   if(!confirm('Bu rezervasyonu silmek istediğinizden emin misiniz?'))return;
