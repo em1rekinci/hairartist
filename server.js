@@ -738,13 +738,25 @@ app.post('/api/paytr-callback', async (req, res) => {
           const rezData = await rezRes.json();
           const rez = Array.isArray(rezData) ? rezData[0] : rezData;
           if (rez && rez.telefon) {
+            // Personel adını UUID'den çek
+            let personelAd = 'Belirtilmedi';
+            if (rez.personel_id) {
+              try {
+                const pRes = await fetch(
+                  `${SB_URL}/rest/v1/personel?id=eq.${encodeURIComponent(rez.personel_id)}&select=ad`,
+                  { headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY } }
+                );
+                const pData = await pRes.json();
+                if (Array.isArray(pData) && pData[0]?.ad) personelAd = pData[0].ad;
+              } catch(e) { console.warn('[WA] Personel adı çekilemedi:', e.message); }
+            }
             const iptalLink = `https://www.fatihkurthairartist.com/iptal?id=${rez.id}`;
             await waTemplatGonder(rez.telefon, 'rezervasyon_onaylandi_odemeli', [
               rez.ad || '',
               rez.hizmet || '',
               rez.tarih || '',
               rez.saat || 'Belirtilmedi',
-              rez.personel_ad || 'Belirtilmedi',
+              personelAd,
               iptalLink
             ]);
           }
