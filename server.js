@@ -12,6 +12,42 @@ const SITE_URL         = process.env.SITE_URL || 'https://www.fatihkurthairartis
 const ADMIN_SIFRE      = process.env.ADMIN_SIFRE || 'hairartist2026';
 const RESEND_API_KEY   = process.env.RESEND_API_KEY || '';
 const CLAUDE_KEY       = process.env.CLAUDE_KEY || '';
+const WA_PHONE_ID      = process.env.WA_PHONE_ID || '';
+const WA_TOKEN         = process.env.WA_TOKEN || '';
+
+// ── WhatsApp template mesajı gönder
+async function waTemplatGonder(telefon, templateAdi, parametreler) {
+  if (!WA_PHONE_ID || !WA_TOKEN) {
+    console.warn('[WA] WA_PHONE_ID veya WA_TOKEN tanımlı değil, mesaj atlanıyor.');
+    return;
+  }
+  let tel = telefon.replace(/\D/g, '');
+  if (tel.startsWith('0')) tel = tel.slice(1);
+  if (!tel.startsWith('90')) tel = '90' + tel;
+  try {
+    const r = await fetch(`https://graph.facebook.com/v22.0/${WA_PHONE_ID}/messages`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + WA_TOKEN },
+      body: JSON.stringify({
+        messaging_product: 'whatsapp',
+        to: tel,
+        type: 'template',
+        template: {
+          name: templateAdi,
+          language: { code: 'tr' },
+          components: [{
+            type: 'body',
+            parameters: parametreler.map(p => ({ type: 'text', text: String(p) }))
+          }]
+        }
+      })
+    });
+    const d = await r.json();
+    console.log(`[WA] ${templateAdi} → ${tel}:`, JSON.stringify(d));
+  } catch(e) {
+    console.warn('[WA] Mesaj gönderilemedi:', e.message);
+  }
+}
 const SERPAPI_KEY      = process.env.SERPAPI_KEY || '03c94f5f1085187e9222bcb72e2a7dd2999460340ae87181388f4c0d4b69367d';
 const PLACE_ID         = 'ChIJ3XOCRsGwyhQRBDLZurYAP7Y';
 
@@ -690,6 +726,31 @@ app.post('/api/paytr-callback', async (req, res) => {
           odeme_tarihi: new Date().toISOString(),
           odeme_turu: payment_type || '',
         });
+
+        // WhatsApp onay mesajı gönder
+        try {
+          const SB_URL = 'https://botxnihztrnwzjnrlwzv.supabase.co';
+          const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvdHhuaWh6dHJud3pqbnJsd3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MTg4MTAsImV4cCI6MjA5MDA5NDgxMH0.AcX4_2Aykf8J1jln9fvODh2rRffymfEJCAekzmN1ALg';
+          const rezRes = await fetch(
+            `${SB_URL}/rest/v1/rezervasyonlar?merchant_oid=eq.${encodeURIComponent(merchant_oid)}&select=*`,
+            { headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY } }
+          );
+          const rezData = await rezRes.json();
+          const rez = Array.isArray(rezData) ? rezData[0] : rezData;
+          if (rez && rez.telefon) {
+            const iptalLink = `https://www.fatihkurthairartist.com/iptal?id=${rez.id}`;
+            await waTemplatGonder(rez.telefon, 'rezervasyon_onaylandi_odemeli', [
+              rez.ad || '',
+              rez.hizmet || '',
+              rez.tarih || '',
+              rez.saat || 'Belirtilmedi',
+              rez.personel_ad || 'Belirtilmedi',
+              iptalLink
+            ]);
+          }
+        } catch(waErr) {
+          console.warn('[WA] Callback mesaj hatası:', waErr.message);
+        }
       }
       console.log(`[PayTR Callback] ✓ Ödeme başarılı: ${merchant_oid}`);
     } else {
