@@ -992,10 +992,10 @@ a[href^="tel"] {
           <div class="cs-dropdown" id="n-cs-dropdown">
             <div class="cs-option" style="opacity:.85;pointer-events:none" data-i18n="rez_hizmet_yukleniyor">Hizmetler yükleniyor...</div>
           </div>
+          <div class="hizmet-max-uyari" id="n-max-uyari">En fazla 5 hizmet seçebilirsiniz.</div>
+          <div class="secili-hizmetler" id="n-secili-hizmetler"></div>
+          <button type="button" id="n-hizmet-ekle-btn" class="hizmet-ekle-btn" style="display:none" onclick="csHizmetEkleAc('n')">＋ Hizmet Ekle</button>
         </div>
-        <div class="hizmet-max-uyari" id="n-max-uyari">En fazla 5 hizmet seçebilirsiniz.</div>
-        <div class="secili-hizmetler" id="n-secili-hizmetler"></div>
-        <button type="button" id="n-hizmet-ekle-btn" class="hizmet-ekle-btn" style="display:none" onclick="var dd=document.getElementById('n-cs-dropdown');var arrow=document.getElementById('n-cs-arrow');dd.classList.add('open');arrow.style.transform='rotate(180deg)';this.closest('.fg,.form-grid-full,div').scrollIntoView({behavior:'smooth',block:'nearest'})">＋ Hizmet Ekle</button>
         <div class="fiyat-box" id="n-fiyat-box">
           <span id="fiyat-indirimli"></span>
           <span id="fiyat-normal"></span>
@@ -1132,10 +1132,10 @@ a[href^="tel"] {
           <div class="cs-dropdown" id="o-cs-dropdown">
             <div class="cs-option" style="opacity:.85;pointer-events:none" data-i18n="rez_hizmet_yukleniyor">Hizmetler yükleniyor...</div>
           </div>
+          <div class="hizmet-max-uyari" id="o-max-uyari">En fazla 5 hizmet seçebilirsiniz.</div>
+          <div class="secili-hizmetler" id="o-secili-hizmetler"></div>
+          <button type="button" id="o-hizmet-ekle-btn" class="hizmet-ekle-btn" style="display:none" onclick="csHizmetEkleAc('o')">＋ Hizmet Ekle</button>
         </div>
-        <div class="hizmet-max-uyari" id="o-max-uyari">En fazla 5 hizmet seçebilirsiniz.</div>
-        <div class="secili-hizmetler" id="o-secili-hizmetler"></div>
-        <button type="button" id="o-hizmet-ekle-btn" class="hizmet-ekle-btn" style="display:none" onclick="var dd=document.getElementById('o-cs-dropdown');var arrow=document.getElementById('o-cs-arrow');dd.classList.add('open');arrow.style.transform='rotate(180deg)'">＋ Hizmet Ekle</button>
         <div class="fiyat-box" id="o-fiyat-box">
           <span id="o-fiyat-indirimli"></span>
           <span id="o-fiyat-normal"></span>
@@ -1396,6 +1396,17 @@ function csToggleN() {
   var arrow = document.getElementById('n-cs-arrow');
   var open = dd.classList.toggle('open');
   arrow.style.transform = open ? 'rotate(180deg)' : '';
+}
+
+// ＋ Hizmet Ekle butonu — dropdown'ı aç ve scroll et
+function csHizmetEkleAc(prefix) {
+  var dd = document.getElementById(prefix + '-cs-dropdown');
+  var arrow = document.getElementById(prefix + '-cs-arrow');
+  dd.classList.add('open');
+  arrow.style.transform = 'rotate(180deg)';
+  setTimeout(function() {
+    dd.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, 50);
 }
 
 function hizmetSecN(el, ad, min, max, sure) {
