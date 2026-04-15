@@ -325,6 +325,25 @@
   border: 1px solid rgba(255,223,0,.15);
   margin-top: 6px;
 }
+.hizmet-ekle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 1px dashed #333;
+  color: #f7f4ef;
+  font-family: 'Montserrat', sans-serif;
+  font-size: .65rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  font-weight: 500;
+  padding: 9px 16px;
+  cursor: pointer;
+  margin-top: 6px;
+  width: 100%;
+  transition: border-color .2s, color .2s;
+}
+.hizmet-ekle-btn:hover { border-color: #555; color: var(--off); }
 .hizmet-max-uyari.show { display: block; }
 .cs-option.max-doldu { opacity: .45; pointer-events: none; cursor: not-allowed; }
 
@@ -973,9 +992,10 @@ a[href^="tel"] {
           <div class="cs-dropdown" id="n-cs-dropdown">
             <div class="cs-option" style="opacity:.85;pointer-events:none" data-i18n="rez_hizmet_yukleniyor">Hizmetler yükleniyor...</div>
           </div>
+          <div class="hizmet-max-uyari" id="n-max-uyari">En fazla 5 hizmet seçebilirsiniz.</div>
+          <div class="secili-hizmetler" id="n-secili-hizmetler"></div>
+          <button type="button" id="n-hizmet-ekle-btn" class="hizmet-ekle-btn" style="display:none" onclick="csHizmetEkleAc('n')">＋ Hizmet Ekle</button>
         </div>
-        <div class="hizmet-max-uyari" id="n-max-uyari">En fazla 5 hizmet seçebilirsiniz.</div>
-        <div class="secili-hizmetler" id="n-secili-hizmetler"></div>
         <div class="fiyat-box" id="n-fiyat-box">
           <span id="fiyat-indirimli"></span>
           <span id="fiyat-normal"></span>
@@ -1112,9 +1132,10 @@ a[href^="tel"] {
           <div class="cs-dropdown" id="o-cs-dropdown">
             <div class="cs-option" style="opacity:.85;pointer-events:none" data-i18n="rez_hizmet_yukleniyor">Hizmetler yükleniyor...</div>
           </div>
+          <div class="hizmet-max-uyari" id="o-max-uyari">En fazla 5 hizmet seçebilirsiniz.</div>
+          <div class="secili-hizmetler" id="o-secili-hizmetler"></div>
+          <button type="button" id="o-hizmet-ekle-btn" class="hizmet-ekle-btn" style="display:none" onclick="csHizmetEkleAc('o')">＋ Hizmet Ekle</button>
         </div>
-        <div class="hizmet-max-uyari" id="o-max-uyari">En fazla 5 hizmet seçebilirsiniz.</div>
-        <div class="secili-hizmetler" id="o-secili-hizmetler"></div>
         <div class="fiyat-box" id="o-fiyat-box">
           <span id="o-fiyat-indirimli"></span>
           <span id="o-fiyat-normal"></span>
@@ -1377,6 +1398,17 @@ function csToggleN() {
   arrow.style.transform = open ? 'rotate(180deg)' : '';
 }
 
+// ＋ Hizmet Ekle butonu — dropdown'ı aç ve scroll et
+function csHizmetEkleAc(prefix) {
+  var dd = document.getElementById(prefix + '-cs-dropdown');
+  var arrow = document.getElementById(prefix + '-cs-arrow');
+  dd.classList.add('open');
+  arrow.style.transform = 'rotate(180deg)';
+  setTimeout(function() {
+    dd.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, 50);
+}
+
 function hizmetSecN(el, ad, min, max, sure) {
   // Zaten seçiliyse kaldır (toggle)
   var mevcutIdx = _nSeciliHizmetler.findIndex(function(h){ return h.ad === ad; });
@@ -1394,6 +1426,11 @@ function hizmetSecN(el, ad, min, max, sure) {
   _nSeciliHizmetler.push({ ad: ad, minFiyat: min, maxFiyat: max, sure: sure || 0 });
   el.classList.add('secili');
   nHizmetGuncelle();
+  // Seçim yapılınca dropdown'ı kapat
+  var dd = document.getElementById('n-cs-dropdown');
+  var arrow = document.getElementById('n-cs-arrow');
+  dd.classList.remove('open');
+  arrow.style.transform = '';
 }
 
 function nHizmetSil(ad) {
@@ -1438,6 +1475,7 @@ function nHizmetGuncelle() {
     secilenDiv.classList.remove('show');
     secilenDiv.innerHTML = '';
     fiyatBox.classList.remove('show');
+    document.getElementById('n-hizmet-ekle-btn').style.display = 'none';
     return;
   }
 
@@ -1470,6 +1508,9 @@ function nHizmetGuncelle() {
   }).join('');
   secilenDiv.innerHTML = itemlerHTML;
   secilenDiv.classList.add('show');
+
+  // "＋ Hizmet Ekle" butonu göster/gizle
+  document.getElementById('n-hizmet-ekle-btn').style.display = liste.length >= MAX_HIZMET ? 'none' : '';
 
   // Toplam fiyat
   var toplamStr = toplamMin === toplamMax
@@ -1522,6 +1563,11 @@ function hizmetSecO(el, ad, fiyat, sure) {
   _oSeciliHizmetler.push({ ad: ad, fiyat: fiyat, sure: sure || 0 });
   el.classList.add('secili');
   oHizmetGuncelle();
+  // Seçim yapılınca dropdown'ı kapat
+  var dd = document.getElementById('o-cs-dropdown');
+  var arrow = document.getElementById('o-cs-arrow');
+  dd.classList.remove('open');
+  arrow.style.transform = '';
 }
 
 function oHizmetSil(ad) {
@@ -1562,6 +1608,7 @@ function oHizmetGuncelle() {
     secilenDiv.innerHTML = '';
     fiyatBox.classList.remove('show');
     document.getElementById('o-fiyat').value = '';
+    document.getElementById('o-hizmet-ekle-btn').style.display = 'none';
     return;
   }
 
@@ -1589,6 +1636,9 @@ function oHizmetGuncelle() {
   }).join('');
   secilenDiv.innerHTML = itemlerHTML;
   secilenDiv.classList.add('show');
+
+  // "＋ Hizmet Ekle" butonu göster/gizle
+  document.getElementById('o-hizmet-ekle-btn').style.display = liste.length >= MAX_HIZMET ? 'none' : '';
 
   // Toplam
   document.getElementById('o-fiyat').value = toplamFiyat;
