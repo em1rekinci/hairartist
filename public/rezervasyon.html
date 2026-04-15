@@ -1504,7 +1504,12 @@ function nHizmetGuncelle() {
     nEkleBtn.id = 'n-hizmet-ekle-btn';
     nEkleBtn.type = 'button';
     nEkleBtn.className = 'hizmet-ekle-btn';
-    nEkleBtn.onclick = function() { csToggleN(); };
+    nEkleBtn.onclick = function() {
+      var dd = document.getElementById('n-cs-dropdown');
+      var arrow = document.getElementById('n-cs-arrow');
+      dd.classList.add('open');
+      arrow.style.transform = 'rotate(180deg)';
+    };
     secilenDiv.parentElement.insertBefore(nEkleBtn, secilenDiv.nextSibling);
   }
   nEkleBtn.innerHTML = '＋ Hizmet Ekle';
@@ -1643,7 +1648,12 @@ function oHizmetGuncelle() {
     oEkleBtn.id = 'o-hizmet-ekle-btn';
     oEkleBtn.type = 'button';
     oEkleBtn.className = 'hizmet-ekle-btn';
-    oEkleBtn.onclick = function() { csToggleO(); };
+    oEkleBtn.onclick = function() {
+      var dd = document.getElementById('o-cs-dropdown');
+      var arrow = document.getElementById('o-cs-arrow');
+      dd.classList.add('open');
+      arrow.style.transform = 'rotate(180deg)';
+    };
     secilenDiv.parentElement.insertBefore(oEkleBtn, secilenDiv.nextSibling);
   }
   oEkleBtn.innerHTML = '＋ Hizmet Ekle';
