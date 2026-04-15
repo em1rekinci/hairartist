@@ -1002,9 +1002,9 @@ a[href^="tel"] {
           <div class="cs-dropdown" id="n-cs-dropdown">
             <div class="cs-option" style="opacity:.85;pointer-events:none" data-i18n="rez_hizmet_yukleniyor">Hizmetler yükleniyor...</div>
           </div>
-          <div class="hizmet-max-uyari" id="n-max-uyari">En fazla 5 hizmet seçebilirsiniz.</div>
+          <div class="hizmet-max-uyari" id="n-max-uyari" data-i18n="rez_max_uyari">En fazla 5 hizmet seçebilirsiniz.</div>
           <div class="secili-hizmetler" id="n-secili-hizmetler"></div>
-          <button type="button" id="n-hizmet-ekle-btn" class="hizmet-ekle-btn" style="display:none" onclick="csHizmetEkleAc('n')">＋ Hizmet Ekle</button>
+          <button type="button" id="n-hizmet-ekle-btn" class="hizmet-ekle-btn" style="display:none" onclick="csHizmetEkleAc('n')" data-i18n="rez_hizmet_ekle">＋ Hizmet Ekle</button>
         </div>
         <div class="fiyat-box" id="n-fiyat-box">
           <span id="fiyat-indirimli"></span>
@@ -1142,9 +1142,9 @@ a[href^="tel"] {
           <div class="cs-dropdown" id="o-cs-dropdown">
             <div class="cs-option" style="opacity:.85;pointer-events:none" data-i18n="rez_hizmet_yukleniyor">Hizmetler yükleniyor...</div>
           </div>
-          <div class="hizmet-max-uyari" id="o-max-uyari">En fazla 5 hizmet seçebilirsiniz.</div>
+          <div class="hizmet-max-uyari" id="o-max-uyari" data-i18n="rez_max_uyari">En fazla 5 hizmet seçebilirsiniz.</div>
           <div class="secili-hizmetler" id="o-secili-hizmetler"></div>
-          <button type="button" id="o-hizmet-ekle-btn" class="hizmet-ekle-btn" style="display:none" onclick="csHizmetEkleAc('o')">＋ Hizmet Ekle</button>
+          <button type="button" id="o-hizmet-ekle-btn" class="hizmet-ekle-btn" style="display:none" onclick="csHizmetEkleAc('o')" data-i18n="rez_hizmet_ekle">＋ Hizmet Ekle</button>
         </div>
         <div class="fiyat-box" id="o-fiyat-box">
           <span id="o-fiyat-indirimli"></span>
@@ -2190,7 +2190,7 @@ document.addEventListener('DOMContentLoaded', function() {
       var hedef = window._kampanyaHedef || 'ikisi';
       var goster = yuzde > 0 && (hedef === 'hizmet' || hedef === 'ikisi');
       if (badge) {
-        if (goster && ind > 0) { badge.textContent = '%' + yuzde + ' İndirim'; badge.style.display = ''; }
+        if (goster && ind > 0) { badge.textContent = '%' + yuzde + ' ' + (_t('rez_indirim') || 'İndirim'); badge.style.display = ''; }
         else { badge.style.display = 'none'; }
       }
       // Seçili hizmet varsa fiyat kutusunu güncelle
@@ -2225,7 +2225,7 @@ document.addEventListener('DOMContentLoaded', function() {
       var hedef = window._kampanyaHedef || 'ikisi';
       var goster = yuzde > 0 && (hedef === 'rezervasyon' || hedef === 'ikisi');
       if (badge) {
-        if (goster && ind > 0) { badge.textContent = '%' + yuzde + ' İndirim'; badge.style.display = ''; }
+        if (goster && ind > 0) { badge.textContent = '%' + yuzde + ' ' + (_t('rez_indirim') || 'İndirim'); badge.style.display = ''; }
         else { badge.style.display = 'none'; }
       }
       // Seçili hizmet varsa fiyat kutusunu güncelle
@@ -2417,7 +2417,7 @@ async function hizmetleriYukle() {
     var odeIBadge = document.getElementById('odeme-indirim-badge');
     var odeTBadge = document.getElementById('odeme-tarih-badge');
     if (odeIBadge) {
-      if (hizmetAlAktif) { odeIBadge.textContent = '%' + indirimYuzde + ' İndirim'; odeIBadge.style.display = ''; }
+      if (hizmetAlAktif) { odeIBadge.textContent = '%' + indirimYuzde + ' ' + (_t('rez_indirim') || 'İndirim'); odeIBadge.style.display = ''; }
       else { odeIBadge.style.display = 'none'; }
     }
     if (odeTBadge) {
@@ -2430,7 +2430,7 @@ async function hizmetleriYukle() {
     var norIBadge = document.getElementById('normal-indirim-badge');
     var norTBadge = document.getElementById('normal-tarih-badge');
     if (norIBadge) {
-      if (rezAktif) { norIBadge.textContent = '%' + indirimYuzde + ' İndirim'; norIBadge.style.display = ''; }
+      if (rezAktif) { norIBadge.textContent = '%' + indirimYuzde + ' ' + (_t('rez_indirim') || 'İndirim'); norIBadge.style.display = ''; }
       else { norIBadge.style.display = 'none'; }
     }
     if (norTBadge) {
@@ -2496,14 +2496,15 @@ function hizmetDropdownOlustur(prefix, liste, indirimYuzde = 0) {
       const eskiStr = hizmetFiyatStr(minFiyat, maxFiyat);
       const yeniStr = hizmetFiyatStr(indMin, indMax);
 
+      const indirimLbl = (window.i18n && window.i18n.t('rez_indirim') !== 'rez_indirim' && window.i18n.t('rez_indirim')) || 'İndirim';
       if (prefix === 'n') {
         return `<div class="cs-option" data-hizmet-ad="${h.ad.replace(/"/g,'&quot;')}" onclick="${fn}(this,'${trAdSafe}',${indMin},${indMax},${sure})">
-          <span class="cs-ad">${gorununAd} <span style="font-size:.6rem;background:#c8a96e22;color:#c8a96e;border:1px solid #c8a96e44;border-radius:8px;padding:1px 7px;font-weight:600">%${indirimYuzde} İndirim</span></span>
+          <span class="cs-ad">${gorununAd} <span style="font-size:.6rem;background:#c8a96e22;color:#c8a96e;border:1px solid #c8a96e44;border-radius:8px;padding:1px 7px;font-weight:600">%${indirimYuzde} ${indirimLbl}</span></span>
           <span class="cs-fiyatlar"><s style="color:var(--text3,#888);font-size:.72rem;font-weight:400">${eskiStr}</s> <span class="cs-indirimli">${yeniStr}</span></span>
         </div>`;
       } else {
         return `<div class="cs-option" data-hizmet-ad="${h.ad.replace(/"/g,'&quot;')}" onclick="${fn}(this,'${trAdSafe}',${indMax},${sure})">
-          <span class="cs-ad">${gorununAd} <span style="font-size:.6rem;background:#c8a96e22;color:#c8a96e;border:1px solid #c8a96e44;border-radius:8px;padding:1px 7px;font-weight:600">%${indirimYuzde} İndirim</span></span>
+          <span class="cs-ad">${gorununAd} <span style="font-size:.6rem;background:#c8a96e22;color:#c8a96e;border:1px solid #c8a96e44;border-radius:8px;padding:1px 7px;font-weight:600">%${indirimYuzde} ${indirimLbl}</span></span>
           <span class="cs-fiyatlar"><s style="color:var(--text3,#888);font-size:.72rem;font-weight:400">${eskiStr}</s> <span class="cs-indirimli">${yeniStr}</span></span>
         </div>`;
       }
@@ -2614,12 +2615,14 @@ function rezDinamikGuncelle() {
     return;
   }
 
-  // Mesai metni
+  // Mesai metni — tüm günler ayrı ayrı
   var pzt = _t('contact_day_0');
   var car = _t('contact_day_2');
+  var per = _t('contact_day_3');
+  var cum = _t('contact_day_4');
   var cmt = _t('contact_day_5');
   var paz = _t('contact_day_6');
-  var mesaiText = pzt + ', ' + car + '–' + cmt + ' 08:30–20:00 · ' + paz + ' 09:00–19:00';
+  var mesaiText = pzt + ' 08:30–20:00 · ' + car + ' 08:30–20:00 · ' + per + ' 08:30–20:00 · ' + cum + ' 08:30–20:00 · ' + cmt + ' 08:30–20:00 · ' + paz + ' 09:00–19:00';
   document.querySelectorAll('.rez-bilgi-mesai-text').forEach(function(el) {
     el.textContent = mesaiText;
   });
