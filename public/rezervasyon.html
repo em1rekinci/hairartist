@@ -325,6 +325,25 @@
   border: 1px solid rgba(255,223,0,.15);
   margin-top: 6px;
 }
+.hizmet-ekle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 1px dashed #333;
+  color: #f7f4ef;
+  font-family: 'Montserrat', sans-serif;
+  font-size: .65rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  font-weight: 500;
+  padding: 9px 16px;
+  cursor: pointer;
+  margin-top: 6px;
+  width: 100%;
+  transition: border-color .2s, color .2s;
+}
+.hizmet-ekle-btn:hover { border-color: #555; color: var(--off); }
 .hizmet-max-uyari.show { display: block; }
 .cs-option.max-doldu { opacity: .45; pointer-events: none; cursor: not-allowed; }
 
@@ -1394,6 +1413,11 @@ function hizmetSecN(el, ad, min, max, sure) {
   _nSeciliHizmetler.push({ ad: ad, minFiyat: min, maxFiyat: max, sure: sure || 0 });
   el.classList.add('secili');
   nHizmetGuncelle();
+  // Seçim yapılınca dropdown'ı kapat
+  var dd = document.getElementById('n-cs-dropdown');
+  var arrow = document.getElementById('n-cs-arrow');
+  dd.classList.remove('open');
+  arrow.style.transform = '';
 }
 
 function nHizmetSil(ad) {
@@ -1438,6 +1462,8 @@ function nHizmetGuncelle() {
     secilenDiv.classList.remove('show');
     secilenDiv.innerHTML = '';
     fiyatBox.classList.remove('show');
+    var _nEkleBtnTemizle = document.getElementById('n-hizmet-ekle-btn');
+    if (_nEkleBtnTemizle) _nEkleBtnTemizle.style.display = 'none';
     return;
   }
 
@@ -1470,6 +1496,19 @@ function nHizmetGuncelle() {
   }).join('');
   secilenDiv.innerHTML = itemlerHTML;
   secilenDiv.classList.add('show');
+
+  // "＋ Hizmet Ekle" butonu — max dolmadıysa göster
+  var nEkleBtn = document.getElementById('n-hizmet-ekle-btn');
+  if (!nEkleBtn) {
+    nEkleBtn = document.createElement('button');
+    nEkleBtn.id = 'n-hizmet-ekle-btn';
+    nEkleBtn.type = 'button';
+    nEkleBtn.className = 'hizmet-ekle-btn';
+    nEkleBtn.onclick = function() { csToggleN(); };
+    secilenDiv.parentElement.insertBefore(nEkleBtn, secilenDiv.nextSibling);
+  }
+  nEkleBtn.innerHTML = '＋ Hizmet Ekle';
+  nEkleBtn.style.display = liste.length >= MAX_HIZMET ? 'none' : '';
 
   // Toplam fiyat
   var toplamStr = toplamMin === toplamMax
@@ -1522,6 +1561,11 @@ function hizmetSecO(el, ad, fiyat, sure) {
   _oSeciliHizmetler.push({ ad: ad, fiyat: fiyat, sure: sure || 0 });
   el.classList.add('secili');
   oHizmetGuncelle();
+  // Seçim yapılınca dropdown'ı kapat
+  var dd = document.getElementById('o-cs-dropdown');
+  var arrow = document.getElementById('o-cs-arrow');
+  dd.classList.remove('open');
+  arrow.style.transform = '';
 }
 
 function oHizmetSil(ad) {
@@ -1562,6 +1606,8 @@ function oHizmetGuncelle() {
     secilenDiv.innerHTML = '';
     fiyatBox.classList.remove('show');
     document.getElementById('o-fiyat').value = '';
+    var _oEkleBtnTemizle = document.getElementById('o-hizmet-ekle-btn');
+    if (_oEkleBtnTemizle) _oEkleBtnTemizle.style.display = 'none';
     return;
   }
 
@@ -1589,6 +1635,19 @@ function oHizmetGuncelle() {
   }).join('');
   secilenDiv.innerHTML = itemlerHTML;
   secilenDiv.classList.add('show');
+
+  // "＋ Hizmet Ekle" butonu — max dolmadıysa göster
+  var oEkleBtn = document.getElementById('o-hizmet-ekle-btn');
+  if (!oEkleBtn) {
+    oEkleBtn = document.createElement('button');
+    oEkleBtn.id = 'o-hizmet-ekle-btn';
+    oEkleBtn.type = 'button';
+    oEkleBtn.className = 'hizmet-ekle-btn';
+    oEkleBtn.onclick = function() { csToggleO(); };
+    secilenDiv.parentElement.insertBefore(oEkleBtn, secilenDiv.nextSibling);
+  }
+  oEkleBtn.innerHTML = '＋ Hizmet Ekle';
+  oEkleBtn.style.display = liste.length >= MAX_HIZMET ? 'none' : '';
 
   // Toplam
   document.getElementById('o-fiyat').value = toplamFiyat;
