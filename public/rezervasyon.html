@@ -275,7 +275,60 @@
 .cs-indirimli { font-weight: 600; font-size: .82rem; color: #f7f4ef; }
 .cs-normal { font-size: .72rem; color: #f7f4ef; text-decoration: line-through; }
 
-/* Fiyat kutusu */
+/* Çoklu hizmet seçim listesi */
+.secili-hizmetler {
+  display: none;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+}
+.secili-hizmetler.show { display: flex; }
+.secili-hizmet-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 14px;
+  background: rgba(247,244,239,.04);
+  border: 1px solid #2a2a2a;
+  gap: 10px;
+}
+.secili-hizmet-ad {
+  font-size: .78rem;
+  color: var(--off);
+  font-weight: 500;
+  flex: 1;
+}
+.secili-hizmet-fiyat {
+  font-size: .78rem;
+  color: #f7f4ef;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.secili-hizmet-sil {
+  background: none;
+  border: none;
+  color: #f7f4ef;
+  font-size: .9rem;
+  cursor: pointer;
+  padding: 0 2px;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: color .15s;
+}
+.secili-hizmet-sil:hover { color: #ff6b6b; }
+.hizmet-max-uyari {
+  display: none;
+  font-size: .7rem;
+  color: #f7f4ef;
+  padding: 6px 12px;
+  background: rgba(255,223,0,.06);
+  border: 1px solid rgba(255,223,0,.15);
+  margin-top: 6px;
+}
+.hizmet-max-uyari.show { display: block; }
+.cs-option.max-doldu { opacity: .45; pointer-events: none; cursor: not-allowed; }
+
+/* Toplam fiyat kutusu */
 .fiyat-box {
   display: none;
   align-items: center;
@@ -910,7 +963,7 @@ a[href^="tel"] {
         <input id="n-tel" class="fi" type="tel" placeholder="05xx xxx xx xx" required oninput="telFormatla(this)">
       </div>
       <div class="fg form-grid-full">
-        <label class="fl" data-i18n="book_select_service">Hizmet</label>
+        <label class="fl" data-i18n="book_select_service">Hizmet <span style="font-size:.55rem;font-weight:500;letter-spacing:.05em;text-transform:none;color:#888">(en fazla 5 hizmet seçebilirsiniz)</span></label>
         <input type="hidden" id="n-hizmet" value="">
         <div class="cs-wrap" id="n-cs-wrap">
           <div class="cs-selected" onclick="csToggleN()">
@@ -921,11 +974,13 @@ a[href^="tel"] {
             <div class="cs-option" style="opacity:.85;pointer-events:none" data-i18n="rez_hizmet_yukleniyor">Hizmetler yükleniyor...</div>
           </div>
         </div>
+        <div class="hizmet-max-uyari" id="n-max-uyari">En fazla 5 hizmet seçebilirsiniz.</div>
+        <div class="secili-hizmetler" id="n-secili-hizmetler"></div>
         <div class="fiyat-box" id="n-fiyat-box">
           <span id="fiyat-indirimli"></span>
           <span id="fiyat-normal"></span>
           <span id="n-sure-badge" class="fiyat-badge" style="background:rgba(247,244,239,.05);border-color:rgba(247,244,239,.1);color:#f7f4ef"></span>
-          <span class="fiyat-badge" data-i18n="rez_tahmini_fiyat">Tahmini fiyat</span>
+          <span class="fiyat-badge" data-i18n="rez_tahmini_fiyat">Tahmini toplam fiyat</span>
         </div>
       </div>
       <div class="fg">
@@ -1046,7 +1101,7 @@ a[href^="tel"] {
         <input id="o-tel" class="fi" type="tel" placeholder="05xx xxx xx xx" required oninput="telFormatla(this)">
       </div>
       <div class="fg form-grid-full">
-        <label class="fl" data-i18n="book_select_service">Hizmet</label>
+        <label class="fl" data-i18n="book_select_service">Hizmet <span style="font-size:.55rem;font-weight:500;letter-spacing:.05em;text-transform:none;color:#888">(en fazla 5 hizmet seçebilirsiniz)</span></label>
         <input type="hidden" id="o-hizmet" value="">
         <input type="hidden" id="o-fiyat" value="">
         <div class="cs-wrap" id="o-cs-wrap">
@@ -1058,11 +1113,13 @@ a[href^="tel"] {
             <div class="cs-option" style="opacity:.85;pointer-events:none" data-i18n="rez_hizmet_yukleniyor">Hizmetler yükleniyor...</div>
           </div>
         </div>
+        <div class="hizmet-max-uyari" id="o-max-uyari">En fazla 5 hizmet seçebilirsiniz.</div>
+        <div class="secili-hizmetler" id="o-secili-hizmetler"></div>
         <div class="fiyat-box" id="o-fiyat-box">
           <span id="o-fiyat-indirimli"></span>
           <span id="o-fiyat-normal"></span>
           <span id="o-sure-badge" class="fiyat-badge" style="background:rgba(247,244,239,.05);border-color:rgba(247,244,239,.1);color:#f7f4ef"></span>
-          <span class="fiyat-badge">Ödeme fiyatı</span>
+          <span class="fiyat-badge">Toplam ödeme fiyatı</span>
         </div>
       </div>
       <div class="fg">
@@ -1307,97 +1364,250 @@ function selectTime(btn, time, prefix) {
   document.getElementById(prefix + '-saat').value = time;
 }
 
-// ── NORMAL FORM HİZMET
+// ── ÇOKLU HİZMET SEÇİM STATE
+var _nSeciliHizmetler = []; // [{ad, minFiyat, maxFiyat, sure}]
+var _oSeciliHizmetler = []; // [{ad, fiyat, sure}]
+const MAX_HIZMET = 5;
+
+// ── NORMAL FORM HİZMET (çoklu)
 function csToggleN() {
   var dd = document.getElementById('n-cs-dropdown');
   var arrow = document.getElementById('n-cs-arrow');
   var open = dd.classList.toggle('open');
   arrow.style.transform = open ? 'rotate(180deg)' : '';
 }
-function hizmetSecN(el, ad, min, max, sure) {
-  document.querySelectorAll('#n-cs-dropdown .cs-option').forEach(i => i.classList.remove('secili'));
-  el.classList.add('secili');
-  document.getElementById('n-hizmet').value = ad;
-  var lbl = document.getElementById('n-cs-label');
-  lbl.style.color = '';
-  lbl.textContent = ad;
-  document.getElementById('n-cs-dropdown').classList.remove('open');
-  document.getElementById('n-cs-arrow').style.transform = '';
 
-  // Seçili tarihe göre gerçek indirimi kontrol et
+function hizmetSecN(el, ad, min, max, sure) {
+  // Zaten seçiliyse kaldır (toggle)
+  var mevcutIdx = _nSeciliHizmetler.findIndex(function(h){ return h.ad === ad; });
+  if (mevcutIdx >= 0) {
+    _nSeciliHizmetler.splice(mevcutIdx, 1);
+    el.classList.remove('secili');
+    nHizmetGuncelle();
+    return;
+  }
+  // Max 5 kontrolü
+  if (_nSeciliHizmetler.length >= MAX_HIZMET) {
+    document.getElementById('n-max-uyari').classList.add('show');
+    return;
+  }
+  _nSeciliHizmetler.push({ ad: ad, minFiyat: min, maxFiyat: max, sure: sure || 0 });
+  el.classList.add('secili');
+  nHizmetGuncelle();
+}
+
+function nHizmetSil(ad) {
+  _nSeciliHizmetler = _nSeciliHizmetler.filter(function(h){ return h.ad !== ad; });
+  // dropdown'da seçiliyi kaldır
+  document.querySelectorAll('#n-cs-dropdown .cs-option').forEach(function(opt) {
+    if (opt.dataset.hizmetAd === ad) opt.classList.remove('secili');
+  });
+  nHizmetGuncelle();
+}
+
+function nHizmetGuncelle() {
+  var liste = _nSeciliHizmetler;
+  var maxUyari = document.getElementById('n-max-uyari');
+  var secilenDiv = document.getElementById('n-secili-hizmetler');
+  var fiyatBox = document.getElementById('n-fiyat-box');
+
+  // Max uyarısı
+  if (liste.length >= MAX_HIZMET) {
+    maxUyari.classList.add('show');
+    document.querySelectorAll('#n-cs-dropdown .cs-option:not(.secili)').forEach(function(o){ o.classList.add('max-doldu'); });
+  } else {
+    maxUyari.classList.remove('show');
+    document.querySelectorAll('#n-cs-dropdown .cs-option').forEach(function(o){ o.classList.remove('max-doldu'); });
+  }
+
+  // Label güncelle
+  var lbl = document.getElementById('n-cs-label');
+  if (liste.length === 0) {
+    lbl.textContent = (window.i18n && window.i18n.t('rez_hizmet_sec')) || '— Hizmet Seçin —';
+    lbl.style.color = '#f7f4ef';
+  } else {
+    lbl.textContent = liste.length + ' hizmet seçildi';
+    lbl.style.color = '';
+  }
+
+  // Hidden input — virgülle ayrılmış hizmet adları
+  document.getElementById('n-hizmet').value = liste.map(function(h){ return h.ad; }).join(', ');
+
+  // Seçili hizmetler listesi
+  if (liste.length === 0) {
+    secilenDiv.classList.remove('show');
+    secilenDiv.innerHTML = '';
+    fiyatBox.classList.remove('show');
+    return;
+  }
+
+  // Tarih bazlı indirim
   var secilenTarih = document.getElementById('n-tarih').value || '';
   var gercekInd = kampanyaKontrol(secilenTarih, 'n');
+  var hizmetListesi = window._hizmetListesi || [];
 
-  // Orijinal fiyatları doğrudan hizmet listesinden al
-  var liste = window._hizmetListesi || [];
-  var hizmetObj = liste.find(function(x){ return x.ad === ad; });
-  var orijMin = hizmetObj ? (hizmetObj.min_fiyat || 0) : min;
-  var orijMax = hizmetObj ? (hizmetObj.max_fiyat || 0) : max;
-  var gercekMin = gercekInd > 0 ? Math.round(orijMin * (1 - gercekInd / 100)) : orijMin;
-  var gercekMax = gercekInd > 0 ? Math.round(orijMax * (1 - gercekInd / 100)) : orijMax;
+  var toplamMin = 0, toplamMax = 0, toplamSure = 0;
+  var itemlerHTML = liste.map(function(h) {
+    var hObj = hizmetListesi.find(function(x){ return x.ad === h.ad; });
+    var oMin = hObj ? (hObj.min_fiyat || 0) : h.minFiyat;
+    var oMax = hObj ? (hObj.max_fiyat || 0) : h.maxFiyat;
+    var gMin = gercekInd > 0 ? Math.round(oMin * (1 - gercekInd/100)) : oMin;
+    var gMax = gercekInd > 0 ? Math.round(oMax * (1 - gercekInd/100)) : oMax;
+    toplamMin += gMin;
+    toplamMax += gMax;
+    toplamSure += (h.sure || 0);
+    var fStr = gMin === gMax ? gMin.toLocaleString('tr-TR') + '₺' : gMin.toLocaleString('tr-TR') + ' – ' + gMax.toLocaleString('tr-TR') + '₺';
+    var eskiStr = '';
+    if (gercekInd > 0) {
+      var eskiMin = oMin === oMax ? oMin.toLocaleString('tr-TR') + '₺' : oMin.toLocaleString('tr-TR') + ' – ' + oMax.toLocaleString('tr-TR') + '₺';
+      eskiStr = '<s style="color:#888;font-size:.68rem;font-weight:400">' + eskiMin + '</s> ';
+    }
+    return '<div class="secili-hizmet-item">' +
+      '<span class="secili-hizmet-ad">' + h.ad + '</span>' +
+      '<span class="secili-hizmet-fiyat">' + eskiStr + fStr + '</span>' +
+      '<button class="secili-hizmet-sil" onclick="nHizmetSil(\'' + h.ad.replace(/'/g,"\\'") + '\')" title="Kaldır">✕</button>' +
+    '</div>';
+  }).join('');
+  secilenDiv.innerHTML = itemlerHTML;
+  secilenDiv.classList.add('show');
 
-  var fiyatStr = gercekMin === gercekMax
-    ? gercekMin.toLocaleString('tr-TR') + '₺'
-    : gercekMin.toLocaleString('tr-TR') + ' – ' + gercekMax.toLocaleString('tr-TR') + '₺';
+  // Toplam fiyat
+  var toplamStr = toplamMin === toplamMax
+    ? toplamMin.toLocaleString('tr-TR') + '₺'
+    : toplamMin.toLocaleString('tr-TR') + ' – ' + toplamMax.toLocaleString('tr-TR') + '₺';
 
+  var toplamEski = '';
   if (gercekInd > 0) {
-    var orijStr = orijMin === orijMax
-      ? orijMin.toLocaleString('tr-TR') + '₺'
-      : orijMin.toLocaleString('tr-TR') + ' – ' + orijMax.toLocaleString('tr-TR') + '₺';
-    document.getElementById('fiyat-indirimli').textContent = fiyatStr;
-    document.getElementById('fiyat-normal').innerHTML = '<s style="color:var(--text3);font-size:.78rem;font-weight:400">' + orijStr + '</s>';
+    var orijMin2 = 0, orijMax2 = 0;
+    liste.forEach(function(h) {
+      var hObj = hizmetListesi.find(function(x){ return x.ad === h.ad; });
+      orijMin2 += hObj ? (hObj.min_fiyat || 0) : h.minFiyat;
+      orijMax2 += hObj ? (hObj.max_fiyat || 0) : h.maxFiyat;
+    });
+    var orijStr2 = orijMin2 === orijMax2 ? orijMin2.toLocaleString('tr-TR') + '₺' : orijMin2.toLocaleString('tr-TR') + ' – ' + orijMax2.toLocaleString('tr-TR') + '₺';
+    document.getElementById('fiyat-normal').innerHTML = '<s style="color:var(--text3);font-size:.78rem;font-weight:400">' + orijStr2 + '</s>';
   } else {
-    document.getElementById('fiyat-indirimli').textContent = fiyatStr;
     document.getElementById('fiyat-normal').textContent = '';
   }
 
+  document.getElementById('fiyat-indirimli').textContent = toplamStr;
+
   var sureBadge = document.getElementById('n-sure-badge');
-  sureBadge.dataset.sure = sure || 0;
+  sureBadge.dataset.sure = toplamSure;
   sureBadgeGuncelle(sureBadge);
-  document.getElementById('n-fiyat-box').classList.add('show');
+  fiyatBox.classList.add('show');
 }
 
-// ── ÖDEME FORM HİZMET
+// ── ÖDEME FORM HİZMET (çoklu)
 function csToggleO() {
   var dd = document.getElementById('o-cs-dropdown');
   var arrow = document.getElementById('o-cs-arrow');
   var open = dd.classList.toggle('open');
   arrow.style.transform = open ? 'rotate(180deg)' : '';
 }
-function hizmetSecO(el, ad, fiyat, sure) {
-  document.querySelectorAll('#o-cs-dropdown .cs-option').forEach(i => i.classList.remove('secili'));
-  el.classList.add('secili');
-  document.getElementById('o-hizmet').value = ad;
-  var lbl = document.getElementById('o-cs-label');
-  lbl.style.color = '';
-  lbl.textContent = ad;
-  document.getElementById('o-cs-dropdown').classList.remove('open');
-  document.getElementById('o-cs-arrow').style.transform = '';
 
-  // Seçili tarihe göre gerçek indirim oranını hesapla
+function hizmetSecO(el, ad, fiyat, sure) {
+  // Toggle — zaten seçiliyse kaldır
+  var mevcutIdx = _oSeciliHizmetler.findIndex(function(h){ return h.ad === ad; });
+  if (mevcutIdx >= 0) {
+    _oSeciliHizmetler.splice(mevcutIdx, 1);
+    el.classList.remove('secili');
+    oHizmetGuncelle();
+    return;
+  }
+  if (_oSeciliHizmetler.length >= MAX_HIZMET) {
+    document.getElementById('o-max-uyari').classList.add('show');
+    return;
+  }
+  _oSeciliHizmetler.push({ ad: ad, fiyat: fiyat, sure: sure || 0 });
+  el.classList.add('secili');
+  oHizmetGuncelle();
+}
+
+function oHizmetSil(ad) {
+  _oSeciliHizmetler = _oSeciliHizmetler.filter(function(h){ return h.ad !== ad; });
+  document.querySelectorAll('#o-cs-dropdown .cs-option').forEach(function(opt) {
+    if (opt.dataset.hizmetAd === ad) opt.classList.remove('secili');
+  });
+  oHizmetGuncelle();
+}
+
+function oHizmetGuncelle() {
+  var liste = _oSeciliHizmetler;
+  var maxUyari = document.getElementById('o-max-uyari');
+  var secilenDiv = document.getElementById('o-secili-hizmetler');
+  var fiyatBox = document.getElementById('o-fiyat-box');
+
+  if (liste.length >= MAX_HIZMET) {
+    maxUyari.classList.add('show');
+    document.querySelectorAll('#o-cs-dropdown .cs-option:not(.secili)').forEach(function(o){ o.classList.add('max-doldu'); });
+  } else {
+    maxUyari.classList.remove('show');
+    document.querySelectorAll('#o-cs-dropdown .cs-option').forEach(function(o){ o.classList.remove('max-doldu'); });
+  }
+
+  var lbl = document.getElementById('o-cs-label');
+  if (liste.length === 0) {
+    lbl.textContent = (window.i18n && window.i18n.t('rez_hizmet_sec')) || '— Hizmet Seçin —';
+    lbl.style.color = '#f7f4ef';
+  } else {
+    lbl.textContent = liste.length + ' hizmet seçildi';
+    lbl.style.color = '';
+  }
+
+  document.getElementById('o-hizmet').value = liste.map(function(h){ return h.ad; }).join(', ');
+
+  if (liste.length === 0) {
+    secilenDiv.classList.remove('show');
+    secilenDiv.innerHTML = '';
+    fiyatBox.classList.remove('show');
+    document.getElementById('o-fiyat').value = '';
+    return;
+  }
+
   var secilenTarih = document.getElementById('o-tarih').value || '';
   var gercekInd = kampanyaKontrol(secilenTarih, 'o');
+  var hizmetListesi = window._hizmetListesi || [];
 
-  // Orijinal fiyatı doğrudan hizmet listesinden al
-  var liste = window._hizmetListesi || [];
-  var hizmetObj = liste.find(function(x){ return x.ad === ad; });
-  var orijinalFiyat = hizmetObj ? (hizmetObj.max_fiyat || 0) : fiyat;
-  var gercekFiyat = gercekInd > 0 ? Math.round(orijinalFiyat * (1 - gercekInd / 100)) : orijinalFiyat;
+  var toplamFiyat = 0, toplamSure = 0;
+  var itemlerHTML = liste.map(function(h) {
+    var hObj = hizmetListesi.find(function(x){ return x.ad === h.ad; });
+    var orijFiyat = hObj ? (hObj.max_fiyat || 0) : h.fiyat;
+    var gFiyat = gercekInd > 0 ? Math.round(orijFiyat * (1 - gercekInd/100)) : orijFiyat;
+    toplamFiyat += gFiyat;
+    toplamSure += (h.sure || 0);
+    var fStr = gFiyat.toLocaleString('tr-TR') + '₺';
+    var eskiStr = '';
+    if (gercekInd > 0) {
+      eskiStr = '<s style="color:#888;font-size:.68rem;font-weight:400">' + orijFiyat.toLocaleString('tr-TR') + '₺</s> ';
+    }
+    return '<div class="secili-hizmet-item">' +
+      '<span class="secili-hizmet-ad">' + h.ad + '</span>' +
+      '<span class="secili-hizmet-fiyat">' + eskiStr + fStr + '</span>' +
+      '<button class="secili-hizmet-sil" onclick="oHizmetSil(\'' + h.ad.replace(/'/g,"\\'") + '\')" title="Kaldır">✕</button>' +
+    '</div>';
+  }).join('');
+  secilenDiv.innerHTML = itemlerHTML;
+  secilenDiv.classList.add('show');
 
-  document.getElementById('o-fiyat').value = gercekFiyat;
+  // Toplam
+  document.getElementById('o-fiyat').value = toplamFiyat;
+  document.getElementById('o-fiyat-indirimli').textContent = toplamFiyat.toLocaleString('tr-TR') + '₺';
 
   if (gercekInd > 0) {
-    document.getElementById('o-fiyat-indirimli').textContent = gercekFiyat.toLocaleString('tr-TR') + '₺';
-    document.getElementById('o-fiyat-normal').innerHTML = '<s style="color:var(--text3);font-size:.78rem;font-weight:400">' + orijinalFiyat.toLocaleString('tr-TR') + '₺</s>';
+    var toplamOrij = liste.reduce(function(s, h) {
+      var hObj = hizmetListesi.find(function(x){ return x.ad === h.ad; });
+      return s + (hObj ? (hObj.max_fiyat || 0) : h.fiyat);
+    }, 0);
+    document.getElementById('o-fiyat-normal').innerHTML = '<s style="color:var(--text3);font-size:.78rem;font-weight:400">' + toplamOrij.toLocaleString('tr-TR') + '₺</s>';
   } else {
-    document.getElementById('o-fiyat-indirimli').textContent = orijinalFiyat.toLocaleString('tr-TR') + '₺';
     document.getElementById('o-fiyat-normal').textContent = '';
   }
 
   var sureBadge = document.getElementById('o-sure-badge');
-  sureBadge.dataset.sure = sure || 0;
+  sureBadge.dataset.sure = toplamSure;
   sureBadgeGuncelle(sureBadge);
-  document.getElementById('o-fiyat-box').classList.add('show');
+  fiyatBox.classList.add('show');
 }
 
 // ── SUPABASE CONFIG
@@ -1561,9 +1771,13 @@ async function normalGonder() {
     document.getElementById('n-hizmet').value = '';
     document.getElementById('n-personel').value = '';
     document.querySelectorAll('#normal-form .personel-row').forEach(k => k.classList.remove('secili'));
+    _nSeciliHizmetler = [];
     document.getElementById('n-cs-label').textContent = (window.i18n && window.i18n.t('rez_hizmet_sec')) || '— Hizmet Seçin —';
     document.getElementById('n-cs-label').style.color = '#f7f4ef';
     document.getElementById('n-fiyat-box').classList.remove('show');
+    document.getElementById('n-secili-hizmetler').classList.remove('show');
+    document.getElementById('n-secili-hizmetler').innerHTML = '';
+    document.getElementById('n-max-uyari').classList.remove('show');
     document.querySelectorAll('#normal-form .time-btn').forEach(b => b.classList.remove('selected'));
     document.getElementById('n-saat').value = '';
     kvkkCheck.checked = false;
@@ -1987,12 +2201,12 @@ async function doluSaatleriCek(personelId, tarih) {
   if (!personelId || !tarih) return [];
   try {
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/kapali_saatler?personel_id=eq.${personelId}&tarih=eq.${tarih}&select=saat`,
+      `${SUPABASE_URL}/rest/v1/rezervasyonlar?personel_id=eq.${personelId}&tarih=eq.${tarih}&durum=neq.iptal_edildi&select=saat`,
       { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }
     );
     if (!res.ok) return [];
     const data = await res.json();
-    return data.map(x => x.saat); // ['10:00', '14:00', ...]
+    return data.map(x => x.saat).filter(Boolean);
   } catch(e) {
     console.warn('Dolu saatler alınamadı:', e);
     return [];
@@ -2223,12 +2437,12 @@ function hizmetDropdownOlustur(prefix, liste, indirimYuzde = 0) {
       const yeniStr = hizmetFiyatStr(indMin, indMax);
 
       if (prefix === 'n') {
-        return `<div class="cs-option" onclick="${fn}(this,'${trAdSafe}',${indMin},${indMax},${sure})">
+        return `<div class="cs-option" data-hizmet-ad="${h.ad.replace(/"/g,'&quot;')}" onclick="${fn}(this,'${trAdSafe}',${indMin},${indMax},${sure})">
           <span class="cs-ad">${gorununAd} <span style="font-size:.6rem;background:#c8a96e22;color:#c8a96e;border:1px solid #c8a96e44;border-radius:8px;padding:1px 7px;font-weight:600">%${indirimYuzde} İndirim</span></span>
           <span class="cs-fiyatlar"><s style="color:var(--text3,#888);font-size:.72rem;font-weight:400">${eskiStr}</s> <span class="cs-indirimli">${yeniStr}</span></span>
         </div>`;
       } else {
-        return `<div class="cs-option" onclick="${fn}(this,'${trAdSafe}',${indMax},${sure})">
+        return `<div class="cs-option" data-hizmet-ad="${h.ad.replace(/"/g,'&quot;')}" onclick="${fn}(this,'${trAdSafe}',${indMax},${sure})">
           <span class="cs-ad">${gorununAd} <span style="font-size:.6rem;background:#c8a96e22;color:#c8a96e;border:1px solid #c8a96e44;border-radius:8px;padding:1px 7px;font-weight:600">%${indirimYuzde} İndirim</span></span>
           <span class="cs-fiyatlar"><s style="color:var(--text3,#888);font-size:.72rem;font-weight:400">${eskiStr}</s> <span class="cs-indirimli">${yeniStr}</span></span>
         </div>`;
@@ -2238,12 +2452,12 @@ function hizmetDropdownOlustur(prefix, liste, indirimYuzde = 0) {
     // İndirim yok — normal gösterim
     const fiyatStr = hizmetFiyatStr(minFiyat, maxFiyat);
     if (prefix === 'n') {
-      return `<div class="cs-option" onclick="${fn}(this,'${trAdSafe}',${minFiyat},${maxFiyat},${sure})">
+      return `<div class="cs-option" data-hizmet-ad="${h.ad.replace(/"/g,'&quot;')}" onclick="${fn}(this,'${trAdSafe}',${minFiyat},${maxFiyat},${sure})">
         <span class="cs-ad">${gorununAd}</span>
         <span class="cs-fiyatlar"><span class="cs-indirimli">${fiyatStr}</span></span>
       </div>`;
     } else {
-      return `<div class="cs-option" onclick="${fn}(this,'${trAdSafe}',${maxFiyat},${sure})">
+      return `<div class="cs-option" data-hizmet-ad="${h.ad.replace(/"/g,'&quot;')}" onclick="${fn}(this,'${trAdSafe}',${maxFiyat},${sure})">
         <span class="cs-ad">${gorununAd}</span>
         <span class="cs-fiyatlar"><span class="cs-indirimli">${fiyatStr}</span></span>
       </div>`;
