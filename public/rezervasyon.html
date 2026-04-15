@@ -995,6 +995,7 @@ a[href^="tel"] {
         </div>
         <div class="hizmet-max-uyari" id="n-max-uyari">En fazla 5 hizmet seçebilirsiniz.</div>
         <div class="secili-hizmetler" id="n-secili-hizmetler"></div>
+        <button type="button" id="n-hizmet-ekle-btn" class="hizmet-ekle-btn" style="display:none" onclick="var dd=document.getElementById('n-cs-dropdown');var arrow=document.getElementById('n-cs-arrow');dd.classList.add('open');arrow.style.transform='rotate(180deg)';this.closest('.fg,.form-grid-full,div').scrollIntoView({behavior:'smooth',block:'nearest'})">＋ Hizmet Ekle</button>
         <div class="fiyat-box" id="n-fiyat-box">
           <span id="fiyat-indirimli"></span>
           <span id="fiyat-normal"></span>
@@ -1134,6 +1135,7 @@ a[href^="tel"] {
         </div>
         <div class="hizmet-max-uyari" id="o-max-uyari">En fazla 5 hizmet seçebilirsiniz.</div>
         <div class="secili-hizmetler" id="o-secili-hizmetler"></div>
+        <button type="button" id="o-hizmet-ekle-btn" class="hizmet-ekle-btn" style="display:none" onclick="var dd=document.getElementById('o-cs-dropdown');var arrow=document.getElementById('o-cs-arrow');dd.classList.add('open');arrow.style.transform='rotate(180deg)'">＋ Hizmet Ekle</button>
         <div class="fiyat-box" id="o-fiyat-box">
           <span id="o-fiyat-indirimli"></span>
           <span id="o-fiyat-normal"></span>
@@ -1462,8 +1464,7 @@ function nHizmetGuncelle() {
     secilenDiv.classList.remove('show');
     secilenDiv.innerHTML = '';
     fiyatBox.classList.remove('show');
-    var _nEkleBtnTemizle = document.getElementById('n-hizmet-ekle-btn');
-    if (_nEkleBtnTemizle) _nEkleBtnTemizle.style.display = 'none';
+    document.getElementById('n-hizmet-ekle-btn').style.display = 'none';
     return;
   }
 
@@ -1497,23 +1498,8 @@ function nHizmetGuncelle() {
   secilenDiv.innerHTML = itemlerHTML;
   secilenDiv.classList.add('show');
 
-  // "＋ Hizmet Ekle" butonu — max dolmadıysa göster
-  var nEkleBtn = document.getElementById('n-hizmet-ekle-btn');
-  if (!nEkleBtn) {
-    nEkleBtn = document.createElement('button');
-    nEkleBtn.id = 'n-hizmet-ekle-btn';
-    nEkleBtn.type = 'button';
-    nEkleBtn.className = 'hizmet-ekle-btn';
-    nEkleBtn.onclick = function() {
-      var dd = document.getElementById('n-cs-dropdown');
-      var arrow = document.getElementById('n-cs-arrow');
-      dd.classList.add('open');
-      arrow.style.transform = 'rotate(180deg)';
-    };
-    secilenDiv.parentElement.insertBefore(nEkleBtn, secilenDiv.nextSibling);
-  }
-  nEkleBtn.innerHTML = '＋ Hizmet Ekle';
-  nEkleBtn.style.display = liste.length >= MAX_HIZMET ? 'none' : '';
+  // "＋ Hizmet Ekle" butonu göster/gizle
+  document.getElementById('n-hizmet-ekle-btn').style.display = liste.length >= MAX_HIZMET ? 'none' : '';
 
   // Toplam fiyat
   var toplamStr = toplamMin === toplamMax
@@ -1611,8 +1597,7 @@ function oHizmetGuncelle() {
     secilenDiv.innerHTML = '';
     fiyatBox.classList.remove('show');
     document.getElementById('o-fiyat').value = '';
-    var _oEkleBtnTemizle = document.getElementById('o-hizmet-ekle-btn');
-    if (_oEkleBtnTemizle) _oEkleBtnTemizle.style.display = 'none';
+    document.getElementById('o-hizmet-ekle-btn').style.display = 'none';
     return;
   }
 
@@ -1641,23 +1626,8 @@ function oHizmetGuncelle() {
   secilenDiv.innerHTML = itemlerHTML;
   secilenDiv.classList.add('show');
 
-  // "＋ Hizmet Ekle" butonu — max dolmadıysa göster
-  var oEkleBtn = document.getElementById('o-hizmet-ekle-btn');
-  if (!oEkleBtn) {
-    oEkleBtn = document.createElement('button');
-    oEkleBtn.id = 'o-hizmet-ekle-btn';
-    oEkleBtn.type = 'button';
-    oEkleBtn.className = 'hizmet-ekle-btn';
-    oEkleBtn.onclick = function() {
-      var dd = document.getElementById('o-cs-dropdown');
-      var arrow = document.getElementById('o-cs-arrow');
-      dd.classList.add('open');
-      arrow.style.transform = 'rotate(180deg)';
-    };
-    secilenDiv.parentElement.insertBefore(oEkleBtn, secilenDiv.nextSibling);
-  }
-  oEkleBtn.innerHTML = '＋ Hizmet Ekle';
-  oEkleBtn.style.display = liste.length >= MAX_HIZMET ? 'none' : '';
+  // "＋ Hizmet Ekle" butonu göster/gizle
+  document.getElementById('o-hizmet-ekle-btn').style.display = liste.length >= MAX_HIZMET ? 'none' : '';
 
   // Toplam
   document.getElementById('o-fiyat').value = toplamFiyat;
