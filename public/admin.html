@@ -1479,20 +1479,34 @@ async function onayEt(id){
       r.durum='onaylandi';
       AKTLOG.unshift({tip:'g',txt:`<strong>${r.ad}</strong> — ${r.hizmet} onaylandı`,z:new Date()});
       waOnayMesaji(r);
-      // Personelin o gün+saatini kapat (sadece o personel için)
+      // Personelin o gün+saatini kapat — işlem süresi kadar tüm slotları kapat
       if(r.personelId && r.tarih && r.saat){
         try{
-          await sRest('kapali_saatler',{
-            method:'POST',
-            headers:{'Prefer':'return=minimal'},
-            body:JSON.stringify({
-              personel_id: r.personelId,
-              tarih: r.tarih,
-              saat: r.saat,
-              rezervasyon_id: r.id
-            })
-          });
-        }catch(e2){console.warn('Kapalı saat kaydedilemedi:',e2);}
+          const hizBilgi = FYT[r.hizmet];
+          const sureDk = hizBilgi ? (hizBilgi.sure || 60) : 60;
+          const [basSaat, basDak] = r.saat.split(':').map(Number);
+          const basToplamDk = basSaat * 60 + basDak;
+          const slotSayisi = Math.ceil(sureDk / 30);
+          const kapatilacakSaatler = [];
+          for(let i = 0; i < slotSayisi; i++){
+            const slotDk = basToplamDk + i * 30;
+            const sh = String(Math.floor(slotDk / 60)).padStart(2,'0');
+            const sd = String(slotDk % 60).padStart(2,'0');
+            kapatilacakSaatler.push(sh+':'+sd);
+          }
+          await Promise.all(kapatilacakSaatler.map(saat =>
+            sRest('kapali_saatler',{
+              method:'POST',
+              headers:{'Prefer':'return=minimal'},
+              body:JSON.stringify({
+                personel_id: r.personelId,
+                tarih: r.tarih,
+                saat,
+                rezervasyon_id: r.id
+              })
+            }).catch(e2 => console.warn('Kapalı saat kaydedilemedi ('+saat+'):', e2))
+          ));
+        }catch(e2){console.warn('Kapalı saat bloğu kaydedilemedi:',e2);}
       }
     }
     verileriRender();toast('Rezervasyon onaylandı, WhatsApp gönderildi.','ok');
@@ -1529,6 +1543,7 @@ async function waRedMesaji(r){
 async function sil(id){
   if(!confirm('Bu rezervasyonu silmek istediğinizden emin misiniz?'))return;
   try{
+    await sRest(`kapali_saatler?rezervasyon_id=eq.${id}`,{method:'DELETE',headers:{'Prefer':'return=minimal'}}).catch(()=>{});
     await sRest(`rezervasyonlar?id=eq.${id}`,{method:'DELETE',headers:{'Prefer':'return=minimal'}});
     TRZ=TRZ.filter(x=>x.id!==id);verileriRender();toast('Silindi.','ok');
   }catch(e){toast('Hata: '+e.message,'hata');}
