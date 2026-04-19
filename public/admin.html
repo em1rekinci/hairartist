@@ -684,7 +684,13 @@ tbody td{padding:10px 13px;vertical-align:middle}
 
     <!-- ══ CİRO & RAPORLAR ══ -->
     <div class="page" id="page-ciro">
-      <div style="margin-bottom:16px"><h2 style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700">Ciro <em style="font-style:italic;font-weight:400;color:var(--text3)">& Raporlar</em></h2><p style="font-size:.7rem;color:var(--text3);margin-top:3px">Gelir takibi ve ödeme analizi</p></div>
+      <div style="margin-bottom:16px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <div><h2 style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700">Ciro <em style="font-style:italic;font-weight:400;color:var(--text3)">& Raporlar</em></h2><p style="font-size:.7rem;color:var(--text3);margin-top:3px">Gelir takibi ve ödeme analizi</p></div>
+        <button class="tbtn pri" onclick="ekstraCiroAc()" style="display:flex;align-items:center;gap:6px;white-space:nowrap;margin-top:4px">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Ekstra Ciro Ekle
+        </button>
+      </div>
 
       <!-- Periyot filtresi -->
       <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;flex-wrap:wrap">
@@ -703,6 +709,7 @@ tbody td{padding:10px 13px;vertical-align:middle}
           <span style="width:1px;background:var(--line2);margin:0 2px;align-self:stretch"></span>
           <button class="fbtn ak" id="ciro-tip-hepsi-btn" onclick="ciroTipFiltrele('hepsi',this)">✦ Tümü</button>
           <button class="fbtn" id="ciro-tip-hizmet-btn" onclick="ciroTipFiltrele('hizmet',this)">✂️ Hizmet</button>
+          <button class="fbtn" id="ciro-tip-walkin-btn" onclick="ciroTipFiltrele('walk_in',this)">🚶 Walk-in</button>
           <button class="fbtn" id="ciro-tip-shop-btn" onclick="ciroTipFiltrele('shop',this)">🛍 Shop</button>
         </div>
       </div>
@@ -989,6 +996,64 @@ tbody td{padding:10px 13px;vertical-align:middle}
     <div class="cmact">
       <button class="tbtn" onclick="cmKapat()">İptal</button>
       <button class="tbtn pri" id="cmOnayBtn" onclick="odemeOnayla()">Ödemeyi Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- EKSTRA CİRO MODAL -->
+<div class="cmov" id="ekstra-ciro-mov" onclick="if(event.target===this)ekstraCiroKapat()">
+  <div class="cmodal" style="max-width:440px">
+    <div class="cmh">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <h3>Ekstra Ciro Ekle</h3>
+    </div>
+    <div class="cmb" style="padding-bottom:0">
+      <p style="font-size:.68rem;color:var(--text3);margin-bottom:14px">Rezervasyonsuz gelen müşteri veya başka bir gelir kalemini ciro'ya ekleyin.</p>
+      <div style="display:flex;flex-direction:column;gap:11px">
+        <div class="ff">
+          <label class="fl">Müşteri Adı <span style="color:var(--text3);font-weight:400">(opsiyonel)</span></label>
+          <input class="fi" id="ec-ad" type="text" placeholder="ör. Ahmet Yılmaz veya Walk-in Müşteri" style="background:var(--bg);border:1px solid var(--line2)">
+        </div>
+        <div class="ff">
+          <label class="fl">Telefon <span style="color:var(--text3);font-weight:400">(opsiyonel)</span></label>
+          <input class="fi" id="ec-tel" type="tel" placeholder="ör. 05xx xxx xx xx" style="background:var(--bg);border:1px solid var(--line2)">
+        </div>
+        <div class="ff">
+          <label class="fl">Hizmet / Açıklama</label>
+          <input class="fi" id="ec-hizmet" type="text" placeholder="ör. Saç Kesimi, Balyaj..." style="background:var(--bg);border:1px solid var(--line2)">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="ff">
+            <label class="fl">Tutar (₺)</label>
+            <input class="fi" id="ec-tutar" type="number" placeholder="0" min="0" style="background:var(--bg);border:1px solid var(--line2)">
+          </div>
+          <div class="ff">
+            <label class="fl">Tarih</label>
+            <input class="fi" id="ec-tarih" type="date" style="background:var(--bg);border:1px solid var(--line2)">
+          </div>
+        </div>
+        <div class="ff">
+          <label class="fl">Personel <span style="color:var(--text3);font-weight:400">(opsiyonel)</span></label>
+          <select class="fsel" id="ec-personel" style="background:var(--bg);border:1px solid var(--line2)">
+            <option value="">— Personel seçin —</option>
+          </select>
+        </div>
+        <div class="ff">
+          <label class="fl">Ödeme Yöntemi</label>
+          <div style="display:flex;gap:8px">
+            <label style="flex:1;display:flex;align-items:center;gap:7px;padding:9px 12px;border:1px solid var(--line2);border-radius:4px;cursor:pointer;font-size:.74rem;color:var(--text2)">
+              <input type="radio" name="ec-yontem" value="nakit" id="ec-nakit" checked style="accent-color:var(--green)"> 💵 Nakit
+            </label>
+            <label style="flex:1;display:flex;align-items:center;gap:7px;padding:9px 12px;border:1px solid var(--line2);border-radius:4px;cursor:pointer;font-size:.74rem;color:var(--text2)">
+              <input type="radio" name="ec-yontem" value="kart" id="ec-kart" style="accent-color:var(--green)"> 💳 Kart
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cmact">
+      <button class="tbtn" onclick="ekstraCiroKapat()">İptal</button>
+      <button class="tbtn pri" onclick="ekstraCiroKaydet()">Ciro'ya Ekle</button>
     </div>
   </div>
 </div>
@@ -2407,7 +2472,7 @@ let SIPARISLER=[];
 
 function ciroTipFiltrele(tip,btn){
   CIRO_TIP=tip;
-  ['ciro-tip-hepsi-btn','ciro-tip-hizmet-btn','ciro-tip-shop-btn'].forEach(id=>{
+  ['ciro-tip-hepsi-btn','ciro-tip-hizmet-btn','ciro-tip-walkin-btn','ciro-tip-shop-btn'].forEach(id=>{
     document.getElementById(id)?.classList.remove('ak');
   });
   btn.classList.add('ak');
@@ -2464,9 +2529,73 @@ function ciroPeriyotAralik(p){
   return{bas,bit};
 }
 
+// ─── EKSTRA CİRO (WALK-IN) ───
+let EKSTRA_CIROLAR = []; // local cache
+
+function ekstraCiroAc() {
+  // Personel dropdown'u doldur
+  const sel = document.getElementById('ec-personel');
+  sel.innerHTML = '<option value="">— Personel seçin —</option>' +
+    personel.map(p => `<option value="${p.id}">${p.ad}${p.rol?' — '+p.rol:''}</option>`).join('');
+  // Tarihi bugüne ayarla
+  document.getElementById('ec-tarih').value = new Date().toISOString().split('T')[0];
+  document.getElementById('ec-ad').value = '';
+  document.getElementById('ec-tel').value = '';
+  document.getElementById('ec-hizmet').value = '';
+  document.getElementById('ec-tutar').value = '';
+  document.getElementById('ec-nakit').checked = true;
+  document.getElementById('ekstra-ciro-mov').classList.add('open');
+}
+
+function ekstraCiroKapat() {
+  document.getElementById('ekstra-ciro-mov').classList.remove('open');
+}
+
+async function ekstraCiroKaydet() {
+  const ad = document.getElementById('ec-ad').value.trim() || 'Walk-in Müşteri';
+  const tel = document.getElementById('ec-tel').value.trim() || '';
+  const hizmet = document.getElementById('ec-hizmet').value.trim();
+  const tutar = parseInt(document.getElementById('ec-tutar').value) || 0;
+  const tarih = document.getElementById('ec-tarih').value;
+  const personelId = document.getElementById('ec-personel').value || null;
+  const yontem = document.querySelector('input[name="ec-yontem"]:checked')?.value || 'nakit';
+
+  if (!hizmet) { toast('Hizmet / açıklama giriniz.', 'hata'); return; }
+  if (!tutar) { toast('Tutar giriniz.', 'hata'); return; }
+  if (!tarih) { toast('Tarih seçiniz.', 'hata'); return; }
+
+  const payload = {
+    ad,
+    telefon: tel || '—',
+    hizmet,
+    tarih,
+    saat: '',
+    durum: 'onaylandi',
+    odeme_alindi: true,
+    fiyat: tutar,
+    odeme_yontemi: yontem,
+    odeme_tarihi: new Date().toISOString(),
+    tip: 'walk_in',
+    personel_id: personelId || null,
+    musteri_notu: 'Walk-in / Rezervasyonsuz müşteri'
+  };
+
+  try {
+    const res = await sRest('rezervasyonlar', { method: 'POST', body: JSON.stringify(payload) });
+    const yeni = Array.isArray(res) ? res[0] : res;
+    TRZ.unshift(dbToLocal({ ...payload, id: yeni.id, created_at: new Date().toISOString() }));
+    AKTLOG.unshift({ tip: 'g', txt: `<strong>${ad}</strong> — ${hizmet} (walk-in) ${tutar.toLocaleString('tr-TR')}₺`, z: new Date() });
+    ekstraCiroKapat();
+    verileriRender();
+    toast(`${tutar.toLocaleString('tr-TR')}₺ ciro'ya eklendi ✓`, 'ok');
+  } catch(e) {
+    toast('Hata: ' + e.message, 'hata');
+  }
+}
+
 function ciroRender(){
   const {bas,bit}=ciroPeriyotAralik(CIRO_PERIYOT);
-  // Hizmet rezervasyonları (sadece tip!=='shop' olanlar)
+  // Hizmet rezervasyonları (shop hariç — walk_in dahil)
   let hizOdemeler=TRZ.filter(r=>{
     if(r.tip==='shop')return false;
     if(!r.odemeAlindi||r.durum!=='onaylandi')return false;
@@ -2485,7 +2614,8 @@ function ciroRender(){
   // Tip filtreleme
   let odemeler=[];
   if(CIRO_TIP==='hepsi') odemeler=[...hizOdemeler,...shopOdemeler];
-  else if(CIRO_TIP==='hizmet') odemeler=hizOdemeler;
+  else if(CIRO_TIP==='hizmet') odemeler=hizOdemeler.filter(r=>r.tip!=='walk_in');
+  else if(CIRO_TIP==='walk_in') odemeler=hizOdemeler.filter(r=>r.tip==='walk_in');
   else if(CIRO_TIP==='shop') odemeler=shopOdemeler;
   if(CIRO_YONTEM!=='hepsi')odemeler=odemeler.filter(r=>(r.odemeYontemi||'nakit')===CIRO_YONTEM);
 
@@ -2515,7 +2645,7 @@ function ciroRender(){
     const p=personel.find(x=>x.id===r.personelId)||personel.find(x=>x.ad===r.personelId);
     const f=fHesapla(r);
     const yont=(r.odemeYontemi||'nakit')==='kart'?'💳 Kart':'💵 Nakit';
-    const tipBadge=r.tip==='shop'?'<span style="font-size:.44rem;background:var(--bbg);color:var(--blue);border:1px solid var(--bbdr);padding:2px 6px;border-radius:8px;font-weight:600">🛍 Shop</span>':'<span style="font-size:.44rem;background:var(--gbg);color:var(--green);border:1px solid var(--gbdr);padding:2px 6px;border-radius:8px;font-weight:600">✂️ Hizmet</span>';
+    const tipBadge=r.tip==='shop'?'<span style="font-size:.44rem;background:var(--bbg);color:var(--blue);border:1px solid var(--bbdr);padding:2px 6px;border-radius:8px;font-weight:600">🛍 Shop</span>':r.tip==='walk_in'?'<span style="font-size:.44rem;background:var(--ybg);color:var(--yellow);border:1px solid var(--ybdr);padding:2px 6px;border-radius:8px;font-weight:600">🚶 Walk-in</span>':'<span style="font-size:.44rem;background:var(--gbg);color:var(--green);border:1px solid var(--gbdr);padding:2px 6px;border-radius:8px;font-weight:600">✂️ Hizmet</span>';
     const gosterTarih=r.odemeTarihi ? utcToLocalDateStr(r.odemeTarihi) : r.tarih;
     return`<tr><td><div class="tad">${r.ad}</div></td><td class="thiz">${r.hizmet}</td><td class="tfyt">${f.toLocaleString('tr-TR')}₺</td><td style="font-size:.72rem">${yont}</td><td>${tipBadge}</td><td class="ttar">${gosterTarih}</td><td style="font-size:.7rem;color:var(--text2)">${r.tip==='shop'?'—':p?p.ad:'—'}</td></tr>`;
   }).join('');
