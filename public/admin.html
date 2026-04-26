@@ -1228,6 +1228,15 @@ function demoData(){
 // ─── GİRİŞ ───
 async function girisYap(){
   const s=document.getElementById('sifre-inp').value.trim();if(!s)return;
+  try{
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/ayarlar?key=eq.admin_sifre&select=value`,{
+      headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY}
+    });
+    if(res.ok){
+      const arr = await res.json();
+      if(arr.length) DS = arr[0].value;
+    }
+  }catch(e){}
   if(s===DS){
     SFR=s;
     document.getElementById('ghata').style.display='none';
@@ -1260,6 +1269,7 @@ async function sifreDegistir(){
     // Yeni şifreyi kaydet
     await sRest('ayarlar?key=eq.admin_sifre',{method:'PATCH',body:JSON.stringify({value:yeni})});
     SFR = yeni;
+    DS = yeni;
     msg.style.color='var(--green)';
     msg.textContent='✓ Şifre başarıyla güncellendi.';
     document.getElementById('ay-eski-sifre').value='';
