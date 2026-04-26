@@ -478,6 +478,9 @@ tbody td{padding:10px 13px;vertical-align:middle}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>Shop
       </div>
 
+      <div class="ni" onclick="sayfaGec('ayarlar',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Ayarlar
+      </div>
       <div class="ni" onclick="window.open('/','_blank')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Siteye Git
       </div>
@@ -658,17 +661,7 @@ tbody td{padding:10px 13px;vertical-align:middle}
                     <input type="radio" name="kampanya-hedef" value="rezervasyon" id="kh-rezervasyon" style="accent-color:var(--black)" onchange="kampanyaHedefDegisti()">
                     <span style="font-size:.72rem;color:var(--text2)">📅 Yalnızca <strong>Rezervasyon Yap</strong></span>
                   </label>
-                  <label id="hlbl-secili" style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:7px 10px;border:1px solid var(--line2);border-radius:3px">
-                    <input type="radio" name="kampanya-hedef" value="secili" id="kh-secili" style="accent-color:var(--black)" onchange="kampanyaHedefDegisti()">
-                    <span style="font-size:.72rem;color:var(--text2)">🎯 Yalnızca <strong>Seçili Hizmetler</strong></span>
-                  </label>
                 </div>
-              </div>
-              <!-- Seçili Hizmet Paneli -->
-              <div id="secili-hizmet-panel" style="display:none;flex-direction:column;gap:6px">
-                <label style="font-size:.5rem;letter-spacing:.17em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:2px">İndirim Uygulanacak Hizmetler</label>
-                <div id="secili-hizmet-listesi" style="display:flex;flex-direction:column;gap:4px;max-height:180px;overflow-y:auto;border:1px solid var(--line2);border-radius:4px;padding:6px"></div>
-                <div id="secili-hizmet-ozet" style="font-size:.6rem;color:var(--text3);min-height:14px"></div>
               </div>
               <div style="display:flex;gap:8px;align-items:center">
                 <input class="fi" id="indirim-input" type="number" min="0" max="100" placeholder="%" style="width:72px;text-align:center;font-size:1rem;font-weight:700;padding:6px 8px" oninput="indirimOnizlemeGuncelle(parseInt(this.value)||0)">
@@ -946,6 +939,33 @@ tbody td{padding:10px 13px;vertical-align:middle}
     </div>
 
     <!-- ══ AYARLAR ══ -->
+    <div class="page" id="page-ayarlar">
+      <div style="margin-bottom:16px">
+        <h2 style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700">Ayarlar</h2>
+        <p style="font-size:.7rem;color:var(--text3);margin-top:3px">Yönetici paneli ayarları</p>
+      </div>
+      <div style="max-width:420px">
+        <div class="card"><div class="ch"><h3>🔒 Şifre Değiştir</h3></div><div class="cb">
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <p style="font-size:.68rem;color:var(--text3);margin:0">Mevcut şifrenizi girin, ardından yeni şifrenizi belirleyin.</p>
+            <div class="ff">
+              <label class="fl">Mevcut Şifre</label>
+              <input class="fi" type="password" id="ay-eski-sifre" placeholder="••••••••">
+            </div>
+            <div class="ff">
+              <label class="fl">Yeni Şifre</label>
+              <input class="fi" type="password" id="ay-yeni-sifre" placeholder="••••••••">
+            </div>
+            <div class="ff">
+              <label class="fl">Yeni Şifre (Tekrar)</label>
+              <input class="fi" type="password" id="ay-yeni-sifre2" placeholder="••••••••">
+            </div>
+            <div id="ay-sifre-msg" style="font-size:.68rem;min-height:16px"></div>
+            <button class="sbtn" onclick="sifreDegistir()">Şifreyi Güncelle</button>
+          </div>
+        </div></div>
+      </div>
+    </div>
 
   </main>
 </div>
@@ -1222,6 +1242,32 @@ function panelAc(){
 }
 function cikisYap(){SFR='';TRZ=[];document.getElementById('panel').style.display='none';const ge=document.getElementById('ge');ge.style.display='flex';ge.style.opacity='1';document.getElementById('sifre-inp').value='';document.getElementById('ghata').style.display='none';}
 
+async function sifreDegistir(){
+  const eski = document.getElementById('ay-eski-sifre').value.trim();
+  const yeni = document.getElementById('ay-yeni-sifre').value.trim();
+  const yeni2 = document.getElementById('ay-yeni-sifre2').value.trim();
+  const msg = document.getElementById('ay-sifre-msg');
+  msg.textContent = '';
+  if(!eski||!yeni||!yeni2){ msg.style.color='var(--red)'; msg.textContent='Tüm alanları doldurun.'; return; }
+  if(yeni!==yeni2){ msg.style.color='var(--red)'; msg.textContent='Yeni şifreler eşleşmiyor.'; return; }
+  if(yeni.length<4){ msg.style.color='var(--red)'; msg.textContent='Şifre en az 4 karakter olmalı.'; return; }
+  try{
+    // Mevcut şifreyi Supabase'den kontrol et
+    const res = await sRest('ayarlar?key=eq.admin_sifre&select=value');
+    const arr = Array.isArray(res) ? res : [];
+    const mevcutSifre = arr.length ? arr[0].value : '';
+    if(eski !== mevcutSifre){ msg.style.color='var(--red)'; msg.textContent='Mevcut şifre yanlış.'; return; }
+    // Yeni şifreyi kaydet
+    await sRest('ayarlar?key=eq.admin_sifre',{method:'PATCH',body:JSON.stringify({value:yeni})});
+    SFR = yeni;
+    msg.style.color='var(--green)';
+    msg.textContent='✓ Şifre başarıyla güncellendi.';
+    document.getElementById('ay-eski-sifre').value='';
+    document.getElementById('ay-yeni-sifre').value='';
+    document.getElementById('ay-yeni-sifre2').value='';
+  }catch(e){ msg.style.color='var(--red)'; msg.textContent='Hata: '+e.message; }
+}
+
 // ─── PANEL BAŞLAT ───
 async function panelBaslat(){
   saatGuncelle();setInterval(saatGuncelle,1000);
@@ -1254,13 +1300,9 @@ async function verileriYukle(showToast=true){
     if(document.getElementById('kampanya-baslangic')) document.getElementById('kampanya-baslangic').value = bas||'';
     if(document.getElementById('kampanya-bitis')) document.getElementById('kampanya-bitis').value = bit||'';
     // Hedef radio'yu ayarla
-    const seciliAyar = (ayarData||[]).find(a=>a.key==='kampanya_secili_hizmetler');
-    let seciliIds = [];
-    try{ seciliIds = seciliAyar ? JSON.parse(seciliAyar.value||'[]') : []; }catch(e){ seciliIds=[]; }
-    window._seciliHizmetIds = seciliIds;
     const khEl = document.getElementById('kh-'+hedef);
     if(khEl){ khEl.checked = true; kampanyaHedefDegisti(); }
-    kampanyaDurumGuncelle(indirimYuzde, bas, bit, hedef, seciliIds);
+    kampanyaDurumGuncelle(indirimYuzde, bas, bit, hedef);
     const inp = document.getElementById('indirim-input');
     if(inp) inp.value = indirimYuzde || '';
     indirimOnizlemeGuncelle(indirimYuzde);
@@ -1957,7 +1999,6 @@ async function indirimKaydet(){
   if(bas && bit && bas > bit){toast('Başlangıç tarihi bitiş tarihinden büyük olamaz.','hata');return;}
   const hedefEl = document.querySelector('input[name="kampanya-hedef"]:checked');
   const hedef = hedefEl ? hedefEl.value : 'ikisi';
-  const seciliIds = (hedef==='secili') ? (window._seciliHizmetIds||[]) : [];
   try{
     await sRest('ayarlar?key=eq.indirim_yuzde',{method:'PATCH',body:JSON.stringify({value:String(yuzde)})});
     const upsert = async (key, val) => {
@@ -1969,9 +2010,8 @@ async function indirimKaydet(){
     await upsert('kampanya_baslangic', bas);
     await upsert('kampanya_bitis', bit);
     await upsert('kampanya_hedef', hedef);
-    await upsert('kampanya_secili_hizmetler', JSON.stringify(seciliIds));
     indirimOnizlemeGuncelle(yuzde);
-    kampanyaDurumGuncelle(yuzde, bas, bit, hedef, seciliIds);
+    kampanyaDurumGuncelle(yuzde, bas, bit, hedef);
     toast(yuzde===0?'İndirim kaldırıldı.':'%'+yuzde+' kampanya kaydedildi.','ok');
   }catch(e){toast('Hata: '+e.message,'hata');}
 }
@@ -1982,15 +2022,13 @@ async function kampanyaSil(){
     await sRest('ayarlar?key=eq.kampanya_baslangic',{method:'PATCH',body:JSON.stringify({value:''})});
     await sRest('ayarlar?key=eq.kampanya_bitis',{method:'PATCH',body:JSON.stringify({value:''})});
     await sRest('ayarlar?key=eq.kampanya_hedef',{method:'PATCH',body:JSON.stringify({value:'ikisi'})});
-    await sRest('ayarlar?key=eq.kampanya_secili_hizmetler',{method:'PATCH',body:JSON.stringify({value:'[]'})});
     document.getElementById('indirim-input').value = '';
     document.getElementById('kampanya-baslangic').value = '';
     document.getElementById('kampanya-bitis').value = '';
-    window._seciliHizmetIds = [];
     const khIkisi = document.getElementById('kh-ikisi');
     if(khIkisi){ khIkisi.checked = true; kampanyaHedefDegisti(); }
     indirimOnizlemeGuncelle(0);
-    kampanyaDurumGuncelle(0,'','','ikisi',[]);
+    kampanyaDurumGuncelle(0,'','','ikisi');
     toast('Kampanya kaldırıldı.','ok');
   }catch(e){toast('Hata: '+e.message,'hata');}
 }
@@ -1998,7 +2036,7 @@ async function kampanyaSil(){
 function kampanyaHedefDegisti(){
   const hedefEl = document.querySelector('input[name="kampanya-hedef"]:checked');
   const hedef = hedefEl ? hedefEl.value : 'ikisi';
-  ['ikisi','hizmet','rezervasyon','secili'].forEach(h=>{
+  ['ikisi','hizmet','rezervasyon'].forEach(h=>{
     const lbl = document.getElementById('hlbl-'+h);
     if(!lbl) return;
     if(hedef===h){
@@ -2009,67 +2047,13 @@ function kampanyaHedefDegisti(){
       lbl.style.background='';
     }
   });
-  const panel = document.getElementById('secili-hizmet-panel');
-  if(panel){
-    if(hedef==='secili'){
-      panel.style.display='flex';
-      seciliHizmetListesiRender();
-    } else {
-      panel.style.display='none';
-    }
-  }
 }
 
-function seciliHizmetListesiRender(){
-  const konteyner = document.getElementById('secili-hizmet-listesi');
-  if(!konteyner) return;
-  if(!hizmetler || !hizmetler.length){
-    konteyner.innerHTML='<span style="font-size:.65rem;color:var(--text3);padding:4px">Henüz hizmet eklenmemiş.</span>';
-    return;
-  }
-  const seciliIds = window._seciliHizmetIds || [];
-  konteyner.innerHTML = hizmetler.map(h=>{
-    const secili = seciliIds.includes(h.id);
-    return `<label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:5px 6px;border-radius:3px;${secili?'background:rgba(0,0,0,.05)':''}">
-      <input type="checkbox" value="${h.id}" ${secili?'checked':''} style="accent-color:var(--black);width:14px;height:14px;flex-shrink:0" onchange="seciliHizmetDegisti(this)">
-      <span style="font-size:.7rem;color:var(--text);flex:1">${h.ad}</span>
-      <span style="font-size:.62rem;color:var(--text3)">${h.min||0}₺${h.max&&h.max!==h.min?' – '+h.max+'₺':''}</span>
-    </label>`;
-  }).join('');
-  seciliHizmetOzetGuncelle();
-}
-
-function seciliHizmetDegisti(cb){
-  const id = cb.value;
-  if(!window._seciliHizmetIds) window._seciliHizmetIds = [];
-  if(cb.checked){
-    if(!window._seciliHizmetIds.includes(id)) window._seciliHizmetIds.push(id);
-  } else {
-    window._seciliHizmetIds = window._seciliHizmetIds.filter(x=>x!==id);
-  }
-  const lbl = cb.closest('label');
-  if(lbl) lbl.style.background = cb.checked?'rgba(0,0,0,.05)':'';
-  seciliHizmetOzetGuncelle();
-}
-
-function seciliHizmetOzetGuncelle(){
-  const el = document.getElementById('secili-hizmet-ozet');
-  if(!el) return;
-  const ids = window._seciliHizmetIds || [];
-  if(!ids.length){ el.textContent='Hiç hizmet seçilmedi — tüm hizmetlere uygulanır.'; return; }
-  const adlar = hizmetler.filter(h=>ids.includes(h.id)).map(h=>h.ad);
-  el.textContent = adlar.length + ' hizmet seçildi: ' + adlar.join(', ');
-}
-
-function kampanyaDurumGuncelle(yuzde, bas, bit, hedef, seciliIds){
+function kampanyaDurumGuncelle(yuzde, bas, bit, hedef){
   const el = document.getElementById('kampanya-durum');
   if(!el) return;
   if(!yuzde){ el.textContent=''; return; }
-  let hedefMetin = hedef==='hizmet'?'Hizmet Al':hedef==='rezervasyon'?'Rezervasyon Yap':hedef==='secili'?'Seçili Hizmetler':'Her İkisi';
-  if(hedef==='secili' && seciliIds && seciliIds.length){
-    const adlar = hizmetler.filter(h=>seciliIds.includes(h.id)).map(h=>h.ad);
-    hedefMetin = adlar.length+' hizmet';
-  }
+  const hedefMetin = hedef==='hizmet'?'Hizmet Al':hedef==='rezervasyon'?'Rezervasyon Yap':'Her İkisi';
   if(!bas || !bit){
     el.innerHTML='<span style="color:var(--green);font-weight:600">✓ Aktif: </span>Süresiz %'+yuzde+' indirim <span style="color:var(--blue);font-size:.6rem">('+hedefMetin+')</span>';
     return;
@@ -2794,7 +2778,7 @@ const BASLIKLAR={
   rezervasyonlar:'Rezervasyonlar',musteriler:'Müşteriler',
   personel:'Personel',hizmetler:'Hizmetler & Fiyatlar',
   shop:'Shop',ciro:'Ciro & Raporlar',
-  portfolio:'Portfolyo Yönetimi',
+  portfolio:'Portfolyo Yönetimi',ayarlar:'Ayarlar',
 };
 function sayfaGec(sayfa,navEl){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('ak'));
