@@ -2445,19 +2445,29 @@ async function hizmetleriYukle() {
     }
 
     // ── Hizmet dropdown indirim oranları ──
-    // seciliIds doluysa: sadece seçili hizmetlere indirim, hedef (hizmet/rezervasyon/ikisi) yine geçerli
-    var hizmetAlInd, normalRezInd;
+    // seciliIds: seçili hizmet UUID listesi. Her hizmet için ayrı kontrol yapılır (-1 sinyali).
+    // Hedef yoksa 'secili' zaten seciliIds üzerinden yönetilir.
+    var normalRezInd, hizmetAlInd;
+
     if (seciliIds.length > 0) {
-      // Seçili hizmetler modunda: per-hizmet bazlı (-1 sinyali)
-      hizmetAlInd  = (kampanyaHedef === 'hizmet' || kampanyaHedef === 'ikisi') ? -1 : 0;
-      normalRezInd = (kampanyaHedef === 'rezervasyon' || kampanyaHedef === 'ikisi') ? -1 : 0;
+      // Seçili hizmetler modu — her form için hedef kontrolü
+      normalRezInd = (kampanyaHedef === 'rezervasyon' || kampanyaHedef === 'ikisi' || kampanyaHedef === 'secili') ? -1 : 0;
+      hizmetAlInd  = (kampanyaHedef === 'hizmet'      || kampanyaHedef === 'ikisi' || kampanyaHedef === 'secili') ? -1 : 0;
+    } else if (kampanyaHedef === 'secili') {
+      // seciliIds boş ama hedef 'secili' — indirim yok
+      normalRezInd = 0;
+      hizmetAlInd  = 0;
     } else {
-      hizmetAlInd   = (kampanyaHedef === 'hizmet'      || kampanyaHedef === 'ikisi') ? efektifIndirim : 0;
-      normalRezInd  = (kampanyaHedef === 'rezervasyon' || kampanyaHedef === 'ikisi') ? efektifIndirim : 0;
-      if (kampanyaHedef === 'secili') { hizmetAlInd = -1; normalRezInd = -1; }
+      normalRezInd = (kampanyaHedef === 'rezervasyon' || kampanyaHedef === 'ikisi') ? efektifIndirim : 0;
+      hizmetAlInd  = (kampanyaHedef === 'hizmet'      || kampanyaHedef === 'ikisi') ? efektifIndirim : 0;
     }
 
+    // Her hizmetin id'sini string olarak eşleştirmek için listeyi zenginleştir
+    const seciliIdsStr = seciliIds.map(String);
+    liste.forEach(h => { h._seciliIndirim = seciliIdsStr.includes(String(h.id)) ? efektifIndirim : 0; });
+
     window._hizmetListesi = liste;
+    window._efektifIndirim = efektifIndirim;
     hizmetDropdownOlustur('n', liste, normalRezInd);
     hizmetDropdownOlustur('o', liste, hizmetAlInd);
   } catch(e) {
@@ -2490,23 +2500,28 @@ function kampanyaKontrol(tarih, prefix) {
 
 // Her hizmet için gerçek indirim oranını döndürür
 function hizmetIndirimHesapla(hizObj, secilenTarih, prefix) {
-  var yuzde = window._indirimYuzde  || 0;
   var hedef = window._kampanyaHedef || 'ikisi';
-  var seciliIds = (window._seciliHizmetIds || []).map(String);
-  var bas = window._kampanyaBas || '';
-  var bit = window._kampanyaBit || '';
-  if (!yuzde) return 0;
-  // Tarih seçilmemişse bugünü kullan
+  var seciliIds = window._seciliHizmetIds || [];
+  var efektif = window._efektifIndirim || 0;
+
+  // Seçili hizmetler modu: yükleme anında hesaplanan _seciliIndirim alanını kullan
+  if (seciliIds.length > 0 || hedef === 'secili') {
+    if (!hizObj) return 0;
+    // Hedef prefix'e uygun mu?
+    if (prefix === 'n' && hedef === 'hizmet') return 0;
+    if (prefix === 'o' && hedef === 'rezervasyon') return 0;
+    return hizObj._seciliIndirim || 0;
+  }
+
+  // Normal mod
+  if (!efektif) return 0;
+  var bas = window._kampanyaBas || '', bit = window._kampanyaBit || '';
   var kontrolTarih = secilenTarih || new Date().toISOString().split('T')[0];
   var tarihOk = (!bas && !bit) || (kontrolTarih >= bas && kontrolTarih <= bit);
   if (!tarihOk) return 0;
-  if (seciliIds.length > 0 || hedef === 'secili') {
-    if (!hizObj) return 0;
-    return seciliIds.includes(String(hizObj.id)) ? yuzde : 0;
-  }
   if (prefix === 'n' && hedef === 'hizmet')      return 0;
   if (prefix === 'o' && hedef === 'rezervasyon') return 0;
-  return yuzde;
+  return efektif;
 }
 
 function hizmetFiyatStr(min, max) {
@@ -2530,13 +2545,10 @@ function hizmetDropdownOlustur(prefix, liste, indirimYuzde = 0) {
     const minFiyat = h.min_fiyat || 0;
     const maxFiyat = h.max_fiyat || 0;
 
-    // Seçili hizmetler modunda: sadece seçili hizmetlere indirim uygula
+    // Seçili hizmetler modunda: h._seciliIndirim alanını kullan (yükleme sırasında hesaplandı)
     let hizmetInd = indirimYuzde;
     if (indirimYuzde === -1) {
-      const bugunStr = new Date().toISOString().split('T')[0];
-      const bas = window._kampanyaBas || '', bit = window._kampanyaBit || '';
-      const tarihOk = (!bas && !bit) || (bugunStr >= bas && bugunStr <= bit);
-      hizmetInd = (tarihOk && seciliIds.map(String).includes(String(h.id))) ? (window._indirimYuzde || 0) : 0;
+      hizmetInd = h._seciliIndirim || 0;
     }
 
     if (hizmetInd > 0) {
