@@ -2484,8 +2484,8 @@ function kampanyaKontrol(tarih, prefix) {
   if (prefix === 'o' && hedef === 'rezervasyon') return 0;
   if (prefix === 'n' && hedef === 'hizmet')      return 0;
   if (!bas && !bit) return yuzde;
-  if (!tarih) return 0;
-  return tarih >= bas && tarih <= bit ? yuzde : 0;
+  var kontrolTarih2 = tarih || new Date().toISOString().split('T')[0];
+  return kontrolTarih2 >= bas && kontrolTarih2 <= bit ? yuzde : 0;
 }
 
 // Her hizmet için gerçek indirim oranını döndürür
@@ -2496,7 +2496,9 @@ function hizmetIndirimHesapla(hizObj, secilenTarih, prefix) {
   var bas = window._kampanyaBas || '';
   var bit = window._kampanyaBit || '';
   if (!yuzde) return 0;
-  var tarihOk = (!bas && !bit) || (secilenTarih && secilenTarih >= bas && secilenTarih <= bit);
+  // Tarih seçilmemişse bugünü kullan
+  var kontrolTarih = secilenTarih || new Date().toISOString().split('T')[0];
+  var tarihOk = (!bas && !bit) || (kontrolTarih >= bas && kontrolTarih <= bit);
   if (!tarihOk) return 0;
   if (seciliIds.length > 0 || hedef === 'secili') {
     if (!hizObj) return 0;
