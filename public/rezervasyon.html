@@ -1489,56 +1489,24 @@ function nHizmetGuncelle() {
     return;
   }
 
-  // Tarih bazlı indirim
+  // Per-hizmet indirim hesabı
   var secilenTarih = document.getElementById('n-tarih').value || '';
   var hizmetListesi = window._hizmetListesi || [];
-  var seciliIds = (window._seciliHizmetIds || []).map(String);
-  var kampanyaHedef = window._kampanyaHedef || 'ikisi';
-  var globalIndirim = window._indirimYuzde || 0;
-
-  // Seçili hizmetler modunda tarih kontrolü
-  function _tarihOkMu(tarih) {
-    var bas = window._kampanyaBas || '', bit = window._kampanyaBit || '';
-    if (!bas && !bit) return true;
-    if (!tarih) return false;
-    return tarih >= bas && tarih <= bit;
-  }
-
-  // Her hizmet için bireysel indirim oranını hesapla
-  function _hizmetIndirimi(hObj, prefix) {
-    if (seciliIds.length > 0) {
-      // Seçili hizmetler modu
-      var hedefUygun = (prefix === 'n')
-        ? (kampanyaHedef === 'rezervasyon' || kampanyaHedef === 'ikisi')
-        : (kampanyaHedef === 'hizmet' || kampanyaHedef === 'ikisi');
-      // 'secili' hedefi ikisi için de geçerli
-      if (kampanyaHedef === 'secili') hedefUygun = true;
-      if (!hedefUygun) return 0;
-      var tarihOk = _tarihOkMu(secilenTarih);
-      if (!tarihOk) return 0;
-      if (hObj && seciliIds.includes(String(hObj.id))) return globalIndirim;
-      return 0;
-    }
-    // Normal mod
-    return kampanyaKontrol(secilenTarih, prefix);
-  }
 
   var toplamMin = 0, toplamMax = 0, toplamSure = 0;
-  var toplamOrijMin = 0, toplamOrijMax = 0;
-  var herhangiIndirim = false;
+  var orijMin2 = 0, orijMax2 = 0;
+  var herhangiInd = false;
   var itemlerHTML = liste.map(function(h) {
     var hObj = hizmetListesi.find(function(x){ return x.ad === h.ad; });
     var oMin = hObj ? (hObj.min_fiyat || 0) : h.minFiyat;
     var oMax = hObj ? (hObj.max_fiyat || 0) : h.maxFiyat;
-    var hInd = _hizmetIndirimi(hObj, 'n');
+    var hInd = hizmetIndirimHesapla(hObj, secilenTarih, 'n');
     var gMin = hInd > 0 ? Math.round(oMin * (1 - hInd/100)) : oMin;
     var gMax = hInd > 0 ? Math.round(oMax * (1 - hInd/100)) : oMax;
-    toplamMin += gMin;
-    toplamMax += gMax;
-    toplamOrijMin += oMin;
-    toplamOrijMax += oMax;
+    toplamMin += gMin; toplamMax += gMax;
+    orijMin2 += oMin; orijMax2 += oMax;
     toplamSure += (h.sure || 0);
-    if (hInd > 0) herhangiIndirim = true;
+    if (hInd > 0) herhangiInd = true;
     var fStr = gMin === gMax ? gMin.toLocaleString('tr-TR') + '₺' : gMin.toLocaleString('tr-TR') + ' – ' + gMax.toLocaleString('tr-TR') + '₺';
     var eskiStr = '';
     if (hInd > 0) {
@@ -1548,7 +1516,7 @@ function nHizmetGuncelle() {
     return '<div class="secili-hizmet-item">' +
       '<span class="secili-hizmet-ad">' + h.ad + '</span>' +
       '<span class="secili-hizmet-fiyat">' + eskiStr + fStr + '</span>' +
-      '<button class="secili-hizmet-sil" onclick="nHizmetSil(\'' + h.ad.replace(/'/g,"\\'") + '\')" title="Kaldır">✕</button>' +
+      '<button class="secili-hizmet-sil" onclick="nHizmetSil(\'' + h.ad.replace(/'/g,"\'") + '\')" title="Kaldır">✕</button>' +
     '</div>';
   }).join('');
   secilenDiv.innerHTML = itemlerHTML;
@@ -1562,8 +1530,8 @@ function nHizmetGuncelle() {
     ? toplamMin.toLocaleString('tr-TR') + '₺'
     : toplamMin.toLocaleString('tr-TR') + ' – ' + toplamMax.toLocaleString('tr-TR') + '₺';
 
-  if (herhangiIndirim) {
-    var orijStr2 = toplamOrijMin === toplamOrijMax ? toplamOrijMin.toLocaleString('tr-TR') + '₺' : toplamOrijMin.toLocaleString('tr-TR') + ' – ' + toplamOrijMax.toLocaleString('tr-TR') + '₺';
+  if (herhangiInd) {
+    var orijStr2 = orijMin2 === orijMax2 ? orijMin2.toLocaleString('tr-TR') + '₺' : orijMin2.toLocaleString('tr-TR') + ' – ' + orijMax2.toLocaleString('tr-TR') + '₺';
     document.getElementById('fiyat-normal').innerHTML = '<s style="color:var(--text3);font-size:.78rem;font-weight:400">' + orijStr2 + '</s>';
   } else {
     document.getElementById('fiyat-normal').textContent = '';
@@ -1652,39 +1620,18 @@ function oHizmetGuncelle() {
 
   var secilenTarih = document.getElementById('o-tarih').value || '';
   var hizmetListesi = window._hizmetListesi || [];
-  var seciliIds = (window._seciliHizmetIds || []).map(String);
-  var kampanyaHedef = window._kampanyaHedef || 'ikisi';
-  var globalIndirim = window._indirimYuzde || 0;
-
-  function _tarihOkMuO(tarih) {
-    var bas = window._kampanyaBas || '', bit = window._kampanyaBit || '';
-    if (!bas && !bit) return true;
-    if (!tarih) return false;
-    return tarih >= bas && tarih <= bit;
-  }
-
-  function _hizmetIndiriminO(hObj) {
-    if (seciliIds.length > 0) {
-      var hedefUygun = (kampanyaHedef === 'hizmet' || kampanyaHedef === 'ikisi' || kampanyaHedef === 'secili');
-      if (!hedefUygun) return 0;
-      if (!_tarihOkMuO(secilenTarih)) return 0;
-      if (hObj && seciliIds.includes(String(hObj.id))) return globalIndirim;
-      return 0;
-    }
-    return kampanyaKontrol(secilenTarih, 'o');
-  }
 
   var toplamFiyat = 0, toplamOrij = 0, toplamSure = 0;
-  var herhangiIndirimO = false;
+  var herhangiIndO = false;
   var itemlerHTML = liste.map(function(h) {
     var hObj = hizmetListesi.find(function(x){ return x.ad === h.ad; });
     var orijFiyat = hObj ? (hObj.max_fiyat || 0) : h.fiyat;
-    var hInd = _hizmetIndiriminO(hObj);
+    var hInd = hizmetIndirimHesapla(hObj, secilenTarih, 'o');
     var gFiyat = hInd > 0 ? Math.round(orijFiyat * (1 - hInd/100)) : orijFiyat;
     toplamFiyat += gFiyat;
     toplamOrij += orijFiyat;
     toplamSure += (h.sure || 0);
-    if (hInd > 0) herhangiIndirimO = true;
+    if (hInd > 0) herhangiIndO = true;
     var fStr = gFiyat.toLocaleString('tr-TR') + '₺';
     var eskiStr = '';
     if (hInd > 0) {
@@ -1693,7 +1640,7 @@ function oHizmetGuncelle() {
     return '<div class="secili-hizmet-item">' +
       '<span class="secili-hizmet-ad">' + h.ad + '</span>' +
       '<span class="secili-hizmet-fiyat">' + eskiStr + fStr + '</span>' +
-      '<button class="secili-hizmet-sil" onclick="oHizmetSil(\'' + h.ad.replace(/'/g,"\\'") + '\')" title="Kaldır">✕</button>' +
+      '<button class="secili-hizmet-sil" onclick="oHizmetSil(\'' + h.ad.replace(/'/g,"\'") + '\')" title="Kaldır">✕</button>' +
     '</div>';
   }).join('');
   secilenDiv.innerHTML = itemlerHTML;
@@ -1706,7 +1653,7 @@ function oHizmetGuncelle() {
   document.getElementById('o-fiyat').value = toplamFiyat;
   document.getElementById('o-fiyat-indirimli').textContent = toplamFiyat.toLocaleString('tr-TR') + '₺';
 
-  if (herhangiIndirimO) {
+  if (herhangiIndO) {
     document.getElementById('o-fiyat-normal').innerHTML = '<s style="color:var(--text3);font-size:.78rem;font-weight:400">' + toplamOrij.toLocaleString('tr-TR') + '₺</s>';
   } else {
     document.getElementById('o-fiyat-normal').textContent = '';
@@ -2526,17 +2473,38 @@ function formatTarihKisa(tarihStr) {
 }
 
 function kampanyaKontrol(tarih, prefix) {
+  // Artık sadece dropdown'da kullanılıyor. Güncelle fonksiyonları hizmetIndirimHesapla kullanır.
   var bas   = window._kampanyaBas   || '';
   var bit   = window._kampanyaBit   || '';
   var yuzde = window._indirimYuzde  || 0;
   var hedef = window._kampanyaHedef || 'ikisi';
+  var seciliIds = window._seciliHizmetIds || [];
   if (!yuzde) return 0;
-  // Hedef kontrolü
+  if (seciliIds.length > 0 || hedef === 'secili') return -1;
   if (prefix === 'o' && hedef === 'rezervasyon') return 0;
   if (prefix === 'n' && hedef === 'hizmet')      return 0;
-  if (!bas && !bit) return yuzde; // tarih yoksa her zaman aktif
+  if (!bas && !bit) return yuzde;
   if (!tarih) return 0;
   return tarih >= bas && tarih <= bit ? yuzde : 0;
+}
+
+// Her hizmet için gerçek indirim oranını döndürür
+function hizmetIndirimHesapla(hizObj, secilenTarih, prefix) {
+  var yuzde = window._indirimYuzde  || 0;
+  var hedef = window._kampanyaHedef || 'ikisi';
+  var seciliIds = (window._seciliHizmetIds || []).map(String);
+  var bas = window._kampanyaBas || '';
+  var bit = window._kampanyaBit || '';
+  if (!yuzde) return 0;
+  var tarihOk = (!bas && !bit) || (secilenTarih && secilenTarih >= bas && secilenTarih <= bit);
+  if (!tarihOk) return 0;
+  if (seciliIds.length > 0 || hedef === 'secili') {
+    if (!hizObj) return 0;
+    return seciliIds.includes(String(hizObj.id)) ? yuzde : 0;
+  }
+  if (prefix === 'n' && hedef === 'hizmet')      return 0;
+  if (prefix === 'o' && hedef === 'rezervasyon') return 0;
+  return yuzde;
 }
 
 function hizmetFiyatStr(min, max) {
