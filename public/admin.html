@@ -667,6 +667,23 @@ tbody td{padding:10px 13px;vertical-align:middle}
                 <input class="fi" id="indirim-input" type="number" min="0" max="100" placeholder="%" style="width:72px;text-align:center;font-size:1rem;font-weight:700;padding:6px 8px" oninput="indirimOnizlemeGuncelle(parseInt(this.value)||0)">
                 <span style="font-size:.65rem;color:var(--text3);white-space:nowrap">% indirim</span>
               </div>
+              <!-- Seçili hizmetler -->
+              <div>
+                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:7px 10px;border:1px solid var(--line2);border-radius:3px;user-select:none" id="secili-hiz-lbl">
+                  <input type="checkbox" id="secili-hiz-chk" style="accent-color:var(--black);width:14px;height:14px" onchange="seciliHizmetToggle()">
+                  <span style="font-size:.72rem;color:var(--text2)">🎯 <strong>Seçili hizmetlere</strong> uygula</span>
+                </label>
+                <div id="secili-hiz-panel" style="display:none;margin-top:6px;border:1px solid var(--line2);border-radius:3px;overflow:hidden">
+                  <div style="padding:7px 10px;background:var(--bg2);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between">
+                    <span style="font-size:.5rem;letter-spacing:.17em;text-transform:uppercase;color:var(--text3)">Hizmetler</span>
+                    <div style="display:flex;gap:6px">
+                      <button class="bsm bdet" style="font-size:.44rem;padding:3px 7px" onclick="seciliHizTumunu(true)">Tümünü Seç</button>
+                      <button class="bsm bdet" style="font-size:.44rem;padding:3px 7px" onclick="seciliHizTumunu(false)">Temizle</button>
+                    </div>
+                  </div>
+                  <div id="secili-hiz-liste" style="max-height:180px;overflow-y:auto;padding:6px 0"></div>
+                </div>
+              </div>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
                 <div><label style="font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:4px">Başlangıç</label>
                 <input class="fi" id="kampanya-baslangic" type="date" style="padding:7px 10px;font-size:.78rem"></div>
@@ -1298,15 +1315,18 @@ async function verileriYukle(showToast=true){
     const basAyar = (ayarData||[]).find(a=>a.key==='kampanya_baslangic');
     const bitAyar = (ayarData||[]).find(a=>a.key==='kampanya_bitis');
     const hedefAyar = (ayarData||[]).find(a=>a.key==='kampanya_hedef');
+    const seciliHizAyar = (ayarData||[]).find(a=>a.key==='kampanya_secili_hizmetler');
     const bas = basAyar ? basAyar.value : '';
     const bit = bitAyar ? bitAyar.value : '';
     const hedef = hedefAyar ? hedefAyar.value : 'ikisi';
+    const seciliHiz = seciliHizAyar ? seciliHizAyar.value : '';
     if(document.getElementById('kampanya-baslangic')) document.getElementById('kampanya-baslangic').value = bas||'';
     if(document.getElementById('kampanya-bitis')) document.getElementById('kampanya-bitis').value = bit||'';
     // Hedef radio'yu ayarla
     const khEl = document.getElementById('kh-'+hedef);
     if(khEl){ khEl.checked = true; kampanyaHedefDegisti(); }
-    kampanyaDurumGuncelle(indirimYuzde, bas, bit, hedef);
+    seciliHizmetleriYukle(seciliHiz);
+    kampanyaDurumGuncelle(indirimYuzde, bas, bit, hedef, seciliHiz);
     const inp = document.getElementById('indirim-input');
     if(inp) inp.value = indirimYuzde || '';
     indirimOnizlemeGuncelle(indirimYuzde);
@@ -2003,6 +2023,7 @@ async function indirimKaydet(){
   if(bas && bit && bas > bit){toast('Başlangıç tarihi bitiş tarihinden büyük olamaz.','hata');return;}
   const hedefEl = document.querySelector('input[name="kampanya-hedef"]:checked');
   const hedef = hedefEl ? hedefEl.value : 'ikisi';
+  const seciliHiz = seciliHizmetleriAl();
   try{
     await sRest('ayarlar?key=eq.indirim_yuzde',{method:'PATCH',body:JSON.stringify({value:String(yuzde)})});
     const upsert = async (key, val) => {
@@ -2014,8 +2035,9 @@ async function indirimKaydet(){
     await upsert('kampanya_baslangic', bas);
     await upsert('kampanya_bitis', bit);
     await upsert('kampanya_hedef', hedef);
+    await upsert('kampanya_secili_hizmetler', seciliHiz);
     indirimOnizlemeGuncelle(yuzde);
-    kampanyaDurumGuncelle(yuzde, bas, bit, hedef);
+    kampanyaDurumGuncelle(yuzde, bas, bit, hedef, seciliHiz);
     toast(yuzde===0?'İndirim kaldırıldı.':'%'+yuzde+' kampanya kaydedildi.','ok');
   }catch(e){toast('Hata: '+e.message,'hata');}
 }
@@ -2026,17 +2048,83 @@ async function kampanyaSil(){
     await sRest('ayarlar?key=eq.kampanya_baslangic',{method:'PATCH',body:JSON.stringify({value:''})});
     await sRest('ayarlar?key=eq.kampanya_bitis',{method:'PATCH',body:JSON.stringify({value:''})});
     await sRest('ayarlar?key=eq.kampanya_hedef',{method:'PATCH',body:JSON.stringify({value:'ikisi'})});
+    await sRest('ayarlar?key=eq.kampanya_secili_hizmetler',{method:'PATCH',body:JSON.stringify({value:''})});
     document.getElementById('indirim-input').value = '';
     document.getElementById('kampanya-baslangic').value = '';
     document.getElementById('kampanya-bitis').value = '';
     const khIkisi = document.getElementById('kh-ikisi');
     if(khIkisi){ khIkisi.checked = true; kampanyaHedefDegisti(); }
+    seciliHizmetleriYukle('');
     indirimOnizlemeGuncelle(0);
-    kampanyaDurumGuncelle(0,'','','ikisi');
+    kampanyaDurumGuncelle(0,'','','ikisi','');
     toast('Kampanya kaldırıldı.','ok');
   }catch(e){toast('Hata: '+e.message,'hata');}
 }
 
+function seciliHizmetToggle(){
+  const chk = document.getElementById('secili-hiz-chk');
+  const panel = document.getElementById('secili-hiz-panel');
+  const lbl = document.getElementById('secili-hiz-lbl');
+  if(chk.checked){
+    panel.style.display='';
+    lbl.style.borderColor='var(--black)';
+    lbl.style.background='rgba(0,0,0,.04)';
+    seciliHizListeRender();
+  } else {
+    panel.style.display='none';
+    lbl.style.borderColor='var(--line2)';
+    lbl.style.background='';
+  }
+}
+function seciliHizListeRender(){
+  const liste = document.getElementById('secili-hiz-liste');
+  if(!liste) return;
+  const seciliStr = liste.dataset.secili || '';
+  const secili = seciliStr ? seciliStr.split('||') : [];
+  liste.innerHTML = hizmetler.map(h=>{
+    const isChecked = secili.includes(String(h.id));
+    return `<label style="display:flex;align-items:center;gap:8px;padding:7px 12px;cursor:pointer;border-bottom:1px solid var(--line);transition:background .1s" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background=''">
+      <input type="checkbox" value="${h.id}" ${isChecked?'checked':''} style="accent-color:var(--black);width:13px;height:13px" onchange="seciliHizGuncelle()">
+      <span style="font-size:.72rem;color:var(--text);flex:1">${h.ad}</span>
+      <span style="font-size:.62rem;color:var(--text3)">${h.min!==h.max?h.min+'–'+h.max+'₺':h.min+'₺'}</span>
+    </label>`;
+  }).join('');
+}
+function seciliHizGuncelle(){
+  const liste = document.getElementById('secili-hiz-liste');
+  if(!liste) return;
+  const secili = [...liste.querySelectorAll('input[type=checkbox]:checked')].map(c=>c.value);
+  liste.dataset.secili = secili.join('||');
+}
+function seciliHizTumunu(sec){
+  const liste = document.getElementById('secili-hiz-liste');
+  if(!liste) return;
+  liste.querySelectorAll('input[type=checkbox]').forEach(c=>c.checked=sec);
+  seciliHizGuncelle();
+}
+function seciliHizmetleriAl(){
+  const chk = document.getElementById('secili-hiz-chk');
+  if(!chk || !chk.checked) return '';
+  const liste = document.getElementById('secili-hiz-liste');
+  if(!liste) return '';
+  const ids = (liste.dataset.secili||'') ? liste.dataset.secili.split('||') : [];
+  return JSON.stringify(ids);
+}
+function seciliHizmetleriYukle(val){
+  const chk = document.getElementById('secili-hiz-chk');
+  if(!chk) return;
+  let ids = [];
+  try{ ids = val ? JSON.parse(val) : []; }catch(e){ ids=[]; }
+  if(ids.length){
+    chk.checked = true;
+    const liste = document.getElementById('secili-hiz-liste');
+    if(liste) liste.dataset.secili = ids.join('||');
+    seciliHizmetToggle();
+  } else {
+    chk.checked = false;
+    seciliHizmetToggle();
+  }
+}
 function kampanyaHedefDegisti(){
   const hedefEl = document.querySelector('input[name="kampanya-hedef"]:checked');
   const hedef = hedefEl ? hedefEl.value : 'ikisi';
@@ -2053,18 +2141,19 @@ function kampanyaHedefDegisti(){
   });
 }
 
-function kampanyaDurumGuncelle(yuzde, bas, bit, hedef){
+function kampanyaDurumGuncelle(yuzde, bas, bit, hedef, seciliHiz){
   const el = document.getElementById('kampanya-durum');
   if(!el) return;
   if(!yuzde){ el.textContent=''; return; }
   const hedefMetin = hedef==='hizmet'?'Hizmet Al':hedef==='rezervasyon'?'Rezervasyon Yap':'Her İkisi';
+  const hizMetin = seciliHiz ? (' — <span style="color:var(--purple);font-size:.6rem">'+seciliHiz.split('||').length+' hizmet seçili</span>') : '';
   if(!bas || !bit){
-    el.innerHTML='<span style="color:var(--green);font-weight:600">✓ Aktif: </span>Süresiz %'+yuzde+' indirim <span style="color:var(--blue);font-size:.6rem">('+hedefMetin+')</span>';
+    el.innerHTML='<span style="color:var(--green);font-weight:600">✓ Aktif: </span>Süresiz %'+yuzde+' indirim <span style="color:var(--blue);font-size:.6rem">('+hedefMetin+')</span>'+hizMetin;
     return;
   }
   const b = new Date(bas).toLocaleDateString('tr-TR');
   const e = new Date(bit).toLocaleDateString('tr-TR');
-  el.innerHTML='<span style="color:var(--green);font-weight:600">✓ Aktif: </span>'+b+' – '+e+' arası %'+yuzde+' indirim <span style="color:var(--blue);font-size:.6rem">('+hedefMetin+')</span>';
+  el.innerHTML='<span style="color:var(--green);font-weight:600">✓ Aktif: </span>'+b+' – '+e+' arası %'+yuzde+' indirim <span style="color:var(--blue);font-size:.6rem">('+hedefMetin+')</span>'+hizMetin;
 }
 function indirimOnizlemeGuncelle(yuzde){
   const el=document.getElementById('indirim-onizleme');
