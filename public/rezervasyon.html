@@ -2190,7 +2190,7 @@ document.addEventListener('DOMContentLoaded', function() {
       var hedef = window._kampanyaHedef || 'ikisi';
       var goster = yuzde > 0 && (hedef === 'hizmet' || hedef === 'ikisi');
       if (badge) {
-        if (goster && ind > 0) { badge.textContent = '%' + yuzde + ' ' + (_t('rez_indirim') || 'İndirim'); badge.style.display = ''; }
+        if (goster && ind > 0) { badge.textContent = '%' + yuzde + ' ' + 'İndirim'; badge.style.display = ''; }
         else { badge.style.display = 'none'; }
       }
       // Seçili hizmet varsa fiyat kutusunu güncelle
@@ -2225,7 +2225,7 @@ document.addEventListener('DOMContentLoaded', function() {
       var hedef = window._kampanyaHedef || 'ikisi';
       var goster = yuzde > 0 && (hedef === 'rezervasyon' || hedef === 'ikisi');
       if (badge) {
-        if (goster && ind > 0) { badge.textContent = '%' + yuzde + ' ' + (_t('rez_indirim') || 'İndirim'); badge.style.display = ''; }
+        if (goster && ind > 0) { badge.textContent = '%' + yuzde + ' ' + 'İndirim'; badge.style.display = ''; }
         else { badge.style.display = 'none'; }
       }
       // Seçili hizmet varsa fiyat kutusunu güncelle
@@ -2369,8 +2369,8 @@ document.addEventListener('DOMContentLoaded', function() {
       const hizInd = (kampanyaHedef === 'hizmet' || kampanyaHedef === 'ikisi') ? (window._indirimYuzde || 0) : 0;
       const rezInd = (kampanyaHedef === 'rezervasyon' || kampanyaHedef === 'ikisi') ? (window._indirimYuzde || 0) : 0;
       // secili modunda per-hizmet indirim hizmetDropdownOlustur içinde hesaplanıyor
-      hizmetDropdownOlustur('n', window._hizmetListesi, kampanyaHedef === 'secili' ? 0 : rezInd);
-      hizmetDropdownOlustur('o', window._hizmetListesi, kampanyaHedef === 'secili' ? 0 : hizInd);
+      hizmetDropdownOlustur('n', window._hizmetListesi, kampanyaHedef === 'secili' ? -1 : rezInd);
+      hizmetDropdownOlustur('o', window._hizmetListesi, kampanyaHedef === 'secili' ? -1 : hizInd);
     }
   });
 });
@@ -2421,7 +2421,7 @@ async function hizmetleriYukle() {
     var odeIBadge = document.getElementById('odeme-indirim-badge');
     var odeTBadge = document.getElementById('odeme-tarih-badge');
     if (odeIBadge) {
-      if (hizmetAlAktif) { odeIBadge.textContent = '%' + indirimYuzde + ' ' + (_t('rez_indirim') || 'İndirim'); odeIBadge.style.display = ''; }
+      if (hizmetAlAktif) { odeIBadge.textContent = '%' + indirimYuzde + ' ' + 'İndirim'; odeIBadge.style.display = ''; }
       else { odeIBadge.style.display = 'none'; }
     }
     if (odeTBadge) {
@@ -2434,7 +2434,7 @@ async function hizmetleriYukle() {
     var norIBadge = document.getElementById('normal-indirim-badge');
     var norTBadge = document.getElementById('normal-tarih-badge');
     if (norIBadge) {
-      if (rezAktif) { norIBadge.textContent = '%' + indirimYuzde + ' ' + (_t('rez_indirim') || 'İndirim'); norIBadge.style.display = ''; }
+      if (rezAktif) { norIBadge.textContent = '%' + indirimYuzde + ' ' + 'İndirim'; norIBadge.style.display = ''; }
       else { norIBadge.style.display = 'none'; }
     }
     if (norTBadge) {
@@ -2445,6 +2445,7 @@ async function hizmetleriYukle() {
     // ── Hizmet dropdown indirim oranları ──
     var hizmetAlInd   = (kampanyaHedef === 'hizmet'      || kampanyaHedef === 'ikisi') ? efektifIndirim : 0;
     var normalRezInd  = (kampanyaHedef === 'rezervasyon' || kampanyaHedef === 'ikisi') ? efektifIndirim : 0;
+    if (kampanyaHedef === 'secili') { hizmetAlInd = -1; normalRezInd = -1; }
 
     window._hizmetListesi = liste;
     hizmetDropdownOlustur('n', liste, normalRezInd);
@@ -2498,12 +2499,11 @@ function hizmetDropdownOlustur(prefix, liste, indirimYuzde = 0) {
 
     // Seçili hizmetler modunda: sadece seçili hizmetlere indirim uygula
     let hizmetInd = indirimYuzde;
-    if (kampanyaHedef === 'secili') {
-      hizmetInd = seciliIds.includes(h.id) ? (window._indirimYuzde || 0) : 0;
-      // Tarih kontrolü
+    if (indirimYuzde === -1) {
       const bugunStr = new Date().toISOString().split('T')[0];
       const bas = window._kampanyaBas || '', bit = window._kampanyaBit || '';
-      if (bas && bit && !(bugunStr >= bas && bugunStr <= bit)) hizmetInd = 0;
+      const tarihOk = (!bas && !bit) || (bugunStr >= bas && bugunStr <= bit);
+      hizmetInd = (tarihOk && seciliIds.includes(h.id)) ? (window._indirimYuzde || 0) : 0;
     }
 
     if (hizmetInd > 0) {
@@ -2512,7 +2512,7 @@ function hizmetDropdownOlustur(prefix, liste, indirimYuzde = 0) {
       const eskiStr = hizmetFiyatStr(minFiyat, maxFiyat);
       const yeniStr = hizmetFiyatStr(indMin, indMax);
 
-      const indirimLbl = (window.i18n && window.i18n.t('rez_indirim') !== 'rez_indirim' && window.i18n.t('rez_indirim')) || 'İndirim';
+      const indirimLbl = 'İndirim';
       if (prefix === 'n') {
         return `<div class="cs-option" data-hizmet-ad="${h.ad.replace(/"/g,'&quot;')}" onclick="${fn}(this,'${trAdSafe}',${indMin},${indMax},${sure})">
           <span class="cs-ad">${gorununAd} <span style="font-size:.6rem;background:#c8a96e22;color:#c8a96e;border:1px solid #c8a96e44;border-radius:8px;padding:1px 7px;font-weight:600">%${hizmetInd} ${indirimLbl}</span></span>

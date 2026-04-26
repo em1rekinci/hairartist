@@ -667,7 +667,6 @@ tbody td{padding:10px 13px;vertical-align:middle}
                   </label>
                 </div>
               </div>
-              <!-- Seçili Hizmet Paneli -->
               <div id="secili-hizmet-panel" style="display:none;flex-direction:column;gap:6px">
                 <label style="font-size:.5rem;letter-spacing:.17em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:2px">İndirim Uygulanacak Hizmetler</label>
                 <div id="secili-hizmet-listesi" style="display:flex;flex-direction:column;gap:4px;max-height:180px;overflow-y:auto;border:1px solid var(--line2);border-radius:4px;padding:6px"></div>
@@ -1131,7 +1130,7 @@ tbody td{padding:10px 13px;vertical-align:middle}
 const SUPA_URL='https://botxnihztrnwzjnrlwzv.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvdHhuaWh6dHJud3pqbnJsd3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MTg4MTAsImV4cCI6MjA5MDA5NDgxMH0.AcX4_2Aykf8J1jln9fvODh2rRffymfEJCAekzmN1ALg';
 const CLAUDE_KEY = (typeof process !== 'undefined' && process.env && process.env.claude) ? process.env.claude : '';
-var ADMIN_SIFRE='fatihkurt341905.';
+var ADMIN_SIFRE='';
 
 // UTC string'i yerel tarihe çevir (Türkiye +3 için)
 function utcToLocalDateStr(str){
@@ -1279,7 +1278,6 @@ async function sifreDegistir(){
     // Yeni şifreyi kaydet
     await sRest('ayarlar?key=eq.admin_sifre',{method:'PATCH',body:JSON.stringify({value:yeni})});
     SFR = yeni;
-    DS = yeni;
     msg.style.color='var(--green)';
     msg.textContent='✓ Şifre başarıyla güncellendi.';
     document.getElementById('ay-eski-sifre').value='';
@@ -2068,13 +2066,8 @@ function kampanyaHedefDegisti(){
   ['ikisi','hizmet','rezervasyon','secili'].forEach(h=>{
     const lbl = document.getElementById('hlbl-'+h);
     if(!lbl) return;
-    if(hedef===h){
-      lbl.style.borderColor='var(--black)';
-      lbl.style.background='rgba(0,0,0,.04)';
-    } else {
-      lbl.style.borderColor='var(--line2)';
-      lbl.style.background='';
-    }
+    if(hedef===h){ lbl.style.borderColor='var(--black)'; lbl.style.background='rgba(0,0,0,.04)'; }
+    else { lbl.style.borderColor='var(--line2)'; lbl.style.background=''; }
   });
   const panel = document.getElementById('secili-hizmet-panel');
   if(panel){
@@ -2086,10 +2079,7 @@ function kampanyaHedefDegisti(){
 function seciliHizmetListesiRender(){
   const konteyner = document.getElementById('secili-hizmet-listesi');
   if(!konteyner) return;
-  if(!hizmetler || !hizmetler.length){
-    konteyner.innerHTML='<span style="font-size:.65rem;color:var(--text3);padding:4px">Henüz hizmet eklenmemiş.</span>';
-    return;
-  }
+  if(!hizmetler || !hizmetler.length){ konteyner.innerHTML='<span style="font-size:.65rem;color:var(--text3);padding:4px">Henüz hizmet eklenmemiş.</span>'; return; }
   const seciliIds = window._seciliHizmetIds || [];
   konteyner.innerHTML = hizmetler.map(h=>{
     const secili = seciliIds.includes(h.id);
@@ -2120,8 +2110,6 @@ function seciliHizmetOzetGuncelle(){
   const adlar = hizmetler.filter(h=>ids.includes(h.id)).map(h=>h.ad);
   el.textContent = adlar.length+' hizmet seçildi: '+adlar.join(', ');
 }
-
-
 
 function kampanyaDurumGuncelle(yuzde, bas, bit, hedef, seciliIds){
   const el = document.getElementById('kampanya-durum');
