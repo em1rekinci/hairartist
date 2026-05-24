@@ -1669,6 +1669,35 @@ function oHizmetGuncelle() {
 const SUPABASE_URL = 'https://botxnihztrnwzjnrlwzv.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvdHhuaWh6dHJud3pqbnJsd3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MTg4MTAsImV4cCI6MjA5MDA5NDgxMH0.AcX4_2Aykf8J1jln9fvODh2rRffymfEJCAekzmN1ALg';
 
+// ── KAPALI GÜN AYARI (Supabase'den, cache'li) ────────────────────────────
+var _kapaliGunCache = null;
+var _kapaliGunCacheTs = 0;
+async function kapaliGunAyariniAl() {
+  // 5 dakika cache — aynı sayfada defalarca sorgu yapmasın
+  var simdi = Date.now();
+  if (_kapaliGunCache && (simdi - _kapaliGunCacheTs) < 5 * 60 * 1000) {
+    return _kapaliGunCache;
+  }
+  try {
+    var res = await fetch(SUPABASE_URL + '/rest/v1/ayarlar?key=eq.kapali_gunler_config&select=value', {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+    });
+    var arr = await res.json();
+    if (arr && arr.length && arr[0].value) {
+      _kapaliGunCache = JSON.parse(arr[0].value);
+    } else {
+      // Ayar yoksa varsayılan: Salı kapalı
+      _kapaliGunCache = { kapali_gunler: [2], istisnalar: [] };
+    }
+  } catch(e) {
+    // Hata durumunda varsayılan
+    _kapaliGunCache = { kapali_gunler: [2], istisnalar: [] };
+  }
+  _kapaliGunCacheTs = Date.now();
+  return _kapaliGunCache;
+}
+// ─────────────────────────────────────────────────────────────────────────
+
 // ── WHATSAPP CONFIG
 const WA_PHONE_ID = '1018603338011115'; // 
 const WA_TOKEN    = 'EAAbpYZAirSdQBRP6ZCU2fCZAN5EKxj3x9d6CIqjMcBAEZBLPAuHaQ1wcomC7NEpdLQfCNzbrdFLgmOuLVNBGQQpwZCp73lm5gfkV2tSzqvkZCS81X8CvSxu513VMYjxhS1yTK1ldFbJzXtPygPWp4ZB1AG2ZBSKhT2KUvd38owytNXr2fX2CJZCBSGaqk4LLe5CU2MwZDZD'; // 
@@ -2278,11 +2307,20 @@ async function saatleriGuncelle(prefix) {
   var suAnSaat = simdi.getHours();
   var personelId = document.getElementById(prefix + '-personel').value;
 
-  // Salı günü kontrolü (0=Pazar, 1=Pazartesi, 2=Salı, ...)
-  var saliMi = false;
+  // Kapalı gün kontrolü — Supabase ayarından dinamik olarak gelir
+  var kapaliMi = false;
   if (tarih) {
+    var ayar = await kapaliGunAyariniAl();
     var secilenGun = new Date(tarih + 'T00:00:00').getDay();
-    saliMi = (secilenGun === 2);
+    // İstisna var mı kontrol et
+    var istisna = ayar.istisnalar.find(function(x){ return x.tarih === tarih; });
+    if (istisna) {
+      // İstisna varsa: 'acik' ise açık, 'kapali' ise kapalı
+      kapaliMi = (istisna.durum === 'kapali');
+    } else {
+      // İstisna yoksa haftalık kapalı gün listesine bak
+      kapaliMi = ayar.kapali_gunler.includes(secilenGun);
+    }
   }
 
   // Supabase'den dolu saatleri çek
@@ -2295,15 +2333,15 @@ async function saatleriGuncelle(prefix) {
     var gecmisMi = bugunMu && saatInt <= suAnSaat;
     var doluMu = doluSaatler.includes(saatStr);
 
-    if (gecmisMi || doluMu || saliMi) {
+    if (gecmisMi || doluMu || kapaliMi) {
       btn.disabled = true;
       btn.classList.remove('selected');
-      btn.style.opacity = saliMi ? '.2' : (doluMu ? '.35' : '.2');
+      btn.style.opacity = kapaliMi ? '.2' : (doluMu ? '.35' : '.2');
       btn.style.cursor = 'not-allowed';
       btn.style.textDecoration = 'line-through';
       var _t = window.i18n && window.i18n.t.bind(window.i18n);
-      btn.title = saliMi
-        ? ((_t && _t('rez_sali_kapali')) || 'Salı günleri kapalıyız')
+      btn.title = kapaliMi
+        ? ((_t && _t('rez_sali_kapali')) || 'Bu gün salonumuz kapalıdır')
         : (doluMu
           ? ((_t && _t('rez_saat_dolu')) || 'Bu saat dolu')
           : ((_t && _t('rez_gecmis_saat')) || 'Geçmiş saat'));
@@ -2316,16 +2354,16 @@ async function saatleriGuncelle(prefix) {
     }
   });
 
-  // Salı ise tarih alanının altında uyarı göster
+  // Kapalı ise tarih alanının altında uyarı göster
   var formEl = document.getElementById(formId);
   var mevcutUyari = formEl ? formEl.querySelector('.sali-uyari') : null;
-  if (saliMi) {
+  if (kapaliMi) {
     if (!mevcutUyari) {
       var uyari = document.createElement('p');
       uyari.className = 'sali-uyari';
       uyari.style.cssText = 'color:#e57373;font-size:.75rem;letter-spacing:.05em;margin-top:6px;';
       uyari.setAttribute('data-i18n','rez_sali_uyari');
-      uyari.textContent = (window.i18n && window.i18n.t('rez_sali_uyari')) || '⚠ Salı günleri salonumuz kapalıdır. Lütfen farklı bir gün seçin.';
+      uyari.textContent = (window.i18n && window.i18n.t('rez_sali_uyari')) || '⚠ Bu gün salonumuz kapalıdır. Lütfen farklı bir gün seçin.';
       tarihEl.parentElement.appendChild(uyari);
     }
   } else {

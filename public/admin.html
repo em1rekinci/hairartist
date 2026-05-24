@@ -961,7 +961,51 @@ tbody td{padding:10px 13px;vertical-align:middle}
         <h2 style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700">Ayarlar</h2>
         <p style="font-size:.7rem;color:var(--text3);margin-top:3px">Yönetici paneli ayarları</p>
       </div>
-      <div style="max-width:420px">
+      <div style="max-width:420px;display:flex;flex-direction:column;gap:16px">
+
+        <!-- KAPALI GÜNLER KARTI -->
+        <div class="card"><div class="ch"><h3>📅 Kapalı Günler</h3></div><div class="cb">
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <p style="font-size:.68rem;color:var(--text3);margin:0">Hangi günlerin varsayılan olarak kapalı olduğunu ayarlayın. İstisna tarihler ekleyerek kapalı günü açabilir veya açık günü kapatabilirsiniz.</p>
+
+            <!-- Haftalık gün toggle'ları -->
+            <div style="display:flex;flex-direction:column;gap:8px" id="gun-toggle-listesi">
+              <!-- JS ile doldurulur -->
+            </div>
+
+            <hr style="border:none;border-top:1px solid var(--line);margin:4px 0">
+
+            <!-- İstisna tarih ekleme -->
+            <div>
+              <label class="fl" style="margin-bottom:8px">📌 İstisna Tarih Ekle</label>
+              <p style="font-size:.63rem;color:var(--text3);margin:0 0 10px">Kapalı bir güne istisna ekle (o tarih açık olur) ya da açık bir güne istisna ekle (o tarih kapalı olur).</p>
+              <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
+                <div class="ff" style="flex:1;min-width:130px">
+                  <label class="fl">Tarih</label>
+                  <input class="fi" type="date" id="istisna-tarih" style="background:var(--bg);border:1px solid var(--line2)">
+                </div>
+                <div class="ff" style="flex:1;min-width:120px">
+                  <label class="fl">Durum</label>
+                  <select class="fsel" id="istisna-durum" style="background:var(--bg);border:1px solid var(--line2)">
+                    <option value="acik">Bu gün AÇIK</option>
+                    <option value="kapali">Bu gün KAPALI</option>
+                  </select>
+                </div>
+                <button class="sbtn" style="padding:8px 14px;white-space:nowrap" onclick="istisnaEkle()">+ Ekle</button>
+              </div>
+            </div>
+
+            <!-- İstisna listesi -->
+            <div id="istisna-liste" style="display:flex;flex-direction:column;gap:6px">
+              <!-- JS ile doldurulur -->
+            </div>
+
+            <button class="sbtn" onclick="kapaliGunleriKaydet()">Kaydet</button>
+            <div id="kapali-gun-msg" style="font-size:.68rem;min-height:16px"></div>
+          </div>
+        </div></div>
+
+        <!-- ŞİFRE KARTI -->
         <div class="card"><div class="ch"><h3>🔒 Şifre Değiştir</h3></div><div class="cb">
           <div style="display:flex;flex-direction:column;gap:12px">
             <p style="font-size:.68rem;color:var(--text3);margin:0">Mevcut şifrenizi girin, ardından yeni şifrenizi belirleyin.</p>
@@ -981,6 +1025,7 @@ tbody td{padding:10px 13px;vertical-align:middle}
             <button class="sbtn" onclick="sifreDegistir()">Şifreyi Güncelle</button>
           </div>
         </div></div>
+
       </div>
     </div>
 
@@ -1262,6 +1307,109 @@ function panelAc(){
   setTimeout(()=>{ge.style.display='none';document.getElementById('panel').style.display='block';panelBaslat();},400);
 }
 function cikisYap(){SFR='';TRZ=[];document.getElementById('panel').style.display='none';const ge=document.getElementById('ge');ge.style.display='flex';ge.style.opacity='1';document.getElementById('sifre-inp').value='';document.getElementById('ghata').style.display='none';}
+
+// ─── KAPALI GÜNLER YÖNETİMİ ───────────────────────────────────────────────
+const GUN_ADLARI = ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
+// Varsayılan: Salı (index 2) kapalı
+let kapaliGunler = { kapali_gunler: [2], istisnalar: [] };
+
+async function kapaliGunleriYukle() {
+  try {
+    const arr = await sRest('ayarlar?key=eq.kapali_gunler_config&select=value');
+    if (arr && arr.length && arr[0].value) {
+      kapaliGunler = JSON.parse(arr[0].value);
+    }
+  } catch(e) {}
+  gunToggleRender();
+  istisnaListeRender();
+}
+
+function gunToggleRender() {
+  const liste = document.getElementById('gun-toggle-listesi');
+  if (!liste) return;
+  liste.innerHTML = '';
+  [1,2,3,4,5,6,0].forEach(function(i) { // Pzt'den başla, Paz sona
+    const kapali = kapaliGunler.kapali_gunler.includes(i);
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border:1px solid var(--line);border-radius:6px;';
+    row.innerHTML = `
+      <span style="font-size:.8rem;color:var(--text)">${GUN_ADLARI[i]}</span>
+      <label style="display:flex;align-items:center;gap:7px;cursor:pointer">
+        <span style="font-size:.7rem;color:${kapali?'var(--red)':'var(--green)'}" id="gun-lbl-${i}">${kapali?'Kapalı':'Açık'}</span>
+        <div onclick="gunToggle(${i})" id="gun-sw-${i}" style="width:36px;height:20px;border-radius:10px;background:${kapali?'var(--red,#e57373)':'var(--green,#81c784)'};position:relative;cursor:pointer;transition:background .2s">
+          <div style="width:16px;height:16px;border-radius:50%;background:#fff;position:absolute;top:2px;${kapali?'left:2px':'left:18px'};transition:left .2s" id="gun-sw-knob-${i}"></div>
+        </div>
+      </label>`;
+    liste.appendChild(row);
+  });
+}
+
+function gunToggle(i) {
+  const idx = kapaliGunler.kapali_gunler.indexOf(i);
+  if (idx > -1) kapaliGunler.kapali_gunler.splice(idx, 1);
+  else kapaliGunler.kapali_gunler.push(i);
+  gunToggleRender();
+}
+
+function istisnaListeRender() {
+  const el = document.getElementById('istisna-liste');
+  if (!el) return;
+  const liste = kapaliGunler.istisnalar || [];
+  if (!liste.length) { el.innerHTML = '<p style="font-size:.68rem;color:var(--text3);margin:0">Henüz istisna eklenmedi.</p>'; return; }
+  el.innerHTML = '';
+  liste.sort((a,b)=>a.tarih.localeCompare(b.tarih)).forEach(function(ist, idx) {
+    const d = new Date(ist.tarih + 'T00:00:00');
+    const gunAdi = GUN_ADLARI[d.getDay()];
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border:1px solid var(--line);border-radius:5px;font-size:.74rem;';
+    row.innerHTML = `
+      <span>${ist.tarih} <span style="color:var(--text3)">(${gunAdi})</span></span>
+      <span style="display:flex;align-items:center;gap:8px">
+        <span style="color:${ist.durum==='acik'?'var(--green)':'var(--red)'};font-weight:600">${ist.durum==='acik'?'✓ Açık':'✕ Kapalı'}</span>
+        <button onclick="istisnaSil(${idx})" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:.9rem;padding:0 2px" title="Sil">✕</button>
+      </span>`;
+    el.appendChild(row);
+  });
+}
+
+function istisnaEkle() {
+  const tarih = document.getElementById('istisna-tarih').value;
+  const durum = document.getElementById('istisna-durum').value;
+  if (!tarih) { toast('Lütfen bir tarih seçin.','err'); return; }
+  if (!kapaliGunler.istisnalar) kapaliGunler.istisnalar = [];
+  const var_ = kapaliGunler.istisnalar.find(x=>x.tarih===tarih);
+  if (var_) { var_.durum = durum; }
+  else kapaliGunler.istisnalar.push({tarih, durum});
+  document.getElementById('istisna-tarih').value = '';
+  istisnaListeRender();
+}
+
+function istisnaSil(idx) {
+  kapaliGunler.istisnalar.splice(idx,1);
+  istisnaListeRender();
+}
+
+async function kapaliGunleriKaydet() {
+  const msg = document.getElementById('kapali-gun-msg');
+  msg.textContent = 'Kaydediliyor...';
+  msg.style.color = 'var(--text3)';
+  try {
+    const val = JSON.stringify(kapaliGunler);
+    const check = await sRest('ayarlar?key=eq.kapali_gunler_config&select=key');
+    if (check && check.length) {
+      await sRest('ayarlar?key=eq.kapali_gunler_config', {method:'PATCH', body:JSON.stringify({value:val})});
+    } else {
+      await sRest('ayarlar', {method:'POST', body:JSON.stringify({key:'kapali_gunler_config', value:val})});
+    }
+    msg.textContent = '✓ Kapalı gün ayarları kaydedildi.';
+    msg.style.color = 'var(--green)';
+    toast('Kapalı gün ayarları güncellendi.','ok');
+  } catch(e) {
+    msg.textContent = '✗ Hata: ' + e.message;
+    msg.style.color = 'var(--red)';
+  }
+}
+// ──────────────────────────────────────────────────────────────────────────
 
 async function sifreDegistir(){
   const eski = document.getElementById('ay-eski-sifre').value.trim();
@@ -2892,6 +3040,7 @@ function sayfaGec(sayfa,navEl){
   if(sayfa==='personel'){pListRender();pStatRender();}
   if(sayfa==='ciro')ciroRender();
   if(sayfa==='portfolio')portRender();
+  if(sayfa==='ayarlar')kapaliGunleriYukle();
 }
 
 // ─── PORTFOLİO ───
