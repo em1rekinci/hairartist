@@ -2309,9 +2309,10 @@ async function saatleriGuncelle(prefix) {
 
   // Kapalı gün kontrolü — Supabase ayarından dinamik olarak gelir
   var kapaliMi = false;
+  var secilenGun = -1;
   if (tarih) {
     var ayar = await kapaliGunAyariniAl();
-    var secilenGun = new Date(tarih + 'T00:00:00').getDay();
+    secilenGun = new Date(tarih + 'T00:00:00').getDay();
     // İstisna var mı kontrol et
     var istisna = ayar.istisnalar.find(function(x){ return x.tarih === tarih; });
     if (istisna) {
@@ -2340,8 +2341,11 @@ async function saatleriGuncelle(prefix) {
       btn.style.cursor = 'not-allowed';
       btn.style.textDecoration = 'line-through';
       var _t = window.i18n && window.i18n.t.bind(window.i18n);
+      var kapaliTitle = secilenGun === 2
+        ? ((_t && _t('rez_sali_kapali')) || 'Salı günleri kapalıyız')
+        : 'Seçtiğiniz gün salonumuz kapalıdır';
       btn.title = kapaliMi
-        ? ((_t && _t('rez_sali_kapali')) || 'Bu gün salonumuz kapalıdır')
+        ? kapaliTitle
         : (doluMu
           ? ((_t && _t('rez_saat_dolu')) || 'Bu saat dolu')
           : ((_t && _t('rez_gecmis_saat')) || 'Geçmiş saat'));
@@ -2358,13 +2362,18 @@ async function saatleriGuncelle(prefix) {
   var formEl = document.getElementById(formId);
   var mevcutUyari = formEl ? formEl.querySelector('.sali-uyari') : null;
   if (kapaliMi) {
+    var kapaliUyariMetni = secilenGun === 2
+      ? ((window.i18n && window.i18n.t('rez_sali_uyari')) || '⚠ Salı günleri salonumuz kapalıdır. Lütfen farklı bir gün seçin.')
+      : '⚠ Seçtiğiniz gün salonumuz kapalıdır. Lütfen farklı bir gün seçin.';
     if (!mevcutUyari) {
       var uyari = document.createElement('p');
       uyari.className = 'sali-uyari';
       uyari.style.cssText = 'color:#e57373;font-size:.75rem;letter-spacing:.05em;margin-top:6px;';
       uyari.setAttribute('data-i18n','rez_sali_uyari');
-      uyari.textContent = (window.i18n && window.i18n.t('rez_sali_uyari')) || '⚠ Bu gün salonumuz kapalıdır. Lütfen farklı bir gün seçin.';
+      uyari.textContent = kapaliUyariMetni;
       tarihEl.parentElement.appendChild(uyari);
+    } else {
+      mevcutUyari.textContent = kapaliUyariMetni;
     }
   } else {
     if (mevcutUyari) mevcutUyari.remove();
