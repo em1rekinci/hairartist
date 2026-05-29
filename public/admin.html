@@ -746,7 +746,8 @@ tbody td{padding:10px 13px;vertical-align:middle}
       <div class="sgrid" style="margin-bottom:14px">
         <div class="sc g"><div class="sct"></div><span class="slbl2">Toplam Ciro</span><div class="sval g" id="c-toplam">—</div><div class="ssub" id="c-toplam-sub">Seçili dönem</div></div>
         <div class="sc b"><div class="sct"></div><span class="slbl2">💵 Nakit</span><div class="sval b" id="c-nakit">—</div><div class="ssub">Nakit ödemeler</div></div>
-        <div class="sc y"><div class="sct"></div><span class="slbl2">💳 Kart</span><div class="sval y" id="c-kart">—</div><div class="ssub">Kart ödemeleri</div></div>
+        <div class="sc y"><div class="sct"></div><span class="slbl2">💳 Kart (Online)</span><div class="sval y" id="c-kart">—</div><div class="ssub">Online rezervasyon kartı</div></div>
+        <div class="sc" style="background:var(--ybg,#fffde7);border-color:var(--ybdr,#ffe082)"><div class="sct"></div><span class="slbl2">🚶 Rezervasyonsuz</span><div class="sval" style="color:var(--yellow)" id="c-walkin">—</div><div class="ssub">Walk-in ciro</div></div>
         <div class="sc g"><div class="sct"></div><span class="slbl2">İşlem Sayısı</span><div class="sval" id="c-sayi">—</div><div class="ssub" id="c-sayi-sub">Ödeme alınan</div></div>
       </div>
 
@@ -2907,7 +2908,7 @@ async function ekstraCiroKaydet() {
 
 function ciroRender(){
   const {bas,bit}=ciroPeriyotAralik(CIRO_PERIYOT);
-  // Hizmet rezervasyonları (shop hariç — walk_in dahil)
+  // Hizmet rezervasyonları (shop hariç — walk_in dahil, tip korunur)
   let hizOdemeler=TRZ.filter(r=>{
     if(r.tip==='shop')return false;
     if(!r.odemeAlindi||r.durum!=='onaylandi')return false;
@@ -2915,7 +2916,7 @@ function ciroRender(){
     if(!tarihStr)return false;
     const t=new Date(tarihStr+'T12:00');
     return t>=bas&&t<=bit;
-  }).map(r=>({...r,tip:'hizmet'}));
+  });
   // Shop siparişleri
   let shopOdemeler=SIPARISLER.filter(r=>{
     const tarihStr=(r.tarih||'').substring(0,10);
@@ -2933,11 +2934,16 @@ function ciroRender(){
 
   const toplam=odemeler.reduce((s,r)=>s+fHesapla(r),0);
   const nakit=odemeler.filter(r=>(r.odemeYontemi||'nakit')==='nakit').reduce((s,r)=>s+fHesapla(r),0);
-  const kart=odemeler.filter(r=>r.odemeYontemi==='kart').reduce((s,r)=>s+fHesapla(r),0);
+  // Kart (Online): walk_in olmayan kart ödemeleri
+  const kart=odemeler.filter(r=>r.odemeYontemi==='kart'&&r.tip!=='walk_in').reduce((s,r)=>s+fHesapla(r),0);
+  // Rezervasyonsuz (walk_in): tüm ödeme yöntemleri
+  const walkin=odemeler.filter(r=>r.tip==='walk_in').reduce((s,r)=>s+fHesapla(r),0);
 
   document.getElementById('c-toplam').textContent=toplam.toLocaleString('tr-TR')+'₺';
   document.getElementById('c-nakit').textContent=nakit.toLocaleString('tr-TR')+'₺';
   document.getElementById('c-kart').textContent=kart.toLocaleString('tr-TR')+'₺';
+  const walkinEl=document.getElementById('c-walkin');
+  if(walkinEl) walkinEl.textContent=walkin.toLocaleString('tr-TR')+'₺';
   document.getElementById('c-sayi').textContent=odemeler.length;
 
   const bas_inp=document.getElementById('ciro-bas-inp')?.value||'';

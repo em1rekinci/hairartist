@@ -2466,7 +2466,7 @@ async function hizmetleriYukle() {
       : '';
 
     // ── Hizmet Al kartı (odeme) ──
-    var hizmetAlAktif = indirimYuzde > 0 && (kampanyaHedef === 'hizmet' || kampanyaHedef === 'ikisi' || kampanyaHedef === 'secili');
+    var hizmetAlAktif = efektifIndirim > 0 && (kampanyaHedef === 'hizmet' || kampanyaHedef === 'ikisi' || kampanyaHedef === 'secili');
     var odeIBadge = document.getElementById('odeme-indirim-badge');
     var odeTBadge = document.getElementById('odeme-tarih-badge');
     if (odeIBadge) {
@@ -2479,7 +2479,7 @@ async function hizmetleriYukle() {
     }
 
     // ── Rezervasyon Yap kartı (normal) ──
-    var rezAktif = indirimYuzde > 0 && (kampanyaHedef === 'rezervasyon' || kampanyaHedef === 'ikisi' || kampanyaHedef === 'secili');
+    var rezAktif = efektifIndirim > 0 && (kampanyaHedef === 'rezervasyon' || kampanyaHedef === 'ikisi' || kampanyaHedef === 'secili');
     var norIBadge = document.getElementById('normal-indirim-badge');
     var norTBadge = document.getElementById('normal-tarih-badge');
     if (norIBadge) {
