@@ -1,0 +1,2749 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rezervasyon — Fatih Kurt Hair Artist</title>
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Hair Artist">
+<meta name="theme-color" content="#080808">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="favicondark.png" media="(prefers-color-scheme: light)">
+<link rel="icon" href="favicon.png" media="(prefers-color-scheme: dark)">
+<link rel="apple-touch-icon" href="favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<script src="/i18n.js" defer></script>
+<link rel="stylesheet" href="style.css">
+<style>
+.rez-page { min-height: 100vh; background: var(--black); padding-top: 70px; }
+
+/* ── SEÇİM EKRANI ── */
+.rez-secim {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 70px);
+  padding: 60px 24px;
+}
+.rez-secim-baslik {
+  text-align: center;
+  margin-bottom: 60px;
+}
+.rez-secim-baslik .sec-tag { color: #f7f4ef; }
+.rez-secim-baslik h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  font-weight: 700;
+  color: var(--off);
+  margin-top: 12px;
+  line-height: 1.1;
+}
+.rez-secim-baslik h1 em {
+  font-style: italic;
+  font-weight: 400;
+  color: #f7f4ef;
+}
+.rez-secim-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  width: 100%;
+  max-width: 860px;
+}
+.rez-kart {
+  background: #111;
+  border: 1px solid #1e1e1e;
+  padding: 48px 40px;
+  cursor: pointer;
+  transition: background .2s, border-color .2s;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.rez-kart:hover { background: #161616; border-color: #333; }
+.rez-kart.odeme { border-color: rgba(255,223,0,.15); }
+.rez-kart.odeme:hover { background: rgba(255,223,0,.04); border-color: rgba(255,223,0,.35); }
+.rez-kart-no {
+  font-size: .6rem;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: #f7f4ef;
+  font-weight: 600;
+}
+.rez-kart.odeme .rez-kart-no { color: #ffdf00; }
+.rez-kart h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--off);
+  line-height: 1.15;
+}
+.rez-kart h2 em {
+  font-style: italic;
+  font-weight: 400;
+  color: #f7f4ef;
+  display: block;
+  font-size: 1.1rem;
+}
+.rez-kart p {
+  font-size: .8rem;
+  line-height: 1.85;
+  color: #f7f4ef;
+}
+.rez-kart-ozellik {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+.rez-oz-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: .72rem;
+  color: #f7f4ef;
+}
+.rez-oz-item::before {
+  content: '';
+  width: 4px;
+  height: 4px;
+  background: rgba(247,244,239,.6);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.rez-kart.odeme .rez-oz-item::before { background: rgba(255,223,0,.5); }
+.rez-kart-btn {
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: .62rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: #f7f4ef;
+  padding-top: 20px;
+  border-top: 1px solid #1e1e1e;
+  transition: color .2s;
+}
+.rez-kart:hover .rez-kart-btn { color: var(--off); }
+.rez-kart.odeme .rez-kart-btn { color: #ffdf00; border-top-color: rgba(255,223,0,.1); }
+.rez-kart.odeme:hover .rez-kart-btn { color: #ffdf00; }
+.rez-kart-btn-arrow { font-size: 1rem; transition: transform .2s; }
+.rez-kart:hover .rez-kart-btn-arrow { transform: translateX(4px); }
+.indirim-badge {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: #ffdf00;
+  color: #080808;
+  font-size: .55rem;
+  font-weight: 700;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  padding: 5px 10px;
+}
+
+/* ── FORM EKRANI ── */
+.rez-form-wrap {
+  display: none;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 60px 40px 80px;
+}
+.rez-form-wrap.aktif { display: block; }
+.rez-geri {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .62rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: #f7f4ef;
+  cursor: pointer;
+  margin-bottom: 48px;
+  background: none;
+  border: none;
+  transition: color .2s;
+}
+.rez-geri:hover { color: var(--off); }
+.rez-form-baslik {
+  margin-bottom: 48px;
+}
+.rez-form-baslik h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  color: var(--off);
+  margin-top: 10px;
+  line-height: 1.1;
+}
+.rez-form-baslik h2 em {
+  font-style: italic;
+  font-weight: 400;
+  color: #f7f4ef;
+}
+.rez-form-baslik p {
+  margin-top: 16px;
+  font-size: .82rem;
+  line-height: 1.8;
+  color: #f7f4ef;
+}
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-grid-full { grid-column: 1 / -1; }
+.fg { margin-bottom: 0; }
+.fl {
+  display: block;
+  font-size: .62rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: #f7f4ef;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+.fi {
+  width: 100%;
+  background: transparent;
+  border: 1px solid #444;
+  color: var(--off);
+  padding: 13px 16px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: .85rem;
+  font-weight: 400;
+  outline: none;
+  transition: border-color .2s;
+  box-sizing: border-box;
+}
+.fi:focus { border-color: #555; }
+.fi option { background: #111; }
+
+/* Hizmet seçici */
+.cs-wrap { position: relative; }
+.cs-selected {
+  width: 100%;
+  background: transparent;
+  border: 1px solid #444;
+  color: var(--off);
+  padding: 13px 16px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: .85rem;
+  font-weight: 400;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  transition: border-color .2s;
+  box-sizing: border-box;
+}
+.cs-selected:hover { border-color: #555; }
+.cs-arrow { width: 10px; height: 6px; color: #f7f4ef; flex-shrink: 0; transition: transform .2s; }
+.cs-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0; right: 0;
+  background: #111;
+  border: 1px solid #333;
+  z-index: 100;
+  max-height: 360px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+.cs-dropdown.open { display: block; }
+.cs-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid #1e1e1e;
+  font-size: .82rem;
+  color: #f7f4ef;
+  gap: 12px;
+  transition: background .15s;
+}
+.cs-option:last-child { border-bottom: none; }
+.cs-option:hover { background: rgba(247,244,239,.05); }
+.cs-option.secili { background: rgba(255,223,0,.07); color: var(--off); }
+.cs-option.secili .cs-indirimli { color: #ffdf00; }
+.cs-option.secili .cs-normal { color: #f7f4ef; text-decoration-color: #f7f4ef; }
+.cs-ad { flex: 1; font-weight: 400; }
+.cs-fiyatlar { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.cs-indirimli { font-weight: 600; font-size: .82rem; color: #f7f4ef; }
+.cs-normal { font-size: .72rem; color: #f7f4ef; text-decoration: line-through; }
+
+/* Çoklu hizmet seçim listesi */
+.secili-hizmetler {
+  display: none;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+}
+.secili-hizmetler.show { display: flex; }
+.secili-hizmet-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 14px;
+  background: rgba(247,244,239,.04);
+  border: 1px solid #2a2a2a;
+  gap: 10px;
+}
+.secili-hizmet-ad {
+  font-size: .78rem;
+  color: var(--off);
+  font-weight: 500;
+  flex: 1;
+}
+.secili-hizmet-fiyat {
+  font-size: .78rem;
+  color: #f7f4ef;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.secili-hizmet-sil {
+  background: none;
+  border: none;
+  color: #f7f4ef;
+  font-size: .9rem;
+  cursor: pointer;
+  padding: 0 2px;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: color .15s;
+}
+.secili-hizmet-sil:hover { color: #ff6b6b; }
+.hizmet-max-uyari {
+  display: none;
+  font-size: .7rem;
+  color: #f7f4ef;
+  padding: 6px 12px;
+  background: rgba(255,223,0,.06);
+  border: 1px solid rgba(255,223,0,.15);
+  margin-top: 6px;
+}
+.hizmet-ekle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 1px dashed #333;
+  color: #f7f4ef;
+  font-family: 'Montserrat', sans-serif;
+  font-size: .65rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  font-weight: 500;
+  padding: 9px 16px;
+  cursor: pointer;
+  margin-top: 6px;
+  width: 100%;
+  transition: border-color .2s, color .2s;
+}
+.hizmet-ekle-btn:hover { border-color: #555; color: var(--off); }
+.hizmet-max-uyari.show { display: block; }
+.cs-option.max-doldu { opacity: .45; pointer-events: none; cursor: not-allowed; }
+
+/* Toplam fiyat kutusu */
+.fiyat-box {
+  display: none;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+  padding: 13px 16px;
+  background: rgba(255,223,0,.05);
+  border: 1px solid rgba(255,223,0,.15);
+  flex-wrap: wrap;
+}
+.fiyat-box.show { display: flex; }
+#fiyat-indirimli {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffdf00;
+  line-height: 1;
+}
+#fiyat-normal, #o-fiyat-normal {
+  font-size: .85rem;
+  color: #f7f4ef;
+  text-decoration: line-through;
+  text-decoration-color: #f7f4ef;
+  line-height: 1;
+}
+.fiyat-badge {
+  font-size: .58rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #ffdf00;
+  background: rgba(255,223,0,.08);
+  border: 1px solid rgba(255,223,0,.2);
+  padding: 4px 10px;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+/* Saat grid */
+.time-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-top: 2px;
+}
+.time-btn {
+  background: transparent;
+  border: 1px solid #444;
+  color: #f7f4ef;
+  padding: 10px 4px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: .72rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .2s;
+  text-align: center;
+}
+.time-btn:hover { border-color: #555; color: var(--off); }
+.time-btn.selected { background: var(--off); color: var(--black); border-color: var(--off); }
+
+/* Mesaj */
+.rez-mesaj {
+  display: none;
+  font-size: .78rem;
+  padding: 12px 16px;
+  margin-top: 16px;
+  border-radius: 2px;
+}
+.rez-mesaj.basari {
+  background: rgba(255,223,0,.08);
+  border: 1px solid rgba(255,223,0,.25);
+  color: #ffdf00;
+}
+.rez-mesaj.hata {
+  background: rgba(255,85,85,.08);
+  border: 1px solid rgba(255,85,85,.25);
+  color: #ff6b6b;
+}
+
+/* Gönder butonu */
+.fsub {
+  width: 100%;
+  background: var(--off);
+  color: var(--black);
+  border: none;
+  padding: 16px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: .65rem;
+  font-weight: 600;
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  cursor: pointer;
+  margin-top: 24px;
+  transition: opacity .2s;
+}
+.fsub:hover { opacity: .85; }
+.fsub.odeme-btn {
+  background: #ffdf00;
+  color: #080808;
+}
+
+/* Bilgi kutusu */
+.rez-bilgi {
+  background: #111;
+  border: 1px solid #1e1e1e;
+  padding: 28px;
+  margin-bottom: 32px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 32px;
+}
+.rez-bilgi-item { font-size: .78rem; color: #f7f4ef; line-height: 1.7; }
+.rez-bilgi-item strong { display: block; font-size: .62rem; letter-spacing: .14em; text-transform: uppercase; color: #f7f4ef; margin-bottom: 4px; font-weight: 600; }
+
+@media(max-width:700px) {
+  .rez-secim-grid { grid-template-columns: 1fr; }
+  .rez-kart { padding: 32px 24px; }
+  .rez-form-wrap { padding: 40px 20px 60px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .form-grid-full { grid-column: auto; }
+  .time-grid { grid-template-columns: repeat(4, 1fr); }
+  .rez-bilgi { grid-template-columns: 1fr; }
+}
+
+/* ── PERSONEL SEÇİMİ — DROPDOWN */
+.personel-secim-wrap { margin-bottom: 0; }
+
+.personel-dropdown-wrap { position: relative; }
+
+.personel-selected {
+  width: 100%;
+  background: transparent;
+  border: 1px solid #444;
+  color: var(--off);
+  padding: 0 16px;
+  height: 52px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: .85rem;
+  font-weight: 400;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  transition: border-color .2s;
+  box-sizing: border-box;
+  user-select: none;
+}
+.personel-selected:hover { border-color: #555; }
+.personel-selected-inner { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+.personel-selected-foto {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+.personel-selected-foto img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
+.personel-selected-text { flex: 1; min-width: 0; }
+.personel-selected-ad { font-size: .82rem; font-weight: 500; color: #f7f4ef; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.personel-selected-unvan { font-size: .62rem; color: #f7f4ef; margin-top: 1px; }
+.personel-selected-placeholder { color: #f7f4ef; font-size: .85rem; }
+.personel-dd-arrow { width: 10px; height: 6px; color: #f7f4ef; flex-shrink: 0; transition: transform .2s; }
+
+.personel-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0; right: 0;
+  background: #111;
+  border: 1px solid #333;
+  z-index: 100;
+  max-height: 260px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+.personel-dropdown.open { display: block; }
+
+
+
+.personel-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid #1e1e1e;
+  transition: background .15s;
+  position: relative;
+  background: transparent;
+  user-select: none;
+}
+.personel-row:last-child { border-bottom: none; }
+.personel-row:hover { background: rgba(247,244,239,.05); }
+.personel-row.secili { background: rgba(247,244,239,.07); }
+
+.personel-foto {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #1a1a1a;
+  border: 1.5px solid #333;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem;
+  transition: border-color .18s;
+}
+.personel-row.secili .personel-foto { border-color: #f7f4ef; }
+.personel-foto img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
+
+.personel-info { flex: 1; min-width: 0; }
+.personel-ad {
+  font-family: 'Montserrat', sans-serif;
+  font-size: .78rem; font-weight: 600;
+  color: #f7f4ef;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.personel-unvan { font-family: 'Montserrat', sans-serif; font-size: .62rem; color: #f7f4ef; margin-top: 2px; }
+
+.personel-check {
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid #3a3a3a;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .18s;
+}
+.personel-row.secili .personel-check { background: var(--off, #f7f4ef); border-color: var(--off, #f7f4ef); }
+.personel-row.secili .personel-check::after {
+  content: '';
+  display: block;
+  width: 4px; height: 7px;
+  border-right: 1.5px solid #080808;
+  border-bottom: 1.5px solid #080808;
+  transform: rotate(45deg) translate(-1px, -1px);
+}
+
+/* ── PAYTR MODAL ── */
+.paytr-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(8,8,8,.92);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.paytr-overlay.aktif { display: flex; }
+.paytr-modal {
+  background: #111;
+  border: 1px solid #444;
+  width: 100%;
+  max-width: 480px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.paytr-modal-baslik {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  border-bottom: 1px solid #1e1e1e;
+}
+.paytr-modal-baslik span {
+  font-size: .6rem;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: #f7f4ef;
+}
+.paytr-modal-tutar {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #ffdf00;
+}
+.paytr-kapat {
+  background: none;
+  border: none;
+  color: #f7f4ef;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: color .2s;
+  line-height: 1;
+}
+.paytr-kapat:hover { color: var(--off); }
+.paytr-iframe-wrap {
+  position: relative;
+  width: 100%;
+  min-height: 440px;
+}
+.paytr-iframe-wrap iframe {
+  width: 100%;
+  height: 100%;
+  min-height: 440px;
+  border: none;
+  display: block;
+}
+.paytr-yukleniyor {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: #111;
+}
+.paytr-yukleniyor-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #ffdf00;
+  animation: paytrPulse 1s infinite alternate;
+}
+.paytr-yukleniyor p {
+  font-size: .72rem;
+  color: #f7f4ef;
+  letter-spacing: .1em;
+}
+@keyframes paytrPulse { from { opacity: .2; } to { opacity: 1; } }
+
+.paytr-hata-kutu {
+  padding: 32px 24px;
+  text-align: center;
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+.paytr-hata-kutu.goster { display: flex; }
+.paytr-hata-kutu p { font-size: .82rem; color: #f7f4ef; line-height: 1.7; }
+.paytr-hata-kutu strong { color: #ff6b6b; font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; }
+
+/* ── SÖZLEŞME CHECKBOXLARI ── */
+.sozlesme-container {
+  margin-top: 32px;
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+  background: rgba(247,244,239,.02);
+  border: 1px solid #1e1e1e;
+}
+.sozlesme-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+.sozlesme-checkbox input[type="checkbox"] {
+  margin-top: 3px;
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  accent-color: #ffdf00;
+}
+.sozlesme-text {
+  font-size: .78rem;
+  line-height: 1.6;
+  color: #f7f4ef;
+}
+.sozlesme-text a {
+  color: #ffdf00;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255,223,0,.3);
+  transition: border-color .2s;
+}
+.sozlesme-text a:hover {
+  border-bottom-color: #ffdf00;
+}
+
+/* ── SÖZLEŞME MODAL ── */
+.sozlesme-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.85);
+  backdrop-filter: blur(4px);
+  z-index: 10000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow-y: auto;
+}
+.sozlesme-modal-overlay.aktif {
+  display: flex;
+}
+.sozlesme-modal {
+  background: #111;
+  border: 1px solid #333;
+  max-width: 800px;
+  width: 100%;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  margin: auto;
+}
+.sozlesme-modal-baslik {
+  padding: 24px 28px;
+  border-bottom: 1px solid #1e1e1e;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.sozlesme-modal-baslik h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--off);
+}
+.sozlesme-kapat {
+  background: none;
+  border: none;
+  color: #f7f4ef;
+  font-size: 1.3rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: color .2s;
+  line-height: 1;
+}
+.sozlesme-kapat:hover {
+  color: var(--off);
+}
+.sozlesme-modal-icerik {
+  padding: 28px;
+  overflow-y: auto;
+  flex: 1;
+  font-size: .85rem;
+  line-height: 1.8;
+  color: #f7f4ef;
+}
+.sozlesme-modal-icerik h4 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--off);
+  margin-top: 20px;
+  margin-bottom: 12px;
+}
+.sozlesme-modal-icerik h4:first-child {
+  margin-top: 0;
+}
+.sozlesme-modal-icerik p {
+  margin-bottom: 16px;
+}
+.sozlesme-modal-icerik ul {
+  margin-bottom: 16px;
+  padding-left: 24px;
+}
+.sozlesme-modal-icerik li {
+  margin-bottom: 8px;
+}
+/* Tel linkleri gold */
+a[href^="tel"] {
+  color: #ffdf00 !important;
+  text-decoration: none;
+  font-weight: 600;
+  text-shadow: 0 0 12px rgba(255,223,0,.35);
+}
+
+/* Gold yazı güçlendirme */
+.rez-kart.odeme .rez-kart-no,
+.rez-kart.odeme .rez-kart-btn,
+.rez-kart.odeme:hover .rez-kart-btn,
+#fiyat-indirimli,
+#o-fiyat-indirimli,
+.cs-option.secili .cs-indirimli,
+.fiyat-badge,
+.paytr-modal-tutar,
+.paytr-yukleniyor-dot {
+  color: #ffdf00 !important;
+  font-weight: 700;
+  text-shadow: 0 0 12px rgba(255,223,0,.35);
+}
+
+/* Footer override */
+
+.foot-credit { color: #fff !important; }
+
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">
+    <img src="images/logo2.png"
+         alt="Hair Artist"
+         onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+    <span class="nav-logo-txt" style="display:none">HAIR ARTIST</span>
+  </a>
+  <ul>
+    <li><a href="/" data-i18n="nav_home">Anasayfa</a></li>
+    <li><a href="/#about" data-i18n="nav_about">Hakkımızda</a></li>
+    <li><a href="/#services" data-i18n="nav_services">Hizmetler</a></li>
+    <li><a href="/fiyatlar" data-i18n="nav_prices">Fiyat Listesi</a></li>
+    <li><a href="/portfolio" data-i18n="nav_portfolio">Portfolyo</a></li>
+    <li><a href="/shop" data-i18n="nav_shop">Shop</a></li>
+    <li><a href="/#contact" data-i18n="nav_contact">İletişim</a></li>
+  </ul>
+  <div class="nav-right">
+    <a href="/rezervasyon" class="nav-book" data-i18n="nav_book">Rezervasyon Yap</a>
+    <button class="hamburger" id="hamburger" aria-label="Menü">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-menu-close" onclick="closeMobileMenu()">✕</button>
+  <ul>
+    <li><a href="/" onclick="closeMobileMenu()">Anasayfa</a></li>
+    <li><a href="/#about" onclick="closeMobileMenu()">Hakkımızda</a></li>
+    <li><a href="/#services" onclick="closeMobileMenu()">Hizmetler</a></li>
+    <li><a href="/fiyatlar" data-i18n="nav_prices">Fiyat Listesi</a></li>
+    <li><a href="/portfolio" data-i18n="nav_portfolio">Portfolyo</a></li>
+    <li><a href="/shop" data-i18n="nav_shop">Shop</a></li>
+    <li><a href="/#contact" onclick="closeMobileMenu()">İletişim</a></li>
+  </ul>
+  <a href="/rezervasyon" class="m-book" data-i18n="nav_book">Rezervasyon Yap</a>
+</div>
+
+<div class="rez-page">
+
+  <!-- SEÇİM EKRANI -->
+  <div class="rez-secim" id="secim-ekrani">
+    <div class="rez-secim-baslik">
+      <span class="sec-tag" data-i18n="rez_tag">Randevu</span>
+      <h1 data-i18n-html="rez_secim_title">Nasıl devam<br><em>etmek istersiniz?</em></h1>
+    </div>
+
+    <div class="rez-secim-grid">
+
+      <!-- Rezervasyon Yap -->
+      <div class="rez-kart" onclick="goster('normal-form')">
+        <div class="indirim-badge" id="normal-indirim-badge" style="display:none;background:#f7f4ef;color:#080808"></div>
+        <div id="normal-tarih-badge" style="display:none;position:absolute;bottom:20px;right:20px;background:rgba(247,244,239,.12);border:1px solid rgba(247,244,239,.25);color:#f7f4ef;font-size:.48rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:4px 9px;pointer-events:none"></div>
+        <div class="rez-kart-no" data-i18n="rez_kart1_no">01 — Ücretsiz</div>
+        <h2 data-i18n-html="rez_kart1_title">Rezervasyon Yap <em>Ödeme yok</em></h2>
+        <p data-i18n="rez_kart1_desc">Rezervasyonunuzu yapın, En kısa sürede rezervasyonunuz onaylansın. Salona geldiğinizde ödeme yaparsınız.</p>
+        <div class="rez-kart-ozellik">
+          <div class="rez-oz-item" data-i18n="rez_kart1_oz1">En kısa sürede Onay</div>
+          <div class="rez-oz-item" data-i18n="rez_kart1_oz2">Ödeme salonda</div>
+        </div>
+        <div class="rez-kart-btn">
+          <span data-i18n="rez_devam">Devam et</span> <span class="rez-kart-btn-arrow">→</span>
+        </div>
+      </div>
+
+      <!-- Hizmet Al -->
+      <div class="rez-kart odeme" onclick="goster('odeme-form')">
+        
+        <div class="indirim-badge" id="odeme-indirim-badge" style="display:none"></div>
+        <div id="odeme-tarih-badge" style="display:none;position:absolute;bottom:20px;right:20px;background:rgba(255,223,0,.12);border:1px solid rgba(255,223,0,.3);color:#ffdf00;font-size:.48rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:4px 9px;pointer-events:none"></div>
+        <div class="rez-kart-no" data-i18n="rez_kart2_no">02 — Online Ödeme</div>
+        <h2 data-i18n-html="rez_kart2_title">Hizmet Al <em>Online ödeme</em></h2>
+        <p data-i18n="rez_kart2_desc">Hizmetinizi şimdi satın alın, online güvenli ödeme yapın. Randevu tarihinizi belirleyin.</p>
+        <div class="rez-kart-ozellik">
+          <div class="rez-oz-item" data-i18n="rez_kart2_oz1">Güvenli ödeme</div>
+          <div class="rez-oz-item" data-i18n="rez_kart2_oz2">Anında rezervasyon onayı</div>
+        </div>
+        <div class="rez-kart-btn">
+          <span data-i18n="rez_devam">Devam et</span> <span class="rez-kart-btn-arrow">→</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- NORMAL REZERVASYON FORMU -->
+  <div class="rez-form-wrap" id="normal-form" data-form="n">
+    <button class="rez-geri" onclick="geriDon()" data-i18n="rez_geri">← Geri</button>
+
+    <div class="rez-form-baslik">
+      <span class="sec-tag" data-i18n="rez_form1_tag">Rezervasyon Yap</span>
+      <h2 data-i18n-html="rez_form1_title">Randevunuzu<br><em>Hemen alın.</em></h2>
+      <p data-i18n="rez_form1_desc">Formu doldurun, Rezervasyonunuz alınsın. En kısa sürede sizinle iletişime geçelim.</p>
+    </div>
+
+    <div class="rez-bilgi">
+      <div class="rez-bilgi-item"><strong data-i18n="contact_address_title">Adres</strong>Esentepe, Yıldıztabya Alibeyköy Cd No:5 34065 Eyüpsultan / İstanbul</div>
+      <div class="rez-bilgi-item"><strong data-i18n="contact_phone_title">Telefon</strong>0531 777 02 03</div>
+      <div class="rez-bilgi-item"><strong data-i18n="rez_mesai">Mesai</strong><span class="rez-bilgi-mesai-text"></span></div>
+      <div class="rez-bilgi-item"><strong data-i18n="rez_kapali">Kapalı</strong><span data-i18n="contact_day_1">Salı</span></div>
+    </div>
+
+    <div class="form-grid">
+      <div class="fg form-grid-full personel-secim-wrap">
+        <label class="fl" data-i18n="rez_personel">Personel Seçimi</label>
+        <input type="hidden" id="n-personel" value="">
+        <input type="hidden" id="n-personel-isim" value="">
+        <div class="personel-dropdown-wrap" id="n-personel-wrap">
+          <div class="personel-selected" onclick="personelToggle('n')">
+            <div class="personel-selected-inner" id="n-personel-selected-inner">
+              <span class="personel-selected-placeholder" data-i18n="rez_personel_sec">— Personel Seçin —</span>
+            </div>
+            <svg class="personel-dd-arrow" id="n-personel-arrow" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.2"/></svg>
+          </div>
+          <div class="personel-dropdown" id="n-personel-dropdown">
+            <div class="personel-row" onclick="personelSec(this,'n','Fatih Kurt','Baş Stilist · 10+ yıl deneyim','images/fatih-kurt.jpg','👨‍🎨')">
+              <div class="personel-foto">
+                <img src="images/fatih-kurt.jpg" alt="Fatih Kurt" onerror="this.style.display='none';this.parentElement.textContent='👨‍🎨'">
+              </div>
+              <div class="personel-info">
+                <div class="personel-ad">Fatih Kurt</div>
+                <div class="personel-unvan">Baş Stilist · 10+ yıl deneyim</div>
+              </div>
+              <div class="personel-check"></div>
+            </div>
+            <div class="personel-row" onclick="personelSec(this,'n','Baran Kurt','Stilist','images/baran-kurt.jpg','💈')">
+              <div class="personel-foto">
+                <img src="images/baran-kurt.jpg" alt="Baran Kurt" onerror="this.style.display='none';this.parentElement.textContent='💈'">
+              </div>
+              <div class="personel-info">
+                <div class="personel-ad">Baran Kurt</div>
+                <div class="personel-unvan">Stilist</div>
+              </div>
+              <div class="personel-check"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="fg">
+        <label class="fl" data-i18n="book_name">Ad Soyad</label>
+        <input id="n-ad" class="fi" type="text" data-i18n-placeholder="rez_name_ph" placeholder="Adınız" required>
+      </div>
+      <div class="fg">
+        <label class="fl"><span data-i18n="book_phone">Telefon</span> <span style="color:#f7f4ef;font-size:.6rem;letter-spacing:.08em;text-transform:none;font-weight:500" data-i18n="rez_tel_uyari">— Lütfen numaranızı doğru yazın</span></label>
+        <input id="n-tel" class="fi" type="tel" placeholder="05xx xxx xx xx" required oninput="telFormatla(this)">
+      </div>
+      <div class="fg form-grid-full">
+        <label class="fl" data-i18n="book_select_service">Hizmet <span style="font-size:.55rem;font-weight:500;letter-spacing:.05em;text-transform:none;color:#888">(en fazla 5 hizmet seçebilirsiniz)</span></label>
+        <input type="hidden" id="n-hizmet" value="">
+        <div class="cs-wrap" id="n-cs-wrap">
+          <div class="cs-selected" onclick="csToggleN()">
+            <span id="n-cs-label" style="color:#f7f4ef" data-i18n="rez_hizmet_sec">— Hizmet Seçin —</span>
+            <svg class="cs-arrow" id="n-cs-arrow" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.2"/></svg>
+          </div>
+          <div class="cs-dropdown" id="n-cs-dropdown">
+            <div class="cs-option" style="opacity:.85;pointer-events:none" data-i18n="rez_hizmet_yukleniyor">Hizmetler yükleniyor...</div>
+          </div>
+          <div class="hizmet-max-uyari" id="n-max-uyari" data-i18n="rez_max_uyari">En fazla 5 hizmet seçebilirsiniz.</div>
+          <div class="secili-hizmetler" id="n-secili-hizmetler"></div>
+          <button type="button" id="n-hizmet-ekle-btn" class="hizmet-ekle-btn" style="display:none" onclick="csHizmetEkleAc('n')" data-i18n="rez_hizmet_ekle">＋ Hizmet Ekle</button>
+        </div>
+        <div class="fiyat-box" id="n-fiyat-box">
+          <span id="fiyat-indirimli"></span>
+          <span id="fiyat-normal"></span>
+          <span id="n-sure-badge" class="fiyat-badge" style="background:rgba(247,244,239,.05);border-color:rgba(247,244,239,.1);color:#f7f4ef"></span>
+          <span class="fiyat-badge" data-i18n="rez_tahmini_fiyat">Tahmini toplam fiyat</span>
+        </div>
+      </div>
+      <div class="fg">
+        <label class="fl" data-i18n="book_select_date">Tarih</label>
+        <input id="n-tarih" class="fi" type="date" required>
+      </div>
+      <div class="fg">
+        <label class="fl" data-i18n="book_select_time">Saat</label>
+        <div class="time-grid">
+          <button type="button" class="time-btn" onclick="selectTime(this,'09:00','n')">09:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'09:30','n')">09:30</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'10:00','n')">10:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'10:30','n')">10:30</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'11:00','n')">11:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'11:30','n')">11:30</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'12:00','n')">12:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'12:30','n')">12:30</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'13:00','n')">13:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'13:30','n')">13:30</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'14:00','n')">14:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'14:30','n')">14:30</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'15:00','n')">15:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'15:30','n')">15:30</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'16:00','n')">16:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'16:30','n')">16:30</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'17:00','n')">17:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'17:30','n')">17:30</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'18:00','n')">18:00</button>
+        </div>
+        <input type="hidden" id="n-saat" value="">
+      </div>
+      <div class="fg form-grid-full">
+        <label class="fl" data-i18n="book_note">Not (saç durumu, istek…)</label>
+        <input id="n-not" class="fi" type="text" data-i18n-placeholder="rez_note_ph" placeholder="İsteğe bağlı">
+      </div>
+    </div>
+
+    <!-- Sözleşme Checkboxları -->
+    <div class="sozlesme-container">
+      <label class="sozlesme-checkbox">
+        <input type="checkbox" id="n-kvkk" required>
+        <span class="sozlesme-text">
+          <a href="#" onclick="sozlesmeAc('kvkk'); return false;">KVKK Aydınlatma Metni</a>'ni okudum, kabul ediyorum.
+        </span>
+      </label>
+      <label class="sozlesme-checkbox">
+        <input type="checkbox" id="n-gizlilik" required>
+        <span class="sozlesme-text">
+          <a href="#" onclick="sozlesmeAc('gizlilik'); return false;">Gizlilik Sözleşmesi</a>'ni okudum, kabul ediyorum.
+        </span>
+      </label>
+    </div>
+
+    <div class="rez-mesaj" id="n-mesaj"></div>
+    <button class="fsub" id="n-btn" onclick="normalGonder()" data-i18n="rez_submit_btn">Rezervasyonu Gönder</button>
+  </div>
+
+  <!-- ÖDEME FORMLU REZ -->
+  <div class="rez-form-wrap" id="odeme-form" data-form="o">
+    <button class="rez-geri" onclick="geriDon()" data-i18n="rez_geri">← Geri</button>
+
+    <div class="rez-form-baslik">
+      <span class="sec-tag" style="color:rgba(212, 175, 55, 1)" data-i18n="rez_form2_tag">Hizmet Al — Online Ödeme</span>
+      <h2 data-i18n-html="rez_form2_title">Hizmetinizi seçin,<br><em>online ödeyin.</em></h2>
+      <p data-i18n="rez_form2_desc">Aşağıdaki formu doldurun. Bilgilerinizi onayladıktan sonra güvenli ödeme sayfasına yönlendirileceksiniz.</p>
+    </div>
+
+    <div class="rez-bilgi">
+      <div class="rez-bilgi-item"><strong data-i18n="contact_address_title">Adres</strong>Esentepe, Yıldıztabya Alibeyköy Cd No:5 34065 Eyüpsultan / İstanbul</div>
+      <div class="rez-bilgi-item"><strong data-i18n="contact_phone_title">Telefon</strong>0531 777 02 03</div>
+      
+      <div class="rez-bilgi-item"><strong data-i18n="rez_mesai">Mesai</strong><span class="rez-bilgi-mesai-text"></span></div>
+      <div class="rez-bilgi-item"><strong data-i18n="rez_kapali">Kapalı</strong><span data-i18n="contact_day_1">Salı</span></div>
+    </div>
+
+    <div class="form-grid">
+      <div class="fg form-grid-full personel-secim-wrap">
+        <label class="fl" data-i18n="rez_personel">Personel Seçimi</label>
+        <input type="hidden" id="o-personel" value="">
+        <input type="hidden" id="o-personel-isim" value="">
+        <div class="personel-dropdown-wrap" id="o-personel-wrap">
+          <div class="personel-selected" onclick="personelToggle('o')">
+            <div class="personel-selected-inner" id="o-personel-selected-inner">
+              <span class="personel-selected-placeholder" data-i18n="rez_personel_sec">— Personel Seçin —</span>
+            </div>
+            <svg class="personel-dd-arrow" id="o-personel-arrow" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.2"/></svg>
+          </div>
+          <div class="personel-dropdown" id="o-personel-dropdown">
+            <div class="personel-row" onclick="personelSec(this,'o','Fatih Kurt','Baş Stilist · 10+ yıl deneyim','images/fatih-kurt.jpg','👨‍🎨')">
+              <div class="personel-foto">
+                <img src="images/fatih-kurt.jpg" alt="Fatih Kurt" onerror="this.style.display='none';this.parentElement.textContent='👨‍🎨'">
+              </div>
+              <div class="personel-info">
+                <div class="personel-ad">Fatih Kurt</div>
+                <div class="personel-unvan">Baş Stilist · 15+ yıl deneyim</div>
+              </div>
+              <div class="personel-check"></div>
+            </div>
+            <div class="personel-row" onclick="personelSec(this,'o','Baran Kurt','Stilist','images/baran-kurt.jpg','💈')">
+              <div class="personel-foto">
+                <img src="images/baran-kurt.jpg" alt="Baran Kurt" onerror="this.style.display='none';this.parentElement.textContent='💈'">
+              </div>
+              <div class="personel-info">
+                <div class="personel-ad">Baran Kurt</div>
+                <div class="personel-unvan">Stilist</div>
+              </div>
+              <div class="personel-check"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="fg">
+        <label class="fl" data-i18n="book_name">Ad Soyad</label>
+        <input id="o-ad" class="fi" type="text" data-i18n-placeholder="rez_name_ph" placeholder="Adınız" required>
+      </div>
+      <div class="fg">
+        <label class="fl"><span data-i18n="book_phone">Telefon</span> <span style="color:#f7f4ef;font-size:.6rem;letter-spacing:.08em;text-transform:none;font-weight:500" data-i18n="rez_tel_uyari">— Lütfen numaranızı doğru yazın</span></label>
+        <input id="o-tel" class="fi" type="tel" placeholder="05xx xxx xx xx" required oninput="telFormatla(this)">
+      </div>
+      <div class="fg form-grid-full">
+        <label class="fl" data-i18n="book_select_service">Hizmet <span style="font-size:.55rem;font-weight:500;letter-spacing:.05em;text-transform:none;color:#888">(en fazla 5 hizmet seçebilirsiniz)</span></label>
+        <input type="hidden" id="o-hizmet" value="">
+        <input type="hidden" id="o-fiyat" value="">
+        <div class="cs-wrap" id="o-cs-wrap">
+          <div class="cs-selected" onclick="csToggleO()">
+            <span id="o-cs-label" style="color:#f7f4ef" data-i18n="rez_hizmet_sec">— Hizmet Seçin —</span>
+            <svg class="cs-arrow" id="o-cs-arrow" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.2"/></svg>
+          </div>
+          <div class="cs-dropdown" id="o-cs-dropdown">
+            <div class="cs-option" style="opacity:.85;pointer-events:none" data-i18n="rez_hizmet_yukleniyor">Hizmetler yükleniyor...</div>
+          </div>
+          <div class="hizmet-max-uyari" id="o-max-uyari" data-i18n="rez_max_uyari">En fazla 5 hizmet seçebilirsiniz.</div>
+          <div class="secili-hizmetler" id="o-secili-hizmetler"></div>
+          <button type="button" id="o-hizmet-ekle-btn" class="hizmet-ekle-btn" style="display:none" onclick="csHizmetEkleAc('o')" data-i18n="rez_hizmet_ekle">＋ Hizmet Ekle</button>
+        </div>
+        <div class="fiyat-box" id="o-fiyat-box">
+          <span id="o-fiyat-indirimli"></span>
+          <span id="o-fiyat-normal"></span>
+          <span id="o-sure-badge" class="fiyat-badge" style="background:rgba(247,244,239,.05);border-color:rgba(247,244,239,.1);color:#f7f4ef"></span>
+          <span class="fiyat-badge">Toplam ödeme fiyatı</span>
+        </div>
+      </div>
+      <div class="fg">
+        <label class="fl" data-i18n="book_select_date">Tarih</label>
+        <input id="o-tarih" class="fi" type="date" required>
+      </div>
+      <div class="fg">
+        <label class="fl" data-i18n="book_select_time">Saat</label>
+        <div class="time-grid">
+          <button type="button" class="time-btn" onclick="selectTime(this,'09:00','o')">09:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'09:30','o')">09:30</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'10:00','o')">10:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'10:30','o')">10:30</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'11:00','o')">11:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'11:30','o')">11:30</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'12:00','o')">12:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'12:30','o')">12:30</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'13:00','o')">13:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'13:30','o')">13:30</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'14:00','o')">14:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'14:30','o')">14:30</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'15:00','o')">15:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'15:30','o')">15:30</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'16:00','o')">16:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'16:30','o')">16:30</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'17:00','o')">17:00</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'17:30','o')">17:30</button>
+          <button type="button" class="time-btn" onclick="selectTime(this,'18:00','o')">18:00</button>
+        </div>
+        <input type="hidden" id="o-saat" value="">
+      </div>
+      <div class="fg form-grid-full">
+        <label class="fl" data-i18n="book_note">Not (saç durumu, istek…)</label>
+        <input id="o-not" class="fi" type="text" data-i18n-placeholder="rez_note_ph" placeholder="İsteğe bağlı">
+      </div>
+    </div>
+
+    <!-- Sözleşme Checkboxları -->
+    <div class="sozlesme-container">
+      <label class="sozlesme-checkbox">
+        <input type="checkbox" id="o-kvkk" required>
+        <span class="sozlesme-text">
+          <a href="#" onclick="sozlesmeAc('kvkk'); return false;">KVKK Aydınlatma Metni</a>'ni okudum, kabul ediyorum.
+        </span>
+      </label>
+      <label class="sozlesme-checkbox">
+        <input type="checkbox" id="o-gizlilik" required>
+        <span class="sozlesme-text">
+          <a href="#" onclick="sozlesmeAc('gizlilik'); return false;">Gizlilik Sözleşmesi</a>'ni okudum, kabul ediyorum.
+        </span>
+      </label>
+      <label class="sozlesme-checkbox">
+        <input type="checkbox" id="o-mesafeli" required>
+        <span class="sozlesme-text">
+          <a href="#" onclick="sozlesmeAc('mesafeli'); return false;">Mesafeli Satış Sözleşmesi</a>'ni okudum, kabul ediyorum.
+        </span>
+      </label>
+      <label class="sozlesme-checkbox">
+        <input type="checkbox" id="o-teslimat" required>
+        <span class="sozlesme-text">
+          <a href="#" onclick="sozlesmeAc('teslimat'); return false;">Teslimat ve İade Koşulları</a>'nı okudum, kabul ediyorum.
+        </span>
+      </label>
+    </div>
+
+    <div class="rez-mesaj" id="o-mesaj"></div>
+    <button class="fsub odeme-btn" id="o-btn" onclick="odemeGit()" data-i18n="rez_odeme_btn">Ödemeye Geç →</button>
+
+    <!-- PayTR Güvenli Ödeme -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-top:16px;padding:14px 0;border-top:1px solid #1e1e1e;">
+      <img src="images/paytr-logo.png" alt="PayTR" style="height:22px;width:auto;opacity:.95;filter:brightness(0) invert(1)">
+      <span style="font-family:'Montserrat',sans-serif;font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:#f7f4ef" data-i18n="rez_guvenli">Güvenli ödeme altyapısı</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- PAYTR ÖDEME MODALI -->
+<div class="paytr-overlay" id="paytr-overlay">
+  <div class="paytr-modal">
+    <div class="paytr-modal-baslik">
+      <div>
+        <span>Güvenli Ödeme</span><br>
+        <span class="paytr-modal-tutar" id="paytr-tutar-goster"></span>
+      </div>
+      <button class="paytr-kapat" onclick="paytrKapat()">✕</button>
+    </div>
+    <div class="paytr-iframe-wrap" id="paytr-iframe-wrap">
+      <div class="paytr-yukleniyor" id="paytr-yukleniyor">
+        <div class="paytr-yukleniyor-dot"></div>
+        <p data-i18n="rez_paytr_loading">Ödeme sayfası yükleniyor…</p>
+      </div>
+    </div>
+    <div class="paytr-hata-kutu" id="paytr-hata-kutu">
+      <strong>⚠ Bağlantı Hatası</strong>
+      <p id="paytr-hata-metin">Ödeme sayfası açılamadı. Lütfen tekrar deneyin.</p>
+      <button class="fsub odeme-btn" style="width:auto;padding:12px 28px;margin-top:8px" onclick="paytrKapat()">Kapat</button>
+    </div>
+  </div>
+</div>
+
+<!-- SÖZLEŞME MODALI -->
+<div class="sozlesme-modal-overlay" id="sozlesme-modal">
+  <div class="sozlesme-modal">
+    <div class="sozlesme-modal-baslik">
+      <h3 id="sozlesme-baslik">Sözleşme</h3>
+      <button class="sozlesme-kapat" onclick="sozlesmeKapat()">✕</button>
+    </div>
+    <div class="sozlesme-modal-icerik" id="sozlesme-icerik">
+      <!-- İçerik JavaScript ile doldurulacak -->
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p data-i18n="footer_rights_full">© 2026 Hair Artist · Branded by Fatih Kurt</p>
+  <a href="https://www.vionasoft.com" class="foot-credit" target="_blank" rel="noopener"><span data-i18n="footer_design">Tasarım:</span> Vionasoft</a>
+</footer>
+
+<script>
+// ── NAV
+const hamburger = document.getElementById('hamburger');
+const mobileMenu = document.getElementById('mobileMenu');
+function closeMobileMenu(){
+  hamburger.classList.remove('open');
+  mobileMenu.classList.remove('open');
+  mobileMenu.style.display='none';
+  document.body.style.overflow='';
+}
+hamburger.addEventListener('click',()=>{
+  const isOpen = hamburger.classList.toggle('open');
+  if(isOpen){
+    mobileMenu.style.display='flex';
+    setTimeout(()=>mobileMenu.classList.add('open'),10);
+    document.body.style.overflow='hidden';
+  } else { closeMobileMenu(); }
+});
+
+// ── PERSONEL DROPDOWN
+var SURE_MAP = {
+  'Fön': 45, 'Saç Kesimi': 60, 'Maşa': 60, 'Topuz': 90,
+  'Kaş Alımı': 15, 'Dudak Üstü': 10,
+  'Manikür': 45, 'Pedikür': 60,
+  'Günlük Makyaj': 45, 'Normal Makyaj': 60, 'Profesyonel Makyaj': 90,
+  'Gelin Saç & Makyaj': 240, 'Kına Saç & Makyaj': 180, 'Nişan Saç & Makyaj': 180,
+  'Ombre': 180, 'Sombre': 180, 'Facelights': 120, 'Balyaj': 180,
+  'Komple Boya': 120, 'Dip Boya': 60, 'Açma Boyama': 180, 'Dip Açma Boyama': 90,
+  'Pigmentasyon': 90, 'Protein Jel Botox': 120, 'Keratin Botoks': 90,
+  'Brezilya Fönü (Kalıcı Fön)': 180, 'Mikro Kaynak (Adet)': 30
+};
+
+function personelToggle(prefix) {
+  var dd = document.getElementById(prefix + '-personel-dropdown');
+  var arrow = document.getElementById(prefix + '-personel-arrow');
+  var open = dd.classList.toggle('open');
+  arrow.style.transform = open ? 'rotate(180deg)' : '';
+}
+
+document.addEventListener('click', function(e) {
+  ['n','o'].forEach(function(prefix) {
+    var wrap = document.getElementById(prefix + '-personel-wrap');
+    if (wrap && !wrap.contains(e.target)) {
+      var dd = document.getElementById(prefix + '-personel-dropdown');
+      var arrow = document.getElementById(prefix + '-personel-arrow');
+      if (dd) { dd.classList.remove('open'); arrow.style.transform = ''; }
+    }
+  });
+  if (document.getElementById('n-cs-wrap') && !document.getElementById('n-cs-wrap').contains(e.target)) {
+    document.getElementById('n-cs-dropdown').classList.remove('open');
+    document.getElementById('n-cs-arrow').style.transform = '';
+  }
+  if (document.getElementById('o-cs-wrap') && !document.getElementById('o-cs-wrap').contains(e.target)) {
+    document.getElementById('o-cs-dropdown').classList.remove('open');
+    document.getElementById('o-cs-arrow').style.transform = '';
+  }
+});
+
+function personelSec(el, prefix, isim, unvan, foto, emoji, personelId) {
+  el.closest('.personel-dropdown').querySelectorAll('.personel-row').forEach(k => k.classList.remove('secili'));
+  el.classList.add('secili');
+  // UUID'yi personel_id'ye, ismi ayrı input'a kaydet
+  document.getElementById(prefix + '-personel').value = personelId || isim;
+  var isimInput = document.getElementById(prefix + '-personel-isim');
+  if (isimInput) isimInput.value = isim;
+  // Dropdown kapat
+  var dd = document.getElementById(prefix + '-personel-dropdown');
+  var arrow = document.getElementById(prefix + '-personel-arrow');
+  dd.classList.remove('open');
+  arrow.style.transform = '';
+  // Seçili göster
+  var inner = document.getElementById(prefix + '-personel-selected-inner');
+  inner.innerHTML =
+    '<div class="personel-selected-foto">' +
+      (foto ? '<img src="' + foto + '" onerror="this.style.display=\'none\';this.parentElement.textContent=\'' + emoji + '\'">' : emoji) +
+    '</div>' +
+    '<div class="personel-selected-text">' +
+      '<div class="personel-selected-ad">' + isim + '</div>' +
+      '<div class="personel-unvan">' + unvan + '</div>' +
+    '</div>';
+  // Personel değişince saatleri yenile
+  saatleriGuncelle(prefix);
+}
+
+// ── EKRAN GEÇİŞ
+function goster(id) {
+  document.getElementById('secim-ekrani').style.display = 'none';
+  document.getElementById('normal-form').classList.remove('aktif');
+  document.getElementById('odeme-form').classList.remove('aktif');
+  document.getElementById(id).classList.add('aktif');
+  var hash = id === 'normal-form' ? '#rezervasyon' : '#hizmet-al';
+  history.pushState(null, '', hash);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function geriDon() {
+  document.getElementById('normal-form').classList.remove('aktif');
+  document.getElementById('odeme-form').classList.remove('aktif');
+  document.getElementById('secim-ekrani').style.display = 'flex';
+  history.pushState(null, '', window.location.pathname);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Sayfa yüklenince hash varsa direkt formu aç
+(function() {
+  function hashKontrol() {
+    var hash = window.location.hash;
+    if (hash === '#rezervasyon') goster('normal-form');
+    else if (hash === '#hizmet-al') goster('odeme-form');
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', hashKontrol);
+  } else {
+    hashKontrol();
+  }
+  window.addEventListener('popstate', hashKontrol);
+})();
+
+// ── SAAT SEÇİCİ
+function selectTime(btn, time, prefix) {
+  btn.closest('.time-grid').querySelectorAll('.time-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  document.getElementById(prefix + '-saat').value = time;
+}
+
+// ── ÇOKLU HİZMET SEÇİM STATE
+var _nSeciliHizmetler = []; // [{ad, minFiyat, maxFiyat, sure}]
+var _oSeciliHizmetler = []; // [{ad, fiyat, sure}]
+const MAX_HIZMET = 5;
+
+// ── NORMAL FORM HİZMET (çoklu)
+function csToggleN() {
+  var dd = document.getElementById('n-cs-dropdown');
+  var arrow = document.getElementById('n-cs-arrow');
+  var open = dd.classList.toggle('open');
+  arrow.style.transform = open ? 'rotate(180deg)' : '';
+}
+
+// ＋ Hizmet Ekle butonu — dropdown'ı aç ve scroll et
+function csHizmetEkleAc(prefix) {
+  var dd = document.getElementById(prefix + '-cs-dropdown');
+  var arrow = document.getElementById(prefix + '-cs-arrow');
+  dd.classList.add('open');
+  arrow.style.transform = 'rotate(180deg)';
+  setTimeout(function() {
+    dd.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, 50);
+}
+
+function hizmetSecN(el, ad, min, max, sure) {
+  // Zaten seçiliyse kaldır (toggle)
+  var mevcutIdx = _nSeciliHizmetler.findIndex(function(h){ return h.ad === ad; });
+  if (mevcutIdx >= 0) {
+    _nSeciliHizmetler.splice(mevcutIdx, 1);
+    el.classList.remove('secili');
+    nHizmetGuncelle();
+    return;
+  }
+  // Max 5 kontrolü
+  if (_nSeciliHizmetler.length >= MAX_HIZMET) {
+    document.getElementById('n-max-uyari').classList.add('show');
+    return;
+  }
+  _nSeciliHizmetler.push({ ad: ad, minFiyat: min, maxFiyat: max, sure: sure || 0 });
+  el.classList.add('secili');
+  nHizmetGuncelle();
+  // Seçim yapılınca dropdown'ı kapat
+  var dd = document.getElementById('n-cs-dropdown');
+  var arrow = document.getElementById('n-cs-arrow');
+  dd.classList.remove('open');
+  arrow.style.transform = '';
+}
+
+function nHizmetSil(ad) {
+  _nSeciliHizmetler = _nSeciliHizmetler.filter(function(h){ return h.ad !== ad; });
+  // dropdown'da seçiliyi kaldır
+  document.querySelectorAll('#n-cs-dropdown .cs-option').forEach(function(opt) {
+    if (opt.dataset.hizmetAd === ad) opt.classList.remove('secili');
+  });
+  nHizmetGuncelle();
+}
+
+function nHizmetGuncelle() {
+  var liste = _nSeciliHizmetler;
+  var maxUyari = document.getElementById('n-max-uyari');
+  var secilenDiv = document.getElementById('n-secili-hizmetler');
+  var fiyatBox = document.getElementById('n-fiyat-box');
+
+  // Max uyarısı
+  if (liste.length >= MAX_HIZMET) {
+    maxUyari.classList.add('show');
+    document.querySelectorAll('#n-cs-dropdown .cs-option:not(.secili)').forEach(function(o){ o.classList.add('max-doldu'); });
+  } else {
+    maxUyari.classList.remove('show');
+    document.querySelectorAll('#n-cs-dropdown .cs-option').forEach(function(o){ o.classList.remove('max-doldu'); });
+  }
+
+  // Label güncelle
+  var lbl = document.getElementById('n-cs-label');
+  if (liste.length === 0) {
+    lbl.textContent = (window.i18n && window.i18n.t('rez_hizmet_sec')) || '— Hizmet Seçin —';
+    lbl.style.color = '#f7f4ef';
+  } else {
+    lbl.textContent = liste.length + ' hizmet seçildi';
+    lbl.style.color = '';
+  }
+
+  // Hidden input — virgülle ayrılmış hizmet adları
+  document.getElementById('n-hizmet').value = liste.map(function(h){ return h.ad; }).join(', ');
+
+  // Seçili hizmetler listesi
+  if (liste.length === 0) {
+    secilenDiv.classList.remove('show');
+    secilenDiv.innerHTML = '';
+    fiyatBox.classList.remove('show');
+    document.getElementById('n-hizmet-ekle-btn').style.display = 'none';
+    return;
+  }
+
+  // Per-hizmet indirim hesabı
+  var secilenTarih = document.getElementById('n-tarih').value || '';
+  var hizmetListesi = window._hizmetListesi || [];
+
+  var toplamMin = 0, toplamMax = 0, toplamSure = 0;
+  var orijMin2 = 0, orijMax2 = 0;
+  var herhangiInd = false;
+  var itemlerHTML = liste.map(function(h) {
+    var hObj = hizmetListesi.find(function(x){ return x.ad === h.ad; });
+    var oMin = hObj ? (hObj.min_fiyat || 0) : h.minFiyat;
+    var oMax = hObj ? (hObj.max_fiyat || 0) : h.maxFiyat;
+    var hInd = hizmetIndirimHesapla(hObj, secilenTarih, 'n');
+    var gMin = hInd > 0 ? Math.round(oMin * (1 - hInd/100)) : oMin;
+    var gMax = hInd > 0 ? Math.round(oMax * (1 - hInd/100)) : oMax;
+    toplamMin += gMin; toplamMax += gMax;
+    orijMin2 += oMin; orijMax2 += oMax;
+    toplamSure += (h.sure || 0);
+    if (hInd > 0) herhangiInd = true;
+    var fStr = gMin === gMax ? gMin.toLocaleString('tr-TR') + '₺' : gMin.toLocaleString('tr-TR') + ' – ' + gMax.toLocaleString('tr-TR') + '₺';
+    var eskiStr = '';
+    if (hInd > 0) {
+      var eskiMin = oMin === oMax ? oMin.toLocaleString('tr-TR') + '₺' : oMin.toLocaleString('tr-TR') + ' – ' + oMax.toLocaleString('tr-TR') + '₺';
+      eskiStr = '<s style="color:#888;font-size:.68rem;font-weight:400">' + eskiMin + '</s> ';
+    }
+    return '<div class="secili-hizmet-item">' +
+      '<span class="secili-hizmet-ad">' + h.ad + '</span>' +
+      '<span class="secili-hizmet-fiyat">' + eskiStr + fStr + '</span>' +
+      '<button class="secili-hizmet-sil" onclick="nHizmetSil(\'' + h.ad.replace(/'/g,"\'") + '\')" title="Kaldır">✕</button>' +
+    '</div>';
+  }).join('');
+  secilenDiv.innerHTML = itemlerHTML;
+  secilenDiv.classList.add('show');
+
+  // "＋ Hizmet Ekle" butonu göster/gizle
+  document.getElementById('n-hizmet-ekle-btn').style.display = liste.length >= MAX_HIZMET ? 'none' : '';
+
+  // Toplam fiyat
+  var toplamStr = toplamMin === toplamMax
+    ? toplamMin.toLocaleString('tr-TR') + '₺'
+    : toplamMin.toLocaleString('tr-TR') + ' – ' + toplamMax.toLocaleString('tr-TR') + '₺';
+
+  if (herhangiInd) {
+    var orijStr2 = orijMin2 === orijMax2 ? orijMin2.toLocaleString('tr-TR') + '₺' : orijMin2.toLocaleString('tr-TR') + ' – ' + orijMax2.toLocaleString('tr-TR') + '₺';
+    document.getElementById('fiyat-normal').innerHTML = '<s style="color:var(--text3);font-size:.78rem;font-weight:400">' + orijStr2 + '</s>';
+  } else {
+    document.getElementById('fiyat-normal').textContent = '';
+  }
+
+  document.getElementById('fiyat-indirimli').textContent = toplamStr;
+
+  var sureBadge = document.getElementById('n-sure-badge');
+  sureBadge.dataset.sure = toplamSure;
+  sureBadgeGuncelle(sureBadge);
+  fiyatBox.classList.add('show');
+}
+
+// ── ÖDEME FORM HİZMET (çoklu)
+function csToggleO() {
+  var dd = document.getElementById('o-cs-dropdown');
+  var arrow = document.getElementById('o-cs-arrow');
+  var open = dd.classList.toggle('open');
+  arrow.style.transform = open ? 'rotate(180deg)' : '';
+}
+
+function hizmetSecO(el, ad, fiyat, sure) {
+  // Toggle — zaten seçiliyse kaldır
+  var mevcutIdx = _oSeciliHizmetler.findIndex(function(h){ return h.ad === ad; });
+  if (mevcutIdx >= 0) {
+    _oSeciliHizmetler.splice(mevcutIdx, 1);
+    el.classList.remove('secili');
+    oHizmetGuncelle();
+    return;
+  }
+  if (_oSeciliHizmetler.length >= MAX_HIZMET) {
+    document.getElementById('o-max-uyari').classList.add('show');
+    return;
+  }
+  _oSeciliHizmetler.push({ ad: ad, fiyat: fiyat, sure: sure || 0 });
+  el.classList.add('secili');
+  oHizmetGuncelle();
+  // Seçim yapılınca dropdown'ı kapat
+  var dd = document.getElementById('o-cs-dropdown');
+  var arrow = document.getElementById('o-cs-arrow');
+  dd.classList.remove('open');
+  arrow.style.transform = '';
+}
+
+function oHizmetSil(ad) {
+  _oSeciliHizmetler = _oSeciliHizmetler.filter(function(h){ return h.ad !== ad; });
+  document.querySelectorAll('#o-cs-dropdown .cs-option').forEach(function(opt) {
+    if (opt.dataset.hizmetAd === ad) opt.classList.remove('secili');
+  });
+  oHizmetGuncelle();
+}
+
+function oHizmetGuncelle() {
+  var liste = _oSeciliHizmetler;
+  var maxUyari = document.getElementById('o-max-uyari');
+  var secilenDiv = document.getElementById('o-secili-hizmetler');
+  var fiyatBox = document.getElementById('o-fiyat-box');
+
+  if (liste.length >= MAX_HIZMET) {
+    maxUyari.classList.add('show');
+    document.querySelectorAll('#o-cs-dropdown .cs-option:not(.secili)').forEach(function(o){ o.classList.add('max-doldu'); });
+  } else {
+    maxUyari.classList.remove('show');
+    document.querySelectorAll('#o-cs-dropdown .cs-option').forEach(function(o){ o.classList.remove('max-doldu'); });
+  }
+
+  var lbl = document.getElementById('o-cs-label');
+  if (liste.length === 0) {
+    lbl.textContent = (window.i18n && window.i18n.t('rez_hizmet_sec')) || '— Hizmet Seçin —';
+    lbl.style.color = '#f7f4ef';
+  } else {
+    lbl.textContent = liste.length + ' hizmet seçildi';
+    lbl.style.color = '';
+  }
+
+  document.getElementById('o-hizmet').value = liste.map(function(h){ return h.ad; }).join(', ');
+
+  if (liste.length === 0) {
+    secilenDiv.classList.remove('show');
+    secilenDiv.innerHTML = '';
+    fiyatBox.classList.remove('show');
+    document.getElementById('o-fiyat').value = '';
+    document.getElementById('o-hizmet-ekle-btn').style.display = 'none';
+    return;
+  }
+
+  var secilenTarih = document.getElementById('o-tarih').value || '';
+  var hizmetListesi = window._hizmetListesi || [];
+
+  var toplamFiyat = 0, toplamOrij = 0, toplamSure = 0;
+  var herhangiIndO = false;
+  var itemlerHTML = liste.map(function(h) {
+    var hObj = hizmetListesi.find(function(x){ return x.ad === h.ad; });
+    var orijFiyat = hObj ? (hObj.max_fiyat || 0) : h.fiyat;
+    var hInd = hizmetIndirimHesapla(hObj, secilenTarih, 'o');
+    var gFiyat = hInd > 0 ? Math.round(orijFiyat * (1 - hInd/100)) : orijFiyat;
+    toplamFiyat += gFiyat;
+    toplamOrij += orijFiyat;
+    toplamSure += (h.sure || 0);
+    if (hInd > 0) herhangiIndO = true;
+    var fStr = gFiyat.toLocaleString('tr-TR') + '₺';
+    var eskiStr = '';
+    if (hInd > 0) {
+      eskiStr = '<s style="color:#888;font-size:.68rem;font-weight:400">' + orijFiyat.toLocaleString('tr-TR') + '₺</s> ';
+    }
+    return '<div class="secili-hizmet-item">' +
+      '<span class="secili-hizmet-ad">' + h.ad + '</span>' +
+      '<span class="secili-hizmet-fiyat">' + eskiStr + fStr + '</span>' +
+      '<button class="secili-hizmet-sil" onclick="oHizmetSil(\'' + h.ad.replace(/'/g,"\'") + '\')" title="Kaldır">✕</button>' +
+    '</div>';
+  }).join('');
+  secilenDiv.innerHTML = itemlerHTML;
+  secilenDiv.classList.add('show');
+
+  // "＋ Hizmet Ekle" butonu göster/gizle
+  document.getElementById('o-hizmet-ekle-btn').style.display = liste.length >= MAX_HIZMET ? 'none' : '';
+
+  // Toplam
+  document.getElementById('o-fiyat').value = toplamFiyat;
+  document.getElementById('o-fiyat-indirimli').textContent = toplamFiyat.toLocaleString('tr-TR') + '₺';
+
+  if (herhangiIndO) {
+    document.getElementById('o-fiyat-normal').innerHTML = '<s style="color:var(--text3);font-size:.78rem;font-weight:400">' + toplamOrij.toLocaleString('tr-TR') + '₺</s>';
+  } else {
+    document.getElementById('o-fiyat-normal').textContent = '';
+  }
+
+  var sureBadge = document.getElementById('o-sure-badge');
+  sureBadge.dataset.sure = toplamSure;
+  sureBadgeGuncelle(sureBadge);
+  fiyatBox.classList.add('show');
+}
+
+// ── SUPABASE CONFIG
+const SUPABASE_URL = 'https://botxnihztrnwzjnrlwzv.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvdHhuaWh6dHJud3pqbnJsd3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MTg4MTAsImV4cCI6MjA5MDA5NDgxMH0.AcX4_2Aykf8J1jln9fvODh2rRffymfEJCAekzmN1ALg';
+
+// ── KAPALI GÜN AYARI (Supabase'den, cache'li) ────────────────────────────
+var _kapaliGunCache = null;
+var _kapaliGunCacheTs = 0;
+async function kapaliGunAyariniAl() {
+  // 5 dakika cache — aynı sayfada defalarca sorgu yapmasın
+  var simdi = Date.now();
+  if (_kapaliGunCache && (simdi - _kapaliGunCacheTs) < 5 * 60 * 1000) {
+    return _kapaliGunCache;
+  }
+  try {
+    var res = await fetch(SUPABASE_URL + '/rest/v1/ayarlar?key=eq.kapali_gunler_config&select=value', {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+    });
+    var arr = await res.json();
+    if (arr && arr.length && arr[0].value) {
+      _kapaliGunCache = JSON.parse(arr[0].value);
+    } else {
+      // Ayar yoksa varsayılan: Salı kapalı
+      _kapaliGunCache = { kapali_gunler: [2], istisnalar: [] };
+    }
+  } catch(e) {
+    // Hata durumunda varsayılan
+    _kapaliGunCache = { kapali_gunler: [2], istisnalar: [] };
+  }
+  _kapaliGunCacheTs = Date.now();
+  return _kapaliGunCache;
+}
+// ─────────────────────────────────────────────────────────────────────────
+
+// ── WHATSAPP CONFIG
+const WA_PHONE_ID = '1018603338011115'; // 
+const WA_TOKEN    = 'EAAbpYZAirSdQBRP6ZCU2fCZAN5EKxj3x9d6CIqjMcBAEZBLPAuHaQ1wcomC7NEpdLQfCNzbrdFLgmOuLVNBGQQpwZCp73lm5gfkV2tSzqvkZCS81X8CvSxu513VMYjxhS1yTK1ldFbJzXtPygPWp4ZB1AG2ZBSKhT2KUvd38owytNXr2fX2CJZCBSGaqk4LLe5CU2MwZDZD'; // 
+
+function telFormatla(input) {
+  let val = input.value.replace(/[^0-9]/g, '');
+  // Sadece 5 ile başlıyorsa önüne 0 ekle (yabancı numaralara dokunma)
+  if (val.startsWith('5')) val = '0' + val;
+  if (val.length > 11) val = val.substring(0, 11);
+  // Format: 05xx xxx xx xx
+  let fmt = '';
+  if (val.length <= 4) fmt = val;
+  else if (val.length <= 7) fmt = val.substring(0,4) + ' ' + val.substring(4);
+  else if (val.length <= 9) fmt = val.substring(0,4) + ' ' + val.substring(4,7) + ' ' + val.substring(7);
+  else fmt = val.substring(0,4) + ' ' + val.substring(4,7) + ' ' + val.substring(7,9) + ' ' + val.substring(9);
+  input.value = fmt;
+}
+
+async function waTemplatGonder(tel, sablon, parametreler) {
+  let t = tel.replace(/\s/g, '').replace(/[^0-9]/g, '');
+  if (t.startsWith('0')) t = t.substring(1);
+  if (!t.startsWith('90')) t = '90' + t;
+  try {
+    const body = {
+      messaging_product: 'whatsapp',
+      to: t,
+      type: 'template',
+      template: {
+        name: sablon,
+        language: { code: 'tr' },
+        components: [{
+          type: 'body',
+          parameters: parametreler.map(p => ({ type: 'text', text: String(p) }))
+        }]
+      }
+    };
+    const res = await fetch(`https://graph.facebook.com/v22.0/${WA_PHONE_ID}/messages`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + WA_TOKEN },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    if (!res.ok) console.warn('WhatsApp gönderilemedi:', data);
+    else console.log('WhatsApp gönderildi ✓');
+  } catch(e) { console.warn('WhatsApp hata:', e); }
+}
+
+// Normal rezervasyon alındı mesajı
+async function whatsappGonder(telefon, ad, hizmet, tarih, saat, personelAd, rezervasyonId) {
+  const iptalLink = rezervasyonId
+    ? `https://www.fatihkurthairartist.com/iptal?id=${rezervasyonId}`
+    : 'Belirtilmedi';
+  await waTemplatGonder(telefon, 'rezervasyon_alindi', [
+    ad,
+    hizmet,
+    tarih,
+    saat || 'Belirtilmedi',
+    personelAd || 'Belirtilmedi'
+  ]);
+}
+
+// PayTR ödemeli rezervasyon onay mesajı
+async function waPaytrOnayMesaji(telefon, ad, hizmet, tarih, saat, personelAd, rezervasyonId) {
+  const iptalLink = rezervasyonId
+    ? `https://www.fatihkurthairartist.com/iptal?id=${rezervasyonId}`
+    : 'Belirtilmedi';
+  await waTemplatGonder(telefon, 'rezervasyon_onaylandi_odemeli', [
+    ad,
+    hizmet,
+    tarih,
+    saat || 'Belirtilmedi',
+    personelAd || 'Belirtilmedi',
+    iptalLink
+  ]);
+}
+
+async function supabaseInsert(tablo, veri) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${tablo}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Prefer': 'return=representation'  // ID geri dönsün
+    },
+    body: JSON.stringify(veri)
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(err);
+  }
+  const data = await res.json();
+  return Array.isArray(data) ? data[0] : data;
+}
+
+async function supabaseUpdate(tablo, id, veri) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${tablo}?id=eq.${id}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Prefer': 'return=minimal'
+    },
+    body: JSON.stringify(veri)
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(err);
+  }
+  return true;
+}
+
+// ── NORMAL REZERVASYON GÖNDER
+async function normalGonder() {
+  const btn = document.getElementById('n-btn');
+  const mesajDiv = document.getElementById('n-mesaj');
+  const ad = document.getElementById('n-ad').value.trim();
+  const telefon = document.getElementById('n-tel').value.trim();
+  const hizmet = document.getElementById('n-hizmet').value;
+  const tarih = document.getElementById('n-tarih').value;
+  const saat = document.getElementById('n-saat').value;
+  const not = document.getElementById('n-not').value.trim();
+  const personel = document.getElementById('n-personel').value || 'Baran Kurt';
+  const personelIsim = document.getElementById('n-personel-isim').value || personel;
+  
+  // Checkbox kontrolleri
+  const kvkkCheck = document.getElementById('n-kvkk');
+  const gizlilikCheck = document.getElementById('n-gizlilik');
+
+  if (!ad || !telefon || !hizmet || !tarih) {
+    mesaj(mesajDiv, 'Lütfen tüm zorunlu alanları doldurun.', 'hata');
+    return;
+  }
+  
+  if (!kvkkCheck.checked || !gizlilikCheck.checked) {
+    mesaj(mesajDiv, 'Lütfen sözleşmeleri okuyup onaylayın.', 'hata');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Gönderiliyor…';
+
+  try {
+    const rez = await supabaseInsert('rezervasyonlar', {
+      ad, telefon, hizmet, tarih, saat, musteri_notu: not,
+      personel_id: personel,
+      durum: 'bekliyor',
+      odeme_alindi: false,
+      tip: 'normal'
+    });
+    whatsappGonder(telefon, ad, hizmet, tarih, saat, personelIsim, rez?.id);
+    mesaj(mesajDiv, '✓Rezervasyonunuz alındı. En kısa sürede sizinle iletişime geçeceğiz.', 'basari');
+    ['n-ad','n-tel','n-tarih','n-not'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('n-hizmet').value = '';
+    document.getElementById('n-personel').value = '';
+    document.querySelectorAll('#normal-form .personel-row').forEach(k => k.classList.remove('secili'));
+    _nSeciliHizmetler = [];
+    document.getElementById('n-cs-label').textContent = (window.i18n && window.i18n.t('rez_hizmet_sec')) || '— Hizmet Seçin —';
+    document.getElementById('n-cs-label').style.color = '#f7f4ef';
+    document.getElementById('n-fiyat-box').classList.remove('show');
+    document.getElementById('n-secili-hizmetler').classList.remove('show');
+    document.getElementById('n-secili-hizmetler').innerHTML = '';
+    document.getElementById('n-max-uyari').classList.remove('show');
+    document.querySelectorAll('#normal-form .time-btn').forEach(b => b.classList.remove('selected'));
+    document.getElementById('n-saat').value = '';
+    kvkkCheck.checked = false;
+    gizlilikCheck.checked = false;
+    btn.textContent = 'Gönderildi ✓';
+  } catch(e) {
+    mesaj(mesajDiv, '✗ Bağlantı hatası. Lütfen tekrar deneyin.', 'hata');
+    btn.disabled = false;
+    btn.textContent = 'Rezervasyonu Gönder';
+  }
+}
+
+// ── PAYTR CONFIG — Kendi bilgilerinizle değiştirin
+// Bu değerler GÜVENLİ DEĞİLDİR; gerçek entegrasyonda backend'e taşıyın!
+// Aşağıdaki endpoint'i kendi sunucunuzda oluşturmalısınız (bkz: paytr-token.php)
+const PAYTR_TOKEN_ENDPOINT = '/api/paytr-token'; // Backend endpoint adresi
+
+// ── ÖDEMEYE GİT (PayTR iFrame)
+async function odemeGit() {
+  const mesajDiv = document.getElementById('o-mesaj');
+  const btn = document.getElementById('o-btn');
+  const ad = document.getElementById('o-ad').value.trim();
+  const telefon = document.getElementById('o-tel').value.trim();
+  const hizmet = document.getElementById('o-hizmet').value;
+  const tarih = document.getElementById('o-tarih').value;
+  const saat = document.getElementById('o-saat').value;
+  const fiyat = document.getElementById('o-fiyat').value;
+  const personel = document.getElementById('o-personel').value || 'Baran Kurt';
+  const personelIsim = document.getElementById('o-personel-isim').value || personel;
+  
+  // Checkbox kontrolleri
+  const kvkkCheck = document.getElementById('o-kvkk');
+  const gizlilikCheck = document.getElementById('o-gizlilik');
+  const mesafeliCheck = document.getElementById('o-mesafeli');
+  const teslimatCheck = document.getElementById('o-teslimat');
+
+  if (!ad || !telefon || !hizmet || !tarih) {
+    mesaj(mesajDiv, 'Lütfen tüm zorunlu alanları doldurun.', 'hata');
+    return;
+  }
+  
+  if (!kvkkCheck.checked || !gizlilikCheck.checked || !mesafeliCheck.checked || !teslimatCheck.checked) {
+    mesaj(mesajDiv, 'Lütfen tüm sözleşmeleri okuyup onaylayın.', 'hata');
+    return;
+  }
+  
+  if (!fiyat || parseInt(fiyat) <= 0) {
+    mesaj(mesajDiv, 'Lütfen geçerli bir hizmet seçin.', 'hata');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Kaydediliyor…';
+
+  try {
+    // merchant_oid'i frontend'de üret — backend'e ve Supabase'e aynı değeri gönder
+    const merchant_oid = 'HA' + Date.now();
+
+    // 1) Rezervasyonu Supabase'e kaydet — merchant_oid'i de dahil et
+    const kayit = await supabaseInsert('rezervasyonlar', {
+      ad, telefon, hizmet, tarih, saat,
+      fiyat: parseInt(fiyat) || 0,
+      personel_id: personel,
+      durum: 'odeme_bekleniyor',
+      odeme_alindi: false,
+      tip: 'odeme_bekleyen',
+      odeme_yontemi: 'kart',
+      merchant_oid: merchant_oid
+    });
+    window._bekleyenRezId = kayit?.id || null;
+    window._bekleyenRezData = { ad, telefon, hizmet, tarih, saat, personel: personelIsim };
+
+    btn.textContent = 'Ödeme açılıyor…';
+
+    // 2) Backend'den PayTR iframe_token al — merchant_oid'i de gönder
+    const tokenRes = await fetch(PAYTR_TOKEN_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ad,
+        telefon,
+        hizmet,
+        tarih,
+        saat,
+        fiyat: parseInt(fiyat),
+        personel,
+        rezervasyon_id: window._bekleyenRezId || null,
+        merchant_oid: merchant_oid   // ← backend bu değeri kullansın
+      })
+    });
+
+    const tokenData = await tokenRes.json();
+
+    if (!tokenRes.ok || tokenData.status !== 'success') {
+      throw new Error(tokenData.reason || 'Token alınamadı');
+    }
+
+    // 3) PayTR modalını aç
+    paytrAc(tokenData.token, parseInt(fiyat));
+
+    btn.disabled = false;
+    btn.textContent = 'Ödemeye Geç →';
+
+  } catch(e) {
+    console.error('Ödeme hatası:', e);
+    // Backend erişilemiyorsa direkt yönlendirmeye geri dön
+    if (e.message && e.message.includes('fetch')) {
+      mesaj(mesajDiv, '⚠ Backend endpoint bulunamadı. /api/paytr-token adresini kontrol edin.', 'hata');
+    } else {
+      mesaj(mesajDiv, '✗ ' + (e.message || 'Ödeme başlatılamadı. Tekrar deneyin.'), 'hata');
+    }
+    btn.disabled = false;
+    btn.textContent = 'Ödemeye Geç →';
+  }
+}
+
+// ── PAYTR MODAL AÇ/KAPAT
+function paytrAc(iframeToken, fiyat) {
+  const overlay = document.getElementById('paytr-overlay');
+  const wrap = document.getElementById('paytr-iframe-wrap');
+  const yukleniyor = document.getElementById('paytr-yukleniyor');
+  const hataKutu = document.getElementById('paytr-hata-kutu');
+
+  // Önceki iframe varsa temizle
+  const eskiIframe = wrap.querySelector('iframe');
+  if (eskiIframe) eskiIframe.remove();
+  yukleniyor.style.display = 'flex';
+  hataKutu.classList.remove('goster');
+
+  // Tutarı göster
+  document.getElementById('paytr-tutar-goster').textContent =
+    fiyat.toLocaleString('tr-TR') + ' ₺';
+
+  // Modal aç
+  overlay.classList.add('aktif');
+  document.body.style.overflow = 'hidden';
+
+  // PayTR iFrame oluştur
+  const iframe = document.createElement('iframe');
+  iframe.src = 'https://www.paytr.com/odeme/guvenli/' + iframeToken;
+  iframe.style.cssText = 'width:100%;border:none;display:block;min-height:440px;';
+  iframe.setAttribute('allowfullscreen', '');
+  iframe.setAttribute('scrolling', 'yes');
+
+  iframe.onload = function() {
+    yukleniyor.style.display = 'none';
+  };
+  iframe.onerror = function() {
+    yukleniyor.style.display = 'none';
+    hataKutu.classList.add('goster');
+  };
+
+  wrap.appendChild(iframe);
+
+  // PayTR'dan gelen mesajları dinle (ödeme sonucu)
+  window.addEventListener('message', paytrMesajDinle);
+}
+
+function paytrKapat() {
+  const overlay = document.getElementById('paytr-overlay');
+  overlay.classList.remove('aktif');
+  document.body.style.overflow = '';
+  window.removeEventListener('message', paytrMesajDinle);
+  // iframe'i temizle
+  const wrap = document.getElementById('paytr-iframe-wrap');
+  const iframe = wrap.querySelector('iframe');
+  if (iframe) iframe.remove();
+}
+
+async function paytrMesajDinle(e) {
+  // PayTR ödeme sonucu bildirimi
+  if (!e.data) return;
+
+  // PayTR hem string hem obje gönderebilir
+  const status = typeof e.data === 'string' ? e.data : e.data.status;
+  if (!status) return;
+
+  if (status === 'success') {
+    paytrKapat();
+
+    // Supabase'deki kaydı "onaylandi + ödeme alındı" olarak güncelle
+    const rezId = window._bekleyenRezId;
+    if (rezId) {
+      try {
+        await supabaseUpdate('rezervasyonlar', rezId, {
+          durum: 'onaylandi',
+          odeme_alindi: true,
+          tip: 'online'
+        });
+        console.log('Rezervasyon ödeme sonrası güncellendi ✓');
+
+        // WhatsApp onay mesajı gönder (ödemeli versiyon)
+        const rd = window._bekleyenRezData;
+        if (rd) {
+          await waPaytrOnayMesaji(rd.telefon, rd.ad, rd.hizmet, rd.tarih, rd.saat, rd.personel, rezId);
+        }
+      } catch(err) {
+        console.warn('Rezervasyon güncellenemedi:', err);
+      }
+    } else {
+      console.warn('Bekleyen rezervasyon ID bulunamadı!');
+    }
+
+    window.location.href = '/odeme-basarili';
+
+  } else if (status === 'fail') {
+    paytrKapat();
+    alert('Ödeme başarısız. Lütfen tekrar deneyin.');
+  }
+}
+
+
+function mesaj(el, metin, tip) {
+  el.textContent = metin;
+  el.className = 'rez-mesaj ' + tip;
+  el.style.display = 'block';
+}
+
+// ─── SÖZLEŞME MODAL
+const SOZLESMELER = {
+  kvkk: {
+    baslik: 'KVKK Aydınlatma Metni',
+    icerik: `
+      <h4>Veri Sorumlusu</h4>
+      <p>Fatih Kurt Hair Artist olarak 6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") uyarınca veri sorumlusu sıfatıyla, kişisel verileriniz aşağıda açıklandığı çerçevede işlenebilecektir.</p>
+      
+      <h4>Kişisel Verilerin İşlenme Amacı</h4>
+      <p>Toplanan kişisel verileriniz; rezervasyon işlemlerinizin gerçekleştirilmesi, hizmet kalitemizin artırılması, müşteri memnuniyetinin sağlanması, iletişim faaliyetlerinin yürütülmesi ve yasal yükümlülüklerin yerine getirilmesi amaçlarıyla işlenmektedir.</p>
+      
+      <h4>İşlenen Kişisel Veriler</h4>
+      <ul>
+        <li>Ad, soyad bilgisi</li>
+        <li>İletişim bilgisi (telefon numarası)</li>
+        <li>Rezervasyon bilgileri (tarih, saat, hizmet tercihi)</li>
+      </ul>
+      
+      <h4>Haklarınız</h4>
+      <p>KVKK'nın 11. maddesi uyarınca, kişisel verileriniz hakkında bilgi talep etme, düzeltme, silme ve işlenmesine itiraz etme haklarınız bulunmaktadır. Bu haklarınızı kullanmak için bizimle iletişime geçebilirsiniz.</p>
+    `
+  },
+  gizlilik: {
+    baslik: 'Gizlilik Sözleşmesi',
+    icerik: `
+      <h4>Gizlilik Politikası</h4>
+      <p>Fatih Kurt Hair Artist olarak müşterilerimizin gizliliğine saygı duyuyor ve kişisel verilerinizi korumak için gerekli tüm tedbirleri alıyoruz.</p>
+      
+      <h4>Toplanan Bilgiler</h4>
+      <p>Rezervasyon sürecinde ad, soyad ve telefon numaranız gibi kişisel bilgilerinizi topluyoruz.</p>
+      
+      <h4>Bilgilerin Kullanımı</h4>
+      <p>Toplanan bilgiler yalnızca rezervasyon işlemlerinizi gerçekleştirmek, sizinle iletişim kurmak ve hizmet kalitemizi artırmak amacıyla kullanılmaktadır.</p>
+      
+      <h4>Bilgi Güvenliği</h4>
+      <p>Kişisel verileriniz güvenli sunucularda saklanmakta ve yetkisiz erişimlere karşı korunmaktadır. Bilgileriniz üçüncü şahıslarla paylaşılmamaktadır.</p>
+      
+      <h4>İletişim</h4>
+      <p>Gizlilik politikamız hakkında sorularınız için bizimle iletişime geçebilirsiniz.</p>
+    `
+  },
+  mesafeli: {
+    baslik: 'Mesafeli Satış Sözleşmesi',
+    icerik: `
+      <h4>Taraflar</h4>
+      <p>İşbu sözleşme Fatih Kurt Hair Artist ile müşteri arasında akdedilmiştir.</p>
+      
+      <h4>Sözleşme Konusu</h4>
+      <p>Bu sözleşme, online ödeme ile yapılan rezervasyonlarda tarafların hak ve yükümlülüklerini düzenler.</p>
+      
+      <h4>Hizmetin Özellikleri</h4>
+      <p>Rezervasyon yaptırdığınız hizmetin adı, süresi ve ücreti rezervasyon formunda belirtilmiştir.</p>
+      
+      <h4>Ödeme Bilgileri</h4>
+      <p>Ödeme, güvenli ödeme altyapısı kullanılarak gerçekleştirilmektedir. Ödeme bilgileriniz tarafımızca saklanmamaktadır.</p>
+      
+      <h4>Cayma Hakkı</h4>
+      <p>Müşteri, randevu tarihinden en az 24 saat önce bildirimde bulunarak cayma hakkını kullanabilir.</p>
+      
+      <h4>Genel Hükümler</h4>
+      <p>İşbu sözleşme müşteri tarafından onaylandığı anda yürürlüğe girer.</p>
+    `
+  },
+  teslimat: {
+    baslik: 'Teslimat ve İade Koşulları',
+    icerik: `
+      <h4>Hizmet Sunumu</h4>
+      <p>Rezervasyon yaptırdığınız hizmet, belirlenen tarih ve saatte salonumuzda sunulacaktır.</p>
+      
+      <h4>İptal ve Değişiklik</h4>
+      <p>Randevunuzu iptal etmek veya değiştirmek isterseniz, randevu tarihinden en az 24 saat önce bizimle iletişime geçmeniz gerekmektedir.</p>
+      
+      <h4>Geç Kalma Durumu</h4>
+      <p>Randevunuza 15 dakikadan fazla geç kalmanız durumunda, randevunuz iptal edilebilir veya hizmet süresi kısaltılabilir.</p>
+      
+      <h4>İade Koşulları</h4>
+      <p>Online ödeme ile yapılan rezervasyonlarda, iptal işlemi randevu tarihinden en az 24 saat önce yapılması halinde ücret iadesi gerçekleştirilir. İade işlemi 5-10 iş günü içerisinde tamamlanır.</p>
+      
+      <h4>Hizmet Memnuniyetsizliği</h4>
+      <p>Aldığınız hizmetten memnun kalmamanız durumunda, durum salonumuz yönetimine iletilmeli ve çözüm aranmalıdır.</p>
+    `
+  }
+};
+
+function sozlesmeAc(tip) {
+  const modal = document.getElementById('sozlesme-modal');
+  const baslik = document.getElementById('sozlesme-baslik');
+  const icerik = document.getElementById('sozlesme-icerik');
+  
+  const sozlesme = SOZLESMELER[tip];
+  if (!sozlesme) return;
+  
+  baslik.textContent = sozlesme.baslik;
+  icerik.innerHTML = sozlesme.icerik;
+  
+  modal.classList.add('aktif');
+  document.body.style.overflow = 'hidden';
+}
+
+function sozlesmeKapat() {
+  const modal = document.getElementById('sozlesme-modal');
+  modal.classList.remove('aktif');
+  document.body.style.overflow = '';
+}
+
+// Modal dışına tıklanınca kapat
+document.addEventListener('click', function(e) {
+  const modal = document.getElementById('sozlesme-modal');
+  if (e.target === modal) {
+    sozlesmeKapat();
+  }
+});
+
+// ─── SAAT SEÇİCİ
+function selectTime(btn, time, prefix) {
+  if (btn.disabled) return;
+  btn.closest('.time-grid').querySelectorAll('.time-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  document.getElementById(prefix + '-saat').value = time;
+}
+
+// Kampanya tarih kontrolü — tarih değişince indirim güncelle
+document.addEventListener('DOMContentLoaded', function() {
+  var oTarih = document.getElementById('o-tarih');
+  if (oTarih) {
+    oTarih.addEventListener('change', function() {
+      var ind = kampanyaKontrol(this.value, 'o');
+      var liste = window._hizmetListesi || [];
+      if (liste.length) hizmetDropdownOlustur('o', liste, ind);
+      var badge = document.getElementById('odeme-indirim-badge');
+      var yuzde = window._indirimYuzde || 0;
+      var hedef = window._kampanyaHedef || 'ikisi';
+      var goster = yuzde > 0 && (hedef === 'hizmet' || hedef === 'ikisi');
+      if (badge) {
+        if (goster && ind > 0) { badge.textContent = '%' + yuzde + ' ' + 'İndirim'; badge.style.display = ''; }
+        else { badge.style.display = 'none'; }
+      }
+      // Seçili hizmet varsa fiyat kutusunu güncelle
+      var secilenHizmet = document.getElementById('o-hizmet').value;
+      var secilenOption = document.querySelector('#o-cs-dropdown .cs-option.secili');
+      if (secilenHizmet && liste.length) {
+        var h = liste.find(function(x){ return x.ad === secilenHizmet; });
+        if (h) {
+          var tumInd = window._indirimYuzde || 0;
+          var orijFiyat = h.max_fiyat || 0;
+          var gercekFiyat = ind > 0 ? Math.round(orijFiyat * (1 - ind / 100)) : orijFiyat;
+          document.getElementById('o-fiyat').value = gercekFiyat;
+          if (ind > 0) {
+            document.getElementById('o-fiyat-indirimli').textContent = gercekFiyat.toLocaleString('tr-TR') + '₺';
+            document.getElementById('o-fiyat-normal').innerHTML = '<s style="color:var(--text3);font-size:.78rem;font-weight:400">' + orijFiyat.toLocaleString('tr-TR') + '₺</s>';
+          } else {
+            document.getElementById('o-fiyat-indirimli').textContent = orijFiyat.toLocaleString('tr-TR') + '₺';
+            document.getElementById('o-fiyat-normal').textContent = '';
+          }
+        }
+      }
+    });
+  }
+  var nTarih = document.getElementById('n-tarih');
+  if (nTarih) {
+    nTarih.addEventListener('change', function() {
+      var ind = kampanyaKontrol(this.value, 'n');
+      var liste = window._hizmetListesi || [];
+      if (liste.length) hizmetDropdownOlustur('n', liste, ind);
+      var badge = document.getElementById('normal-indirim-badge');
+      var yuzde = window._indirimYuzde || 0;
+      var hedef = window._kampanyaHedef || 'ikisi';
+      var goster = yuzde > 0 && (hedef === 'rezervasyon' || hedef === 'ikisi');
+      if (badge) {
+        if (goster && ind > 0) { badge.textContent = '%' + yuzde + ' ' + 'İndirim'; badge.style.display = ''; }
+        else { badge.style.display = 'none'; }
+      }
+      // Seçili hizmet varsa fiyat kutusunu güncelle
+      var secilenHizmet = document.getElementById('n-hizmet').value;
+      if (secilenHizmet && liste.length) {
+        var h = liste.find(function(x){ return x.ad === secilenHizmet; });
+        if (h) {
+          var orijMin = h.min_fiyat || 0;
+          var orijMax = h.max_fiyat || 0;
+          var gercekMin = ind > 0 ? Math.round(orijMin * (1 - ind / 100)) : orijMin;
+          var gercekMax = ind > 0 ? Math.round(orijMax * (1 - ind / 100)) : orijMax;
+          var fiyatStr = gercekMin === gercekMax
+            ? gercekMin.toLocaleString('tr-TR') + '₺'
+            : gercekMin.toLocaleString('tr-TR') + ' – ' + gercekMax.toLocaleString('tr-TR') + '₺';
+          if (ind > 0) {
+            var orijStr = orijMin === orijMax
+              ? orijMin.toLocaleString('tr-TR') + '₺'
+              : orijMin.toLocaleString('tr-TR') + ' – ' + orijMax.toLocaleString('tr-TR') + '₺';
+            document.getElementById('fiyat-indirimli').textContent = fiyatStr;
+            document.getElementById('fiyat-normal').innerHTML = '<s style="color:var(--text3);font-size:.78rem;font-weight:400">' + orijStr + '</s>';
+          } else {
+            document.getElementById('fiyat-indirimli').textContent = fiyatStr;
+            document.getElementById('fiyat-normal').textContent = '';
+          }
+        }
+      }
+    });
+  }
+});
+
+// Personelin seçili tarihte dolu saatlerini Supabase'den çek
+async function doluSaatleriCek(personelId, tarih) {
+  if (!personelId || !tarih) return [];
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/rezervasyonlar?personel_id=eq.${personelId}&tarih=eq.${tarih}&durum=in.(bekliyor,onaylandi,odeme_bekleniyor,odeme_bekleyen)&select=saat`,
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }
+    );
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.map(x => x.saat).filter(Boolean);
+  } catch(e) {
+    console.warn('Dolu saatler alınamadı:', e);
+    return [];
+  }
+}
+
+async function saatleriGuncelle(prefix) {
+  var tarihEl = document.getElementById(prefix + '-tarih');
+  if (!tarihEl) return;
+  var tarih = tarihEl.value;
+  var simdi = new Date();
+  var bugun = simdi.toISOString().split('T')[0];
+  var bugunMu = tarih === bugun;
+  var suAnSaat = simdi.getHours();
+  var personelId = document.getElementById(prefix + '-personel').value;
+
+  // Kapalı gün kontrolü — Supabase ayarından dinamik olarak gelir
+  var kapaliMi = false;
+  var secilenGun = -1;
+  if (tarih) {
+    var ayar = await kapaliGunAyariniAl();
+    secilenGun = new Date(tarih + 'T00:00:00').getDay();
+    // İstisna var mı kontrol et
+    var istisna = ayar.istisnalar.find(function(x){ return x.tarih === tarih; });
+    if (istisna) {
+      // İstisna varsa: 'acik' ise açık, 'kapali' ise kapalı
+      kapaliMi = (istisna.durum === 'kapali');
+    } else {
+      // İstisna yoksa haftalık kapalı gün listesine bak
+      kapaliMi = ayar.kapali_gunler.includes(secilenGun);
+    }
+  }
+
+  // Supabase'den dolu saatleri çek
+  var doluSaatler = tarih ? await doluSaatleriCek(personelId, tarih) : [];
+
+  var formId = prefix === 'n' ? 'normal-form' : 'odeme-form';
+  document.querySelectorAll('#' + formId + ' .time-btn').forEach(function(btn) {
+    var saatStr = btn.textContent.trim(); // '10:00'
+    var saatInt = parseInt(saatStr.split(':')[0]);
+    var gecmisMi = bugunMu && saatInt <= suAnSaat;
+    var doluMu = doluSaatler.includes(saatStr);
+
+    if (gecmisMi || doluMu || kapaliMi) {
+      btn.disabled = true;
+      btn.classList.remove('selected');
+      btn.style.opacity = kapaliMi ? '.2' : (doluMu ? '.35' : '.2');
+      btn.style.cursor = 'not-allowed';
+      btn.style.textDecoration = 'line-through';
+      var _t = window.i18n && window.i18n.t.bind(window.i18n);
+      var kapaliTitle = secilenGun === 2
+        ? ((_t && _t('rez_sali_kapali')) || 'Salı günleri kapalıyız')
+        : 'Seçtiğiniz gün salonumuz kapalıdır';
+      btn.title = kapaliMi
+        ? kapaliTitle
+        : (doluMu
+          ? ((_t && _t('rez_saat_dolu')) || 'Bu saat dolu')
+          : ((_t && _t('rez_gecmis_saat')) || 'Geçmiş saat'));
+    } else {
+      btn.disabled = false;
+      btn.style.opacity = '';
+      btn.style.cursor = '';
+      btn.style.textDecoration = '';
+      btn.title = '';
+    }
+  });
+
+  // Kapalı ise tarih alanının altında uyarı göster
+  var formEl = document.getElementById(formId);
+  var mevcutUyari = formEl ? formEl.querySelector('.sali-uyari') : null;
+  if (kapaliMi) {
+    var kapaliUyariMetni = secilenGun === 2
+      ? ((window.i18n && window.i18n.t('rez_sali_uyari')) || '⚠ Salı günleri salonumuz kapalıdır. Lütfen farklı bir gün seçin.')
+      : '⚠ Seçtiğiniz gün salonumuz kapalıdır. Lütfen farklı bir gün seçin.';
+    if (!mevcutUyari) {
+      var uyari = document.createElement('p');
+      uyari.className = 'sali-uyari';
+      uyari.style.cssText = 'color:#e57373;font-size:.75rem;letter-spacing:.05em;margin-top:6px;';
+      uyari.setAttribute('data-i18n','rez_sali_uyari');
+      uyari.textContent = kapaliUyariMetni;
+      tarihEl.parentElement.appendChild(uyari);
+    } else {
+      mevcutUyari.textContent = kapaliUyariMetni;
+    }
+  } else {
+    if (mevcutUyari) mevcutUyari.remove();
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  var bugun = new Date().toISOString().split('T')[0];
+  ['n', 'o'].forEach(function(prefix) {
+    var el = document.getElementById(prefix + '-tarih');
+    if (!el) return;
+    el.min = bugun;
+    el.addEventListener('click', function() { try { el.showPicker(); } catch(e) {} });
+    el.addEventListener('change', function() {
+      if (el.value < bugun) { el.value = bugun; }
+      saatleriGuncelle(prefix);
+    });
+    el.addEventListener('input', function() {
+      if (el.value < bugun) { el.value = bugun; }
+      saatleriGuncelle(prefix);
+    });
+  });
+  saatleriGuncelle('n');
+  saatleriGuncelle('o');
+
+  // ── Personeli Supabase'den yükle
+  personelYukle();
+  // ── Hizmetleri Supabase'den yükle
+  hizmetleriYukle();
+
+  // ── Dil değişince dropdown'ları yeniden render et
+  window.addEventListener('langchange', () => {
+    if (window._hizmetListesi) {
+      const kampanyaHedef = window._kampanyaHedef || 'ikisi';
+      const seciliIds = window._seciliHizmetIds || [];
+      let hizInd, rezInd;
+      if (seciliIds.length > 0) {
+        hizInd = (kampanyaHedef === 'hizmet' || kampanyaHedef === 'ikisi') ? -1 : 0;
+        rezInd = (kampanyaHedef === 'rezervasyon' || kampanyaHedef === 'ikisi') ? -1 : 0;
+      } else {
+        hizInd = (kampanyaHedef === 'hizmet' || kampanyaHedef === 'ikisi' || kampanyaHedef === 'secili') ? (window._indirimYuzde || 0) : 0;
+        rezInd = (kampanyaHedef === 'rezervasyon' || kampanyaHedef === 'ikisi' || kampanyaHedef === 'secili') ? (window._indirimYuzde || 0) : 0;
+        if (kampanyaHedef === 'secili') { hizInd = -1; rezInd = -1; }
+      }
+      hizmetDropdownOlustur('n', window._hizmetListesi, rezInd);
+      hizmetDropdownOlustur('o', window._hizmetListesi, hizInd);
+    }
+  });
+});
+
+async function hizmetleriYukle() {
+  try {
+    const [hizRes, ayarRes] = await Promise.all([
+      fetch(`${SUPABASE_URL}/rest/v1/hizmetler?select=*&order=sira.asc,created_at.asc`, {
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+      }),
+      fetch(`${SUPABASE_URL}/rest/v1/ayarlar?key=in.(indirim_yuzde,kampanya_baslangic,kampanya_bitis,kampanya_hedef,kampanya_secili_hizmetler)&select=key,value`, {
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+      })
+    ]);
+    if (!hizRes.ok) return;
+    const liste = await hizRes.json();
+    if (!liste.length) return;
+
+    let indirimYuzde = 0, kampanyaBas = '', kampanyaBit = '', kampanyaHedef = 'ikisi', seciliIds = [];
+    if (ayarRes.ok) {
+      const ayarlar = await ayarRes.json();
+      indirimYuzde = parseInt((ayarlar.find(a => a.key === 'indirim_yuzde') || {}).value) || 0;
+      kampanyaBas  = (ayarlar.find(a => a.key === 'kampanya_baslangic') || {}).value || '';
+      kampanyaBit  = (ayarlar.find(a => a.key === 'kampanya_bitis')     || {}).value || '';
+      kampanyaHedef= (ayarlar.find(a => a.key === 'kampanya_hedef')     || {}).value || 'ikisi';
+      try{ seciliIds = JSON.parse((ayarlar.find(a => a.key === 'kampanya_secili_hizmetler') || {}).value || '[]'); }catch(e){ seciliIds=[]; }
+    }
+    window._indirimYuzde  = indirimYuzde;
+    window._kampanyaBas   = kampanyaBas;
+    window._kampanyaBit   = kampanyaBit;
+    window._kampanyaHedef = kampanyaHedef;
+    window._seciliHizmetIds = seciliIds;
+
+    // Tarih yoksa indirim her zaman aktif; tarih varsa bugünün tarihi kampanya aralığında mı kontrol et
+    const bugunStr = new Date().toISOString().split('T')[0];
+    const indirimAktif = !kampanyaBas && !kampanyaBit
+      ? true
+      : (bugunStr >= kampanyaBas && bugunStr <= kampanyaBit);
+    const efektifIndirim = indirimAktif ? indirimYuzde : 0;
+
+    // Tarih badge metni  (ör. "10 Mar – 20 Mar")
+    var tarihBadgeTxt = (kampanyaBas && kampanyaBit)
+      ? formatTarihKisa(kampanyaBas) + ' – ' + formatTarihKisa(kampanyaBit)
+      : '';
+
+    // ── Hizmet Al kartı (odeme) ──
+    var hizmetAlAktif = efektifIndirim > 0 && (kampanyaHedef === 'hizmet' || kampanyaHedef === 'ikisi' || kampanyaHedef === 'secili');
+    var odeIBadge = document.getElementById('odeme-indirim-badge');
+    var odeTBadge = document.getElementById('odeme-tarih-badge');
+    if (odeIBadge) {
+      if (hizmetAlAktif) { odeIBadge.textContent = '%' + indirimYuzde + ' ' + 'İndirim'; odeIBadge.style.display = ''; }
+      else { odeIBadge.style.display = 'none'; }
+    }
+    if (odeTBadge) {
+      if (tarihBadgeTxt && hizmetAlAktif) { odeTBadge.textContent = tarihBadgeTxt; odeTBadge.style.display = ''; }
+      else { odeTBadge.style.display = 'none'; }
+    }
+
+    // ── Rezervasyon Yap kartı (normal) ──
+    var rezAktif = efektifIndirim > 0 && (kampanyaHedef === 'rezervasyon' || kampanyaHedef === 'ikisi' || kampanyaHedef === 'secili');
+    var norIBadge = document.getElementById('normal-indirim-badge');
+    var norTBadge = document.getElementById('normal-tarih-badge');
+    if (norIBadge) {
+      if (rezAktif) { norIBadge.textContent = '%' + indirimYuzde + ' ' + 'İndirim'; norIBadge.style.display = ''; }
+      else { norIBadge.style.display = 'none'; }
+    }
+    if (norTBadge) {
+      if (tarihBadgeTxt && rezAktif) { norTBadge.textContent = tarihBadgeTxt; norTBadge.style.display = ''; }
+      else { norTBadge.style.display = 'none'; }
+    }
+
+    // ── Hizmet dropdown indirim oranları ──
+    // seciliIds: seçili hizmet UUID listesi. Her hizmet için ayrı kontrol yapılır (-1 sinyali).
+    // Hedef yoksa 'secili' zaten seciliIds üzerinden yönetilir.
+    var normalRezInd, hizmetAlInd;
+
+    if (seciliIds.length > 0) {
+      // Seçili hizmetler modu — her form için hedef kontrolü
+      normalRezInd = (kampanyaHedef === 'rezervasyon' || kampanyaHedef === 'ikisi' || kampanyaHedef === 'secili') ? -1 : 0;
+      hizmetAlInd  = (kampanyaHedef === 'hizmet'      || kampanyaHedef === 'ikisi' || kampanyaHedef === 'secili') ? -1 : 0;
+    } else if (kampanyaHedef === 'secili') {
+      // seciliIds boş ama hedef 'secili' — indirim yok
+      normalRezInd = 0;
+      hizmetAlInd  = 0;
+    } else {
+      normalRezInd = (kampanyaHedef === 'rezervasyon' || kampanyaHedef === 'ikisi') ? efektifIndirim : 0;
+      hizmetAlInd  = (kampanyaHedef === 'hizmet'      || kampanyaHedef === 'ikisi') ? efektifIndirim : 0;
+    }
+
+    // Her hizmetin id'sini string olarak eşleştirmek için listeyi zenginleştir
+    const seciliIdsStr = seciliIds.map(String);
+    liste.forEach(h => { h._seciliIndirim = seciliIdsStr.includes(String(h.id)) ? efektifIndirim : 0; });
+
+    window._hizmetListesi = liste;
+    window._efektifIndirim = efektifIndirim;
+    hizmetDropdownOlustur('n', liste, normalRezInd);
+    hizmetDropdownOlustur('o', liste, hizmetAlInd);
+  } catch(e) {
+    console.warn('Hizmetler yüklenemedi:', e);
+  }
+}
+
+function formatTarihKisa(tarihStr) {
+  if (!tarihStr) return '';
+  var d = new Date(tarihStr + 'T00:00:00');
+  var aylar = ['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'];
+  return d.getDate() + ' ' + aylar[d.getMonth()];
+}
+
+function kampanyaKontrol(tarih, prefix) {
+  // Artık sadece dropdown'da kullanılıyor. Güncelle fonksiyonları hizmetIndirimHesapla kullanır.
+  var bas   = window._kampanyaBas   || '';
+  var bit   = window._kampanyaBit   || '';
+  var yuzde = window._indirimYuzde  || 0;
+  var hedef = window._kampanyaHedef || 'ikisi';
+  var seciliIds = window._seciliHizmetIds || [];
+  if (!yuzde) return 0;
+  if (seciliIds.length > 0 || hedef === 'secili') return -1;
+  if (prefix === 'o' && hedef === 'rezervasyon') return 0;
+  if (prefix === 'n' && hedef === 'hizmet')      return 0;
+  if (!bas && !bit) return yuzde;
+  var kontrolTarih2 = tarih || new Date().toISOString().split('T')[0];
+  return kontrolTarih2 >= bas && kontrolTarih2 <= bit ? yuzde : 0;
+}
+
+// Her hizmet için gerçek indirim oranını döndürür
+function hizmetIndirimHesapla(hizObj, secilenTarih, prefix) {
+  var hedef = window._kampanyaHedef || 'ikisi';
+  var seciliIds = window._seciliHizmetIds || [];
+  var efektif = window._efektifIndirim || 0;
+
+  // Seçili hizmetler modu: yükleme anında hesaplanan _seciliIndirim alanını kullan
+  if (seciliIds.length > 0 || hedef === 'secili') {
+    if (!hizObj) return 0;
+    // Hedef prefix'e uygun mu?
+    if (prefix === 'n' && hedef === 'hizmet') return 0;
+    if (prefix === 'o' && hedef === 'rezervasyon') return 0;
+    return hizObj._seciliIndirim || 0;
+  }
+
+  // Normal mod
+  if (!efektif) return 0;
+  var bas = window._kampanyaBas || '', bit = window._kampanyaBit || '';
+  var kontrolTarih = secilenTarih || new Date().toISOString().split('T')[0];
+  var tarihOk = (!bas && !bit) || (kontrolTarih >= bas && kontrolTarih <= bit);
+  if (!tarihOk) return 0;
+  if (prefix === 'n' && hedef === 'hizmet')      return 0;
+  if (prefix === 'o' && hedef === 'rezervasyon') return 0;
+  return efektif;
+}
+
+function hizmetFiyatStr(min, max) {
+  if (min === max) return min.toLocaleString('tr-TR') + '₺';
+  return min.toLocaleString('tr-TR') + ' – ' + max.toLocaleString('tr-TR') + '₺';
+}
+
+function hizmetDropdownOlustur(prefix, liste, indirimYuzde = 0) {
+  const dd = document.getElementById(prefix + '-cs-dropdown');
+  if (!dd) return;
+  const fn = prefix === 'n' ? 'hizmetSecN' : 'hizmetSecO';
+  const aktifDil = (window.i18n && window.i18n.detectLang()) || 'tr';
+  const kampanyaHedef = window._kampanyaHedef || 'ikisi';
+  const seciliIds = window._seciliHizmetIds || [];
+  
+  dd.innerHTML = liste.map(h => {
+    const gorununAd = h["ad_" + aktifDil] || h.ad;
+    // Supabase'e her zaman Türkçe ad kaydedilsin
+    const trAdSafe = h.ad.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    const sure = h.sure || 60;
+    const minFiyat = h.min_fiyat || 0;
+    const maxFiyat = h.max_fiyat || 0;
+
+    // Seçili hizmetler modunda: h._seciliIndirim alanını kullan (yükleme sırasında hesaplandı)
+    let hizmetInd = indirimYuzde;
+    if (indirimYuzde === -1) {
+      hizmetInd = h._seciliIndirim || 0;
+    }
+
+    if (hizmetInd > 0) {
+      const indMin = Math.round(minFiyat * (1 - hizmetInd / 100));
+      const indMax = Math.round(maxFiyat * (1 - hizmetInd / 100));
+      const eskiStr = hizmetFiyatStr(minFiyat, maxFiyat);
+      const yeniStr = hizmetFiyatStr(indMin, indMax);
+
+      const indirimLbl = 'İndirim';
+      if (prefix === 'n') {
+        return `<div class="cs-option" data-hizmet-ad="${h.ad.replace(/"/g,'&quot;')}" onclick="${fn}(this,'${trAdSafe}',${indMin},${indMax},${sure})">
+          <span class="cs-ad">${gorununAd} <span style="font-size:.6rem;background:#c8a96e22;color:#c8a96e;border:1px solid #c8a96e44;border-radius:8px;padding:1px 7px;font-weight:600">%${hizmetInd} ${indirimLbl}</span></span>
+          <span class="cs-fiyatlar"><s style="color:var(--text3,#888);font-size:.72rem;font-weight:400">${eskiStr}</s> <span class="cs-indirimli">${yeniStr}</span></span>
+        </div>`;
+      } else {
+        return `<div class="cs-option" data-hizmet-ad="${h.ad.replace(/"/g,'&quot;')}" onclick="${fn}(this,'${trAdSafe}',${indMax},${sure})">
+          <span class="cs-ad">${gorununAd} <span style="font-size:.6rem;background:#c8a96e22;color:#c8a96e;border:1px solid #c8a96e44;border-radius:8px;padding:1px 7px;font-weight:600">%${hizmetInd} ${indirimLbl}</span></span>
+          <span class="cs-fiyatlar"><s style="color:var(--text3,#888);font-size:.72rem;font-weight:400">${eskiStr}</s> <span class="cs-indirimli">${yeniStr}</span></span>
+        </div>`;
+      }
+    }
+
+    // İndirim yok — normal gösterim
+    const fiyatStr = hizmetFiyatStr(minFiyat, maxFiyat);
+    if (prefix === 'n') {
+      return `<div class="cs-option" data-hizmet-ad="${h.ad.replace(/"/g,'&quot;')}" onclick="${fn}(this,'${trAdSafe}',${minFiyat},${maxFiyat},${sure})">
+        <span class="cs-ad">${gorununAd}</span>
+        <span class="cs-fiyatlar"><span class="cs-indirimli">${fiyatStr}</span></span>
+      </div>`;
+    } else {
+      return `<div class="cs-option" data-hizmet-ad="${h.ad.replace(/"/g,'&quot;')}" onclick="${fn}(this,'${trAdSafe}',${maxFiyat},${sure})">
+        <span class="cs-ad">${gorununAd}</span>
+        <span class="cs-fiyatlar"><span class="cs-indirimli">${fiyatStr}</span></span>
+      </div>`;
+    }
+  }).join('');
+}
+
+
+async function personelYukle() {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/personel?select=*&order=created_at.asc`, {
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY
+      }
+    });
+    if (!res.ok) return;
+    const personelListesi = await res.json();
+    // Aktif personelin hepsini al (rez_aktif false olanlar da görünsün ama seçilemesin)
+    const aktifler = personelListesi.filter(p => p.durum === 'aktif');
+    if (!aktifler.length) return;
+    ['n', 'o'].forEach(prefix => personelDropdownOlustur(prefix, aktifler));
+  } catch(e) {
+    console.warn('Personel yüklenemedi:', e);
+  }
+}
+
+function personelDropdownOlustur(prefix, liste) {
+  const dropdown = document.getElementById(prefix + '-personel-dropdown');
+  if (!dropdown) return;
+  dropdown.innerHTML = liste.map(p => {
+    const rezAcik = p.rez_aktif !== false;
+    const foto = p.foto ? (p.foto.startsWith('http') ? p.foto : 'images/' + p.foto) : '';
+    const initials = p.ad.split(' ').map(x=>x[0]).join('').substring(0,2).toUpperCase();
+    const fotoHtml = foto
+      ? `<img src="${foto}" alt="${p.ad}" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=\\'font-size:.9rem\\'>${initials}</span>'">`
+      : `<span style="font-size:.9rem">${initials}</span>`;
+
+    if (!rezAcik) {
+      // Kapalı personel — görünür ama seçilemiyor
+      return `<div class="personel-row" style="opacity:.45;cursor:not-allowed;pointer-events:none;position:relative">
+        <div class="personel-foto" style="filter:grayscale(1)">${fotoHtml}</div>
+        <div class="personel-info">
+          <div class="personel-ad">${p.ad}</div>
+          <div class="personel-unvan" style="color:#f7f4ef" data-i18n="rez_musait_degil">Uygun rezervasyon bulunamadı</div>
+        </div>
+        <div style="font-size:.55rem;color:#f7f4ef;white-space:nowrap">🚫</div>
+      </div>`;
+    }
+
+    return `<div class="personel-row" onclick="personelSec(this,'${prefix}','${p.ad}','${p.rol||''}','${foto}','${initials}','${p.id}')">
+      <div class="personel-foto">${fotoHtml}</div>
+      <div class="personel-info">
+        <div class="personel-ad">${p.ad}</div>
+        <div class="personel-unvan">${p.rol||''}</div>
+      </div>
+      <div class="personel-check"></div>
+    </div>`;
+  }).join('');
+}
+
+
+// ── Dinamik i18n güncellemeleri (mesai + sure badge)
+function _t(key) {
+  return (window.i18n && window.i18n.t(key)) || '';
+}
+
+function _i18nHazirMi() {
+  // i18n hazır mı? t() key'i aynen döndürüyorsa henüz yüklenmemiş demek
+  var test = _t('contact_day_0');
+  return test && test !== 'contact_day_0';
+}
+
+function sureBadgeGuncelle(badge) {
+  var sure = parseInt(badge.dataset.sure) || 0;
+  if (sure > 0) {
+    if (!_i18nHazirMi()) {
+      setTimeout(function() { sureBadgeGuncelle(badge); }, 80);
+      return;
+    }
+    var lbl  = _t('rez_islem_suresi') || 'İşlem süresi:';
+    var unit = _t('rez_dk') || 'dk';
+    badge.textContent = lbl + ' ' + sure + ' ' + unit;
+    badge.style.display = '';
+  } else {
+    badge.textContent = '';
+    badge.style.display = 'none';
+  }
+}
+
+function rezDinamikGuncelle() {
+  if (!_i18nHazirMi()) {
+    setTimeout(rezDinamikGuncelle, 80);
+    return;
+  }
+
+  // Mesai metni — tüm günler ayrı ayrı
+  var pzt = _t('contact_day_0');
+  var car = _t('contact_day_2');
+  var per = _t('contact_day_3');
+  var cum = _t('contact_day_4');
+  var cmt = _t('contact_day_5');
+  var paz = _t('contact_day_6');
+  var mesaiText = pzt + ' 08:30–20:00 · ' + car + ' 08:30–20:00 · ' + per + ' 08:30–20:00 · ' + cum + ' 08:30–20:00 · ' + cmt + ' 08:30–20:00 · ' + paz + ' 09:00–19:00';
+  document.querySelectorAll('.rez-bilgi-mesai-text').forEach(function(el) {
+    el.textContent = mesaiText;
+  });
+
+  // Sure badge'leri
+  document.querySelectorAll('#n-sure-badge, #o-sure-badge').forEach(sureBadgeGuncelle);
+}
+
+// İlk yükleme
+document.addEventListener('DOMContentLoaded', rezDinamikGuncelle);
+
+// Dil değişince
+window.addEventListener('langchange', rezDinamikGuncelle);
+</script>
+</body>
+</html>
