@@ -2173,14 +2173,16 @@ async function indirimKaydet(){
   const hedefEl = document.querySelector('input[name="kampanya-hedef"]:checked');
   const hedef = hedefEl ? hedefEl.value : 'ikisi';
   const seciliHiz = seciliHizmetleriAl();
+  const chkS = document.getElementById('secili-hiz-chk');
+  if(chkS && chkS.checked && seciliHiz === '[]'){toast('En az bir hizmet seçin veya "Seçili hizmetler" kutusunu kaldırın.','hata');return;}
   try{
-    await sRest('ayarlar?key=eq.indirim_yuzde',{method:'PATCH',body:JSON.stringify({value:String(yuzde)})});
     const upsert = async (key, val) => {
       const check = await sRest('ayarlar?key=eq.'+key+'&select=key');
       const arr = Array.isArray(check) ? check : [];
       if(arr.length) await sRest('ayarlar?key=eq.'+key,{method:'PATCH',body:JSON.stringify({value:val})});
       else await sRest('ayarlar',{method:'POST',body:JSON.stringify({key,value:val})});
     };
+    await upsert('indirim_yuzde', String(yuzde));
     await upsert('kampanya_baslangic', bas);
     await upsert('kampanya_bitis', bit);
     await upsert('kampanya_hedef', hedef);
@@ -2193,11 +2195,17 @@ async function indirimKaydet(){
 
 async function kampanyaSil(){
   try{
-    await sRest('ayarlar?key=eq.indirim_yuzde',{method:'PATCH',body:JSON.stringify({value:'0'})});
-    await sRest('ayarlar?key=eq.kampanya_baslangic',{method:'PATCH',body:JSON.stringify({value:''})});
-    await sRest('ayarlar?key=eq.kampanya_bitis',{method:'PATCH',body:JSON.stringify({value:''})});
-    await sRest('ayarlar?key=eq.kampanya_hedef',{method:'PATCH',body:JSON.stringify({value:'ikisi'})});
-    await sRest('ayarlar?key=eq.kampanya_secili_hizmetler',{method:'PATCH',body:JSON.stringify({value:''})});
+    const upsert = async (key, val) => {
+      const check = await sRest('ayarlar?key=eq.'+key+'&select=key');
+      const arr = Array.isArray(check) ? check : [];
+      if(arr.length) await sRest('ayarlar?key=eq.'+key,{method:'PATCH',body:JSON.stringify({value:val})});
+      else await sRest('ayarlar',{method:'POST',body:JSON.stringify({key,value:val})});
+    };
+    await upsert('indirim_yuzde','0');
+    await upsert('kampanya_baslangic','');
+    await upsert('kampanya_bitis','');
+    await upsert('kampanya_hedef','ikisi');
+    await upsert('kampanya_secili_hizmetler','');
     document.getElementById('indirim-input').value = '';
     document.getElementById('kampanya-baslangic').value = '';
     document.getElementById('kampanya-bitis').value = '';
@@ -2295,7 +2303,8 @@ function kampanyaDurumGuncelle(yuzde, bas, bit, hedef, seciliHiz){
   if(!el) return;
   if(!yuzde){ el.textContent=''; return; }
   const hedefMetin = hedef==='hizmet'?'Hizmet Al':hedef==='rezervasyon'?'Rezervasyon Yap':'Her İkisi';
-  const hizMetin = seciliHiz ? (' — <span style="color:var(--purple);font-size:.6rem">'+seciliHiz.split('||').length+' hizmet seçili</span>') : '';
+  let hizSayi = 0; try{ hizSayi = seciliHiz ? JSON.parse(seciliHiz).length : 0; }catch(e){ hizSayi = 0; }
+  const hizMetin = hizSayi ? (' — <span style="color:var(--purple);font-size:.6rem">'+hizSayi+' hizmet seçili</span>') : '';
   if(!bas || !bit){
     el.innerHTML='<span style="color:var(--green);font-weight:600">✓ Aktif: </span>Süresiz %'+yuzde+' indirim <span style="color:var(--blue);font-size:.6rem">('+hedefMetin+')</span>'+hizMetin;
     return;
