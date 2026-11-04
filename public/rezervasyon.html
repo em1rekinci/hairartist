@@ -1847,9 +1847,21 @@ async function normalGonder() {
   btn.disabled = true;
   btn.textContent = 'Gönderiliyor…';
 
+  // Kampanya dahil tahmini tutar (aralığın ortası) — admin panelinde indirimli fiyat görünsün
+  let tahminiTutar = 0;
+  (_nSeciliHizmetler || []).forEach(function(h) {
+    var hObj = (window._hizmetListesi || []).find(function(x){ return x.ad === h.ad; });
+    var oMin = hObj ? (hObj.min_fiyat || 0) : (h.minFiyat || 0);
+    var oMax = hObj ? (hObj.max_fiyat || 0) : (h.maxFiyat || 0);
+    var ind = hizmetIndirimHesapla(hObj, tarih, 'n');
+    var mid = (oMin + oMax) / 2;
+    tahminiTutar += Math.round(ind > 0 ? mid * (1 - ind / 100) : mid);
+  });
+
   try {
     const rez = await supabaseInsert('rezervasyonlar', {
       ad, telefon, hizmet, tarih, saat, musteri_notu: not,
+      ...(tahminiTutar > 0 ? { fiyat: tahminiTutar } : {}),
       personel_id: personel,
       durum: 'bekliyor',
       odeme_alindi: false,
@@ -2398,6 +2410,7 @@ async function hizmetleriYukle() {
     window._kampanyaBit   = kampanyaBit;
     window._kampanyaHedef = kampanyaHedef;
     window._seciliHizmetIds = seciliIds;
+    console.log('[kampanya]', { indirimYuzde, kampanyaBas, kampanyaBit, kampanyaHedef, seciliIds, hizmetIdleri: liste.map(h => h.id) });
 
     // Tarih yoksa indirim her zaman aktif; tarih varsa bugünün tarihi kampanya aralığında mı kontrol et
     const bugunStr = yerelBugun();
@@ -2410,7 +2423,7 @@ async function hizmetleriYukle() {
       : '';
 
     // ── Hizmet Al kartı (odeme) ──
-    var hizmetAlAktif = efektifIndirim > 0 && (kampanyaHedef === 'hizmet' || kampanyaHedef === 'ikisi');
+    var hizmetAlAktif = efektifIndirim > 0 && (kampanyaHedef === 'hizmet' || kampanyaHedef === 'ikisi' || kampanyaHedef === 'secili');
     var odeIBadge = document.getElementById('odeme-indirim-badge');
     var odeTBadge = document.getElementById('odeme-tarih-badge');
     if (odeIBadge) {
@@ -2423,7 +2436,7 @@ async function hizmetleriYukle() {
     }
 
     // ── Rezervasyon Yap kartı (normal) ──
-    var rezAktif = efektifIndirim > 0 && (kampanyaHedef === 'rezervasyon' || kampanyaHedef === 'ikisi');
+    var rezAktif = efektifIndirim > 0 && (kampanyaHedef === 'rezervasyon' || kampanyaHedef === 'ikisi' || kampanyaHedef === 'secili');
     var norIBadge = document.getElementById('normal-indirim-badge');
     var norTBadge = document.getElementById('normal-tarih-badge');
     if (norIBadge) {
