@@ -2209,33 +2209,8 @@ document.addEventListener('DOMContentLoaded', function() {
       var ind = kampanyaKontrol(this.value, 'o');
       var liste = window._hizmetListesi || [];
       if (liste.length) hizmetDropdownOlustur('o', liste, ind);
-      var badge = document.getElementById('odeme-indirim-badge');
-      var yuzde = window._indirimYuzde || 0;
-      var hedef = window._kampanyaHedef || 'ikisi';
-      var goster = yuzde > 0 && (hedef === 'hizmet' || hedef === 'ikisi');
-      if (badge) {
-        if (goster && ind > 0) { badge.textContent = '%' + yuzde + ' ' + 'İndirim'; badge.style.display = ''; }
-        else { badge.style.display = 'none'; }
-      }
-      // Seçili hizmet varsa fiyat kutusunu güncelle
-      var secilenHizmet = document.getElementById('o-hizmet').value;
-      var secilenOption = document.querySelector('#o-cs-dropdown .cs-option.secili');
-      if (secilenHizmet && liste.length) {
-        var h = liste.find(function(x){ return x.ad === secilenHizmet; });
-        if (h) {
-          var tumInd = window._indirimYuzde || 0;
-          var orijFiyat = h.max_fiyat || 0;
-          var gercekFiyat = ind > 0 ? Math.round(orijFiyat * (1 - ind / 100)) : orijFiyat;
-          document.getElementById('o-fiyat').value = gercekFiyat;
-          if (ind > 0) {
-            document.getElementById('o-fiyat-indirimli').textContent = gercekFiyat.toLocaleString('tr-TR') + '₺';
-            document.getElementById('o-fiyat-normal').innerHTML = '<s style="color:var(--text3);font-size:.78rem;font-weight:400">' + orijFiyat.toLocaleString('tr-TR') + '₺</s>';
-          } else {
-            document.getElementById('o-fiyat-indirimli').textContent = orijFiyat.toLocaleString('tr-TR') + '₺';
-            document.getElementById('o-fiyat-normal').textContent = '';
-          }
-        }
-      }
+      // Toplam fiyatı tarihe göre yeniden hesapla (çoklu hizmet + seçili hizmet destekli)
+      if (typeof oHizmetGuncelle === 'function') oHizmetGuncelle();
     });
   }
   var nTarih = document.getElementById('n-tarih');
@@ -2244,38 +2219,8 @@ document.addEventListener('DOMContentLoaded', function() {
       var ind = kampanyaKontrol(this.value, 'n');
       var liste = window._hizmetListesi || [];
       if (liste.length) hizmetDropdownOlustur('n', liste, ind);
-      var badge = document.getElementById('normal-indirim-badge');
-      var yuzde = window._indirimYuzde || 0;
-      var hedef = window._kampanyaHedef || 'ikisi';
-      var goster = yuzde > 0 && (hedef === 'rezervasyon' || hedef === 'ikisi');
-      if (badge) {
-        if (goster && ind > 0) { badge.textContent = '%' + yuzde + ' ' + 'İndirim'; badge.style.display = ''; }
-        else { badge.style.display = 'none'; }
-      }
-      // Seçili hizmet varsa fiyat kutusunu güncelle
-      var secilenHizmet = document.getElementById('n-hizmet').value;
-      if (secilenHizmet && liste.length) {
-        var h = liste.find(function(x){ return x.ad === secilenHizmet; });
-        if (h) {
-          var orijMin = h.min_fiyat || 0;
-          var orijMax = h.max_fiyat || 0;
-          var gercekMin = ind > 0 ? Math.round(orijMin * (1 - ind / 100)) : orijMin;
-          var gercekMax = ind > 0 ? Math.round(orijMax * (1 - ind / 100)) : orijMax;
-          var fiyatStr = gercekMin === gercekMax
-            ? gercekMin.toLocaleString('tr-TR') + '₺'
-            : gercekMin.toLocaleString('tr-TR') + ' – ' + gercekMax.toLocaleString('tr-TR') + '₺';
-          if (ind > 0) {
-            var orijStr = orijMin === orijMax
-              ? orijMin.toLocaleString('tr-TR') + '₺'
-              : orijMin.toLocaleString('tr-TR') + ' – ' + orijMax.toLocaleString('tr-TR') + '₺';
-            document.getElementById('fiyat-indirimli').textContent = fiyatStr;
-            document.getElementById('fiyat-normal').innerHTML = '<s style="color:var(--text3);font-size:.78rem;font-weight:400">' + orijStr + '</s>';
-          } else {
-            document.getElementById('fiyat-indirimli').textContent = fiyatStr;
-            document.getElementById('fiyat-normal').textContent = '';
-          }
-        }
-      }
+      // Toplam fiyatı tarihe göre yeniden hesapla (çoklu hizmet + seçili hizmet destekli)
+      if (typeof nHizmetGuncelle === 'function') nHizmetGuncelle();
     });
   }
 });
