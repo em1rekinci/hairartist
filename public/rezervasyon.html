@@ -2512,6 +2512,7 @@ async function hizmetleriYukle() {
     // Her hizmetin id'sini string olarak eşleştirmek için listeyi zenginleştir
     const seciliIdsStr = seciliIds.map(String);
     liste.forEach(h => { h._seciliIndirim = seciliIdsStr.includes(String(h.id)) ? efektifIndirim : 0; });
+    liste.forEach(h => { h._seciliUye = seciliIdsStr.includes(String(h.id)); });
 
     window._hizmetListesi = liste;
     window._efektifIndirim = efektifIndirim;
@@ -2578,13 +2579,19 @@ function hizmetIndirimHesapla(hizObj, secilenTarih, prefix) {
   var seciliIds = window._seciliHizmetIds || [];
   var efektif = window._efektifIndirim || 0;
 
-  // Seçili hizmetler modu: yükleme anında hesaplanan _seciliIndirim alanını kullan
+  // Seçili hizmetler modu: sadece listedeki hizmetler, randevu tarihi kampanya aralığındaysa
   if (seciliIds.length > 0 || hedef === 'secili') {
-    if (!hizObj) return 0;
-    // Hedef prefix'e uygun mu?
+    if (!hizObj || !hizObj._seciliUye) return 0;
     if (prefix === 'n' && hedef === 'hizmet') return 0;
     if (prefix === 'o' && hedef === 'rezervasyon') return 0;
-    return hizObj._seciliIndirim || 0;
+    var yuzde = window._indirimYuzde || 0;
+    if (!yuzde) return 0;
+    var b2 = window._kampanyaBas || '', e2 = window._kampanyaBit || '';
+    var d = new Date();
+    var bugunL = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    var kt = secilenTarih || bugunL;
+    if ((b2 && kt < b2) || (e2 && kt > e2)) return 0;
+    return yuzde;
   }
 
   // Normal mod
