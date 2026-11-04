@@ -2459,6 +2459,8 @@ async function hizmetleriYukle() {
       ? true
       : (bugunStr >= kampanyaBas && bugunStr <= kampanyaBit);
     const efektifIndirim = indirimAktif ? indirimYuzde : 0;
+    // Rozet: kampanya bitene kadar (başlamadan önce de) görünsün
+    const rozetGoster = indirimYuzde > 0 && (!kampanyaBit || bugunStr <= kampanyaBit);
 
     // Tarih badge metni  (ör. "10 Mar – 20 Mar")
     var tarihBadgeTxt = (kampanyaBas && kampanyaBit)
@@ -2466,7 +2468,7 @@ async function hizmetleriYukle() {
       : '';
 
     // ── Hizmet Al kartı (odeme) ──
-    var hizmetAlAktif = efektifIndirim > 0 && (kampanyaHedef === 'hizmet' || kampanyaHedef === 'ikisi' || kampanyaHedef === 'secili');
+    var hizmetAlAktif = rozetGoster && (kampanyaHedef === 'hizmet' || kampanyaHedef === 'ikisi' || kampanyaHedef === 'secili');
     var odeIBadge = document.getElementById('odeme-indirim-badge');
     var odeTBadge = document.getElementById('odeme-tarih-badge');
     if (odeIBadge) {
@@ -2479,7 +2481,7 @@ async function hizmetleriYukle() {
     }
 
     // ── Rezervasyon Yap kartı (normal) ──
-    var rezAktif = efektifIndirim > 0 && (kampanyaHedef === 'rezervasyon' || kampanyaHedef === 'ikisi' || kampanyaHedef === 'secili');
+    var rezAktif = rozetGoster && (kampanyaHedef === 'rezervasyon' || kampanyaHedef === 'ikisi' || kampanyaHedef === 'secili');
     var norIBadge = document.getElementById('normal-indirim-badge');
     var norTBadge = document.getElementById('normal-tarih-badge');
     if (norIBadge) {
@@ -2511,7 +2513,7 @@ async function hizmetleriYukle() {
 
     // Her hizmetin id'sini string olarak eşleştirmek için listeyi zenginleştir
     const seciliIdsStr = seciliIds.map(String);
-    liste.forEach(h => { h._seciliIndirim = seciliIdsStr.includes(String(h.id)) ? efektifIndirim : 0; });
+    liste.forEach(h => { h._seciliIndirim = (rozetGoster && seciliIdsStr.includes(String(h.id))) ? indirimYuzde : 0; });
     liste.forEach(h => { h._seciliUye = seciliIdsStr.includes(String(h.id)); });
 
     window._hizmetListesi = liste;
@@ -2526,7 +2528,7 @@ async function hizmetleriYukle() {
 // Rozetler: hizmetler listesinden bağımsız, sadece ayarlar tablosuna bakar
 async function kampanyaRozetleriYukle() {
   try {
-    const r = await fetch(`${SUPABASE_URL}/rest/v1/ayarlar?key=in.(indirim_yuzde,kampanya_baslangic,kampanya_bitis,kampanya_hedef)&select=key,value`, {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/ayarlar?key=in.(indirim_yuzde,kampanya_baslangic,kampanya_bitis,kampanya_hedef,kampanya_secili_hizmetler)&select=key,value`, {
       headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
     });
     const dbg = /[?&]debug=1/.test(location.search);
@@ -2540,7 +2542,7 @@ async function kampanyaRozetleriYukle() {
     const hedef = g('kampanya_hedef') || 'ikisi';
     const d = new Date();
     const bugun = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-    const aktif = yuzde > 0 && (!bas || bugun >= bas) && (!bit || bugun <= bit);
+    const aktif = yuzde > 0 && (!bit || bugun <= bit);
     const tarihTxt = (bas && bit) ? formatTarihKisa(bas) + ' – ' + formatTarihKisa(bit) : '';
     const set = (badgeId, tarihId, goster) => {
       const b = document.getElementById(badgeId), t = document.getElementById(tarihId);
