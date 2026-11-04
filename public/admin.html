@@ -1465,6 +1465,7 @@ async function verileriYukle(showToast=true){
     const bitAyar = (ayarData||[]).find(a=>a.key==='kampanya_bitis');
     const hedefAyar = (ayarData||[]).find(a=>a.key==='kampanya_hedef');
     const seciliHizAyar = (ayarData||[]).find(a=>a.key==='kampanya_secili_hizmetler');
+    const seciliYuzAyar = (ayarData||[]).find(a=>a.key==='kampanya_secili_yuzdeler');
     const bas = basAyar ? basAyar.value : '';
     const bit = bitAyar ? bitAyar.value : '';
     const hedef = hedefAyar ? hedefAyar.value : 'ikisi';
@@ -1474,7 +1475,7 @@ async function verileriYukle(showToast=true){
     // Hedef radio'yu ayarla
     const khEl = document.getElementById('kh-'+hedef);
     if(khEl){ khEl.checked = true; kampanyaHedefDegisti(); }
-    seciliHizmetleriYukle(seciliHiz);
+    seciliHizmetleriYukle(seciliHiz, seciliYuzAyar ? seciliYuzAyar.value : '');
     kampanyaDurumGuncelle(indirimYuzde, bas, bit, hedef, seciliHiz);
     const inp = document.getElementById('indirim-input');
     if(inp) inp.value = indirimYuzde || '';
@@ -1513,28 +1514,7 @@ async function verileriYukle(showToast=true){
 function verileriRender(){statsGuncelle();tabloRender(AKT_FILTRE);bugRandevu();sonRez();hDagitim();mustRender();aktRender();nbGuncelle();pStatRender();tkRender();ciroRender();}
 
 // ─── STATS ───
-// Rezervasyon için tahmini tutar: hizmet adlarını (virgüllü olabilir) hizmetler listesinden bulur,
-// kampanya rezervasyon tarihinde ve forma (normal / ödemeli) uygunsa indirimi uygular.
-function tahminiFiyat(r){
-  const out={tutar:0,orij:0,yuzde:0};
-  if(!r||!r.hizmet) return out;
-  const k=window._kamp||{yuzde:0};
-  const prefix=(r.tip==='normal')?'n':'o';
-  const tarihOk=!!k.yuzde && (!k.bas||r.tarih>=k.bas) && (!k.bit||r.tarih<=k.bit)
-    && !(prefix==='n'&&k.hedef==='hizmet') && !(prefix==='o'&&k.hedef==='rezervasyon');
-  r.hizmet.split(',').map(s=>s.trim()).filter(Boolean).forEach(ad=>{
-    const f=FYT[ad]; if(!f) return;
-    const hObj=hizmetler.find(x=>x.ad===ad);
-    const mid=(f.min+f.max)/2;
-    const secOk=!k.ids||!k.ids.length||(hObj&&k.ids.includes(String(hObj.id)));
-    const ind=(tarihOk&&secOk)?k.yuzde:0;
-    out.orij+=Math.round(mid);
-    out.tutar+=Math.round(ind>0?mid*(1-ind/100):mid);
-    if(ind>out.yuzde) out.yuzde=ind;
-  });
-  return out;
-}
-function fHesapla(r){if(r.tip==='shop'){return r.fiyat||0;}if(r.odemeAlindi&&r.durum==='onaylandi'){if(r.fiyat)return r.fiyat;return tahminiFiyat(r).tutar;}return 0;}
+function fHesapla(r){if(r.tip==='shop'){return r.fiyat||0;}if(r.odemeAlindi&&r.durum==='onaylandi'){if(r.fiyat)return r.fiyat;const h=FYT[r.hizmet];return h?Math.round((h.min+h.max)/2):0;}return 0;}
 function statsGuncelle(){
   const t=TRZ.length,bek=TRZ.filter(r=>r.durum==='bekliyor').length;
   const onay=TRZ.filter(r=>r.durum==='onaylandi'&&r.odemeAlindi&&r.tip!=='shop');
@@ -1569,7 +1549,7 @@ function bugRandevu(){
   document.getElementById('bugsayi').textContent=l.length+' randevu';
   const e=document.getElementById('bugliste');
   if(!l.length){e.innerHTML='<div class="bos">Bugün onaylı randevu yok.</div>';return;}
-  e.innerHTML=l.map(r=>{const _tf3=tahminiFiyat(r);const f=(r.fiyat||_tf3.tutar)?(r.fiyat||_tf3.tutar).toLocaleString('tr-TR')+'₺':'—';const[sa,dk]=((r.saat||'--:--').split(':'));const p=personel.find(x=>x.id===r.personelId)||personel.find(x=>x.ad===r.personelId);
+  e.innerHTML=l.map(r=>{const h=FYT[r.hizmet];const f=h?Math.round((h.min+h.max)/2).toLocaleString('tr-TR')+'₺':'—';const[sa,dk]=((r.saat||'--:--').split(':'));const p=personel.find(x=>x.id===r.personelId)||personel.find(x=>x.ad===r.personelId);
   return`<div class="bi"><div class="bsaat">${sa}<span>${dk||'00'}</span></div><div class="bciz"></div><div class="bblg"><div class="bmus">${r.ad}</div><div class="bhiz">${r.hizmet}${p?' · '+p.ad:''}</div></div><div class="bfyt">${f}</div></div>`;}).join('');
 }
 function sonRez(){
@@ -1651,7 +1631,7 @@ function tabloRender(f){
   if(!l.length){e.innerHTML=`<tr><td colspan="8" class="bos">Rezervasyon bulunamadı.</td></tr>`;return;}
   e.innerHTML=l.map(r=>{
     const h=FYT[r.hizmet];
-    const fiyatSay=r.fiyat||tahminiFiyat(r).tutar;
+    const fiyatSay=r.fiyat||(h?Math.round((h.min+h.max)/2):0);
     const fiyat=fiyatSay?fiyatSay.toLocaleString('tr-TR')+'₺':'—';
     const p=personel.find(x=>x.id===r.personelId)||personel.find(x=>x.ad===r.personelId);
     let aks;
@@ -1845,7 +1825,7 @@ function detay(id){
   const r=TRZ.find(x=>x.id===id);
   if(!r)return;
   const h=FYT[r.hizmet];
-  const _tf=tahminiFiyat(r);const fiyat=r.odemeAlindi&&r.fiyat?r.fiyat.toLocaleString('tr-TR')+'₺':(r.fiyat?r.fiyat.toLocaleString('tr-TR')+'₺ (tahmini)':(_tf.tutar?_tf.tutar.toLocaleString('tr-TR')+'₺ (tahmini'+(_tf.yuzde?', %'+_tf.yuzde+' indirimli':'')+')':'—'));
+  const fiyat=r.odemeAlindi&&r.fiyat?r.fiyat.toLocaleString('tr-TR')+'₺':(h?Math.round((h.min+h.max)/2).toLocaleString('tr-TR')+'₺ (tahmini)':'—');
   const olusturma=new Date(r.tarihOlustur).toLocaleString('tr-TR',{day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
    const p=personel.find(x=>x.id===r.personelId)||personel.find(x=>x.ad===r.personelId)||personel.find(x=>x.ad===r.personelId);
    const pOptions=personel.map(px=>`<option value="${px.id}"${(px.id===r.personelId||px.ad===r.personelId)?' selected':''}>${px.ad} — ${px.rol||''}</option>`).join('');
@@ -1962,7 +1942,7 @@ function mustDetay(telEnc){
   document.getElementById('must-mlist').innerHTML = sorted.map(r => {
     const p = personel.find(x=>x.id===r.personelId)||personel.find(x=>x.ad===r.personelId);
     const h = FYT[r.hizmet];
-    const _tf2 = tahminiFiyat(r); const fiyatStr = r.odemeAlindi && r.fiyat ? r.fiyat.toLocaleString('tr-TR')+'₺' : (r.fiyat ? r.fiyat.toLocaleString('tr-TR')+'₺' : (_tf2.tutar ? _tf2.tutar.toLocaleString('tr-TR')+'₺' : '—'));
+    const fiyatStr = r.odemeAlindi && r.fiyat ? r.fiyat.toLocaleString('tr-TR')+'₺' : (h ? Math.round((h.min+h.max)/2).toLocaleString('tr-TR')+'₺' : '—');
     const durumBadge = bH(r.durum);
     const odemeBadge = r.odemeAlindi ? '<span class="badge bo" style="font-size:.42rem;margin-left:5px">Ödendi</span>' : '';
     return `<div style="padding:13px 18px;border-bottom:1px solid var(--line);display:flex;align-items:flex-start;gap:12px">
@@ -2186,7 +2166,9 @@ function hizRender(){
   }).join('');
 }
 async function indirimKaydet(){
-  const yuzde = parseInt(document.getElementById('indirim-input').value)||0;
+  let yuzde = parseInt(document.getElementById('indirim-input').value)||0;
+  const seciliYuz = seciliYuzdeleriAl();
+  if(!yuzde && seciliYuz){ try{ yuzde = Math.max(...Object.values(JSON.parse(seciliYuz))); document.getElementById('indirim-input').value = yuzde; }catch(e){} }
   if(yuzde<0||yuzde>100){toast('Geçerli bir oran girin (0-100).','hata');return;}
   const bas = document.getElementById('kampanya-baslangic').value;
   const bit = document.getElementById('kampanya-bitis').value;
@@ -2194,20 +2176,19 @@ async function indirimKaydet(){
   const hedefEl = document.querySelector('input[name="kampanya-hedef"]:checked');
   const hedef = hedefEl ? hedefEl.value : 'ikisi';
   const seciliHiz = seciliHizmetleriAl();
-  const chkS = document.getElementById('secili-hiz-chk');
-  if(chkS && chkS.checked && seciliHiz === '[]'){toast('En az bir hizmet seçin veya "Seçili hizmetler" kutusunu kaldırın.','hata');return;}
   try{
+    await sRest('ayarlar?key=eq.indirim_yuzde',{method:'PATCH',body:JSON.stringify({value:String(yuzde)})});
     const upsert = async (key, val) => {
       const check = await sRest('ayarlar?key=eq.'+key+'&select=key');
       const arr = Array.isArray(check) ? check : [];
       if(arr.length) await sRest('ayarlar?key=eq.'+key,{method:'PATCH',body:JSON.stringify({value:val})});
       else await sRest('ayarlar',{method:'POST',body:JSON.stringify({key,value:val})});
     };
-    await upsert('indirim_yuzde', String(yuzde));
     await upsert('kampanya_baslangic', bas);
     await upsert('kampanya_bitis', bit);
     await upsert('kampanya_hedef', hedef);
     await upsert('kampanya_secili_hizmetler', seciliHiz);
+    await upsert('kampanya_secili_yuzdeler', seciliYuz);
     indirimOnizlemeGuncelle(yuzde);
     kampanyaDurumGuncelle(yuzde, bas, bit, hedef, seciliHiz);
     toast(yuzde===0?'İndirim kaldırıldı.':'%'+yuzde+' kampanya kaydedildi.','ok');
@@ -2216,17 +2197,13 @@ async function indirimKaydet(){
 
 async function kampanyaSil(){
   try{
-    const upsert = async (key, val) => {
-      const check = await sRest('ayarlar?key=eq.'+key+'&select=key');
-      const arr = Array.isArray(check) ? check : [];
-      if(arr.length) await sRest('ayarlar?key=eq.'+key,{method:'PATCH',body:JSON.stringify({value:val})});
-      else await sRest('ayarlar',{method:'POST',body:JSON.stringify({key,value:val})});
-    };
-    await upsert('indirim_yuzde','0');
-    await upsert('kampanya_baslangic','');
-    await upsert('kampanya_bitis','');
-    await upsert('kampanya_hedef','ikisi');
-    await upsert('kampanya_secili_hizmetler','');
+    await sRest('ayarlar?key=eq.indirim_yuzde',{method:'PATCH',body:JSON.stringify({value:'0'})});
+    await sRest('ayarlar?key=eq.kampanya_baslangic',{method:'PATCH',body:JSON.stringify({value:''})});
+    await sRest('ayarlar?key=eq.kampanya_bitis',{method:'PATCH',body:JSON.stringify({value:''})});
+    await sRest('ayarlar?key=eq.kampanya_hedef',{method:'PATCH',body:JSON.stringify({value:'ikisi'})});
+    await sRest('ayarlar?key=eq.kampanya_secili_hizmetler',{method:'PATCH',body:JSON.stringify({value:''})});
+    await sRest('ayarlar?key=eq.kampanya_secili_yuzdeler',{method:'PATCH',body:JSON.stringify({value:''})});
+    const _sl = document.getElementById('secili-hiz-liste'); if(_sl){ _sl.dataset.yuzde=''; _sl.dataset.secili=''; }
     document.getElementById('indirim-input').value = '';
     document.getElementById('kampanya-baslangic').value = '';
     document.getElementById('kampanya-bitis').value = '';
@@ -2259,12 +2236,15 @@ function seciliHizListeRender(){
   if(!liste) return;
   const seciliStr = liste.dataset.secili || '';
   const secili = seciliStr ? seciliStr.split('||') : [];
+  let yuzdeMap = {};
+  try{ yuzdeMap = liste.dataset.yuzde ? JSON.parse(liste.dataset.yuzde) : {}; }catch(e){ yuzdeMap = {}; }
   liste.innerHTML = hizmetler.map(h=>{
     const isChecked = secili.includes(String(h.id));
     return `<label style="display:flex;align-items:center;gap:8px;padding:7px 12px;cursor:pointer;border-bottom:1px solid var(--line);transition:background .1s" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background=''">
       <input type="checkbox" value="${h.id}" ${isChecked?'checked':''} style="accent-color:var(--black);width:13px;height:13px" onchange="seciliHizGuncelle()">
       <span style="font-size:.72rem;color:var(--text);flex:1">${h.ad}</span>
       <span style="font-size:.62rem;color:var(--text3)">${h.min!==h.max?h.min+'–'+h.max+'₺':h.min+'₺'}</span>
+      <input type="number" min="1" max="100" data-pct-id="${h.id}" value="${yuzdeMap[String(h.id)]||''}" placeholder="%" title="Bu hizmete özel indirim % (boşsa genel %)" onclick="event.stopPropagation()" oninput="seciliHizGuncelle()" style="width:46px;padding:3px 4px;font-size:.68rem;text-align:center;border:1px solid var(--line2);border-radius:3px;background:var(--bg2);color:var(--text)">
     </label>`;
   }).join('');
 }
@@ -2273,6 +2253,21 @@ function seciliHizGuncelle(){
   if(!liste) return;
   const secili = [...liste.querySelectorAll('input[type=checkbox]:checked')].map(c=>c.value);
   liste.dataset.secili = secili.join('||');
+  const map = {};
+  liste.querySelectorAll('input[type=number][data-pct-id]').forEach(inp=>{
+    const v = parseInt(inp.value);
+    if(v>0 && v<=100 && secili.includes(inp.dataset.pctId)) map[inp.dataset.pctId] = v;
+  });
+  liste.dataset.yuzde = JSON.stringify(map);
+}
+function seciliYuzdeleriAl(){
+  const chk = document.getElementById('secili-hiz-chk');
+  if(!chk || !chk.checked) return '';
+  const liste = document.getElementById('secili-hiz-liste');
+  if(!liste) return '';
+  seciliHizGuncelle();
+  const m = liste.dataset.yuzde || '{}';
+  return m==='{}' ? '' : m;
 }
 function seciliHizTumunu(sec){
   const liste = document.getElementById('secili-hiz-liste');
@@ -2288,9 +2283,11 @@ function seciliHizmetleriAl(){
   const ids = (liste.dataset.secili||'') ? liste.dataset.secili.split('||') : [];
   return JSON.stringify(ids);
 }
-function seciliHizmetleriYukle(val){
+function seciliHizmetleriYukle(val, yuzdeVal){
   const chk = document.getElementById('secili-hiz-chk');
   if(!chk) return;
+  const _l = document.getElementById('secili-hiz-liste');
+  if(_l) _l.dataset.yuzde = yuzdeVal || '';
   let ids = [];
   try{ ids = val ? JSON.parse(val) : []; }catch(e){ ids=[]; }
   if(ids.length){
@@ -2320,14 +2317,11 @@ function kampanyaHedefDegisti(){
 }
 
 function kampanyaDurumGuncelle(yuzde, bas, bit, hedef, seciliHiz){
-  let _ids=[]; try{ _ids = seciliHiz ? JSON.parse(seciliHiz) : []; }catch(e){ _ids=[]; }
-  window._kamp = { yuzde: yuzde||0, bas: bas||'', bit: bit||'', hedef: hedef||'ikisi', ids: _ids.map(String) };
   const el = document.getElementById('kampanya-durum');
   if(!el) return;
   if(!yuzde){ el.textContent=''; return; }
   const hedefMetin = hedef==='hizmet'?'Hizmet Al':hedef==='rezervasyon'?'Rezervasyon Yap':'Her İkisi';
-  let hizSayi = 0; try{ hizSayi = seciliHiz ? JSON.parse(seciliHiz).length : 0; }catch(e){ hizSayi = 0; }
-  const hizMetin = hizSayi ? (' — <span style="color:var(--purple);font-size:.6rem">'+hizSayi+' hizmet seçili</span>') : '';
+  const hizMetin = seciliHiz ? (' — <span style="color:var(--purple);font-size:.6rem">'+(function(){try{const a=JSON.parse(seciliHiz);return Array.isArray(a)?a.length:seciliHiz.split('||').length;}catch(e){return seciliHiz.split('||').length;}})()+' hizmet seçili</span>') : '';
   if(!bas || !bit){
     el.innerHTML='<span style="color:var(--green);font-weight:600">✓ Aktif: </span>Süresiz %'+yuzde+' indirim <span style="color:var(--blue);font-size:.6rem">('+hedefMetin+')</span>'+hizMetin;
     return;

@@ -2375,7 +2375,7 @@ async function hizmetleriYukle() {
       fetch(`${SUPABASE_URL}/rest/v1/hizmetler?select=*&order=sira.asc,created_at.asc`, {
         headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
       }),
-      fetch(`${SUPABASE_URL}/rest/v1/ayarlar?key=in.(indirim_yuzde,kampanya_baslangic,kampanya_bitis,kampanya_hedef,kampanya_secili_hizmetler)&select=key,value`, {
+      fetch(`${SUPABASE_URL}/rest/v1/ayarlar?key=in.(indirim_yuzde,kampanya_baslangic,kampanya_bitis,kampanya_hedef,kampanya_secili_hizmetler,kampanya_secili_yuzdeler)&select=key,value`, {
         headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
       })
     ]);
@@ -2383,7 +2383,7 @@ async function hizmetleriYukle() {
     const liste = await hizRes.json();
     if (!liste.length) return;
 
-    let indirimYuzde = 0, kampanyaBas = '', kampanyaBit = '', kampanyaHedef = 'ikisi', seciliIds = [];
+    let indirimYuzde = 0, kampanyaBas = '', kampanyaBit = '', kampanyaHedef = 'ikisi', seciliIds = [], yuzdeMap = {};
     if (ayarRes.ok) {
       const ayarlar = await ayarRes.json();
       indirimYuzde = parseInt((ayarlar.find(a => a.key === 'indirim_yuzde') || {}).value) || 0;
@@ -2391,7 +2391,9 @@ async function hizmetleriYukle() {
       kampanyaBit  = (ayarlar.find(a => a.key === 'kampanya_bitis')     || {}).value || '';
       kampanyaHedef= (ayarlar.find(a => a.key === 'kampanya_hedef')     || {}).value || 'ikisi';
       try{ seciliIds = JSON.parse((ayarlar.find(a => a.key === 'kampanya_secili_hizmetler') || {}).value || '[]'); }catch(e){ seciliIds=[]; }
+      try{ yuzdeMap = JSON.parse((ayarlar.find(a => a.key === 'kampanya_secili_yuzdeler') || {}).value || '{}') || {}; }catch(e){ yuzdeMap={}; }
     }
+    window._seciliYuzdeler = yuzdeMap;
     window._indirimYuzde  = indirimYuzde;
     window._kampanyaBas   = kampanyaBas;
     window._kampanyaBit   = kampanyaBit;
@@ -2417,7 +2419,7 @@ async function hizmetleriYukle() {
     var odeIBadge = document.getElementById('odeme-indirim-badge');
     var odeTBadge = document.getElementById('odeme-tarih-badge');
     if (odeIBadge) {
-      if (hizmetAlAktif) { odeIBadge.textContent = '%' + indirimYuzde + ' ' + 'İndirim'; odeIBadge.style.display = ''; }
+      if (hizmetAlAktif) { odeIBadge.textContent = rozetYuzdeMetni(indirimYuzde, seciliIds, yuzdeMap); odeIBadge.style.display = ''; }
       else { odeIBadge.style.display = 'none'; }
     }
     if (odeTBadge) {
@@ -2430,7 +2432,7 @@ async function hizmetleriYukle() {
     var norIBadge = document.getElementById('normal-indirim-badge');
     var norTBadge = document.getElementById('normal-tarih-badge');
     if (norIBadge) {
-      if (rezAktif) { norIBadge.textContent = '%' + indirimYuzde + ' ' + 'İndirim'; norIBadge.style.display = ''; }
+      if (rezAktif) { norIBadge.textContent = rozetYuzdeMetni(indirimYuzde, seciliIds, yuzdeMap); norIBadge.style.display = ''; }
       else { norIBadge.style.display = 'none'; }
     }
     if (norTBadge) {
@@ -2458,7 +2460,7 @@ async function hizmetleriYukle() {
 
     // Her hizmetin id'sini string olarak eşleştirmek için listeyi zenginleştir
     const seciliIdsStr = seciliIds.map(String);
-    liste.forEach(h => { h._seciliIndirim = (rozetGoster && seciliIdsStr.includes(String(h.id))) ? indirimYuzde : 0; });
+    liste.forEach(h => { h._seciliPct = parseInt(yuzdeMap[String(h.id)]) || indirimYuzde; h._seciliIndirim = (rozetGoster && seciliIdsStr.includes(String(h.id))) ? h._seciliPct : 0; });
     liste.forEach(h => { h._seciliUye = seciliIdsStr.includes(String(h.id)); });
 
     window._hizmetListesi = liste;
@@ -2473,7 +2475,7 @@ async function hizmetleriYukle() {
 // Rozetler: hizmetler listesinden bağımsız, sadece ayarlar tablosuna bakar
 async function kampanyaRozetleriYukle() {
   try {
-    const r = await fetch(`${SUPABASE_URL}/rest/v1/ayarlar?key=in.(indirim_yuzde,kampanya_baslangic,kampanya_bitis,kampanya_hedef,kampanya_secili_hizmetler)&select=key,value`, {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/ayarlar?key=in.(indirim_yuzde,kampanya_baslangic,kampanya_bitis,kampanya_hedef,kampanya_secili_hizmetler,kampanya_secili_yuzdeler)&select=key,value`, {
       headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
     });
     const dbg = /[?&]debug=1/.test(location.search);
@@ -2485,13 +2487,16 @@ async function kampanyaRozetleriYukle() {
     const yuzde = parseInt(g('indirim_yuzde')) || 0;
     const bas = g('kampanya_baslangic'), bit = g('kampanya_bitis');
     const hedef = g('kampanya_hedef') || 'ikisi';
+    let sIds = [], sMap = {};
+    try { sIds = JSON.parse(g('kampanya_secili_hizmetler') || '[]') || []; } catch(e) {}
+    try { sMap = JSON.parse(g('kampanya_secili_yuzdeler') || '{}') || {}; } catch(e) {}
     const d = new Date();
     const bugun = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
     const aktif = yuzde > 0 && (!bit || bugun <= bit);
     const tarihTxt = (bas && bit) ? formatTarihKisa(bas) + ' – ' + formatTarihKisa(bit) : '';
     const set = (badgeId, tarihId, goster) => {
       const b = document.getElementById(badgeId), t = document.getElementById(tarihId);
-      if (b) { b.textContent = '%' + yuzde + ' İndirim'; b.style.display = goster ? '' : 'none'; }
+      if (b) { b.textContent = rozetYuzdeMetni(yuzde, sIds, sMap); b.style.display = goster ? '' : 'none'; }
       if (t) { t.textContent = tarihTxt; t.style.display = (goster && tarihTxt) ? '' : 'none'; }
     };
     set('odeme-indirim-badge', 'odeme-tarih-badge', aktif && ['hizmet','ikisi','secili'].includes(hedef));
@@ -2499,6 +2504,15 @@ async function kampanyaRozetleriYukle() {
   } catch(e) { console.warn('Rozet yüklenemedi:', e); }
 }
 kampanyaRozetleriYukle();
+
+// Rozet yüzde metni: farklı yüzdeler varsa "%20–%40 İndirim"
+function rozetYuzdeMetni(genel, ids, map) {
+  var vals = [];
+  (ids || []).forEach(function(id){ vals.push(parseInt((map || {})[String(id)]) || genel); });
+  if (!vals.length) vals = [genel];
+  var mn = Math.min.apply(null, vals), mx = Math.max.apply(null, vals);
+  return (mn === mx ? '%' + mx : '%' + mn + '–%' + mx) + ' İndirim';
+}
 
 function formatTarihKisa(tarihStr) {
   if (!tarihStr) return '';
@@ -2534,7 +2548,7 @@ function hizmetIndirimHesapla(hizObj, secilenTarih, prefix) {
     if (!hizObj || !hizObj._seciliUye) return 0;
     if (prefix === 'n' && hedef === 'hizmet') return 0;
     if (prefix === 'o' && hedef === 'rezervasyon') return 0;
-    var yuzde = window._indirimYuzde || 0;
+    var yuzde = hizObj._seciliPct || window._indirimYuzde || 0;
     if (!yuzde) return 0;
     var b2 = window._kampanyaBas || '', e2 = window._kampanyaBit || '';
     var d = new Date();
